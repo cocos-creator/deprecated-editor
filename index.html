@@ -1,0 +1,54 @@
+<html>
+    <head>
+        <title>Editor</title>
+        <link rel="shortcut icon" href="favicon.ico">
+        <link rel="stylesheet" href="ext/fontawesome/css/font-awesome.css">
+        <link rel="stylesheet" href="ext/fire-editor-ui/editor-ui.css">
+
+        <script type="text/javascript" src="ext/platform/platform.js" shadow></script>
+        <script type="text/javascript" src="ext/fire-core/core.min.js"></script>
+        <script type="text/javascript" src="ext/mousetrap/mousetrap.min.js"></script>
+        <script type="text/javascript" src="3rd/bluebird.js"></script>
+        <script type="text/javascript" src="3rd/require.min.nw.js" data-main="bin/requireIndex"></script>
+
+        <script type="text/javascript" src="ext/web-animations-js/web-animations.js"></script>
+
+        <link rel="import" href="ext/polymer/polymer.html">
+        <link rel="import" href="ext/fire-editor-ui/editor-ui.html">
+        <link rel="import" href="bin/app.html">
+
+        <style>
+            body {
+                margin: 0px;
+            }
+            * {
+                font-family: Helvetica,Arial,sans-serif;
+                box-sizing: border-box;
+
+                cursor: default;
+                user-select: none;
+                -webkit-user-select: none;
+            }
+            *:focus {
+                outline: 0;
+            }
+
+            body /deep/ * {
+                box-sizing: border-box;
+
+                cursor: default;
+                user-select: none;
+                -webkit-user-select: none;
+            }
+
+            body /deep/ *:focus {
+                outline: 0;
+            }
+
+        </style>
+    </head>
+
+    <body>
+        <h1>Hello World</h1>
+    </body>
+</html>
