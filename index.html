@@ -5,21 +5,25 @@
         <link rel="stylesheet" href="ext/fontawesome/css/font-awesome.css">
         <link rel="stylesheet" href="ext/fire-editor-ui/editor-ui.css">
 
-        <script type="text/javascript" src="ext/platform/platform.js" shadow></script>
+        <script type="text/javascript" src="ext/platform/platform.js"></script>
         <script type="text/javascript" src="ext/fire-core/core.min.js"></script>
         <script type="text/javascript" src="ext/mousetrap/mousetrap.min.js"></script>
-        <script type="text/javascript" src="3rd/bluebird.js"></script>
-        <script type="text/javascript" src="3rd/require.min.nw.js" data-main="bin/requireIndex"></script>
+        <!-- <script type="text/javascript" src="ext/bluebird.js"></script>                                    -->
+        <!-- <script type="text/javascript" src="ext/require.min.nw.js" data-main="bin/requireIndex"></script> -->
 
         <script type="text/javascript" src="ext/web-animations-js/web-animations.js"></script>
 
         <link rel="import" href="ext/polymer/polymer.html">
         <link rel="import" href="ext/fire-editor-ui/editor-ui.html">
-        <link rel="import" href="bin/app.html">
+        <!-- <link rel="import" href="bin/app.html"> -->
 
         <style>
             body {
                 margin: 0px;
+                color: white;
+                background-color: #333;
+                border: 10px solid black;
+                padding: 5px;
             }
             * {
                 font-family: Helvetica,Arial,sans-serif;
@@ -45,10 +49,100 @@
                 outline: 0;
             }
 
+            span.space {
+                height: 5px;
+                width: 5px;
+                display: block;
+                background-color: yellow;
+            }
+
+            fire-ui-panel {
+                border: 4px solid red;
+                box-sizing: border-box;
+                min-width: 240px;
+                min-height: 400px;
+            }
+            fire-ui-tabbar {
+                border: 4px solid green;
+                box-sizing: border-box;
+            }
+            #body {
+                border: 4px dashed white;
+                box-sizing: border-box;
+            }
+
+            // layout[flex-row] {
+            //     border: 2px solid red; 
+            // }
+            // layout[flex-col] {
+            //     border: 2px solid green; 
+            // }
+
         </style>
     </head>
 
-    <body>
-        <h1>Hello World</h1>
+    <body flex-col flex-stretch>
+        <template id="my-template" is="auto-binding">
+            <h2 style="text-align: center; color: #ccc;">Fireball-x Editor</h2>
+
+            <layout flex-row flex-1 flex-stretch>
+                <fire-ui-panel flex-col flex-stretch id="project">
+                    <fire-ui-tabbar>
+                        <fire-ui-tab>Project</fire-ui-tab>
+                    </fire-ui-tabbar>
+                    <div flex-1 id="body">
+                    </div>
+                </fire-ui-panel>
+
+                <div flex-col>
+                    <span flex-1 class="space"></span>
+                </div>
+
+                <layout flex-col flex-stretch>
+                    <fire-ui-panel flex-col flex-stretch id="hirarchy">
+                        <fire-ui-tabbar>
+                            <fire-ui-tab>Hirarchy</fire-ui-tab>
+                        </fire-ui-tabbar>
+                        <div flex-1 id="body">
+                        </div>
+                    </fire-ui-panel>
+
+                    <div flex-row>
+                        <span flex-1 class="space"></span>
+                    </div>
+
+                    <fire-ui-panel flex-col flex-1 flex-stretch id="insepctor">
+                        <fire-ui-tabbar>
+                            <fire-ui-tab>Inspector</fire-ui-tab>
+                        </fire-ui-tabbar>
+                        <div flex-1 id="body">
+                        </div>
+                    </fire-ui-panel>
+                </layout>
+
+                <div flex-col>
+                    <span flex-1 class="space"></span>
+                </div>
+
+                <fire-ui-panel flex-col flex-1 flex-stretch id="scene">
+                    <fire-ui-tabbar>
+                        <fire-ui-tab>Scene</fire-ui-tab>
+                    </fire-ui-tabbar>
+                    <div flex-1 id="body">
+                    </div>
+                </fire-ui-panel>
+            </layout>
+        </template>
+
+        <script>
+            model = {
+            };
+            var tmpl = document.querySelector('#my-template');
+            for ( var m in model ) {
+                if ( model.hasOwnProperty(m) ) {
+                    tmpl[m] = model[m];
+                }
+            }
+        </script>
     </body>
 </html>

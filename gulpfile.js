@@ -1,14 +1,16 @@
-var gulp = require('gulp');
+﻿var path = require('path');
+var Q = require('q');
+var es = require('event-stream');
+var stylish = require('jshint-stylish');
 
+var gulp = require('gulp');
 var gutil = require('gulp-util');
 var clean = require('gulp-clean');
 var jshint = require('gulp-jshint');
-var stylish = require('jshint-stylish');
 var uglify = require('gulp-uglify');
 var stylus = require('gulp-stylus');
+var rename = require('gulp-rename');
 var vulcanize = require('gulp-vulcanize');
-var Q = require('q');
-var es = require('event-stream');
 
 var paths = {
     ext_core: [ 
@@ -19,27 +21,30 @@ var paths = {
         '../editor-ui/bin/editor-ui.html',
         '../editor-ui/bin/img/**/*.png',
     ],
-    img: 'src/img/**/*',
-    css: 'src/**/*.styl',
-    html: 'src/**/*.html',
-    js: [
-        'src/**/*.js',
-    ],
+    img: 'src/app/img/**/*',
+    css:  'src/app/**/*.styl',
+    html: 'src/app/**/*.html',
+    js:   'src/**/*.js',
+    third_party: '3rd/**/*',
+    minify_ext: [],
 };
 
 // clean
 gulp.task('clean', function() {
     return gulp.src('bin/', {read: false})
-    .pipe(clean())
-    ;
+    .pipe(clean());
 });
 
+/////////////////////////////////////////////////////////////////////////////
 // copy
+/////////////////////////////////////////////////////////////////////////////
+
 gulp.task('cp-core', function() {
     return gulp.src(paths.ext_core)
     .pipe(gulp.dest('ext/fire-core'))
     ;
 });
+
 gulp.task('cp-editor-ui', function() {
     var deferred = Q.defer();
 
@@ -53,31 +58,65 @@ gulp.task('cp-editor-ui', function() {
 
     return deferred.promise;
 });
+
 gulp.task('cp-img', function() {
-    return gulp.src(paths.img)
-    .pipe(gulp.dest('bin/img'))
-    ;
-});
-gulp.task('cp-html', function() {
-    return gulp.src(paths.html, {base: 'src'} )
+    return gulp.src(paths.img, {base: 'src/'})
     .pipe(gulp.dest('bin'))
     ;
 });
 
+gulp.task('cp-html', function() {
+    return gulp.src(paths.html, {base: 'src/'})
+    .pipe(gulp.dest('bin'))
+    ;
+});
+
+gulp.task('cp-3rd', function() {
+    return gulp.src(paths.third_party, {base: '3rd/'})
+    .pipe(gulp.dest('ext'))
+    ;
+});
+
+/////////////////////////////////////////////////////////////////////////////
+// build
+/////////////////////////////////////////////////////////////////////////////
+
 // css
 gulp.task('css', function() {
-    return gulp.src(paths.css)
+    return gulp.src(paths.css, {base: 'src/'})
     .pipe(stylus({
         compress: true,
         include: 'src'
     }))
-    .pipe(gulp.dest('bin'))
-    ;
+    .pipe(gulp.dest('bin'));
 });
+
+// write version
+var pkg = require('./package.json');
+var writeVersion = function (filename) {
+    return es.map(function(file, callback) {
+        if (path.basename(file.path) !== filename) {
+            callback(null, file);
+            return;
+        }
+        var date = new Date();
+        var yy = date.getFullYear().toString().substring(2);
+        var m = (date.getMonth()+1).toString();
+        var mm = m.length == 2 ? m : '0' + m;
+        var d = date.getDate().toString();
+        var dd = d.length == 2 ? d : '0' + d;
+        var build = yy + mm + dd;
+
+        var data = { file: file, gulp_version: pkg.version, gulp_build: build };
+        file.contents = new Buffer(gutil.template(file.contents, data));
+        callback(null, file);
+    });
+};
 
 // js
 gulp.task('js', function() {
     return gulp.src(paths.js, {base: 'src'})
+    // .pipe(writeVersion('atlas-editor.js'))
     .pipe(jshint())
     .pipe(jshint.reporter(stylish))
     .pipe(uglify())
@@ -88,52 +127,45 @@ gulp.task('js', function() {
 // js-no-uglify
 gulp.task('js-dev', function() {
     return gulp.src(paths.js, {base: 'src'})
+    // .pipe(writeVersion('atlas-editor.js'))
     .pipe(gulp.dest('bin'))
     ;
 });
 
-// write version
-// var pkg = require('./package.json');
-// var task_version = function () {
-//     var writeVersion = function () {
-//         return es.map(function(file, callback) {
-//             var date = new Date();
-//             var yy = date.getFullYear().toString().substring(2);
-//             var m = (date.getMonth()+1).toString();
-//             var mm = m.length == 2 ? m : '0' + m;
-//             var d = date.getDate().toString();
-//             var dd = d.length == 2 ? d : '0' + d;
-//             var build = yy + mm + dd;
 
-//             var data = { file: file, gulp_version: pkg.version, gulp_build: build };
-//             //console.log(file.contents.toString());
-//             file.contents = new Buffer(gutil.template(file.contents, data));
-//             callback(null, file);
-//         });
-//     };
-//     return gulp.src('bin/elements/atlas-editor.js')
-//     .pipe(writeVersion())
-//     .pipe(gulp.dest('bin/elements'));
-// };
-// gulp.task('version', ['js'], task_version);
-// gulp.task('version-dev', ['js-dev'], task_version);
+// minify 3rd libraries from their source
+gulp.task('ext-min', ['cp-3rd'], function() {
+    // return gulp.src(paths.minify_ext)
+    // .pipe(uglify())
+    // .pipe(rename(function (path) {
+    //     //path
+    //     path.extname = ".min" + path.extname;
+    // }))
+    // .pipe(gulp.dest('ext'));
+});
 
 // html
-var task_build_html = function (strip) {
+var build_html = function (strip) {
     return function () {
-        return gulp.src('bin/app.html')
+        return gulp.src('bin/app/app.html')
         .pipe(vulcanize({
-            dest: 'bin',
+            dest: 'bin/app',
             inline: true,
             strip: strip,
-        }))
-        .pipe(gulp.dest('bin'))
-        ;
+        }));
     };
 };
 
-gulp.task('build-html', ['cp-html', 'css', 'version'], task_build_html(true));
-gulp.task('build-html-dev', ['cp-html', 'css', 'version-dev'], task_build_html(false));
+/////////////////////////////////////////////////////////////////////////////
+// commands
+/////////////////////////////////////////////////////////////////////////////
+
+// short tasks
+gulp.task('build-html', ['cp-html', 'css', 'js'], build_html(true));
+gulp.task('build-html-dev', ['cp-html', 'css', 'js-dev'], build_html(false));
+gulp.task('cp-all', ['cp-core', 'cp-editor-ui', 'cp-img', 'cp-html', 'cp-3rd'] );
+gulp.task('dev', ['cp-all', 'build-html-dev' ] );
+gulp.task('default', ['cp-all', 'ext-min', 'build-html' ] );
 
 // watch
 gulp.task('watch', function() {
@@ -144,9 +176,3 @@ gulp.task('watch', function() {
     gulp.watch(paths.js, ['build-html-dev']).on ( 'error', gutil.log );
     gulp.watch(paths.html, ['build-html-dev']).on ( 'error', gutil.log );
 });
-
-// tasks
-gulp.task('cp-all', ['cp-core', 'cp-editor-ui', 'cp-img', 'cp-html' ] );
-gulp.task('dev', ['cp-all', 'build-html-dev' ] );
-gulp.task('default', ['cp-all', 'build-html' ] );
-gulp.task('all', ['dev'] );

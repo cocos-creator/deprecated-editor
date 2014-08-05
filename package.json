@@ -5,12 +5,7 @@
   "homepage": "http://github.com/fireball-x/editor",
   "license": "MIT",
   "licenseUrl": "http://opensource.org/licenses/MIT",
-  "main": "index.html",
-  "window": {
-    "toolbar": false,
-    "width": 1280,
-    "height": 720
-  },
+  "main": "main.js",
   "dependencies": {},
   "devDependencies": {
     "event-stream": "^3.1.7",
@@ -21,6 +16,7 @@
     "gulp-jshint": "",
     "gulp-stylus": "",
     "gulp-uglify": "",
+    "gulp-rename": "",
     "gulp-util": "",
     "gulp-vulcanize": "",
     "jshint-stylish": "",
