@@ -165,29 +165,31 @@
         </div>
 
         <fire-ui-dock flex-1 flex-row flex-stretch>
-            <fire-ui-panel flex-col flex-stretch id="project">
-                <fire-ui-tabbar>
-                    <div id="inner" flex-row>
-                        <div id="tabs" flex-1 flex-row flex-stretch>
-                            <fire-ui-tab class="active">
-                                <div id="inner">
-                                    Project 1
-                                </div>
-                            </fire-ui-tab><span></span>
-                            <fire-ui-tab>
-                                <div id="inner">
-                                    Project 2
-                                </div>
-                            </fire-ui-tab>
+            <fire-ui-dock flex-col flex-stretch>
+                <fire-ui-panel flex-1 flex-col flex-stretch id="project">
+                    <fire-ui-tabbar>
+                        <div id="inner" flex-row>
+                            <div id="tabs" flex-1 flex-row flex-stretch>
+                                <fire-ui-tab class="active">
+                                    <div id="inner">
+                                        Project 1
+                                    </div>
+                                </fire-ui-tab><span></span>
+                                <fire-ui-tab>
+                                    <div id="inner">
+                                        Project 2
+                                    </div>
+                                </fire-ui-tab>
+                            </div>
+                            <i class="fa fa-bars"></i>
                         </div>
-                        <i class="fa fa-bars"></i>
+                    </fire-ui-tabbar>
+                    <div flex-1 flex-col flex-stretch id="body">
+                        <div flex-1 id="inner">
+                        </div>
                     </div>
-                </fire-ui-tabbar>
-                <div flex-1 flex-col flex-stretch id="body">
-                    <div flex-1 id="inner">
-                    </div>
-                </div>
-            </fire-ui-panel>
+                </fire-ui-panel>
+            </fire-ui-dock>
 
             <div flex-col>
                 <span flex-1 class="space"></span>
@@ -241,34 +243,60 @@
                 <span flex-1 class="space"></span>
             </div>
 
-            <fire-ui-panel flex-1 flex-col flex-stretch id="scene">
-                <fire-ui-tabbar>
-                    <div id="inner" flex-row>
-                        <div id="tabs" flex-1 flex-row flex-stretch>
-                            <fire-ui-tab class="active">
-                                <div id="inner">
-                                    Scene 1
-                                </div>
-                            </fire-ui-tab><span></span>
-                            <fire-ui-tab>
-                                <div id="inner">
-                                    Scene 2
-                                </div>
-                            </fire-ui-tab>
-                            <fire-ui-tab>
-                                <div id="inner">
-                                    Scene 3
-                                </div>
-                            </fire-ui-tab>
+            <fire-ui-dock flex-1 flex-col flex-stretch>
+                <fire-ui-panel flex-1 flex-col flex-stretch id="scene">
+                    <fire-ui-tabbar>
+                        <div id="inner" flex-row>
+                            <div id="tabs" flex-1 flex-row flex-stretch>
+                                <fire-ui-tab class="active">
+                                    <div id="inner">
+                                        Scene 1
+                                    </div>
+                                </fire-ui-tab><span></span>
+                                <fire-ui-tab>
+                                    <div id="inner">
+                                        Scene 2
+                                    </div>
+                                </fire-ui-tab>
+                                <fire-ui-tab>
+                                    <div id="inner">
+                                        Scene 3
+                                    </div>
+                                </fire-ui-tab>
+                            </div>
+                            <i class="fa fa-bars"></i>
                         </div>
-                        <i class="fa fa-bars"></i>
+                    </fire-ui-tabbar>
+                    <div flex-1 flex-col flex-stretch id="body">
+                        <div flex-1 id="inner">
+                        </div>
                     </div>
-                </fire-ui-tabbar>
-                <div flex-1 flex-col flex-stretch id="body">
-                    <div flex-1 id="inner">
-                    </div>
+                </fire-ui-panel>
+
+                <div flex-row>
+                    <span flex-1 class="space"></span>
                 </div>
-            </fire-ui-panel>
+
+                <fire-ui-panel flex-col flex-stretch id="console">
+                    <fire-ui-tabbar>
+                        <div id="inner" flex-row>
+                            <div id="tabs" flex-1 flex-row flex-stretch>
+                                <fire-ui-tab class="active">
+                                    <div id="inner">
+                                        Console
+                                    </div>
+                                </fire-ui-tab><span></span>
+                            </div>
+                            <i class="fa fa-bars"></i>
+                        </div>
+                    </fire-ui-tabbar>
+                    <div flex-1 flex-col flex-stretch id="body">
+                        <div flex-1 id="inner">
+                        </div>
+                    </div>
+                </fire-ui-panel>
+
+            </fire-ui-dock>
         </fire-ui-dock>
 
     </body>
