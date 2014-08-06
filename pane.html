@@ -1,0 +1,275 @@
+<html>
+    <head>
+        <title>Editor</title>
+        <link rel="shortcut icon" href="favicon.ico">
+        <link rel="stylesheet" href="ext/fontawesome/css/font-awesome.css">
+        <link rel="stylesheet" href="ext/fire-editor-ui/editor-ui.css">
+
+        <style>
+            body {
+                margin: 0px;
+                color: white;
+                background-color: #333;
+                border: 0px solid black;
+                padding: 3px;
+            }
+            * {
+                font-family: Helvetica,Arial,sans-serif;
+                box-sizing: border-box;
+
+                cursor: default;
+                user-select: none;
+                -webkit-user-select: none;
+            }
+            *:focus {
+                outline: 0;
+            }
+
+            body /deep/ * {
+                box-sizing: border-box;
+
+                cursor: default;
+                user-select: none;
+                -webkit-user-select: none;
+            }
+
+            body /deep/ *:focus {
+                outline: 0;
+            }
+
+            span.space {
+                height: 3px;
+                width: 3px;
+                display: block;
+            }
+
+            fire-ui-panel {
+                box-sizing: border-box;
+                min-width: 240px;
+                min-height: 400px;
+            }
+            fire-ui-tabbar {
+                position: relative;
+                border-left: 1px solid #212121;
+                border-right: 1px solid #212121;
+                border-top: 1px solid #212121;
+                box-sizing: border-box;
+
+                font-size: 10px;
+                color: #aaa;
+                background-color: #333;
+            }
+            fire-ui-tabbar #inner {
+                border-left: 1px solid rgba(255, 255, 255, 0.08);
+                border-right: 1px solid rgba(255, 255, 255, 0.08);
+                border-top: 1px solid rgba(255, 255, 255, 0.2);
+
+                padding-right: 5px;
+            }
+            fire-ui-tabbar #inner #tabs {
+                margin-bottom: -2px;
+                margin-left: -2px;
+                margin-top: -2px;
+            }
+            fire-ui-tabbar span {
+                display: inline-block;
+                border-left: 1px solid #212121;
+                height: 20px;
+            }
+            fire-ui-tab {
+                display: inline-block;
+                font-size: 12px;
+                color: #aaa;
+                display: inline-block;
+
+                border-right: 1px solid #212121;
+                border-left: 0px solid #212121;
+                border-top: 1px solid #212121;
+                height: 20px;
+
+                background-color: #333;
+            }
+            fire-ui-tab.active {
+                border-left: 1px solid #212121;
+                border-right: 0px solid #212121;
+                border-top: 1px solid #212121;
+                height: 22px;
+
+                background-color: #444;
+            }
+            fire-ui-tab #inner {
+                display: inline-block;
+                border-left: 1px solid rgba(255, 255, 255, 0.08);
+                border-right: 1px solid rgba(255, 255, 255, 0.08);
+                border-top: 1px solid rgba(255, 255, 255, 0.2);
+                height: 19px;
+
+                padding: 3px 8px;
+            }
+            fire-ui-tab.active #inner {
+                border-top: 1px solid rgba(255, 255, 255, 0.2);
+                height: 21px;
+            }
+            #body {
+                border: 1px solid #212121;
+                box-sizing: border-box;
+                background: #444;
+            }
+            #body #inner {
+                border: 1px solid rgba(255, 255, 255, 0.08);
+                border-top: 1px solid rgba(255, 255, 255, 0.2);
+                box-sizing: border-box;
+            }
+
+            // fire-ui-dock[flex-row] {
+            //     border: 2px solid red; 
+            // }
+            // fire-ui-dock[flex-col] {
+            //     border: 2px solid green; 
+            // }
+
+            #button_group {
+                font-size: 12px;
+                margin-left: auto;
+                margin-right: auto;
+                margin-bottom: 3px;
+
+                background: #444;
+                border: 1px solid #212121;
+                border-radius: 4px;
+            }
+            #btn {
+                padding: 5px 15px;
+                display: inline-block;
+                border-left: 1px solid black;
+                border-right: 1px solid #555;
+            }
+            #btn:last-child {
+                border-right: 0px;
+            }
+            #btn:first-child {
+                border-left: 0px;
+            }
+        </style>
+    </head>
+
+    <body flex-col flex-stretch>
+        <div id="button_group">
+            <div id="btn">
+                <i class="fa fa-play"></i>
+            </div><div id="btn">
+                <i class="fa fa-pause"></i>
+            </div><div id="btn">
+                <i class="fa fa-step-forward"></i>
+            </div>
+        </div>
+
+        <fire-ui-dock flex-1 flex-row flex-stretch>
+            <fire-ui-panel flex-col flex-stretch id="project">
+                <fire-ui-tabbar>
+                    <div id="inner" flex-row>
+                        <div id="tabs" flex-1 flex-row flex-stretch>
+                            <fire-ui-tab class="active">
+                                <div id="inner">
+                                    Project 1
+                                </div>
+                            </fire-ui-tab><span></span>
+                            <fire-ui-tab>
+                                <div id="inner">
+                                    Project 2
+                                </div>
+                            </fire-ui-tab>
+                        </div>
+                        <i class="fa fa-bars"></i>
+                    </div>
+                </fire-ui-tabbar>
+                <div flex-1 flex-col flex-stretch id="body">
+                    <div flex-1 id="inner">
+                    </div>
+                </div>
+            </fire-ui-panel>
+
+            <div flex-col>
+                <span flex-1 class="space"></span>
+            </div>
+
+            <fire-ui-dock flex-col flex-stretch>
+                <fire-ui-panel flex-col flex-stretch id="hirarchy">
+                    <fire-ui-tabbar>
+                        <div id="inner" flex-row>
+                            <div id="tabs" flex-1 flex-row flex-stretch>
+                                <fire-ui-tab class="active">
+                                    <div id="inner">
+                                        Hirarchy
+                                    </div>
+                                </fire-ui-tab><span></span>
+                            </div>
+                            <i class="fa fa-bars"></i>
+                        </div>
+                    </fire-ui-tabbar>
+                    <div flex-1 flex-col flex-stretch id="body">
+                        <div flex-1 id="inner">
+                        </div>
+                    </div>
+                </fire-ui-panel>
+
+                <div flex-row>
+                    <span flex-1 class="space"></span>
+                </div>
+
+                <fire-ui-panel flex-1 flex-col flex-stretch id="insepctor">
+                    <fire-ui-tabbar>
+                        <div id="inner" flex-row>
+                            <div id="tabs" flex-1 flex-row flex-stretch>
+                                <fire-ui-tab class="active">
+                                    <div id="inner">
+                                        Inspector
+                                    </div>
+                                </fire-ui-tab><span></span>
+                            </div>
+                            <i class="fa fa-bars"></i>
+                        </div>
+                    </fire-ui-tabbar>
+                    <div flex-1 flex-col flex-stretch id="body">
+                        <div flex-1 id="inner">
+                        </div>
+                    </div>
+                </fire-ui-panel>
+            </fire-ui-dock>
+
+            <div flex-col>
+                <span flex-1 class="space"></span>
+            </div>
+
+            <fire-ui-panel flex-1 flex-col flex-stretch id="scene">
+                <fire-ui-tabbar>
+                    <div id="inner" flex-row>
+                        <div id="tabs" flex-1 flex-row flex-stretch>
+                            <fire-ui-tab class="active">
+                                <div id="inner">
+                                    Scene 1
+                                </div>
+                            </fire-ui-tab><span></span>
+                            <fire-ui-tab>
+                                <div id="inner">
+                                    Scene 2
+                                </div>
+                            </fire-ui-tab>
+                            <fire-ui-tab>
+                                <div id="inner">
+                                    Scene 3
+                                </div>
+                            </fire-ui-tab>
+                        </div>
+                        <i class="fa fa-bars"></i>
+                    </div>
+                </fire-ui-tabbar>
+                <div flex-1 flex-col flex-stretch id="body">
+                    <div flex-1 id="inner">
+                    </div>
+                </div>
+            </fire-ui-panel>
+        </fire-ui-dock>
+
+    </body>
+</html>
