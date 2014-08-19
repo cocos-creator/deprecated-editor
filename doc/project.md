@@ -2,7 +2,7 @@
 
 ## 建立项目
 
-newProject(path)
+create(path)
 
 - 使用 fs
 - 建立目录结构
@@ -10,7 +10,7 @@ newProject(path)
 
 ## 载入项目
 
-loadProject(path)
+load(path)
 
 
 
