@@ -1,29 +1,25 @@
 // assetMng.js
+var AssetMng;
+(function (AssetMng) {
+    var fs = require('fs');
 
-console.log("load assetMng.js");
+    AssetMng.newAsset = function (path) {
+        console.log('create asset');
+        console.log(path);
 
-var fs = require('fs');
+        // TODO: create asset
+        // TODO: create asset.json
+    }
 
-function newAsset(path) {
-    console.log('create asset');
-    console.log(path);
+    AssetMng.deleteAsset = function (path) {
+        console.log('delete asset');
 
-    // TODO: create asset
-    // TODO: create asset.json
-}
+        // TODO: delete asset
+        // TODO: delete asset.json
+    }
 
-function deleteAsset (path) {
-    console.log('delete asset');
+    AssetMng.moveAsset = function (src, dest) {
+        console.log('move asset');
+    }
 
-    // TODO: delete asset
-    // TODO: delete asset.json
-}
-
-
-function moveAsset (src, dest) {
-    console.log('move asset');
-}
-
-exports.newAsset = newAsset;
-exports.deleteAsset = deleteAsset;
-exports.moveAsset = moveAsset;
+})(AssetMng || (AssetMng = {}));
