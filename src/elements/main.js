@@ -1,6 +1,7 @@
 (function () {
     Polymer('main-window', {
         ready: function () {
+            // init node-webkit
             if (FIRE.isNw) {
                 var nwgui = require('nw.gui');
                 var nativeWin = nwgui.Window.get();
@@ -72,6 +73,9 @@
                 //     menu.popup(e.originalEvent.x, e.originalEvent.y);
                 // });
             }
+
+            // init project-tree
+            this.$.projectView.load("test/foo/bar/");
         },
     });
 })();

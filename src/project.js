@@ -8,7 +8,7 @@ var Project;
      * action(file, stat): called on each file or until an error occurs. file: path to the file. stat: stat of the file (retrived by fs.stat)
      * done(err): called one time when the process is complete. err is undifined is everything was ok. the error that stopped the process otherwise
      */
-    var walk = function(dir, action, done) {
+    var _walk = function(dir, action, done) {
 
         // this flag will indicate if an error occured (in this case we don't want to go on walking the tree)
         var dead = false;
@@ -24,7 +24,7 @@ var Project;
         };
 
         var checkSuccess = function() {
-            if(!dead && pending == 0) {
+            if(!dead && pending === 0) {
                 done();
             }
         };
@@ -81,7 +81,7 @@ var Project;
         dive(dir);
     };
 
-    Project.newProject = function (path) {
+    Project.create = function (path) {
 
         var AssetsDir = path+'/assets';
         var SettingDir = path+'/settings';
@@ -108,10 +108,10 @@ var Project;
         };
 
         return EmptyProject;
-    }
+    };
     
 
-    Project.loadProject = function(path) {
+    Project.load = function(path) {
         console.log(path);
 
         if(!fs.existsSync(path)) {
@@ -134,9 +134,9 @@ var Project;
                 // TODO load js
             }
 
-        }
+        };
 
-        walk(path, action, function(err){
+        _walk(path, action, function(err){
             if (err) {
                 console.log(err);
             } else {
@@ -145,6 +145,6 @@ var Project;
         });
 
         return project;
-    }
+    };
 
 })(Project || (Project = {}));

@@ -37,11 +37,11 @@ exports.testNewProject = function(test){
     fs.mkdirSync(ProjectPath);
     
     // newProject
-    project.newProject(ProjectPath);
+    project.create(ProjectPath);
 
     test.ok(fs.existsSync(ProjectPath+'/assets'), "has assets dir");
 
-    project.loadProject(ProjectPath);
+    project.load(ProjectPath);
     // test.expect(1);
     // test.ok(true, "this assertion should pass");
     // test.done();
