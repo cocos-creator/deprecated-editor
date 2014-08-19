@@ -7,7 +7,7 @@
 
         <script type="text/javascript" src="ext/platform/platform.js"></script>
         <script type="text/javascript" src="ext/fire-core/core.min.js"></script>
-        <script type="text/javascript" src="ext/mousetrap/mousetrap.min.js"></script>
+        <!-- <script type="text/javascript" src="ext/mousetrap/mousetrap.min.js"></script> -->
         <!-- <script type="text/javascript" src="ext/bluebird.js"></script>                                    -->
         <!-- <script type="text/javascript" src="ext/require.min.nw.js" data-main="bin/requireIndex"></script> -->
 
@@ -15,134 +15,78 @@
 
         <link rel="import" href="ext/polymer/polymer.html">
         <link rel="import" href="ext/fire-editor-ui/editor-ui.html">
-        <!-- <link rel="import" href="bin/app.html"> -->
+        <link rel="import" href="bin/app.html">
 
         <style>
             body {
                 margin: 0px;
-                color: white;
+                color: #ddd;
                 background-color: #333;
-                border: 10px solid black;
-                padding: 5px;
+                border: 0px solid black;
+                padding: 3px;
+                // overflow: hidden;
             }
-            * {
-                font-family: Helvetica,Arial,sans-serif;
-                box-sizing: border-box;
-
-                cursor: default;
-                user-select: none;
-                -webkit-user-select: none;
-            }
-            *:focus {
-                outline: 0;
-            }
-
-            body /deep/ * {
-                box-sizing: border-box;
-
-                cursor: default;
-                user-select: none;
-                -webkit-user-select: none;
-            }
-
-            body /deep/ *:focus {
-                outline: 0;
-            }
-
             span.space {
+                height: 3px;
+                width: 3px;
+                display: block;
+            }
+            html /deep/ *::-webkit-scrollbar {
                 height: 5px;
                 width: 5px;
-                display: block;
-                background-color: yellow;
             }
+            html /deep/ *::-webkit-scrollbar-thumb {
+                border-top: 2px solid rgba(12,112,200,1.0);
+                border-bottom: 2px solid rgba(12,112,200,1.0);
 
-            fire-ui-panel {
-                border: 4px solid red;
-                box-sizing: border-box;
-                min-width: 240px;
-                min-height: 400px;
+                background: #171717;
             }
-            fire-ui-tabbar {
-                border: 4px solid green;
-                box-sizing: border-box;
+            html /deep/ *::-webkit-scrollbar-track {
+                background-color: #444;
+                border-left: 1px solid #171717;
             }
-            #body {
-                border: 4px dashed white;
-                box-sizing: border-box;
+            html /deep/ *::-webkit-scrollbar-button {
+                height: 0;
+                width: 0;
             }
-
-            // layout[flex-row] {
-            //     border: 2px solid red; 
-            // }
-            // layout[flex-col] {
-            //     border: 2px solid green; 
-            // }
-
+            html /deep/ *::-webkit-scrollbar-corner {
+                background-color: #171717;
+            }
         </style>
     </head>
 
     <body flex-col flex-stretch>
         <template id="my-template" is="auto-binding">
-            <h2 style="text-align: center; color: #ccc;">Fireball-x Editor</h2>
+            <fire-ui-dock flex-1 flex-row flex-stretch>
+                <fire-ui-dock-panel style="width: 200px;">
+                    <div name="Project" flex-1 style="padding: 5px; margin-top: 2px; box-shadow: inset 0 0 8px 2px rgba(0,0,0,0.2); border: 1px solid #171717; background: #333;">
+                    </div>                                                                                                                                                          
+                </fire-ui-dock-panel>
 
-            <layout flex-row flex-1 flex-stretch>
-                <fire-ui-panel flex-col flex-stretch id="project">
-                    <fire-ui-tabbar>
-                        <fire-ui-tab>Project</fire-ui-tab>
-                    </fire-ui-tabbar>
-                    <div flex-1 id="body">
+                <fire-ui-dock-panel style="min-width: 240px; width: 240px;">
+                    <div name="Inspector" flex-1>
                     </div>
-                </fire-ui-panel>
+                </fire-ui-dock-panel>
 
-                <div flex-col>
-                    <span flex-1 class="space"></span>
-                </div>
-
-                <layout flex-col flex-stretch>
-                    <fire-ui-panel flex-col flex-stretch id="hirarchy">
-                        <fire-ui-tabbar>
-                            <fire-ui-tab>Hirarchy</fire-ui-tab>
-                        </fire-ui-tabbar>
-                        <div flex-1 id="body">
+                <fire-ui-dock flex-1 flex-col flex-stretch>
+                    <fire-ui-dock-panel flex-1 style="">
+                        <div name="Scene" flex-1>
                         </div>
-                    </fire-ui-panel>
-
-                    <div flex-row>
-                        <span flex-1 class="space"></span>
-                    </div>
-
-                    <fire-ui-panel flex-col flex-1 flex-stretch id="insepctor">
-                        <fire-ui-tabbar>
-                            <fire-ui-tab>Inspector</fire-ui-tab>
-                        </fire-ui-tabbar>
-                        <div flex-1 id="body">
+                        <div name="Game" flex-1>
                         </div>
-                    </fire-ui-panel>
-                </layout>
+                    </fire-ui-dock-panel>
 
-                <div flex-col>
-                    <span flex-1 class="space"></span>
-                </div>
+                    <fire-ui-dock-panel style="min-height: 200px;">
+                        <div name="Console" style="margin: 5px; margin-right: 0px; overflow: auto;">
+                        </div>
+                    </fire-ui-dock-panel>
+                </fire-ui-dock>
 
-                <fire-ui-panel flex-col flex-1 flex-stretch id="scene">
-                    <fire-ui-tabbar>
-                        <fire-ui-tab>Scene</fire-ui-tab>
-                    </fire-ui-tabbar>
-                    <div flex-1 id="body">
+                <fire-ui-dock-panel style="min-width: 200px; width: 200px;">
+                    <div name="Hierachy" flex-1>
                     </div>
-                </fire-ui-panel>
-            </layout>
+                </fire-ui-dock-panel>
+            </fire-ui-dock>
         </template>
-
-        <script>
-            model = {
-            };
-            var tmpl = document.querySelector('#my-template');
-            for ( var m in model ) {
-                if ( model.hasOwnProperty(m) ) {
-                    tmpl[m] = model[m];
-                }
-            }
-        </script>
     </body>
 </html>
