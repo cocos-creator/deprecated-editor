@@ -1,0 +1,42 @@
+<polymer-element 
+    name="main-window" 
+    constructor="MainWindow"
+    >
+<template>
+
+<link rel="stylesheet" href="main.css">
+
+<fire-ui-dock flex-1 flex-row flex-stretch>
+    <fire-ui-dock-panel style="width: 200px;">
+        <project-tree name="Project" flex-1></project-tree>
+    </fire-ui-dock-panel>
+
+    <fire-ui-dock-panel style="min-width: 240px; width: 240px;">
+        <div name="Inspector" flex-1>
+        </div>
+    </fire-ui-dock-panel>
+
+    <fire-ui-dock flex-1 flex-col flex-stretch>
+        <fire-ui-dock-panel flex-1 style="">
+            <div name="Scene" flex-1>
+            </div>
+            <div name="Game" flex-1>
+            </div>
+        </fire-ui-dock-panel>
+
+        <fire-ui-dock-panel style="min-height: 200px;">
+            <div name="Console" style="margin: 5px; margin-right: 0px; overflow: auto;">
+            </div>
+        </fire-ui-dock-panel>
+    </fire-ui-dock>
+
+    <fire-ui-dock-panel style="min-width: 200px; width: 200px;">
+        <div name="Hierachy" flex-1>
+        </div>
+    </fire-ui-dock-panel>
+</fire-ui-dock>
+
+</template>
+
+<script type="text/javascript" src="main.js"></script>
+</polymer-element>
