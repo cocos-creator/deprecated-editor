@@ -1,0 +1,4 @@
+(function () {
+    Polymer('project-tree', {
+    });
+})();
