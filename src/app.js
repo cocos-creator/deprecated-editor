@@ -1,11 +1,11 @@
 var EditorApp;
 (function (EditorApp) {
-    var nwgui = null;
-    var fs = null;
+    var nwGUI = null;
+    var Fs = null;
 
     if ( FIRE.isNw ) {
-        nwgui = require('nw.gui');
-        fs = require('fs');
+        nwGUI = require('nw.gui');
+        Fs = require('fs');
     }
 
     var _mainWin = null;
@@ -37,19 +37,19 @@ var EditorApp;
         // init native functions
         if (FIRE.isNw) {
             _appPath = process.cwd();
-            var nativeWin = nwgui.Window.get();
+            var nativeWin = nwGUI.Window.get();
 
             // TODO: login
             // TODO: choose project
 
             // load user-profile
-            if ( !fs.existsSync(_appPath+"/user-profile.json") ) {
+            if ( !Fs.existsSync(_appPath+"/user-profile.json") ) {
                 // TODO: create default user profile.
             }
 
             //
             var defaultProjectPath = _appPath + "/bin/projects/default";
-            if ( !fs.existsSync(defaultProjectPath) ) {
+            if ( !Fs.existsSync(defaultProjectPath) ) {
                 EditorApp.newProject(defaultProjectPath);
             }
             EditorApp.openProject(defaultProjectPath);
@@ -72,14 +72,14 @@ var EditorApp;
 
             // init menu
             if (FIRE.isDarwin) {
-                var nativeMenuBar = new nwgui.Menu({ type: "menubar" });
+                var nativeMenuBar = new nwGUI.Menu({ type: "menubar" });
                 nativeMenuBar.createMacBuiltin("Fireball-X");
                 nativeWin.menu = nativeMenuBar;
             }
         }
 
         // init project-tree
-        // _mainWin.$.projectView.load("test/foo/bar/");
+        _mainWin.$.projectView.load("assets://");
 
         // init engine & game-view
         console.log('fire-engine initializing...');
@@ -93,13 +93,13 @@ var EditorApp;
         EditorUtils.mkdirpSync(path);
 
         var assetsPath = path+'/assets';
-        fs.mkdirSync(assetsPath);
+        Fs.mkdirSync(assetsPath);
 
         var settingsPath = path+'/settings';
-        fs.mkdirSync(settingsPath);
+        Fs.mkdirSync(settingsPath);
 
         var projectFile = path+'/.fireball';
-        fs.writeFileSync(projectFile, '');
+        Fs.writeFileSync(projectFile, '');
     };
 
     EditorApp.openProject = function ( path ) {

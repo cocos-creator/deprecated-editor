@@ -1,7 +1,7 @@
 var EditorUtils;
 (function (EditorUtils) {
-    var fs = require('fs');
-    var path = require('path');
+    var Fs = require('fs');
+    var Path = require('path');
 
     function _mkdirp (p, opts, f) {
         if (typeof opts === 'function') {
@@ -15,15 +15,15 @@ var EditorUtils;
         }
         
         var cb = f || function () {};
-        p = path.resolve(p);
+        p = Path.resolve(p);
         
-        fs.mkdir(p, mode, function (er) {
+        Fs.mkdir(p, mode, function (er) {
             if (!er) {
                 return cb(null);
             }
             switch (er.code) {
                 case 'ENOENT':
-                    _mkdirp(path.dirname(p), opts, function (er) {
+                    _mkdirp(Path.dirname(p), opts, function (er) {
                         if (er) cb(er);
                         else _mkdirp(p, opts, cb);
                     });
@@ -33,7 +33,7 @@ var EditorUtils;
                 // there already.  If so, then hooray!  If not, then something
                 // is borked.
                 default:
-                    fs.stat(p, function (er2, stat) {
+                    Fs.stat(p, function (er2, stat) {
                         // if the stat fails, then that's super weird.
                         // let the original error be the failure reason.
                         if (er2 || !stat.isDirectory()) cb(er);
@@ -56,15 +56,15 @@ var EditorUtils;
             mode = 0777 & (~process.umask());
         }
 
-        p = path.resolve(p);
+        p = Path.resolve(p);
 
         try {
-            fs.mkdirSync(p, mode);
+            Fs.mkdirSync(p, mode);
         }
         catch (err0) {
             switch (err0.code) {
                 case 'ENOENT' :
-                    _mkdirpSync(path.dirname(p), opts);
+                    _mkdirpSync(Path.dirname(p), opts);
                     _mkdirpSync(p, opts);
                     break;
 
@@ -74,7 +74,7 @@ var EditorUtils;
                 default:
                     var stat;
                     try {
-                        stat = fs.statSync(p);
+                        stat = Fs.statSync(p);
                     }
                     catch (err1) {
                         throw err0;

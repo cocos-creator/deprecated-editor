@@ -1,7 +1,9 @@
 // assetMng.js
 var AssetDB;
 (function (AssetDB) {
-    var fs = require('fs');
+    var Fs = require('fs');
+    var Walk = require('walk');
+    var Path = require('path');
 
     var _mounts = {};
 
@@ -20,7 +22,7 @@ var AssetDB;
             return null;
         }
 
-        return path.resolve( _mounts[mountName] + "/" + relativePath );
+        return Path.resolve( _mounts[mountName] + "/" + relativePath );
     }; 
 
     // name://foo/bar/foobar.png
@@ -90,6 +92,39 @@ var AssetDB;
         }
 
         //
+        options = {
+            listeners: {
+                names: function (root, nodeNamesArray) {
+                    nodeNamesArray.sort(function (a, b) {
+                        if (a > b) return 1;
+                        if (a < b) return -1;
+                        return 0;
+                    });
+                }, 
+                directories: function (root, dirStatsArray, next) {
+                    // dirStatsArray is an array of `stat` objects with the additional attributes
+                    // * type
+                    // * error
+                    // * name
+                    callback( root, dirStatsArray );
+
+                    next();
+                }, 
+                file: function (root, fileStats, next) {
+                    // Fs.readFile(fileStats.name, function () {
+                    //   // doStuff
+                    //   next();
+                    // });
+                    callback( root, fileStats );
+
+                    next();
+                }, 
+                errors: function (root, nodeStatsArray, next) {
+                    next();
+                }
+            }
+        };
+        walker = Walk.walk(rpath, options);
     };
 
 })(AssetDB || (AssetDB = {}));
