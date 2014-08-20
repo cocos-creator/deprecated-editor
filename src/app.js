@@ -84,7 +84,6 @@ var EditorApp;
 
     //
     EditorApp.newProject = function ( path ) {
-        console.log("new project");
         EditorUtils.mkdirpSync(path);
 
         var assetsPath = path+'/assets';
@@ -98,8 +97,14 @@ var EditorApp;
     };
 
     EditorApp.openProject = function ( path ) {
-        console.log("open project");
-        // TODO
+        _cwd = path;
+
+        // TODO: load settings
+        // TODO: load window layouts
+
+        // mounting assets
+        AssetDB.mount(path+'/assets', 'assets');
+        // AssetDB.mount(appPath+'/shares', 'shares');
     };
 
 })(EditorApp || (EditorApp = {}));
