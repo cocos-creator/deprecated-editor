@@ -17,6 +17,7 @@
     "tests"
   ],
   "dependencies": {
+    "pixi": "~1.6.1",
     "polymer": "Polymer/polymer#~0.3.5",
     "web-animations-js": "web-animations/web-animations-js#master",
     "fontawesome": "",

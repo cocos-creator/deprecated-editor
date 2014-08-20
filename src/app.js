@@ -1,8 +1,12 @@
 var EditorApp;
 (function (EditorApp) {
-    var nwgui = require('nw.gui');
-    var fs = require('fs');
+    var nwgui = null;
+    var fs = null;
 
+    if ( FIRE.isNw ) {
+        nwgui = require('nw.gui');
+        fs = require('fs');
+    }
 
     var _mainWin = null;
     EditorApp.__defineGetter__('mainWin', function () { return _mainWin; } );
@@ -44,7 +48,7 @@ var EditorApp;
             }
 
             //
-            var defaultProjectPath = "bin/projects/default";
+            var defaultProjectPath = _appPath + "/bin/projects/default";
             if ( !fs.existsSync(defaultProjectPath) ) {
                 EditorApp.newProject(defaultProjectPath);
             }
@@ -78,8 +82,10 @@ var EditorApp;
         // _mainWin.$.projectView.load("test/foo/bar/");
 
         // init engine & game-view
-        // FIRE.Engine.init();
-        // _mainWin.$.gameView.init();
+        console.log('fire-engine initializing...');
+        var canvas = FIRE.Engine.init( _mainWin.$.gameView.$.view.clientWidth,
+                                       _mainWin.$.gameView.$.view.clientHeight );
+        _mainWin.$.gameView.setCanvas(canvas);
     };
 
     //
