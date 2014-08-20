@@ -1,0 +1,30 @@
+<polymer-element 
+    name="play-bar" 
+    constructor="PlayBar"
+    
+    >
+<template>
+<link rel="stylesheet" href="play-bar.css">
+
+<div flex-row id="border">
+    <div id="play" class="btn" on-click="{{playAction}}">
+        <div class="border">
+            <i class="fa fa-play"></i>
+        </div>
+    </div>
+    <div id="pause" class="btn" on-click="{{pauseAction}}">
+        <div class="border">
+            <i class="fa fa-pause"></i>
+        </div>
+    </div>
+    <div id="step" class="btn" on-click="{{stepAction}}">
+        <div class="border">
+            <i class="fa fa-step-forward"></i>
+        </div>
+    </div>
+</div>
+
+</template>
+
+<script type="text/javascript" src="play-bar.js"></script>
+</polymer-element>

@@ -1,14 +1,4 @@
-console.log('starting fireball-x');
+var EditorApp;
+(function (EditorApp) {
 
-// document events
-document.addEventListener( "drop", function (event) {
-    event.preventDefault(); 
-} );
-document.addEventListener( "dragover", function (event) {
-    event.preventDefault(); 
-} );
-document.addEventListener( "contextmenu", function (event) {
-    event.preventDefault();
-    event.stopPropagation();
-} );
-
+})(EditorApp || (EditorApp = {}));

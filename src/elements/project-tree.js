@@ -3,7 +3,7 @@
 
         load: function ( path ) {
             // TODO:
-            // Project.load(path);
+            // Project.walk(path,action);
         },
 
     });

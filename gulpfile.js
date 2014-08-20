@@ -16,6 +16,9 @@ var paths = {
     ext_core: [ 
         '../core/bin/**/*.js',
     ],
+    ext_engine: [ 
+        '../engine/bin/**/*.js',
+    ],
     ext_editor_ui: [ 
         '../editor-ui/bin/editor-ui.css',
         '../editor-ui/bin/editor-ui.html',
@@ -42,6 +45,12 @@ gulp.task('clean', function() {
 gulp.task('cp-core', function() {
     return gulp.src(paths.ext_core)
     .pipe(gulp.dest('ext/fire-core'))
+    ;
+});
+
+gulp.task('cp-engine', function() {
+    return gulp.src(paths.ext_engine)
+    .pipe(gulp.dest('ext/fire-engine'))
     ;
 });
 
@@ -163,13 +172,14 @@ var build_html = function (strip) {
 // short tasks
 gulp.task('build-html', ['cp-html', 'css', 'js'], build_html(true));
 gulp.task('build-html-dev', ['cp-html', 'css', 'js-dev'], build_html(false));
-gulp.task('cp-all', ['cp-core', 'cp-editor-ui', 'cp-img', 'cp-html', 'cp-3rd'] );
+gulp.task('cp-all', ['cp-core', 'cp-engine', 'cp-editor-ui', 'cp-img', 'cp-html', 'cp-3rd'] );
 gulp.task('dev', ['cp-all', 'build-html-dev' ] );
 gulp.task('default', ['cp-all', 'ext-min', 'build-html' ] );
 
 // watch
 gulp.task('watch', function() {
     gulp.watch(paths.ext_core, ['cp-core']).on ( 'error', gutil.log );
+    gulp.watch(paths.ext_engine, ['cp-engine']).on ( 'error', gutil.log );
     gulp.watch(paths.ext_editor_ui, ['cp-editor-ui']).on ( 'error', gutil.log );
     gulp.watch(paths.img, ['cp-img']).on ( 'error', gutil.log );
     gulp.watch(paths.css, ['css', 'build-html-dev']).on ( 'error', gutil.log );
