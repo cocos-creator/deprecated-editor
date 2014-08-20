@@ -4,5 +4,9 @@
             // init editor-app
             EditorApp.init(this);
         },
+
+        resizedAction: function () {
+            this.$.gameView.resize();
+        },
     });
 })();
