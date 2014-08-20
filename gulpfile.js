@@ -156,9 +156,9 @@ gulp.task('ext-min', ['cp-3rd'], function() {
 // html
 var build_html = function (strip) {
     return function () {
-        return gulp.src('bin/app/app.html')
+        return gulp.src('bin/app.html')
         .pipe(vulcanize({
-            dest: 'bin/app',
+            dest: 'bin/',
             inline: true,
             strip: strip,
         }));

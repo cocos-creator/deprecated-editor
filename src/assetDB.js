@@ -1,9 +1,9 @@
 // assetMng.js
-var AssetMng;
-(function (AssetMng) {
+var AssetDB;
+(function (AssetDB) {
     var fs = require('fs');
 
-    AssetMng.newAsset = function (path) {
+    AssetDB.newAsset = function (path) {
         console.log('create asset');
         console.log(path);
 
@@ -11,15 +11,19 @@ var AssetMng;
         // TODO: create asset.json
     };
 
-    AssetMng.deleteAsset = function (path) {
+    AssetDB.deleteAsset = function (path) {
         console.log('delete asset');
 
         // TODO: delete asset
         // TODO: delete asset.json
     };
 
-    AssetMng.moveAsset = function (src, dest) {
+    AssetDB.moveAsset = function (src, dest) {
         console.log('move asset');
     };
 
-})(AssetMng || (AssetMng = {}));
+    // TODO:
+    AssetDB.mount = function (path) {
+    };
+
+})(AssetDB || (AssetDB = {}));

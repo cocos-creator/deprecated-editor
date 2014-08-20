@@ -1,5 +1,8 @@
 var EditorApp;
 (function (EditorApp) {
+    var nwgui = require('nw.gui');
+    var fs = require('fs');
+
 
     var _mainWin = null;
     EditorApp.__defineGetter__('mainWin', function () { return _mainWin; } );
@@ -29,10 +32,25 @@ var EditorApp;
 
         // init native functions
         if (FIRE.isNw) {
-            var nwgui = require('nw.gui');
+            _appPath = process.cwd();
             var nativeWin = nwgui.Window.get();
 
-            _appPath = process.cwd();
+            // TODO: login
+            // TODO: choose project
+
+            // load user-profile
+            if ( !fs.existsSync(_appPath+"/user-profile.json") ) {
+                // TODO: create default user profile.
+            }
+
+            //
+            var defaultProjectPath = "bin/projects/default";
+            if ( !fs.existsSync(defaultProjectPath) ) {
+                EditorApp.newProject(defaultProjectPath);
+            }
+            EditorApp.openProject(defaultProjectPath);
+
+            // init hot-keys
             document.onkeydown = function (e) { 
                 switch ( e.keyCode ) {
                     // F12
@@ -48,6 +66,7 @@ var EditorApp;
                 }
             };
 
+            // init menu
             if (FIRE.isDarwin) {
                 var nativeMenuBar = new nwgui.Menu({ type: "menubar" });
                 nativeMenuBar.createMacBuiltin("Fireball-X");
@@ -63,7 +82,23 @@ var EditorApp;
         // _mainWin.$.gameView.init();
     };
 
+    //
+    EditorApp.newProject = function ( path ) {
+        console.log("new project");
+        EditorUtils.mkdirpSync(path);
+
+        var assetsPath = path+'/assets';
+        fs.mkdirSync(assetsPath);
+
+        var settingsPath = path+'/settings';
+        fs.mkdirSync(settingsPath);
+
+        var projectFile = path+'/.fireball';
+        fs.writeFileSync(projectFile, '');
+    };
+
     EditorApp.openProject = function ( path ) {
+        console.log("open project");
         // TODO
     };
 
