@@ -113,8 +113,9 @@ var AssetDB;
                         if ( dirStats.name[0] !== '.' ) {
                             callback( root, dirStats );
                         }
-                        next();
                     }
+
+                    next();
                 }, 
                 file: function (root, fileStats, next) {
                     // skip .files
@@ -133,6 +134,7 @@ var AssetDB;
             }
         };
         walker = Walk.walk(rpath, options);
+        // walker = Walk.walkSync(rpath, options);
     };
 
 })(AssetDB || (AssetDB = {}));

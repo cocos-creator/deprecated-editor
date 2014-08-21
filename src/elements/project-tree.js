@@ -6,14 +6,16 @@
 
         load: function ( path ) {
             AssetDB.walk( path, function ( root, stat ) {
-                var itemEL = new ProjectItem();
+                itemEL = new ProjectItem();
+                itemEL.$.name.innerHTML = stat.name;
                 if ( stat.isDirectory() ) {
-                    itemEL.$.name.innerHTML = "<b>" + stat.name + "</b>";
+                    itemEL.foldable = true;
+                    itemEL.setIcon('fa-folder');
 
                     this.folderElements[root+"/"+stat.name] = itemEL;
                 }
                 else {
-                    itemEL.$.name.innerHTML = stat.name;
+                    itemEL.setIcon('fa-file-image-o');
                 }
 
                 var parentEL = this.folderElements[root];

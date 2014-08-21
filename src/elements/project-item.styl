@@ -2,7 +2,7 @@
     display: block
 
     font-size: 12px
-    margin-left: 10px
+    margin-left: 16px
 
     .item {
         display: inline-block
@@ -12,11 +12,26 @@
         cursor: default 
 
         .type-icon {
-            color: #09f
+            color: #fff
             margin-right: 2px
+            width: 10px
         }
 
         .fold-icon {
+            visibility: hidden 
+            width: 10px
+        }
+
+        .fa-folder {
+            color: #09f
+        }
+    }
+
+
+    &([foldable]) {
+        .fold-icon {
+            visibility: visible 
+            width: 10px
         }
     }
 }
