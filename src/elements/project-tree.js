@@ -24,16 +24,6 @@
                     itemEL.style.marginLeft="0px";
                     this.$.content.appendChild(itemEL);
                 }
-
-                // DELME
-                // var el = document.createElement("div");
-                // if ( stat.isDirectory() ) {
-                //     el.innerHTML = "<b>" + stat.name + "</b>";
-                // }
-                // else {
-                //     el.innerHTML = stat.name;
-                // }
-                // this.$.content.appendChild(el);
             }.bind(this) );
         },
 

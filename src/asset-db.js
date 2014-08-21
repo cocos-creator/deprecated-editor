@@ -119,7 +119,10 @@ var AssetDB;
                 file: function (root, fileStats, next) {
                     // skip .files
                     if ( fileStats.name[0] !== '.' ) {
-                        callback( root, fileStats );
+                        // skip xxx.meta files
+                        if ( fileStats.name.split('.').pop() !== 'meta' ) {
+                            callback( root, fileStats );
+                        }
                     }
 
                     next();
