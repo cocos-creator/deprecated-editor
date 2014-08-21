@@ -2,10 +2,15 @@
     Polymer('project-tree', {
 
         load: function ( path ) {
-            AssetDB.walk( path, function ( path, stat ) {
+            AssetDB.walk( path, function ( root, stat ) {
                 var el = document.createElement("div");
-                el.innerHTML = stat.name;
-                this.$.view.appendChild(el);
+                if ( stat.isDirectory() ) {
+                    el.innerHTML = "<b>" + stat.name + "</b>";
+                }
+                else {
+                    el.innerHTML = stat.name;
+                }
+                this.$.content.appendChild(el);
             }.bind(this) );
         },
 

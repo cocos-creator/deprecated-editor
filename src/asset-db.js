@@ -106,16 +106,21 @@ var AssetDB;
                     // * type
                     // * error
                     // * name
-                    callback( root, dirStatsArray );
 
-                    next();
+                    // skip .dirs
+                    for ( var i = 0; i < dirStatsArray.length; ++i ) {
+                        var dirStats = dirStatsArray[i];
+                        if ( dirStats.name[0] !== '.' ) {
+                            callback( root, dirStats );
+                        }
+                        next();
+                    }
                 }, 
                 file: function (root, fileStats, next) {
-                    // Fs.readFile(fileStats.name, function () {
-                    //   // doStuff
-                    //   next();
-                    // });
-                    callback( root, fileStats );
+                    // skip .files
+                    if ( fileStats.name[0] !== '.' ) {
+                        callback( root, fileStats );
+                    }
 
                     next();
                 }, 
