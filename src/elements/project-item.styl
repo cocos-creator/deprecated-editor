@@ -1,17 +1,22 @@
 :host {
-    display: flex
-    flex-direction: row
-    flex-wrap: nowrap     
-    align-items: center
+    display: block
 
     font-size: 12px
+    margin-left: 20px
 
-    font-family: Helvetica,Arial,sans-serif
-    color: #aaa
-    cursor: default 
+    .item {
+        display: inline-block
+        flex-direction: row
+        flex-wrap: nowrap     
+        align-items: center
 
-    .icon {
-        color: #09f
-        margin-right: 5px
+        font-family: Helvetica,Arial,sans-serif
+        color: #aaa
+        cursor: default 
+
+        .icon {
+            color: #09f
+            margin-right: 2px
+        }
     }
 }
