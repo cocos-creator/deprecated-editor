@@ -2,36 +2,47 @@
     display: block
 
     font-size: 12px
-    margin-left: 16px
+    margin-left: 24px
 
     .item {
         display: inline-block
+        white-space: nowrap
 
         font-family: Helvetica,Arial,sans-serif
         color: #aaa
         cursor: default 
 
-        .type-icon {
-            color: #fff
-            margin-right: 2px
-            width: 10px
-        }
+        .border {
+            display: flex
+            flex-direction: row
+            flex-wrap: nowrap     
+            align-items: center
 
-        .fold-icon {
-            visibility: hidden 
-            width: 10px
-        }
+            .fold-icon {
+                display: none
+                width: 10px
+            }
 
-        .fa-folder {
-            color: #09f
+            .type-icon {
+                color: #fff
+                width: 14px
+            }
+
+            .fa-folder {
+                color: #09f
+            }
         }
     }
 
-
     &([foldable]) {
-        .fold-icon {
-            visibility: visible 
-            width: 10px
+        margin-left: 10px
+
+        .item {
+            .border {
+                .fold-icon {
+                    display: inline-block
+                }
+            }
         }
     }
 }
