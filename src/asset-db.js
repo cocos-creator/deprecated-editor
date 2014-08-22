@@ -101,36 +101,72 @@ var AssetDB;
                         return 0;
                     });
                 }, 
-                directories: function (root, dirStatsArray, next) {
-                    // dirStatsArray is an array of `stat` objects with the additional attributes
-                    // * type
-                    // * error
-                    // * name
 
-                    // skip .dirs
-                    for ( var i = 0; i < dirStatsArray.length; ++i ) {
-                        var dirStats = dirStatsArray[i];
-                        if ( dirStats.name[0] !== '.' ) {
-                            callback( root, dirStats );
-                        }
-                    }
-
-                    next();
-                }, 
-                file: function (root, fileStats, next) {
-                    // skip .files
-                    if ( fileStats.name[0] !== '.' ) {
-                        // skip xxx.meta files
-                        if ( fileStats.name.split('.').pop() !== 'meta' ) {
-                            callback( root, fileStats );
-                        }
-                    }
-
-                    next();
-                }, 
                 errors: function (root, nodeStatsArray, next) {
                     next();
-                }
+                },
+
+                node: function ( root, stats, next ) {
+                    // skip .dirs, .files
+                    if ( stats.name[0] !== '.' ) {
+                        // skip xxx.meta files
+                        if ( stats.isFile ) {
+                            if ( stats.name.split('.').pop() !== 'meta' ) {
+                                callback( root, stats.name, stats );
+                            }
+                        }
+                        else {
+                            callback( root, stats.name, stats );
+                        }
+                    }
+                    next();
+                },
+
+                // directories: function (root, statsArray, next) {
+                //     // skip .dirs
+                //     for ( var i = 0; i < statsArray.length; ++i ) {
+                //         var stats = statsArray[i];
+                //         if ( stats.name[0] !== '.' ) {
+                //             callback( root, stats.name, stats );
+                //         }
+                //     }
+                //     next();
+                // }, 
+
+                // files: function (root, statsArray, next) {
+                //     // skip .files
+                //     for ( var i = 0; i < statsArray.length; ++i ) {
+                //         var stats = statsArray[i];
+                //         if ( stats.name[0] !== '.' ) {
+                //             // skip xxx.meta files
+                //             if ( stats.name.split('.').pop() !== 'meta' ) {
+                //                 callback( root, stats.name, stats );
+                //             }
+                //         }
+                //     }
+                //     next();
+                // }, 
+
+                // DISABLE
+                // directory: function (root, stats, next) {
+                //     // skip .dirs
+                //     if ( stats.name[0] !== '.' ) {
+                //         callback( root, stats.name, stats );
+                //     }
+                //     next();
+                // }, 
+
+                // file: function (root, stats, next) {
+                //     // skip .files
+                //     if ( stats.name[0] !== '.' ) {
+                //         // skip xxx.meta files
+                //         if ( stats.name.split('.').pop() !== 'meta' ) {
+                //             callback( root, stats.name, stats );
+                //         }
+                //     }
+                //     next();
+                // }, 
+                // DISABLE
             }
         };
         walker = Walk.walk(rpath, options);

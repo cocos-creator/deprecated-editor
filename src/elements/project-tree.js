@@ -19,14 +19,14 @@
         },
 
         load: function ( path ) {
-            AssetDB.walk( path, function ( root, stat ) {
+            AssetDB.walk( path, function ( root, name, stat ) {
                 itemEL = new ProjectItem();
-                itemEL.$.name.innerHTML = stat.name;
+                itemEL.$.name.innerHTML = name;
                 if ( stat.isDirectory() ) {
                     itemEL.foldable = true;
                     itemEL.setIcon('fa-folder');
 
-                    this.folderElements[root+"/"+stat.name] = itemEL;
+                    this.folderElements[root+"/"+name] = itemEL;
                 }
                 else {
                     itemEL.setIcon('fa-file-image-o');
