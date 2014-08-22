@@ -1,11 +1,11 @@
 (function () {
     Polymer('project-item', {
         publish: {
+            folded: false,
             foldable: {
                 value: false,
                 reflect: true
             },
-
             selected: {
                 value: false,
                 reflect: true
@@ -18,11 +18,26 @@
 
         mousedownAction: function ( event ) {
             var isToggle = false;
-            if ( event.metaKey || event.ctrlKey ) {
+            var isShift = false;
+
+            if ( event.shiftKey ) {
+                isShift = true;
+            }
+            else if ( event.metaKey || event.ctrlKey ) {
                 isToggle = true;
             }
 
-            this.fire('select', { toggle: isToggle } );
+            this.fire('select', { 
+                toggle: isToggle, 
+                shift: isShift
+            } );
+
+            event.stopPropagation();
+        },
+
+        foldMousedownAction: function ( event ) {
+            this.folded = !this.folded;
+
             event.stopPropagation();
         },
     });

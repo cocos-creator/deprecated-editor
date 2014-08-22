@@ -10,13 +10,21 @@
     <div class="bar"></div>
     <div class="item">
         <div class="border">
-            <i id="foldIcon" class="fold-icon fa fa-caret-down"></i>
+            <i id="foldIcon" 
+               class="fold-icon fa {{folded ? 'fa-caret-right' : 'fa-caret-down'}}"
+               on-mousedown="{{foldMousedownAction}}"
+               >
+           </i>
             <i id="typeIcon" class="type-icon fa fa-folder"></i>
             <span id="name" class="name"></span>
         </div>
     </div>
 </div>
-<content/>
+<div id="content"
+     style="display: {{ folded ? 'none' : '' }}"
+     >
+    <content/>
+</div>
 
 </template>
 

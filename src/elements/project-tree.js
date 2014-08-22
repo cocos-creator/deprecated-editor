@@ -67,14 +67,22 @@
             this.$.view.focus();
 
             if ( event.target instanceof ProjectItem ) {
-                if ( event.detail.toggle ) {
+                if ( event.detail.shift ) {
+                    if ( !this.lastActive ) {
+                        this.lastActive = event.target;
+                        this.select( [event.target] );
+                    }
+                    else {
+                        // TODO:
+                    }
+                }
+                else if ( event.detail.toggle ) {
                     this.toggle( [event.target] );
                 }
                 else {
                     this.clearSelect();
                     this.select( [event.target] );
                 } 
-
                 this.lastActive = event.target;
             }
             event.stopPropagation();
