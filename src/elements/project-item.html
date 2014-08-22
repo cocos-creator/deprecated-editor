@@ -1,15 +1,19 @@
 <polymer-element 
     name="project-item" 
     constructor="ProjectItem"
+    on-mousedown="{{mousedownAction}}"
     >
 <template>
 <link rel="stylesheet" href="project-item.css">
 
-<div class="item">
-    <div class="border">
-        <i id="foldIcon" class="fold-icon fa fa-caret-down"></i>
-        <i id="typeIcon" class="type-icon fa fa-folder"></i>
-        <span id="name" class="name"></span>
+<div class="wrapper">
+    <div class="bar"></div>
+    <div class="item">
+        <div class="border">
+            <i id="foldIcon" class="fold-icon fa fa-caret-down"></i>
+            <i id="typeIcon" class="type-icon fa fa-folder"></i>
+            <span id="name" class="name"></span>
+        </div>
     </div>
 </div>
 <content/>

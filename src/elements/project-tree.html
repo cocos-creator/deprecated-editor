@@ -11,7 +11,13 @@
 <!--     <fire-ui-button>Search</fire-ui-button>             -->
 <!--     <div style="width: 2px; height: 2px;"></div>        -->
 <!-- </div>                                                  -->
-<div class="view" flex-1>
+<div id="view"
+    class="view" flex-1
+    on-focusin="{{focusinAction}}"
+    on-focusout="{{focusoutAction}}"
+    on-mousedown="{{mousedownAction}}"
+    on-select="{{selectAction}}"
+    >
     <div id="content">
     </div>
 </div>
