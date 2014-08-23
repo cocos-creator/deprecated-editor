@@ -32,6 +32,7 @@
                 shift: isShift
             } );
 
+            event.preventDefault();
             event.stopPropagation();
         },
 
