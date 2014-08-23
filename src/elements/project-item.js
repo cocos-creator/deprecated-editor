@@ -10,6 +10,10 @@
                 value: false,
                 reflect: true
             },
+            highlighted: {
+                value: false,
+                reflect: true
+            },
         },
 
         setIcon: function ( className ) {

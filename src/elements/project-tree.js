@@ -110,6 +110,11 @@
                 if ( item.selected === false ) {
                     item.selected = true;
                     this.selection.push(item);
+
+                    // TEMP
+                    if ( item.parentElement ) {
+                        item.parentElement.highlighted = true;
+                    }
                 }
             }
         },
