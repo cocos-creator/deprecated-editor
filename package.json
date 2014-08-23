@@ -7,9 +7,11 @@
   "licenseUrl": "http://opensource.org/licenses/MIT",
   "main": "index.html",
   "window": {
+      "title:": "Fireball-x",
       "toolbar": false,
       "width": 1280,
-      "height": 720
+      "height": 720,
+      "show": false
   },
   "dependencies": {
       "walk": "",

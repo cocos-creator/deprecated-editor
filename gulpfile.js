@@ -8,6 +8,7 @@ var gutil = require('gulp-util');
 var clean = require('gulp-clean');
 var jshint = require('gulp-jshint');
 var uglify = require('gulp-uglify');
+var concat = require('gulp-concat');
 var stylus = require('gulp-stylus');
 var rename = require('gulp-rename');
 var vulcanize = require('gulp-vulcanize');
@@ -24,12 +25,17 @@ var paths = {
         '../editor-ui/bin/editor-ui.html',
         '../editor-ui/bin/img/**/*.png',
     ],
-    img: 'src/img/**/*',
-    css:  'src/**/*.styl',
-    html: 'src/**/*.html',
-    js:   'src/**/*.js',
     third_party: '3rd/**/*',
     minify_ext: [],
+    elements_img:  'src/elements/img/**/*.png',
+    elements_css:  'src/elements/**/*.styl',
+    elements_html: 'src/elements/**/*.html',
+    elements_js:   'src/elements/**/*.js',
+    editor_js: [
+        'src/core/utils.js',
+        'src/core/asset-db.js',
+        'src/core/editor-app.js',
+    ],
 };
 
 // clean
@@ -68,14 +74,14 @@ gulp.task('cp-editor-ui', function() {
     return deferred.promise;
 });
 
-gulp.task('cp-img', function() {
-    return gulp.src(paths.img, {base: 'src/'})
+gulp.task('cp-elements-img', function() {
+    return gulp.src(paths.elements_img, {base: 'src/'})
     .pipe(gulp.dest('bin'))
     ;
 });
 
-gulp.task('cp-html', function() {
-    return gulp.src(paths.html, {base: 'src/'})
+gulp.task('cp-elements-html', function() {
+    return gulp.src(paths.elements_html, {base: 'src/'})
     .pipe(gulp.dest('bin'))
     ;
 });
@@ -91,8 +97,8 @@ gulp.task('cp-3rd', function() {
 /////////////////////////////////////////////////////////////////////////////
 
 // css
-gulp.task('css', function() {
-    return gulp.src(paths.css, {base: 'src/'})
+gulp.task('elements-css', function() {
+    return gulp.src(paths.elements_css, {base: 'src/'})
     .pipe(stylus({
         compress: true,
         include: 'src'
@@ -122,10 +128,9 @@ var writeVersion = function (filename) {
     });
 };
 
-// js
-gulp.task('js', function() {
-    return gulp.src(paths.js, {base: 'src'})
-    // .pipe(writeVersion('atlas-editor.js'))
+// elements-js
+gulp.task('elements-js', function() {
+    return gulp.src(paths.elements_js, {base: 'src'})
     .pipe(jshint())
     .pipe(jshint.reporter(stylish))
     .pipe(uglify())
@@ -133,14 +138,32 @@ gulp.task('js', function() {
     ;
 });
 
-// js-no-uglify
-gulp.task('js-dev', function() {
-    return gulp.src(paths.js, {base: 'src'})
-    // .pipe(writeVersion('atlas-editor.js'))
+// elements-js-dev
+gulp.task('elements-js-dev', function() {
+    return gulp.src(paths.elements_js, {base: 'src'})
     .pipe(gulp.dest('bin'))
     ;
 });
 
+// editor-js-dev
+gulp.task('editor-js-dev', function() {
+    return gulp.src(paths.editor_js)
+    // .pipe(writeVersion('editor-app.js'))
+    .pipe(concat('editor.dev.js'))
+    .pipe(gulp.dest('bin'))
+    ;
+});
+
+// editor-js-min
+gulp.task('editor-js-min', ['editor-js-dev'], function() {
+    return gulp.src('bin/editor.dev.js')
+    .pipe(jshint())
+    .pipe(jshint.reporter(stylish))
+    .pipe(rename('editor.min.js'))
+    .pipe(uglify())
+    .pipe(gulp.dest('bin'))
+    ;
+});
 
 // minify 3rd libraries from their source
 gulp.task('ext-min', ['cp-3rd'], function() {
@@ -154,9 +177,9 @@ gulp.task('ext-min', ['cp-3rd'], function() {
 });
 
 // html
-var build_html = function (strip) {
+var build_elements_html = function (strip) {
     return function () {
-        return gulp.src('bin/app.html')
+        return gulp.src('bin/elements/editor.html')
         .pipe(vulcanize({
             dest: 'bin/',
             inline: true,
@@ -170,19 +193,20 @@ var build_html = function (strip) {
 /////////////////////////////////////////////////////////////////////////////
 
 // short tasks
-gulp.task('build-html', ['cp-html', 'css', 'js'], build_html(true));
-gulp.task('build-html-dev', ['cp-html', 'css', 'js-dev'], build_html(false));
-gulp.task('cp-all', ['cp-core', 'cp-engine', 'cp-editor-ui', 'cp-img', 'cp-html', 'cp-3rd'] );
-gulp.task('dev', ['cp-all', 'build-html-dev' ] );
-gulp.task('default', ['cp-all', 'ext-min', 'build-html' ] );
+gulp.task('build-elements-html', ['cp-elements-html', 'elements-css', 'elements-js'], build_elements_html(true));
+gulp.task('build-elements-html-dev', ['cp-elements-html', 'elements-css', 'elements-js-dev'], build_elements_html(false));
+gulp.task('cp-all', ['cp-core', 'cp-engine', 'cp-editor-ui', 'cp-elements-img', 'cp-elements-html', 'cp-3rd'] );
+gulp.task('dev', ['cp-all', 'build-elements-html-dev', 'editor-js-dev' ] );
+gulp.task('default', ['cp-all', 'ext-min', 'build-elements-html', 'editor-js-min' ] );
 
 // watch
 gulp.task('watch', function() {
     gulp.watch(paths.ext_core, ['cp-core']).on ( 'error', gutil.log );
     gulp.watch(paths.ext_engine, ['cp-engine']).on ( 'error', gutil.log );
     gulp.watch(paths.ext_editor_ui, ['cp-editor-ui']).on ( 'error', gutil.log );
-    gulp.watch(paths.img, ['cp-img']).on ( 'error', gutil.log );
-    gulp.watch(paths.css, ['css', 'build-html-dev']).on ( 'error', gutil.log );
-    gulp.watch(paths.js, ['build-html-dev']).on ( 'error', gutil.log );
-    gulp.watch(paths.html, ['build-html-dev']).on ( 'error', gutil.log );
+    gulp.watch(paths.elements_img, ['cp-elements-img']).on ( 'error', gutil.log );
+    gulp.watch(paths.elements_css, ['elements-css', 'build-elements-html-dev']).on ( 'error', gutil.log );
+    gulp.watch(paths.elements_js, ['build-elements-html-dev']).on ( 'error', gutil.log );
+    gulp.watch(paths.elements_html, ['build-elements-html-dev']).on ( 'error', gutil.log );
+    gulp.watch(paths.editor_js, ['editor-js-dev']).on ( 'error', gutil.log );
 });

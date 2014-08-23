@@ -7,18 +7,15 @@
 
         <script type="text/javascript" src="ext/platform/platform.js"></script>
         <script type="text/javascript" src="ext/pixi/bin/pixi.dev.js"></script>
-
-        <script type="text/javascript" src="ext/fire-core/core.min.js"></script>
-        <script type="text/javascript" src="ext/fire-engine/engine.dev.js"></script>
-        <!-- <script type="text/javascript" src="ext/mousetrap/mousetrap.min.js"></script> -->
-        <!-- <script type="text/javascript" src="ext/bluebird.js"></script>                                    -->
-        <!-- <script type="text/javascript" src="ext/require.min.nw.js" data-main="bin/requireIndex"></script> -->
-
         <script type="text/javascript" src="ext/web-animations-js/web-animations.js"></script>
+
+        <script type="text/javascript" src="ext/fire-core/core.dev.js"></script>
+        <script type="text/javascript" src="ext/fire-engine/engine.dev.js"></script>
+        <script type="text/javascript" src="bin/editor.dev.js"></script>
 
         <link rel="import" href="ext/polymer/polymer.html">
         <link rel="import" href="ext/fire-editor-ui/editor-ui.html">
-        <link rel="import" href="bin/app.html">
+        <link rel="import" href="bin/editor.html">
 
         <style>
             body {
@@ -30,6 +27,10 @@
                 overflow: hidden;
             }
         </style>
+
+        <script>
+            EditorApp.start();
+        </script>
     </head>
 
     <body flex-col flex-stretch>

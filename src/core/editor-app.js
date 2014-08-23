@@ -2,25 +2,28 @@ var EditorApp;
 (function (EditorApp) {
     var nwGUI = null;
     var Fs = null;
+    var nativeMainWin = null;
 
     if ( FIRE.isNw ) {
         nwGUI = require('nw.gui');
         Fs = require('fs');
+        nativeMainWin = nwGUI.Window.get();
     }
 
-    var _mainWin = null;
-    EditorApp.__defineGetter__('mainWin', function () { return _mainWin; } );
+    EditorApp.start = function () {
+        if ( FIRE.isNw ) {
+            // nativeMainWin.showDevTools();
 
-    var _cwd = null; // the path of current opened project
-    EditorApp.__defineGetter__('cwd', function () { return _cwd; } );
+            // init and show main window
+            EditorApp.init();
+            nativeMainWin.show();
+            nativeMainWin.focus();
+        }
+    };
 
-    var _appPath = null; // the path of fireball-x editor 
-    EditorApp.__defineGetter__('appPath', function () { return _appPath; } );
-
-    EditorApp.init = function ( mainWindow ) {
+    //
+    EditorApp.init = function () {
         console.log('editor-app initializing...');
-
-        _mainWin = mainWindow;
 
         // init document events
         document.addEventListener( "drop", function (event) {
@@ -35,9 +38,8 @@ var EditorApp;
         } );
 
         // init native functions
-        if (FIRE.isNw) {
+        if ( FIRE.isNw ) {
             _appPath = process.cwd();
-            var nativeWin = nwGUI.Window.get();
 
             // TODO: login
             // TODO: choose project
@@ -47,45 +49,51 @@ var EditorApp;
                 // TODO: create default user profile.
             }
 
-            //
+            // TEMP
             var defaultProjectPath = _appPath + "/bin/projects/default";
             if ( !Fs.existsSync(defaultProjectPath) ) {
                 EditorApp.newProject(defaultProjectPath);
             }
             EditorApp.openProject(defaultProjectPath);
+            // TEMP
 
             // init hot-keys
             document.onkeydown = function (e) { 
                 switch ( e.keyCode ) {
                     // F12
                     case 123:
-                        nativeWin.showDevTools();
+                        nativeMainWin.showDevTools();
                         e.stopPropagation();
                     break;
 
                     // F5
                     case 116:
-                        nativeWin.reload();
+                        nativeMainWin.reload();
                     break;
                 }
             };
 
             // init menu
-            if (FIRE.isDarwin) {
+            if ( FIRE.isDarwin ) {
                 var nativeMenuBar = new nwGUI.Menu({ type: "menubar" });
                 nativeMenuBar.createMacBuiltin("Fireball-X");
-                nativeWin.menu = nativeMenuBar;
+                nativeMainWin.menu = nativeMenuBar;
             }
         }
+    };
 
-        // init project-tree
-        _mainWin.$.projectView.load("assets://");
+    var _mainWin = null;
+    EditorApp.__defineGetter__('mainWin', function () { return _mainWin; } );
 
-        // init engine & game-view
-        console.log('fire-engine initializing...');
-        var canvas = FIRE.Engine.init( _mainWin.$.gameView.$.view.clientWidth,
-                                       _mainWin.$.gameView.$.view.clientHeight );
-        _mainWin.$.gameView.setCanvas(canvas);
+    var _cwd = null; // the path of current opened project
+    EditorApp.__defineGetter__('cwd', function () { return _cwd; } );
+
+    var _appPath = null; // the path of fireball-x editor 
+    EditorApp.__defineGetter__('appPath', function () { return _appPath; } );
+
+    //
+    EditorApp.setMainWindow = function ( mainWin ) {
+        _mainWin = mainWin;
     };
 
     //
@@ -102,6 +110,7 @@ var EditorApp;
         Fs.writeFileSync(projectFile, '');
     };
 
+    //
     EditorApp.openProject = function ( path ) {
         _cwd = path;
 
