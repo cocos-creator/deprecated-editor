@@ -86,4 +86,25 @@ var EditorUtils;
     }
     EditorUtils.mkdirpSync = _mkdirpSync;
 
+    // foo/bar, foo/bar/foobar ==> 1
+    // foo/bar/foobar, foo/bar ==> -1
+    // foo/bar, foo/bar ==> 0
+    // foo/bar/foobar, foobar/bar/foo ==> null
+    EditorUtils.comparePath = function ( pathA, pathB ) {
+        if ( pathA.length < pathB.length ) {
+            if ( pathB.indexOf (pathA) === 0 )
+                return 1;
+        }
+        else if ( pathA.length > pathB.length ) {
+            if ( pathA.indexOf (pathB) === 0 )
+                return -1;
+        }
+        else {
+            if ( pathA === pathB )
+                return 0;
+        }
+
+        return null;
+    };
+
 })(EditorUtils || (EditorUtils = {}));

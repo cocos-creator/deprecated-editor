@@ -19,6 +19,10 @@
         created: function () {
             this._isToggle = false;
             this._isShift = false;
+
+            this.basename = '';
+            this.extname = '';
+            this.isFolder = false;
         },
 
         setIcon: function ( className ) {
@@ -41,7 +45,7 @@
                 shift: this._isShift
             } );
 
-            // event.preventDefault();
+            event.preventDefault();
             event.stopPropagation();
         },
 

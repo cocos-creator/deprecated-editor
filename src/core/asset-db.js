@@ -111,7 +111,7 @@ var AssetDB;
                     if ( stats.name[0] !== '.' ) {
                         // skip xxx.meta files
                         if ( stats.isFile ) {
-                            if ( stats.name.split('.').pop() !== 'meta' ) {
+                            if ( Path.extname(stats.name) !== '.meta' ) {
                                 callback( root, stats.name, stats );
                             }
                         }

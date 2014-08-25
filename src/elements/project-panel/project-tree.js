@@ -1,4 +1,6 @@
 (function () {
+    var Path = require('path');
+
     Polymer('project-tree', {
         publish: {
             focused: {
@@ -34,7 +36,12 @@
 
             this.addEventListener('mouseup', function ( event ) {
                 if ( this.startDragging ) {
-                    this.cancelDrag();
+                    if ( this.curDragoverEL ) {
+                        this.dropTo( this.curDragoverEL,
+                                     this.getMostIncludeElements(this.selection) );
+                    }
+
+                    this.stopDragging();
                     event.stopPropagation();
                 }
             }, true );
@@ -43,15 +50,23 @@
         load: function ( path ) {
             AssetDB.walk( path, function ( root, name, stat ) {
                 itemEL = new ProjectItem();
-                itemEL.$.name.innerHTML = name;
                 if ( stat.isDirectory() ) {
                     itemEL.foldable = true;
                     itemEL.setIcon('fa-folder');
+
+                    itemEL.isFolder = true;
+                    itemEL.extname = '';
+                    itemEL.basename = name;
+                    itemEL.$.name.innerHTML = itemEL.basename;
 
                     this.folderElements[root+"/"+name] = itemEL;
                 }
                 else {
                     itemEL.setIcon('fa-file-image-o');
+
+                    itemEL.extname = Path.extname(name);
+                    itemEL.basename = Path.basename(name, itemEL.extname);
+                    itemEL.$.name.innerHTML = itemEL.basename;
                 }
 
                 var parentEL = this.folderElements[root];
@@ -147,7 +162,7 @@
         },
 
         dragcancelAction: function (event) {
-            this.cancelDrag();
+            this.stopDragging();
         },
 
         keydownAction: function (event) {
@@ -155,7 +170,7 @@
                 switch ( event.which ) {
                     // esc
                     case 27:
-                        this.cancelDrag();
+                        this.stopDragging();
                         event.stopPropagation();
                     break;
                 }
@@ -238,13 +253,96 @@
             this.selection = [];
         },
 
-        cancelDrag: function () {
+        getPath: function ( element ) {
+            var path = element.basename + element.extname;
+            var parentEL = element.parentElement;
+            while ( parentEL instanceof ProjectItem ) {
+                path = parentEL.basename + "/" + path;
+                parentEL = parentEL.parentElement;
+            }
+            return path;
+        },
+
+        getMostIncludeElements: function ( elements ) {
+            var i,j;
+            var resultELs = [];
+            var paths = [];
+
+            for ( i = 0; i < elements.length; ++i ) {
+                var el = elements[i];
+                var path = this.getPath(el);
+                var addEL = true;
+                var resultEL = null;
+                var resultPath = null;
+                var cmp = null;
+
+                if ( el.isFolder ) {
+                    for ( j = 0; j < resultELs.length; ++j ) {
+                        resultEL = resultELs[j];
+                        resultPath = this.getPath(resultEL);
+                        cmp = EditorUtils.comparePath( path, resultPath );
+
+                        if ( cmp !== null ) {
+                            // path is childOf resultPath
+                            if ( cmp == -1 ) {
+                                addEL = false;
+                                break;
+                            }
+
+                            // path is parentOf resultPath
+                            if ( cmp >= 0 ) {
+                                resultELs.splice(j,1);
+                                --j;
+                            }
+                        }
+
+                        // path is not relative with resultPath
+                    }
+
+                    if ( addEL ) {
+                        resultELs.push(el);
+                    }
+                }
+                else {
+                    for ( j = 0; j < resultELs.length; ++j ) {
+                        resultEL = resultELs[j];
+                        resultPath = this.getPath(resultEL);
+                        cmp = EditorUtils.comparePath( path, resultPath );
+
+                        if ( cmp !== null ) {
+                            // path is childOf resultPath
+                            if ( cmp == -1 ) {
+                                addEL = false;
+                                break;
+                            }
+                        }
+
+                        // path is not relative with resultPath
+                    }
+
+                    if ( addEL ) {
+                        resultELs.push(el);
+                    }
+                }
+            }
+
+            return resultELs;
+        },
+
+        stopDragging: function () {
             if ( this.curDragoverEL ) {
                 this.curDragoverEL.highlighted = false;
                 this.curDragoverEL = false;
                 this.$.highlightMask.style.display = "none";
             }
             this.startDragging = false;
+        },
+
+        dropTo: function ( targetEL, elements ) {
+            for ( var i = 0; i < elements.length; ++i ) {
+                var el = elements[i];
+                targetEL.appendChild(el);
+            }
         },
 
         nextItem: function ( curItem, checkFolded ) {
