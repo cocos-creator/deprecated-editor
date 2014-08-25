@@ -1,6 +1,7 @@
-editor
-======
+# Intro
 
 Fireball-x Editor
 
-[Doc](doc)
+## Content
+
+ - [API Documentation](doc)
