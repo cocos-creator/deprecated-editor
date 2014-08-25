@@ -38,7 +38,7 @@
                 }
                 else {
                     itemEL.style.marginLeft="0px";
-                    this.$.content.appendChild(itemEL);
+                    this.appendChild(itemEL);
                 }
             }.bind(this) );
         },
@@ -111,10 +111,15 @@
                     item.selected = true;
                     this.selection.push(item);
 
-                    // TEMP
-                    if ( item.parentElement ) {
-                        item.parentElement.highlighted = true;
-                    }
+                    // // TEMP
+                    // if ( item.parentElement ) {
+                    //     item.parentElement.highlighted = true;
+                    //     this.$.highlightMask.style.display = "block";
+                    //     this.$.highlightMask.style.left = item.parentElement.offsetLeft + "px";
+                    //     this.$.highlightMask.style.top = item.parentElement.offsetTop + "px";
+                    //     this.$.highlightMask.style.width = item.parentElement.offsetWidth + "px";
+                    //     this.$.highlightMask.style.height = item.parentElement.offsetHeight + "px";
+                    // }
                 }
             }
         },

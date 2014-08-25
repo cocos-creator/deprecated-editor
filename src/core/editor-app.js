@@ -12,7 +12,8 @@ var EditorApp;
 
     EditorApp.start = function () {
         if ( FIRE.isNw ) {
-            // nativeMainWin.showDevTools();
+            // DEBUG
+            nativeMainWin.showDevTools();
 
             // init and show main window
             EditorApp.init();

@@ -22,10 +22,11 @@
         box-shadow: inset 0 0 8px 2px rgba(0,0,0,0.2)
         background: #333
 
-        // enable this will allow the width exceed the .view.width 
-        // .content {
-        //     display: inline-block
-        // }
+        .content {
+            // enable this will allow the width exceed the .view.width 
+            // display: inline-block
+            // position: relative
+        }
 
         &::-webkit-scrollbar {
             height: 5px
@@ -44,19 +45,18 @@
         &::-webkit-scrollbar-button {
             display: none
         }
+
+        .highlight {
+            display: none
+            position: absolute
+            border: 2px solid #c7722c
+            box-sizing: border-box
+
+            pointer-events: none
+        }
     }
 
     // &([focused]) .view {
     //     border: 1px solid #04a
     // }
-
-    &([focused]) {
-        project-item[selected]::shadow {
-            .wrapper {
-                .bar {
-                    background: #059
-                }
-            }
-        }
-    }
 }
