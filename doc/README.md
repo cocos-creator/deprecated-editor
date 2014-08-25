@@ -2,10 +2,10 @@
 
 ## Contents
 
-[Editor](zh/editor.md)
-[Project](zh/project.md)
-[Asset](zh/asset.md)
-[Share](zh/share.md)
+ - [Editor](zh/editor.md)
+ - [Project](zh/project.md)
+ - [Asset](zh/asset.md)
+ - [Share](zh/share.md)
 
 ## Test
 
