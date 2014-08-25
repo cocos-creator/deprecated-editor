@@ -43,11 +43,6 @@
         load: function ( path ) {
             AssetDB.walk( path, function ( root, name, stat ) {
                 itemEL = new ProjectItem();
-                // itemEL.setAttribute("draggable", "true");
-                // itemEL.addEventListener ( "dragstart", function () {
-                //     console.log("drag-start");
-                // } );
-
                 itemEL.$.name.innerHTML = name;
                 if ( stat.isDirectory() ) {
                     itemEL.foldable = true;
