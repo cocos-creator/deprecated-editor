@@ -16,27 +16,53 @@
             },
         },
 
+        created: function () {
+            this._isToggle = false;
+            this._isShift = false;
+        },
+
         setIcon: function ( className ) {
             this.$.typeIcon.className = "type-icon fa " + className;
         },
 
         mousedownAction: function ( event ) {
-            var isToggle = false;
-            var isShift = false;
+            this._isToggle = false;
+            this._isShift = false;
 
             if ( event.shiftKey ) {
-                isShift = true;
+                this._isShift = true;
             }
             else if ( event.metaKey || event.ctrlKey ) {
-                isToggle = true;
+                this._isToggle = true;
             }
 
-            this.fire('select', { 
-                toggle: isToggle, 
-                shift: isShift
+            this.fire('selecting', { 
+                toggle: this._isToggle, 
+                shift: this._isShift
             } );
 
-            event.preventDefault();
+            // event.preventDefault();
+            event.stopPropagation();
+        },
+
+        mouseupAction: function ( event ) {
+            this.fire('select', { 
+                toggle: this._isToggle, 
+                shift: this._isShift
+            } );
+
+            event.stopPropagation();
+        },
+
+        mousemoveAction: function ( event ) {
+            this.fire('draghover');
+
+            event.stopPropagation();
+        },
+
+        dragoverAction: function ( event ) {
+            this.fire('draghover');
+
             event.stopPropagation();
         },
 

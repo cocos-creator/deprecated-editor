@@ -12,15 +12,54 @@
             this.folderElements = {};
             this.selection = [];
             this.lastActive = null;
+            this.startDragging = false;
+            this.curDragoverEL = null; 
         },
 
         ready: function () {
-            this.$.view.tabIndex = EditorUI.getParentTabIndex(this)+1;
+            this.tabIndex = EditorUI.getParentTabIndex(this)+1;
+
+            this.addEventListener('mousedown', function ( event ) {
+                this.focus();
+            }, true );
+
+            this.addEventListener('mousemove', function ( event ) {
+                if ( this.startDragging ) {
+                    // TODO: go to dragging state by distance
+                }
+                else {
+                    event.stopPropagation();
+                }
+            }, true );
+
+            this.addEventListener('mouseup', function ( event ) {
+                if ( this.startDragging ) {
+                    this.cancelDrag();
+                    event.stopPropagation();
+                }
+            }, true );
+
+            this.addEventListener('keydown', function ( event ) {
+                if ( this.startDragging ) {
+                switch ( event.which ) {
+                    // esc
+                    case 27:
+                        this.cancelDrag();
+                        event.stopPropagation();
+                    break;
+                }
+                }
+            } );
         },
 
         load: function ( path ) {
             AssetDB.walk( path, function ( root, name, stat ) {
                 itemEL = new ProjectItem();
+                // itemEL.setAttribute("draggable", "true");
+                // itemEL.addEventListener ( "dragstart", function () {
+                //     console.log("drag-start");
+                // } );
+
                 itemEL.$.name.innerHTML = name;
                 if ( stat.isDirectory() ) {
                     itemEL.foldable = true;
@@ -54,18 +93,10 @@
             if ( EditorUI.find( this.shadowRoot, event.relatedTarget ) )
                 return;
 
-            // this.clearSelect(); // TODO
             this.focused = false;
         },
 
-        mousedownAction: function ( event ) {
-            // NOTE: this will prevent dragging auto-scroll
-            event.preventDefault();
-        },
-
-        selectAction: function (event) {
-            this.$.view.focus();
-
+        selectingAction: function (event) {
             if ( event.target instanceof ProjectItem ) {
                 if ( event.detail.shift ) {
                     if ( !this.lastActive ) {
@@ -80,12 +111,60 @@
                     this.toggle( [event.target] );
                 }
                 else {
-                    this.clearSelect();
-                    this.select( [event.target] );
+                    this.startDragging = true;
+                    if ( this.selection.indexOf(event.target) === -1 ) {
+                        this.clearSelect();
+                        this.select( [event.target] );
+                    }
                 } 
                 this.lastActive = event.target;
             }
             event.stopPropagation();
+        },
+
+        selectAction: function (event) {
+            if ( event.target instanceof ProjectItem ) {
+                if ( event.detail.shift ) {
+                    // TODO:
+                }
+                else if ( event.detail.toggle ) {
+                    // TODO:
+                }
+                else {
+                    if ( this.selection.indexOf(event.target) !== -1 ) {
+                        this.clearSelect();
+                        this.select( [event.target] );
+                    }
+                } 
+            }
+
+            // TODO: confirm selection
+            event.stopPropagation();
+        },
+
+        draghoverAction: function (event) {
+            if ( event.target ) {
+                var target = event.target;
+                if ( event.target.foldable === false )
+                    target = event.target.parentElement;
+                if ( target ) {
+                    this.$.highlightMask.style.display = "block";
+                    this.$.highlightMask.style.left = target.offsetLeft + "px";
+                    this.$.highlightMask.style.top = target.offsetTop + "px";
+                    this.$.highlightMask.style.width = target.offsetWidth + "px";
+                    this.$.highlightMask.style.height = target.offsetHeight + "px";
+                }
+                if ( this.curDragoverEL ) {
+                    this.curDragoverEL.highlighted = false;
+                }
+                target.highlighted = true;
+                this.curDragoverEL = target;
+            }
+            event.stopPropagation();
+        },
+
+        dragcancelAction: function (event) {
+            this.cancelDrag();
         },
 
         toggle: function ( items ) {
@@ -110,16 +189,6 @@
                 if ( item.selected === false ) {
                     item.selected = true;
                     this.selection.push(item);
-
-                    // // TEMP
-                    // if ( item.parentElement ) {
-                    //     item.parentElement.highlighted = true;
-                    //     this.$.highlightMask.style.display = "block";
-                    //     this.$.highlightMask.style.left = item.parentElement.offsetLeft + "px";
-                    //     this.$.highlightMask.style.top = item.parentElement.offsetTop + "px";
-                    //     this.$.highlightMask.style.width = item.parentElement.offsetWidth + "px";
-                    //     this.$.highlightMask.style.height = item.parentElement.offsetHeight + "px";
-                    // }
                 }
             }
         },
@@ -141,6 +210,15 @@
                 this.selection[i].selected = false;
             }
             this.selection = [];
+        },
+
+        cancelDrag: function () {
+            if ( this.curDragoverEL ) {
+                this.curDragoverEL.highlighted = false;
+                this.curDragoverEL = false;
+                this.$.highlightMask.style.display = "none";
+            }
+            this.startDragging = false;
         },
     });
 })();

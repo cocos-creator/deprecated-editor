@@ -59,12 +59,12 @@ var EditorApp;
             // TEMP
 
             // init hot-keys
-            document.onkeydown = function (e) { 
-                switch ( e.keyCode ) {
+            document.addEventListener ( 'keydown', function ( event ) {
+                switch ( event.keyCode ) {
                     // F12
                     case 123:
                         nativeMainWin.showDevTools();
-                        e.stopPropagation();
+                        event.stopPropagation();
                     break;
 
                     // F5
@@ -72,7 +72,7 @@ var EditorApp;
                         nativeMainWin.reload();
                     break;
                 }
-            };
+            } );
 
             // init menu
             if ( FIRE.isDarwin ) {
