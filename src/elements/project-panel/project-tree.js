@@ -38,18 +38,6 @@
                     event.stopPropagation();
                 }
             }, true );
-
-            this.addEventListener('keydown', function ( event ) {
-                if ( this.startDragging ) {
-                switch ( event.which ) {
-                    // esc
-                    case 27:
-                        this.cancelDrag();
-                        event.stopPropagation();
-                    break;
-                }
-                }
-            } );
         },
 
         load: function ( path ) {
@@ -167,6 +155,49 @@
             this.cancelDrag();
         },
 
+        keydownAction: function (event) {
+            if ( this.startDragging ) {
+                switch ( event.which ) {
+                    // esc
+                    case 27:
+                        this.cancelDrag();
+                        event.stopPropagation();
+                    break;
+                }
+            }
+            else {
+                switch ( event.which ) {
+                    // key-up
+                    case 38:
+                        if ( this.lastActive ) {
+                            this.clearSelect();
+                            var prev = this.prevItem(this.lastActive);
+                            if ( prev === null ) {
+                                prev = this.lastActive;
+                            }
+                            this.lastActive = prev;
+                            this.select([this.lastActive]);
+                        }
+                        event.stopPropagation();
+                    break;
+
+                    // key-down
+                    case 40:
+                        if ( this.lastActive ) {
+                            this.clearSelect();
+                            var next = this.nextItem(this.lastActive,true);
+                            if ( next === null ) {
+                                next = this.lastActive;
+                            }
+                            this.lastActive = next;
+                            this.select([this.lastActive]);
+                        }
+                        event.stopPropagation();
+                    break;
+                }
+            }
+        },
+
         toggle: function ( items ) {
             for ( var i = 0; i < items.length; ++i ) {
                 var item = items[i];
@@ -219,6 +250,57 @@
                 this.$.highlightMask.style.display = "none";
             }
             this.startDragging = false;
+        },
+
+        nextItem: function ( curItem, checkFolded ) {
+            if ( checkFolded &&
+                 curItem.foldable && 
+                 curItem.folded === false && 
+                 curItem.children.length > 0 ) 
+            {
+                return curItem.firstElementChild;
+            }
+
+            if ( curItem.nextElementSibling )
+                return curItem.nextElementSibling;
+
+            var parentEL = curItem.parentElement;
+            if ( parentEL instanceof ProjectItem === false ) {
+                return null;
+            }
+
+            return this.nextItem(parentEL,false);
+        },
+
+        prevItem: function ( curItem ) {
+            if ( curItem.previousElementSibling ) {
+                if ( curItem.previousElementSibling.foldable && 
+                     curItem.previousElementSibling.folded === false && 
+                     curItem.previousElementSibling.children.length > 0 ) 
+                {
+                    return this.getLastElementRecursively(curItem.previousElementSibling);
+                }
+
+                return curItem.previousElementSibling;
+            }
+
+            var parentEL = curItem.parentElement;
+            if ( parentEL instanceof ProjectItem === false ) {
+                return null;
+            }
+
+            return parentEL;
+        },
+
+        getLastElementRecursively: function ( curItem ) {
+            if ( curItem.foldable && 
+                 curItem.folded === false && 
+                 curItem.children.length > 0 ) 
+            {
+                return this.getLastElementRecursively (curItem.lastElementChild);
+            }
+
+            return curItem;
         },
     });
 })();
