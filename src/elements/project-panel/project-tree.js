@@ -78,36 +78,44 @@
         },
 
         load: function ( path ) {
-            AssetDB.walk( path, function ( root, name, stat ) {
-                itemEL = new ProjectItem();
-                if ( stat.isDirectory() ) {
-                    itemEL.foldable = true;
-                    itemEL.setIcon('fa-folder');
+            AssetDB.walk( 
+                path, 
 
-                    itemEL.isFolder = true;
-                    itemEL.extname = '';
-                    itemEL.basename = name;
-                    itemEL.$.name.innerHTML = itemEL.basename;
+                function ( root, name, stat ) {
+                    itemEL = new ProjectItem();
+                    if ( stat.isDirectory() ) {
+                        itemEL.foldable = true;
+                        itemEL.setIcon('fa-folder');
 
-                    this.folderElements[root+"/"+name] = itemEL;
-                }
-                else {
-                    itemEL.setIcon('fa-file-image-o');
+                        itemEL.isFolder = true;
+                        itemEL.extname = '';
+                        itemEL.basename = name;
+                        itemEL.$.name.innerHTML = itemEL.basename;
 
-                    itemEL.extname = Path.extname(name);
-                    itemEL.basename = Path.basename(name, itemEL.extname);
-                    itemEL.$.name.innerHTML = itemEL.basename;
-                }
+                        this.folderElements[root+"/"+name] = itemEL;
+                    }
+                    else {
+                        itemEL.setIcon('fa-file-image-o');
 
-                var parentEL = this.folderElements[root];
-                if ( parentEL ) {
-                    parentEL.appendChild(itemEL);
-                }
-                else {
-                    itemEL.style.marginLeft="0px";
-                    this.appendChild(itemEL);
-                }
-            }.bind(this) );
+                        itemEL.extname = Path.extname(name);
+                        itemEL.basename = Path.basename(name, itemEL.extname);
+                        itemEL.$.name.innerHTML = itemEL.basename;
+                    }
+
+                    var parentEL = this.folderElements[root];
+                    if ( parentEL ) {
+                        parentEL.appendChild(itemEL);
+                    }
+                    else {
+                        itemEL.style.marginLeft="0px";
+                        this.appendChild(itemEL);
+                    }
+                }.bind(this), 
+
+                function () {
+                    // console.log("finish walk");
+                }.bind(this)
+            );
         },
 
         focusinAction: function (event) {

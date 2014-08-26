@@ -4,6 +4,7 @@ var AssetDB;
     var Fs = require('fs');
     var Walk = require('walk');
     var Path = require('path');
+    var Uuid = require('node-uuid');
 
     var _mounts = {};
 
@@ -81,21 +82,73 @@ var AssetDB;
         }
 
         // TODO: move asset
-        // TODO: move asset.json
+        // TODO: move asset.meta
     };
 
-    AssetDB.importAsset = function ( root, name, stat ) {
-        // TODO:
+    AssetDB.importAsset = function ( rpath ) {
+        // check if we have .meta
+        var metaPath = rpath + ".meta";
+        Fs.exists( metaPath, function ( exists ) {
+            if ( exists === false ) {
+                // create new .meta file
+                var meta = {
+                    ver: EditorUtils.metaVer,
+                    uuid: Uuid.v4(),
+                };
+                Fs.writeFile(metaPath, JSON.stringify(meta,null,'  '), function ( err ) {
+                    if (err) throw err;
+                } );
+            }
+        } );
     };
 
     // import any changes
     AssetDB.refresh = function () {
+        var doImport = function ( root, name, stat ) {
+            if ( stat.isDirectory() === false ) {
+                AssetDB.importAsset( root + "/" + name );
+            }
+            else {
+                // do nothing if this is a directory
+            }
+        };
+
+        var checkMetaExists = function ( exists ) {
+            if ( exists === false ) {
+                Fs.unlink( root + "/" + stats.name );
+            }
+        };
+
+        var options = {
+            listeners: {
+                files: function (root, statsArray, next) {
+                    // skip .files
+                    for ( var i = 0; i < statsArray.length; ++i ) {
+                        var stats = statsArray[i];
+                        if ( stats.name[0] !== '.' ) {
+                            // skip xxx.meta files
+                            if ( Path.extname(stats.name) !== '.meta' ) {
+                                doImport( root, stats.name, stats );
+                            }
+                            else {
+                                // remove meta file if its raw data not exists
+                                var basename = Path.basename(stats.name,'.meta');
+                                Fs.exists( root + "/" + basename, checkMetaExists );
+                            }
+                        }
+                    }
+                    next();
+                }, 
+            },
+        };
         for ( var name in _mounts ) {
-            AssetDB.walk ( name + "://", AssetDB.importAsset );
+            // AssetDB.walk ( name + "://", doImport );
+            var rpath = _realpath( name + "://" );
+            Walk.walk(rpath, options);
         }
     };
 
-    AssetDB.walk = function ( path, callback ) {
+    AssetDB.walk = function ( path, callback, finished ) {
         var rpath = _realpath(path);
         if ( rpath === null ) {
             console.error("Failed to walk path: " + path);
@@ -103,10 +156,10 @@ var AssetDB;
         }
 
         //
-        options = {
+        var options = {
             listeners: {
-                names: function (root, nodeNamesArray) {
-                    nodeNamesArray.sort(function (a, b) {
+                names: function (root, nodeNames) {
+                    nodeNames.sort(function (a, b) {
                         if (a > b) return 1;
                         if (a < b) return -1;
                         return 0;
@@ -115,6 +168,11 @@ var AssetDB;
 
                 errors: function (root, nodeStatsArray, next) {
                     next();
+                },
+
+                end: function () {
+                    if ( finished )
+                        finished();
                 },
 
                 node: function ( root, stats, next ) {
@@ -157,31 +215,10 @@ var AssetDB;
                 //     }
                 //     next();
                 // }, 
-
-                // DISABLE
-                // directory: function (root, stats, next) {
-                //     // skip .dirs
-                //     if ( stats.name[0] !== '.' ) {
-                //         callback( root, stats.name, stats );
-                //     }
-                //     next();
-                // }, 
-
-                // file: function (root, stats, next) {
-                //     // skip .files
-                //     if ( stats.name[0] !== '.' ) {
-                //         // skip xxx.meta files
-                //         if ( stats.name.split('.').pop() !== 'meta' ) {
-                //             callback( root, stats.name, stats );
-                //         }
-                //     }
-                //     next();
-                // }, 
-                // DISABLE
             }
         };
-        walker = Walk.walk(rpath, options);
-        // walker = Walk.walkSync(rpath, options);
+        Walk.walk(rpath, options);
+        // Walk.walkSync(rpath, options);
     };
 
 })(AssetDB || (AssetDB = {}));

@@ -128,6 +128,8 @@ var EditorApp;
         // mounting assets
         AssetDB.mount(path+'/assets', 'assets');
         // AssetDB.mount(appPath+'/shares', 'shares');
+
+        AssetDB.refresh();
     };
 
 })(EditorApp || (EditorApp = {}));

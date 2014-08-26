@@ -7,15 +7,15 @@
   "licenseUrl": "http://opensource.org/licenses/MIT",
   "main": "index.html",
   "window": {
-      "title:": "Fireball-x",
-      "toolbar": false,
-      "width": 1280,
-      "height": 720,
-      "show": false
+    "title:": "Fireball-x",
+    "toolbar": false,
+    "width": 1280,
+    "height": 720,
+    "show": false
   },
   "dependencies": {
-      "walk": "",
-      "findit": ""
+    "walk": "",
+    "node-uuid": ""
   },
   "devDependencies": {
     "event-stream": "^3.1.7",
