@@ -1,6 +1,28 @@
 (function () {
     var Path = require('path');
 
+    function _binaryIndexOf ( elements, key ) {
+        var lo = 0;
+        var hi = elements.length - 1;
+        var mid, el;
+
+        while (lo <= hi) {
+            mid = ((lo + hi) >> 1);
+            el = elements[mid];
+
+            if (el.basename < key) {
+                lo = mid + 1;
+            } 
+            else if (el.basename > key) {
+                hi = mid - 1;
+            } 
+            else {
+                return mid;
+            }
+        }
+        return lo;
+    }
+
     Polymer('project-tree', {
         publish: {
             focused: {
@@ -280,20 +302,19 @@
                     for ( j = 0; j < resultELs.length; ++j ) {
                         resultEL = resultELs[j];
                         resultPath = this.getPath(resultEL);
-                        cmp = EditorUtils.comparePath( path, resultPath );
 
-                        if ( cmp !== null ) {
-                            // path is childOf resultPath
-                            if ( cmp == -1 ) {
-                                addEL = false;
-                                break;
-                            }
+                        // path is child of resultPath
+                        cmp = EditorUtils.includePath( resultPath, path );
+                        if ( cmp ) {
+                            addEL = false;
+                            break;
+                        }
 
-                            // path is parentOf resultPath
-                            if ( cmp >= 0 ) {
-                                resultELs.splice(j,1);
-                                --j;
-                            }
+                        // path is parent or same of resultPath
+                        cmp = EditorUtils.includePath( path, resultPath );
+                        if ( cmp ) {
+                            resultELs.splice(j,1);
+                            --j;
                         }
 
                         // path is not relative with resultPath
@@ -307,14 +328,12 @@
                     for ( j = 0; j < resultELs.length; ++j ) {
                         resultEL = resultELs[j];
                         resultPath = this.getPath(resultEL);
-                        cmp = EditorUtils.comparePath( path, resultPath );
 
-                        if ( cmp !== null ) {
-                            // path is childOf resultPath
-                            if ( cmp == -1 ) {
-                                addEL = false;
-                                break;
-                            }
+                        // path is child of resultPath
+                        cmp = EditorUtils.includePath( resultPath, path );
+                        if ( cmp ) {
+                            addEL = false;
+                            break;
                         }
 
                         // path is not relative with resultPath
@@ -339,9 +358,21 @@
         },
 
         dropTo: function ( targetEL, elements ) {
+            var targetPath = this.getPath(targetEL);
             for ( var i = 0; i < elements.length; ++i ) {
                 var el = elements[i];
-                targetEL.appendChild(el);
+                var path = this.getPath(el);
+
+                if ( EditorUtils.includePath(path,targetPath) === false ) {
+                    // binary insert
+                    var idx = _binaryIndexOf( targetEL.children, el.basename );
+                    if ( idx === -1 ) {
+                        targetEL.appendChild(el);
+                    }
+                    else {
+                        targetEL.insertBefore(el,targetEL.children[idx]);
+                    }
+                }
             }
         },
 

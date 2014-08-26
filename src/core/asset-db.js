@@ -84,6 +84,17 @@ var AssetDB;
         // TODO: move asset.json
     };
 
+    AssetDB.importAsset = function ( root, name, stat ) {
+        // TODO:
+    };
+
+    // import any changes
+    AssetDB.refresh = function () {
+        for ( var name in _mounts ) {
+            AssetDB.walk ( name + "://", AssetDB.importAsset );
+        }
+    };
+
     AssetDB.walk = function ( path, callback ) {
         var rpath = _realpath(path);
         if ( rpath === null ) {
