@@ -26,6 +26,13 @@ var EditorApp;
     EditorApp.init = function () {
         console.log('editor-app initializing...');
 
+        // init node.js events
+        // handle the error safely
+        process.on('uncaughtException', function(err) {
+            console.log(err);
+        });
+
+
         // init document events
         document.addEventListener( "drop", function (event) {
             event.preventDefault(); 
