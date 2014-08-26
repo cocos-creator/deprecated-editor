@@ -56,6 +56,13 @@
                 }
             }, true );
 
+            this.addEventListener('mouseleave', function ( event ) {
+                if ( this.startDragging ) {
+                    this.cancelHighligting();
+                    event.stopPropagation();
+                }
+            }, true );
+
             this.addEventListener('mouseup', function ( event ) {
                 if ( this.startDragging ) {
                     if ( this.curDragoverEL ) {
@@ -63,7 +70,8 @@
                                      this.getMostIncludeElements(this.selection) );
                     }
 
-                    this.stopDragging();
+                    this.cancelHighligting();
+                    this.startDragging = false;
                     event.stopPropagation();
                 }
             }, true );
@@ -184,7 +192,7 @@
         },
 
         dragcancelAction: function (event) {
-            this.stopDragging();
+            this.cancelHighligting();
         },
 
         keydownAction: function (event) {
@@ -192,7 +200,8 @@
                 switch ( event.which ) {
                     // esc
                     case 27:
-                        this.stopDragging();
+                        this.cancelHighligting();
+                        this.startDragging = false;
                         event.stopPropagation();
                     break;
                 }
@@ -348,13 +357,12 @@
             return resultELs;
         },
 
-        stopDragging: function () {
+        cancelHighligting: function () {
             if ( this.curDragoverEL ) {
                 this.curDragoverEL.highlighted = false;
-                this.curDragoverEL = false;
+                this.curDragoverEL = null;
                 this.$.highlightMask.style.display = "none";
             }
-            this.startDragging = false;
         },
 
         dropTo: function ( targetEL, elements ) {
