@@ -11,7 +11,7 @@ var AssetDB;
     var _pathToUuid = {};
 
     var _realpath = function ( path ) {
-        var list = path.split("://");
+        var list = path.split(":/");
         if ( list.length !== 2 ) {
             console.warn("Invalid path " + path);
             return null;
@@ -28,7 +28,23 @@ var AssetDB;
         return Path.resolve( Path.join(_mounts[mountName],relativePath) );
     }; 
 
-    // name://foo/bar/foobar.png
+    var _realmove = function (rsrc, rdest) {
+        // if dest file exists, delete it first
+        if ( Fs.existsSync(rdest) ) {
+            AssetDB.deleteAsset(rdest);
+        }
+
+        var uuid = _pathToUuid[rsrc];
+        delete _pathToUuid[rsrc];
+        delete _uuidToPath[uuid];
+
+        Fs.renameSync( rsrc, rdest );
+        Fs.renameSync( rsrc + ".meta", rdest + ".meta" );
+        _pathToUuid[rdest] = uuid;
+        _pathToUuid[uuid] = rdest;
+    };
+
+    // name:/foo/bar/foobar.png
     AssetDB.mount = function ( path, name, replace ) {
         if ( ["http", "https", "files", "ftp" ].indexOf(name) !== -1 ) {
             console.warn("Can not use " + name + " for mounting");
@@ -79,12 +95,27 @@ var AssetDB;
     AssetDB.moveAsset = function (src, dest) {
         var rsrc = _realpath(src);
         if ( rsrc === null ) {
-            console.error("Failed to move asset: " + rsrc);
-            return;
+            console.error("Failed to move asset: " + src);
+            return false;
         }
 
-        // TODO: move asset
-        // TODO: move asset.meta
+        var rdest = _realpath(dest);
+        if ( rdest === null ) {
+            console.error("Invalid dest path: " + dest);
+            return false;
+        }
+
+        try {
+            _realmove ( rsrc, rdest );
+        }
+        catch ( err ) {
+            console.error(err);
+            return false;
+        }
+
+        // dispatch event
+        EditorApp.fire( 'assetMoved', { src: src, dest: dest } );
+        return true;
     };
 
     AssetDB.importAsset = function ( rpath ) {
@@ -93,9 +124,9 @@ var AssetDB;
         var meta = null;
         var createNewMeta = false;
         var metaPath = rpath + ".meta";
-        var exists = Fs.existsSync(metaPath);
+        var stat = Fs.statSync(rpath);
 
-        if ( exists ) {
+        if ( Fs.existsSync(metaPath) ) {
             data = Fs.readFileSync(metaPath);
             try {
                 meta = JSON.parse(data);
@@ -111,16 +142,23 @@ var AssetDB;
 
         // create new .meta file if needed
         if (createNewMeta) {
-            meta = {
-                ver: EditorUtils.metaVer,
-                uuid: Uuid.v4(),
-            };
+            if ( stat.isDirectory() ) {
+                meta = {
+                    ver: EditorUtils.metaVer,
+                };
+            }
+            else {
+                meta = {
+                    ver: EditorUtils.metaVer,
+                    uuid: Uuid.v4(),
+                };
+            }
             data = JSON.stringify(meta,null,'  ');
             Fs.writeFileSync(metaPath, data);
         }
 
         // import asset by its meta data
-        if ( meta ) {
+        if ( meta && stat.isDirectory() === false ) {
             // reimport the asset if we found uuid collision
             if ( _uuidToPath[meta.uuid] ) {
                 Fs.unlinkSync(metaPath);
@@ -135,45 +173,41 @@ var AssetDB;
 
     // import any changes
     AssetDB.refresh = function () {
-        var doImport = function ( root, name, stat ) {
-            if ( stat.isDirectory() === false ) {
-                AssetDB.importAsset( Path.join(root,name) );
+        var doImportAsset = function ( root, name, stat ) {
+            AssetDB.importAsset( Path.join(root,name) );
+        };
+
+        var doRefresh = function (root, statsArray, next) {
+            for ( var i = 0; i < statsArray.length; ++i ) {
+                var stats = statsArray[i];
+                // skip hidden files
+                if ( stats.name[0] !== '.' ) {
+                    // check if this is .meta file
+                    if ( Path.extname(stats.name) !== '.meta' ) {
+                        doImportAsset( root, stats.name, stats );
+                    }
+                    else {
+                        // remove .meta file if its raw data does not exist
+                        var basename = Path.basename(stats.name,'.meta');
+                        var rawfile = Path.join(root,basename);
+                        if ( Fs.existsSync(rawfile) === false ) {
+                            Fs.unlink( Path.join(root,stats.name) );
+                        }
+                    }
+                }
             }
-            else {
-                // do nothing if this is a directory
-            }
+            next();
         };
 
         var options = {
             listeners: {
-                files: function (root, statsArray, next) {
-                    for ( var i = 0; i < statsArray.length; ++i ) {
-                        var stats = statsArray[i];
-                        // skip hidden files
-                        if ( stats.name[0] !== '.' ) {
-                            // check if this is .meta file
-                            if ( Path.extname(stats.name) !== '.meta' ) {
-                                doImport( root, stats.name, stats );
-                            }
-                            else {
-                                // remove .meta file if its raw data does not exist
-                                var basename = Path.basename(stats.name,'.meta');
-                                var rawfile = Path.join(root,basename);
-                                var exists = Fs.existsSync(rawfile);
-
-                                if ( exists === false || Fs.statSync(rawfile).isDirectory() ) {
-                                    Fs.unlink( Path.join(root,stats.name) );
-                                }
-                            }
-                        }
-                    }
-                    next();
-                }, 
+                files: doRefresh,
+                directories: doRefresh,
             },
         };
         for ( var name in _mounts ) {
-            // AssetDB.walk ( name + "://", doImport );
-            var rpath = _realpath( name + "://" );
+            // AssetDB.walk ( name + ":/", doImport );
+            var rpath = _realpath( name + ":/" );
             Walk.walk(rpath, options);
         }
     };

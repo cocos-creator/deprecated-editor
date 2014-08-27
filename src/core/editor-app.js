@@ -3,6 +3,7 @@ var EditorApp;
     var nwGUI = null;
     var Fs = null;
     var nativeMainWin = null;
+    var eventListeners = {}; 
 
     if ( FIRE.isNw ) {
         nwGUI = require('nw.gui');
@@ -78,6 +79,13 @@ var EditorApp;
                     case 116:
                         nativeMainWin.reload();
                     break;
+
+                    // TEST
+                    // F2
+                    case 113:
+                        AssetDB.moveAsset( 'assets:/Characters/Ashe/Ashe.fbx',
+                                           'assets:/Characters/Ashe1/Foobar.fbx' );
+                    break;
                 }
             } );
 
@@ -102,6 +110,51 @@ var EditorApp;
     //
     EditorApp.setMainWindow = function ( mainWin ) {
         _mainWin = mainWin;
+    };
+
+    //
+    EditorApp.on = function ( name, fn ) {
+        var list = eventListeners[name];
+        if ( !list ) {
+            list = [];
+            eventListeners[name] = list;
+        }
+        if ( list.indexOf(fn) === -1 ) {
+            list.push(fn);
+        }
+    };
+
+    //
+    EditorApp.off = function ( name, fn ) {
+        var list = eventListeners[name];
+        if ( !list ) {
+            return;
+        }
+
+        if ( !fn ) {
+            eventListeners[name] = [];
+            return;
+        }
+
+        var idx = list.indexOf(fn);
+        if ( idx === -1 ) {
+            return;
+        }
+        list.splice(idx,1);
+    };
+
+    //
+    EditorApp.fire = function ( name, params ) {
+        var list = eventListeners[name];
+        if ( !list ) {
+            return;
+        }
+        for ( var i = 0; i < list.length; ++i ) {
+            var fn = list[i];
+            if ( fn ) {
+                fn ( { type: name, detail: params } );
+            }
+        }
     };
 
     //

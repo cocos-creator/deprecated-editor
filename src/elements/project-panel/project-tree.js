@@ -23,6 +23,16 @@
         return lo;
     }
 
+    function _findElement ( elements, name ) {
+        for ( var i = 0; i < elements.length; ++i ) {
+            var el = elements[i];
+            var fullname = el.basename + el.extname;
+            if ( fullname === name )
+                return el;
+        }
+        return null;
+    }
+
     Polymer('project-tree', {
         publish: {
             focused: {
@@ -66,8 +76,7 @@
             this.addEventListener('mouseup', function ( event ) {
                 if ( this.startDragging ) {
                     if ( this.curDragoverEL ) {
-                        this.dropTo( this.curDragoverEL,
-                                     this.getMostIncludeElements(this.selection) );
+                        this.moveSelection( this.curDragoverEL );
                     }
 
                     this.cancelHighligting();
@@ -75,6 +84,35 @@
                     event.stopPropagation();
                 }
             }, true );
+
+            EditorApp.on('assetMoved', function ( event ) {
+                var srcEL = this.getElement( event.detail.src );
+                if ( srcEL === null ) {
+                    console.warn( 'Can not find source element: ' + event.detail.src );
+                    return;
+                }
+
+                var destEL = this.getElement( Path.dirname(event.detail.dest) );
+                if ( destEL === null ) {
+                    console.warn( 'Can not find dest element: ' + event.detail.dest );
+                    return;
+                }
+
+                var destExtname = Path.extname(event.detail.dest);
+                var destBasename = Path.basename(event.detail.dest, destExtname);
+                srcEL.extname = destExtname;
+                srcEL.basename = destBasename;
+                srcEL.$.name.innerHTML = destBasename;
+
+                // binary insert
+                var idx = _binaryIndexOf( destEL.children, srcEL.basename );
+                if ( idx === -1 ) {
+                    destEL.appendChild(srcEL);
+                }
+                else {
+                    destEL.insertBefore(srcEL,destEL.children[idx]);
+                }
+            }.bind(this) );
         },
 
         load: function ( path ) {
@@ -296,10 +334,30 @@
             var path = element.basename + element.extname;
             var parentEL = element.parentElement;
             while ( parentEL instanceof ProjectItem ) {
-                path = parentEL.basename + "/" + path;
+                path = Path.join( parentEL.basename, path );
                 parentEL = parentEL.parentElement;
             }
-            return path;
+            return "assets:/" + path;
+        },
+
+        getElement: function ( path ) {
+            var list = path.split(":/");
+            if ( list.length !== 2 ) {
+                console.warn("Invalid path " + path);
+                return null;
+            }
+            var relativePath = list[1];
+            var names = relativePath.split("/");
+            var el = this;
+
+            for ( var i = 0; i < names.length; ++i ) {
+                var name = names[i];
+                el = _findElement ( el.children, name );
+                if ( !el )
+                    return null;
+            }
+
+            return el;
         },
 
         getMostIncludeElements: function ( elements ) {
@@ -373,20 +431,19 @@
             }
         },
 
-        dropTo: function ( targetEL, elements ) {
+        moveSelection: function ( targetEL ) {
+            var elements = this.getMostIncludeElements(this.selection);
             var targetPath = this.getPath(targetEL);
             for ( var i = 0; i < elements.length; ++i ) {
                 var el = elements[i];
                 var path = this.getPath(el);
 
                 if ( EditorUtils.includePath(path,targetPath) === false ) {
-                    // binary insert
-                    var idx = _binaryIndexOf( targetEL.children, el.basename );
-                    if ( idx === -1 ) {
-                        targetEL.appendChild(el);
-                    }
-                    else {
-                        targetEL.insertBefore(el,targetEL.children[idx]);
+                    var srcPath = path;
+                    var destPath = Path.join( targetPath, el.basename + el.extname );
+                    var result = AssetDB.moveAsset( srcPath, destPath );
+                    if ( result === false ) {
+                        // TODO: failed
                     }
                 }
             }
