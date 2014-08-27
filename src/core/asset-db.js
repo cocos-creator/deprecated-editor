@@ -89,35 +89,48 @@ var AssetDB;
 
     AssetDB.importAsset = function ( rpath ) {
         // check if we have .meta
-        var metaPath = rpath + ".meta";
         var data = null;
-        Fs.exists( metaPath, function ( exists ) {
-            var meta = null;
-            if ( exists ) {
-                data = Fs.readFileSync(metaPath);
+        var meta = null;
+        var createNewMeta = false;
+        var metaPath = rpath + ".meta";
+        var exists = Fs.existsSync(metaPath);
+
+        if ( exists ) {
+            data = Fs.readFileSync(metaPath);
+            try {
                 meta = JSON.parse(data);
             }
+            catch (err) {
+                meta = null;
+                createNewMeta = true;
+            }
+        }
+        else {
+            createNewMeta = true;
+        }
+
+        // create new .meta file if needed
+        if (createNewMeta) {
+            meta = {
+                ver: EditorUtils.metaVer,
+                uuid: Uuid.v4(),
+            };
+            data = JSON.stringify(meta,null,'  ');
+            Fs.writeFileSync(metaPath, data);
+        }
+
+        // import asset by its meta data
+        if ( meta ) {
+            // reimport the asset if we found uuid collision
+            if ( _uuidToPath[meta.uuid] ) {
+                Fs.unlinkSync(metaPath);
+                AssetDB.importAsset(rpath);
+            }
             else {
-                // create new .meta file if it's not exist
-                meta = {
-                    ver: EditorUtils.metaVer,
-                    uuid: Uuid.v4(),
-                };
-                data = JSON.stringify(meta,null,'  ');
-                Fs.writeFileSync(metaPath, data);
+                _uuidToPath[meta.uuid] = rpath;
+                _pathToUuid[rpath] = meta.uuid;
             }
-            if ( meta ) {
-                // reimport the asset if we found uuid collision
-                if ( _uuidToPath[meta.uuid] ) {
-                    Fs.unlinkSync(metaPath);
-                    AssetDB.importAsset(rpath);
-                }
-                else {
-                    _uuidToPath[meta.uuid] = rpath;
-                    _pathToUuid[rpath] = meta.uuid;
-                }
-            }
-        } );
+        }
     };
 
     // import any changes
@@ -128,12 +141,6 @@ var AssetDB;
             }
             else {
                 // do nothing if this is a directory
-            }
-        };
-
-        var checkRawData = function ( exists ) {
-            if ( exists === false ) {
-                Fs.unlink( Path.join(root,stats.name) );
             }
         };
 
@@ -151,7 +158,12 @@ var AssetDB;
                             else {
                                 // remove .meta file if its raw data does not exist
                                 var basename = Path.basename(stats.name,'.meta');
-                                Fs.exists( Path.join(root,basename), checkRawData );
+                                var rawfile = Path.join(root,basename);
+                                var exists = Fs.existsSync(rawfile);
+
+                                if ( exists === false || Fs.statSync(rawfile).isDirectory() ) {
+                                    Fs.unlink( Path.join(root,stats.name) );
+                                }
                             }
                         }
                     }
