@@ -471,13 +471,20 @@
             var targetPath = this.getPath(targetEL);
             for ( var i = 0; i < elements.length; ++i ) {
                 var el = elements[i];
-                var path = this.getPath(el);
 
+                // do nothing if we already here
+                if ( el.parentElement === targetEL )
+                    continue;
+
+                var path = this.getPath(el);
                 if ( EditorUtils.includePath(path,targetPath) === false ) {
                     var srcPath = path;
                     var destPath = Path.join( targetPath, el.basename + el.extname );
-                    var result = AssetDB.moveAsset( srcPath, destPath );
-                    if ( result === false ) {
+                    try {
+                        AssetDB.moveAsset( srcPath, destPath );
+                    }
+                    catch (err) {
+                        console.error(err);
                         // TODO: failed
                     }
                 }

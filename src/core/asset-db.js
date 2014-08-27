@@ -29,20 +29,40 @@ var AssetDB;
     }; 
 
     var _realmove = function (rsrc, rdest) {
-        // if dest file exists, delete it first
-        if ( Fs.existsSync(rdest) ) {
-            // TODO: delete rdest
-            // AssetDB.deleteAsset(rdest);
+        var rstat = Fs.statSync(rsrc);
+        if ( rstat.isDirectory() ) {
+            var options = {
+                listeners: {
+                    file: function ( root, stats, next ) {
+                        if ( Path.extname(stats.name) !== '.meta' ) {
+                            var rawfile = Path.join(root,stats.name);
+                            var rel = Path.relative( rsrc, rawfile );
+                            var dest = Path.join(rdest,rel);
+
+                            var uuid = _rpathToUuid[rawfile];
+                            delete _rpathToUuid[rawfile];
+                            _rpathToUuid[dest] = uuid;
+                            _uuidToRpath[uuid] = dest;
+                        }
+                        next();
+                    },
+                },
+            };
+            Walk.walkSync(rsrc, options);
+
+            Fs.renameSync( rsrc, rdest );
+            Fs.renameSync( rsrc + ".meta", rdest + ".meta" );
         }
+        else {
+            var uuid = _rpathToUuid[rsrc];
+            delete _rpathToUuid[rsrc];
+            delete _uuidToRpath[uuid];
 
-        var uuid = _rpathToUuid[rsrc];
-        delete _rpathToUuid[rsrc];
-        delete _uuidToRpath[uuid];
-
-        Fs.renameSync( rsrc, rdest );
-        Fs.renameSync( rsrc + ".meta", rdest + ".meta" );
-        _rpathToUuid[rdest] = uuid;
-        _rpathToUuid[uuid] = rdest;
+            Fs.renameSync( rsrc, rdest );
+            Fs.renameSync( rsrc + ".meta", rdest + ".meta" );
+            _rpathToUuid[rdest] = uuid;
+            _rpathToUuid[uuid] = rdest;
+        }
     };
 
     AssetDB.rpath = function (path) {
@@ -100,27 +120,22 @@ var AssetDB;
     AssetDB.moveAsset = function (src, dest) {
         var rsrc = _realpath(src);
         if ( rsrc === null ) {
-            console.error("Failed to move asset: " + src);
-            return false;
+            throw "Failed to move asset: " + src;
         }
 
         var rdest = _realpath(dest);
         if ( rdest === null ) {
-            console.error("Invalid dest path: " + dest);
-            return false;
+            throw "Invalid dest path: " + dest;
         }
 
-        try {
-            _realmove ( rsrc, rdest );
+        if ( Fs.existsSync(rdest) ) {
+            throw "Faield to move asset to: " + dest + ", the dest already exists.";
         }
-        catch ( err ) {
-            console.error(err);
-            return false;
-        }
+
+        _realmove ( rsrc, rdest );
 
         // dispatch event
         EditorApp.fire( 'assetMoved', { src: src, dest: dest } );
-        return true;
     };
 
     AssetDB.importAsset = function ( rpath ) {
