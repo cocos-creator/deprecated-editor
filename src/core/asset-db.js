@@ -7,8 +7,8 @@ var AssetDB;
     var Uuid = require('node-uuid');
 
     var _mounts = {};
-    var _uuidToPath = {};
-    var _pathToUuid = {};
+    var _uuidToRpath = {};
+    var _rpathToUuid = {};
 
     var _realpath = function ( path ) {
         var list = path.split(":/");
@@ -31,17 +31,22 @@ var AssetDB;
     var _realmove = function (rsrc, rdest) {
         // if dest file exists, delete it first
         if ( Fs.existsSync(rdest) ) {
-            AssetDB.deleteAsset(rdest);
+            // TODO: delete rdest
+            // AssetDB.deleteAsset(rdest);
         }
 
-        var uuid = _pathToUuid[rsrc];
-        delete _pathToUuid[rsrc];
-        delete _uuidToPath[uuid];
+        var uuid = _rpathToUuid[rsrc];
+        delete _rpathToUuid[rsrc];
+        delete _uuidToRpath[uuid];
 
         Fs.renameSync( rsrc, rdest );
         Fs.renameSync( rsrc + ".meta", rdest + ".meta" );
-        _pathToUuid[rdest] = uuid;
-        _pathToUuid[uuid] = rdest;
+        _rpathToUuid[rdest] = uuid;
+        _rpathToUuid[uuid] = rdest;
+    };
+
+    AssetDB.rpath = function (path) {
+        return _realpath(path);
     };
 
     // name:/foo/bar/foobar.png
@@ -160,13 +165,13 @@ var AssetDB;
         // import asset by its meta data
         if ( meta && stat.isDirectory() === false ) {
             // reimport the asset if we found uuid collision
-            if ( _uuidToPath[meta.uuid] ) {
+            if ( _uuidToRpath[meta.uuid] ) {
                 Fs.unlinkSync(metaPath);
                 AssetDB.importAsset(rpath);
             }
             else {
-                _uuidToPath[meta.uuid] = rpath;
-                _pathToUuid[rpath] = meta.uuid;
+                _uuidToRpath[meta.uuid] = rpath;
+                _rpathToUuid[rpath] = meta.uuid;
             }
         }
     };
@@ -182,8 +187,16 @@ var AssetDB;
                 var stats = statsArray[i];
                 // skip hidden files
                 if ( stats.name[0] !== '.' ) {
+                    var extname = Path.extname(stats.name);
+
                     // check if this is .meta file
-                    if ( Path.extname(stats.name) !== '.meta' ) {
+                    if ( extname !== '.meta' ) {
+                        // NOTE: we don't allow file asset with empty extname.
+                        // it will lead to conflicts of .meta file when folder 
+                        // and empty-ext file using same name.
+                        if ( extname === '.' || extname === '' ) {
+                            continue;
+                        }
                         doImportAsset( root, stats.name, stats );
                     }
                     else {

@@ -30,6 +30,10 @@
         },
 
         mousedownAction: function ( event ) {
+            // if this is not the mouse-left-button
+            if ( event.which !== 1 )
+                return;
+
             this._isToggle = false;
             this._isShift = false;
 
@@ -50,6 +54,10 @@
         },
 
         mouseupAction: function ( event ) {
+            // if this is not the mouse-left-button
+            if ( event.which !== 1 )
+                return;
+
             this.fire('select', { 
                 toggle: this._isToggle, 
                 shift: this._isShift

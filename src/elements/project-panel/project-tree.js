@@ -1,5 +1,6 @@
 (function () {
     var Path = require('path');
+    var nwGUI = require('nw.gui');
 
     function _binaryIndexOf ( elements, key ) {
         var lo = 0;
@@ -31,6 +32,17 @@
                 return el;
         }
         return null;
+    }
+
+    function _contextMenu ( event ) {
+        var menu = new nwGUI.Menu();
+
+        menu.append(new gui.MenuItem({ label: 'Item A' }));
+        menu.append(new gui.MenuItem({ label: 'Item B' }));
+        menu.append(new gui.MenuItem({ type: 'separator' }));
+        menu.append(new gui.MenuItem({ label: 'Item C' }));
+
+        menu.popup(event.x, event.y);
     }
 
     Polymer('project-tree', {
@@ -241,6 +253,26 @@
             this.cancelHighligting();
         },
 
+        contextmenuAction: function (event) {
+            this.cancelHighligting();
+            this.startDragging = false;
+
+            var menu = new nwGUI.Menu();
+
+            menu.append(new nwGUI.MenuItem({ 
+                label: 'Show in finder',
+                click: function () {
+                    if ( this.lastActive ) {
+                        var rpath = AssetDB.rpath(this.getPath(this.lastActive));
+                        nwGUI.Shell.showItemInFolder(rpath);
+                    }
+                }.bind(this)
+            }));
+
+            menu.popup(event.x, event.y);
+            event.stopPropagation();
+        },
+
         keydownAction: function (event) {
             if ( this.startDragging ) {
                 switch ( event.which ) {
@@ -337,7 +369,7 @@
                 path = Path.join( parentEL.basename, path );
                 parentEL = parentEL.parentElement;
             }
-            return "assets:/" + path;
+            return "assets://" + path;
         },
 
         getElement: function ( path ) {
@@ -352,6 +384,9 @@
 
             for ( var i = 0; i < names.length; ++i ) {
                 var name = names[i];
+                if ( name === '' )
+                    continue;
+
                 el = _findElement ( el.children, name );
                 if ( !el )
                     return null;
