@@ -10,23 +10,21 @@
   "private": true,
   "ignore": [
     "**/.*",
-    "node_modules",
+    "3rd",
     "bower_components",
     "ext",
-    "test",
-    "tests"
+    "node_modules",
+    "test"
   ],
   "dependencies": {
+    "FileSaver": "fireball-x/FileSaver.js",
+    "dustjs-linkedin": "",
+    "fontawesome": "",
+    "mousetrap": "",
     "pixi": "~1.6.1",
     "polymer": "Polymer/polymer#~0.3.5",
-    "web-animations-js": "web-animations/web-animations-js#master",
-    "fontawesome": "",
-    "dustjs-linkedin": "",
-    "mousetrap": "",
-    "jszip": "Stuk/jszip#~2.3.0",
-    "FileSaver": "fireball-x/FileSaver.js"
+    "web-animations-js": "web-animations/web-animations-js#master"
   },
   "devDependencies": {
-    "bluebird": "~2.2.2"
   }
 }

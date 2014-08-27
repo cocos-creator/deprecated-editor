@@ -18,8 +18,6 @@
     "node-uuid": ""
   },
   "devDependencies": {
-    "event-stream": "^3.1.7",
-    "express": "",
     "gulp": "",
     "gulp-clean": "",
     "gulp-concat": "",
@@ -30,6 +28,8 @@
     "gulp-util": "",
     "gulp-vulcanize": "",
     "jshint-stylish": "",
-    "q": ""
+    "event-stream": "^3.1.7",
+    "q": "",
+    "express": ""
   }
 }

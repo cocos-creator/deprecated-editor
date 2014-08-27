@@ -7,6 +7,8 @@ var AssetDB;
     var Uuid = require('node-uuid');
 
     var _mounts = {};
+    var _uuidToPath = {};
+    var _pathToUuid = {};
 
     var _realpath = function ( path ) {
         var list = path.split("://");
@@ -23,7 +25,7 @@ var AssetDB;
             return null;
         }
 
-        return Path.resolve( _mounts[mountName] + "/" + relativePath );
+        return Path.resolve( Path.join(_mounts[mountName],relativePath) );
     }; 
 
     // name://foo/bar/foobar.png
@@ -88,16 +90,32 @@ var AssetDB;
     AssetDB.importAsset = function ( rpath ) {
         // check if we have .meta
         var metaPath = rpath + ".meta";
+        var data = null;
         Fs.exists( metaPath, function ( exists ) {
-            if ( exists === false ) {
-                // create new .meta file
-                var meta = {
+            var meta = null;
+            if ( exists ) {
+                data = Fs.readFileSync(metaPath);
+                meta = JSON.parse(data);
+            }
+            else {
+                // create new .meta file if it's not exist
+                meta = {
                     ver: EditorUtils.metaVer,
                     uuid: Uuid.v4(),
                 };
-                Fs.writeFile(metaPath, JSON.stringify(meta,null,'  '), function ( err ) {
-                    if (err) throw err;
-                } );
+                data = JSON.stringify(meta,null,'  ');
+                Fs.writeFileSync(metaPath, data);
+            }
+            if ( meta ) {
+                // reimport the asset if we found uuid collision
+                if ( _uuidToPath[meta.uuid] ) {
+                    Fs.unlinkSync(metaPath);
+                    AssetDB.importAsset(rpath);
+                }
+                else {
+                    _uuidToPath[meta.uuid] = rpath;
+                    _pathToUuid[rpath] = meta.uuid;
+                }
             }
         } );
     };
@@ -106,34 +124,34 @@ var AssetDB;
     AssetDB.refresh = function () {
         var doImport = function ( root, name, stat ) {
             if ( stat.isDirectory() === false ) {
-                AssetDB.importAsset( root + "/" + name );
+                AssetDB.importAsset( Path.join(root,name) );
             }
             else {
                 // do nothing if this is a directory
             }
         };
 
-        var checkMetaExists = function ( exists ) {
+        var checkRawData = function ( exists ) {
             if ( exists === false ) {
-                Fs.unlink( root + "/" + stats.name );
+                Fs.unlink( Path.join(root,stats.name) );
             }
         };
 
         var options = {
             listeners: {
                 files: function (root, statsArray, next) {
-                    // skip .files
                     for ( var i = 0; i < statsArray.length; ++i ) {
                         var stats = statsArray[i];
+                        // skip hidden files
                         if ( stats.name[0] !== '.' ) {
-                            // skip xxx.meta files
+                            // check if this is .meta file
                             if ( Path.extname(stats.name) !== '.meta' ) {
                                 doImport( root, stats.name, stats );
                             }
                             else {
-                                // remove meta file if its raw data not exists
+                                // remove .meta file if its raw data does not exist
                                 var basename = Path.basename(stats.name,'.meta');
-                                Fs.exists( root + "/" + basename, checkMetaExists );
+                                Fs.exists( Path.join(root,basename), checkRawData );
                             }
                         }
                     }
