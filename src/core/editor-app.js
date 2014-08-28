@@ -83,9 +83,9 @@ var EditorApp;
                     // TEST
                     // F2
                     case 113:
-                        // AssetDB.moveAsset( 'assets://Characters/Ashe/Ashe.fbx',
-                        //                    'assets://Characters/Ashe1/Foobar.fbx' );
-                        AssetDB.makedirs( 'assets://foo/bar/foobar' );
+                        AssetDB.moveAsset( 'assets://Characters/Ashe/Ashe.fbx',
+                                           'assets://Characters/Ashe1/foo/bar/Foobar.fbx' );
+                        // AssetDB.makedirs( 'assets://foo/bar/foobar' );
                     break;
                 }
             } );

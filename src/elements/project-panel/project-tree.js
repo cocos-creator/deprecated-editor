@@ -24,6 +24,16 @@
         return lo;
     }
 
+    function _binaryInsert( parentEL, el ) {
+        var idx = _binaryIndexOf( parentEL.children, el.basename );
+        if ( idx === -1 ) {
+            parentEL.appendChild(el);
+        }
+        else {
+            parentEL.insertBefore(el,parentEL.children[idx]);
+        }
+    }
+
     function _findElement ( elements, name ) {
         for ( var i = 0; i < elements.length; ++i ) {
             var el = elements[i];
@@ -45,6 +55,31 @@
         menu.popup(event.x, event.y);
     }
 
+    function _newProjectItem ( name, isfolder ) {
+        var newEL = new ProjectItem();
+        var extname = Path.extname(name); 
+        var basename = Path.basename(name,extname); 
+        var type = isfolder ? 'folder' : extname;
+
+        switch ( type ) {
+        case 'folder':
+            newEL.foldable = true;
+            newEL.setIcon('fa-folder');
+            newEL.foldable = true;
+            newEL.extname = extname;
+            newEL.basename = basename;
+            newEL.$.name.innerHTML = basename;
+            return newEL;
+                
+        default:
+            newEL.setIcon('fa-file-image-o');
+            newEL.extname = extname;
+            newEL.basename = basename;
+            newEL.$.name.innerHTML = basename;
+            return newEL;
+        }
+    }
+
     Polymer('project-tree', {
         publish: {
             focused: {
@@ -55,7 +90,6 @@
 
         created: function () {
             this.focused = false;
-            this.folderElements = {};
             this.selection = [];
             this.lastActive = null;
             this.startDragging = false;
@@ -117,42 +151,38 @@
                 srcEL.$.name.innerHTML = destBasename;
 
                 // binary insert
-                var idx = _binaryIndexOf( destEL.children, srcEL.basename );
-                if ( idx === -1 ) {
-                    destEL.appendChild(srcEL);
+                _binaryInsert ( destEL, srcEL );
+            }.bind(this) );
+
+            EditorApp.on('folderCreated', function ( event ) {
+                var parentPath = Path.dirname(event.detail.path);
+                var parentEL = this.getElement(parentPath);
+                if ( parentEL === null ) {
+                    console.warn( 'Can not find element at ' + parentPath );
+                    return;
                 }
-                else {
-                    destEL.insertBefore(srcEL,destEL.children[idx]);
-                }
+
+                // create new folder
+                var basename = Path.basename(event.detail.path);
+                var newEL = _newProjectItem(basename,true);
+
+                // binary insert
+                _binaryInsert ( parentEL, newEL );
             }.bind(this) );
         },
 
         load: function ( path ) {
+            var folderElements = {};
             AssetDB.walk( 
                 path, 
 
                 function ( root, name, stat ) {
-                    itemEL = new ProjectItem();
+                    var itemEL = _newProjectItem( name, stat.isDirectory() );
                     if ( stat.isDirectory() ) {
-                        itemEL.foldable = true;
-                        itemEL.setIcon('fa-folder');
-
-                        itemEL.isFolder = true;
-                        itemEL.extname = '';
-                        itemEL.basename = name;
-                        itemEL.$.name.innerHTML = itemEL.basename;
-
-                        this.folderElements[root+"/"+name] = itemEL;
-                    }
-                    else {
-                        itemEL.setIcon('fa-file-image-o');
-
-                        itemEL.extname = Path.extname(name);
-                        itemEL.basename = Path.basename(name, itemEL.extname);
-                        itemEL.$.name.innerHTML = itemEL.basename;
+                        folderElements[root+"/"+name] = itemEL;
                     }
 
-                    var parentEL = this.folderElements[root];
+                    var parentEL = folderElements[root];
                     if ( parentEL ) {
                         parentEL.appendChild(itemEL);
                     }

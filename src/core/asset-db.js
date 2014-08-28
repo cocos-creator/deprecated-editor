@@ -106,8 +106,10 @@ var AssetDB;
         var folderNames = relativePath.split('/'); 
         var currentPath = mountPath;
         var metaPath = currentPath + '.meta';
+        var assetPath = '';
         for ( var i = 0; i < folderNames.length; ++i ) {
             var folder = folderNames[i];
+            assetPath = Path.join(assetPath,folder);
             currentPath = Path.join(currentPath,folder);
             metaPath = currentPath + '.meta';
 
@@ -124,36 +126,10 @@ var AssetDB;
             meta = _newMeta ('folder');
             data = JSON.stringify(meta,null,'  ');
             Fs.writeFileSync(metaPath, data);
+
+            // dispatch event
+            EditorApp.fire( 'folderCreated', { path: mountName + "://" + assetPath } );
         }
-
-        // var rpath = Path.resolve( Path.join(mountPath,relativePath) );
-        // var p = Path.resolve(rpath);
-
-        // try {
-        //     Fs.mkdirSync(p);
-        // }
-        // catch (err0) {
-        //     switch (err0.code) {
-        //         case 'ENOENT' :
-        //             _mkdirpSync(Path.dirname(p), opts);
-        //             _mkdirpSync(p, opts);
-        //             break;
-
-        //         // In the case of any other error, just see if there's a dir
-        //         // there already.  If so, then hooray!  If not, then something
-        //         // is borked.
-        //         default:
-        //             var stat;
-        //             try {
-        //                 stat = Fs.statSync(p);
-        //             }
-        //             catch (err1) {
-        //                 throw err0;
-        //             }
-        //             if (!stat.isDirectory()) throw err0;
-        //             break;
-        //     }
-        // }
     };
 
     // name:/foo/bar/foobar.png
@@ -210,6 +186,10 @@ var AssetDB;
             throw "Failed to move asset: " + src;
         }
 
+        if ( Fs.existsSync(rsrc) === false ) {
+            throw "Faield to move asset: " + src + ", the src is not exists.";
+        }
+
         var rdest = _realpath(dest);
         if ( rdest === null ) {
             throw "Invalid dest path: " + dest;
@@ -219,6 +199,10 @@ var AssetDB;
             throw "Faield to move asset to: " + dest + ", the dest already exists.";
         }
 
+        // make sure the dest parent path exists 
+        AssetDB.makedirs( Path.dirname(dest) );
+
+        //
         _realmove ( rsrc, rdest );
 
         // dispatch event
