@@ -10,6 +10,21 @@ var AssetDB;
     var _uuidToRpath = {};
     var _rpathToUuid = {};
 
+    var _newMeta = function ( type ) {
+        switch ( type ) {
+        case 'folder':
+            return {
+                ver: EditorUtils.metaVer,
+            };
+
+        default:
+            return {
+                ver: EditorUtils.metaVer,
+                uuid: Uuid.v4(),
+            };
+        }
+    };
+
     var _realpath = function ( path ) {
         var list = path.split(":/");
         if ( list.length !== 2 ) {
@@ -67,6 +82,78 @@ var AssetDB;
 
     AssetDB.rpath = function (path) {
         return _realpath(path);
+    };
+
+    // 
+    AssetDB.makedirs = function ( path ) {
+        var list = path.split(":/");
+        if ( list.length !== 2 ) {
+            throw "Invalid path " + path;
+        }
+
+        var mountName = list[0];
+        var relativePath = Path.resolve(list[1]);
+        var mountPath = _mounts[mountName];
+
+        if ( !mountPath ) {
+            throw "Can not find the mounting " + mountName;
+        }
+
+        if ( relativePath[0] === '/' ) {
+            relativePath = relativePath.slice(1);
+        }
+
+        var folderNames = relativePath.split('/'); 
+        var currentPath = mountPath;
+        var metaPath = currentPath + '.meta';
+        for ( var i = 0; i < folderNames.length; ++i ) {
+            var folder = folderNames[i];
+            currentPath = Path.join(currentPath,folder);
+            metaPath = currentPath + '.meta';
+
+            if ( Fs.existsSync(currentPath) ) {
+                var stat = Fs.statSync(currentPath);
+                if ( stat.isDirectory() === false ) {
+                    throw "The path " + currentPath + " is not a folder";
+                } 
+                continue;
+            }
+
+            // create new folder
+            Fs.mkdirSync(currentPath);
+            meta = _newMeta ('folder');
+            data = JSON.stringify(meta,null,'  ');
+            Fs.writeFileSync(metaPath, data);
+        }
+
+        // var rpath = Path.resolve( Path.join(mountPath,relativePath) );
+        // var p = Path.resolve(rpath);
+
+        // try {
+        //     Fs.mkdirSync(p);
+        // }
+        // catch (err0) {
+        //     switch (err0.code) {
+        //         case 'ENOENT' :
+        //             _mkdirpSync(Path.dirname(p), opts);
+        //             _mkdirpSync(p, opts);
+        //             break;
+
+        //         // In the case of any other error, just see if there's a dir
+        //         // there already.  If so, then hooray!  If not, then something
+        //         // is borked.
+        //         default:
+        //             var stat;
+        //             try {
+        //                 stat = Fs.statSync(p);
+        //             }
+        //             catch (err1) {
+        //                 throw err0;
+        //             }
+        //             if (!stat.isDirectory()) throw err0;
+        //             break;
+        //     }
+        // }
     };
 
     // name:/foo/bar/foobar.png
@@ -163,15 +250,10 @@ var AssetDB;
         // create new .meta file if needed
         if (createNewMeta) {
             if ( stat.isDirectory() ) {
-                meta = {
-                    ver: EditorUtils.metaVer,
-                };
+                meta = _newMeta ('folder');
             }
             else {
-                meta = {
-                    ver: EditorUtils.metaVer,
-                    uuid: Uuid.v4(),
-                };
+                meta = _newMeta (Path.extname(rpath));
             }
             data = JSON.stringify(meta,null,'  ');
             Fs.writeFileSync(metaPath, data);
