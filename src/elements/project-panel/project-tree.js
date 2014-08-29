@@ -94,6 +94,7 @@
             this.lastActive = null;
             this.startDragging = false;
             this.curDragoverEL = null; 
+            this.contextmenuAt = null;
         },
 
         ready: function () {
@@ -287,19 +288,27 @@
             this.cancelHighligting();
             this.startDragging = false;
 
-            var menu = new nwGUI.Menu();
+            //
+            this.contextmenuAt = null;
+            if ( event.target instanceof ProjectItem ) {
+                this.contextmenuAt = event.target;
+                this.clearSelect();
+                this.lastActive = this.contextmenuAt;
+                this.select([this.contextmenuAt]);
+            }
 
+            var menu = new nwGUI.Menu();
             menu.append(new nwGUI.MenuItem({ 
                 label: 'Show in finder',
                 click: function () {
-                    if ( this.lastActive ) {
-                        var rpath = AssetDB.rpath(this.getPath(this.lastActive));
+                    if ( this.contextmenuAt instanceof ProjectItem ) {
+                        var rpath = AssetDB.rpath(this.getPath(this.contextmenuAt));
                         nwGUI.Shell.showItemInFolder(rpath);
                     }
                 }.bind(this)
             }));
-
             menu.popup(event.x, event.y);
+
             event.stopPropagation();
         },
 

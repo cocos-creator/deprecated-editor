@@ -30,7 +30,7 @@ var EditorApp;
         // init node.js events
         // handle the error safely
         process.on('uncaughtException', function(err) {
-            console.log(err);
+            console.error(err);
         });
 
 
@@ -83,8 +83,8 @@ var EditorApp;
                     // TEST
                     // F2
                     case 113:
-                        AssetDB.moveAsset( 'assets://Characters/Ashe/Ashe.fbx',
-                                           'assets://Characters/Ashe1/foo/bar/Foobar.fbx' );
+                        // AssetDB.moveAsset( 'assets://Characters/Ashe/Ashe.fbx',
+                        //                    'assets://Characters/Ashe1/foo/bar/Foobar.fbx' );
                         // AssetDB.makedirs( 'assets://foo/bar/foobar' );
                     break;
                 }
