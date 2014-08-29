@@ -44,27 +44,35 @@
         return null;
     }
 
-    function _newProjectItem ( name, isfolder ) {
-        var newEL = new ProjectItem();
+    function _newProjectItem ( name, isfolder, isroot ) {
         var extname = Path.extname(name); 
         var basename = Path.basename(name,extname); 
         var type = isfolder ? 'folder' : extname;
+        type = isroot ? 'root' : type;
+
+        var newEL = new ProjectItem();
+        newEL.isFolder = isfolder;
+        newEL.isRoot = isroot;
+        newEL.extname = extname;
+        newEL.basename = basename;
 
         switch ( type ) {
-        case 'folder':
+        case 'root':
+            newEL.setIcon('fa-database');
             newEL.foldable = true;
+            break;
+
+        case 'folder':
             newEL.setIcon('fa-folder');
             newEL.foldable = true;
-            newEL.extname = extname;
-            newEL.basename = basename;
-            return newEL;
+            break;
                 
         default:
             newEL.setIcon('fa-file-image-o');
-            newEL.extname = extname;
-            newEL.basename = basename;
-            return newEL;
+            break;
         }
+
+        return newEL;
     }
 
     Polymer('project-tree', {
@@ -166,11 +174,16 @@
 
         load: function ( path ) {
             var folderElements = {};
+            var mountname = AssetDB.mountname(path);
+            var rootEL = _newProjectItem( mountname, true, true );
+            rootEL.style.marginLeft="0px";
+            this.appendChild(rootEL);
+
             AssetDB.walk( 
                 path, 
 
                 function ( root, name, stat ) {
-                    var itemEL = _newProjectItem( name, stat.isDirectory() );
+                    var itemEL = _newProjectItem( name, stat.isDirectory(), false );
                     if ( stat.isDirectory() ) {
                         folderElements[root+"/"+name] = itemEL;
                     }
@@ -180,8 +193,7 @@
                         parentEL.appendChild(itemEL);
                     }
                     else {
-                        itemEL.style.marginLeft="0px";
-                        this.appendChild(itemEL);
+                        rootEL.appendChild(itemEL);
                     }
                 }.bind(this), 
 
@@ -452,28 +464,43 @@
         },
 
         getPath: function ( element ) {
+            if ( element.isRoot ) {
+                return element.basename + "://"; 
+            }
+
             var path = element.basename + element.extname;
             var parentEL = element.parentElement;
             while ( parentEL instanceof ProjectItem ) {
-                path = Path.join( parentEL.basename, path );
-                parentEL = parentEL.parentElement;
+                if ( parentEL.isRoot ) {
+                    path = parentEL.basename + "://" + path;
+                    break;
+                }
+                else {
+                    path = Path.join( parentEL.basename, path );
+                    parentEL = parentEL.parentElement;
+                }
             }
-            return "assets://" + path;
+            return path;
         },
 
         getElement: function ( path ) {
-            var list = path.split(":/");
+            var list = path.split(":");
             if ( list.length !== 2 ) {
                 console.warn("Invalid path " + path);
                 return null;
             }
-            var relativePath = list[1];
+            var relativePath = Path.normalize(list[1]);
+            if ( relativePath[0] === '/' ) {
+                relativePath = relativePath.slice(1);
+            }
             var names = relativePath.split("/");
+            names.unshift(list[0]);
             var el = this;
 
             for ( var i = 0; i < names.length; ++i ) {
                 var name = names[i];
-                if ( name === '' )
+
+                if ( name === '' || name === '.' )
                     continue;
 
                 el = _findElement ( el.children, name );

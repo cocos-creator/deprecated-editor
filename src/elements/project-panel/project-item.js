@@ -23,6 +23,7 @@
             this.basename = '';
             this.extname = '';
             this.isFolder = false;
+            this.isRoot = false;
 
             this.renaming = false;
         },

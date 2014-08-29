@@ -26,14 +26,14 @@ var AssetDB;
     };
 
     var _realpath = function ( path ) {
-        var list = path.split(":/");
+        var list = path.split(":");
         if ( list.length !== 2 ) {
             console.warn("Invalid path " + path);
             return null;
         }
 
         var mountName = list[0];
-        var relativePath = list[1];
+        var relativePath = Path.normalize(list[1]);
 
         if ( !_mounts[mountName] ) {
             console.warn("Can not find the mounting " + mountName);
@@ -128,15 +128,24 @@ var AssetDB;
         return _realpath(path);
     };
 
+    AssetDB.mountname = function (path) {
+        var list = path.split(":");
+        if ( list.length !== 2 ) {
+            throw "Invalid path " + path;
+        }
+
+        return list[0];
+    };
+
     // 
     AssetDB.makedirs = function ( path ) {
-        var list = path.split(":/");
+        var list = path.split(":");
         if ( list.length !== 2 ) {
             throw "Invalid path " + path;
         }
 
         var mountName = list[0];
-        var relativePath = list[1];
+        var relativePath = Path.normalize(list[1]);
         var mountPath = _mounts[mountName];
 
         if ( !mountPath ) {
