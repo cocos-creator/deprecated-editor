@@ -321,6 +321,14 @@
                 }.bind(this)
             }));
             menu.append(new nwGUI.MenuItem({ 
+                label: 'Rename',
+                click: function () {
+                    if ( this.contextmenuAt instanceof ProjectItem ) {
+                        this.contextmenuAt.rename();
+                    }
+                }.bind(this)
+            }));
+            menu.append(new nwGUI.MenuItem({ 
                 label: 'Delete',
                 click: function () {
                     if ( this.contextmenuAt instanceof ProjectItem ) {

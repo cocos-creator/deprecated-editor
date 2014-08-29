@@ -27,10 +27,16 @@
             this.renaming = false;
         },
 
+        domReady: function () {
+            // HACK: to make this.$.rename.select() works
+            this.$.rename.value = this.basename;
+        },
+
         rename: function () {
             this.$.rename.style.display = '';
             this.$.rename.value = this.basename;
             this.$.rename.focus();
+            this.$.rename.select();
 
             this.renaming = true;
         },
