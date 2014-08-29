@@ -155,6 +155,15 @@
                 _binaryInsert ( destEL, srcEL );
             }.bind(this) );
 
+            EditorApp.on('assetDeleted', function ( event ) {
+                var el = this.getElement( event.detail.path );
+                if ( el === null ) {
+                    console.warn( 'Can not find source element: ' + event.detail.path );
+                    return;
+                }
+                el.parentElement.removeChild(el);
+            }.bind(this) );
+
             EditorApp.on('folderCreated', function ( event ) {
                 var parentPath = Path.dirname(event.detail.path);
                 var parentEL = this.getElement(parentPath);
@@ -170,6 +179,7 @@
                 // binary insert
                 _binaryInsert ( parentEL, newEL );
             }.bind(this) );
+
         },
 
         load: function ( path ) {
@@ -292,8 +302,8 @@
             this.contextmenuAt = null;
             if ( event.target instanceof ProjectItem ) {
                 this.contextmenuAt = event.target;
-                this.clearSelect();
                 this.lastActive = this.contextmenuAt;
+                this.clearSelect();
                 this.select([this.contextmenuAt]);
             }
 
@@ -307,6 +317,26 @@
                     }
                 }.bind(this)
             }));
+            menu.append(new nwGUI.MenuItem({ 
+                label: 'Delete',
+                click: function () {
+                    if ( this.contextmenuAt instanceof ProjectItem ) {
+                        var assetPath = this.getPath(this.contextmenuAt);
+                        AssetDB.deleteAsset(assetPath);
+                    }
+                }.bind(this)
+            }));
+            menu.append(new nwGUI.MenuItem({ type: 'separator' })); 
+            menu.append(new nwGUI.MenuItem({ 
+                label: 'Reimport',
+                click: function () {
+                    if ( this.contextmenuAt instanceof ProjectItem ) {
+                        var rpath = AssetDB.rpath(this.getPath(this.contextmenuAt));
+                        AssetDB.importAsset(rpath);
+                    }
+                }.bind(this)
+            }));
+
             menu.popup(event.x, event.y);
 
             event.stopPropagation();

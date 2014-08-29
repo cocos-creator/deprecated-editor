@@ -80,6 +80,50 @@ var AssetDB;
         }
     };
 
+    var _rmfile = function ( rpath ) {
+        var basename = Path.basename(rpath);
+        if ( basename[0] !== '.' ) {
+            if ( Path.extname(basename) !== '.meta' ) {
+                var uuid = _rpathToUuid[rpath];
+                delete _rpathToUuid[rpath];
+                delete _uuidToRpath[uuid];
+            }
+        }
+        Fs.unlinkSync( rpath );
+    };
+
+    var _rmdirRecursively = function ( rpath ) {
+        var files = Fs.readdirSync(rpath);
+        files.forEach( function( file, index ) {
+            var curPath = rpath + "/" + file;
+
+            // recurse
+            if ( Fs.statSync(curPath).isDirectory() ) {
+                _rmdirRecursively(curPath);
+            } 
+            // delete file
+            else {
+                _rmfile(curPath);
+            }
+        });
+
+        Fs.rmdirSync(rpath);
+    };
+
+    var _realdelete = function ( rpath ) {
+        var rstat = Fs.statSync(rpath);
+        if ( rstat.isDirectory() ) {
+            _rmdirRecursively(rpath);
+        }
+        else {
+            _rmfile(rpath);
+        }
+
+        if ( Fs.existsSync(rpath + ".meta") ) {
+            Fs.unlinkSync( rpath + ".meta" );
+        }
+    };
+
     AssetDB.rpath = function (path) {
         return _realpath(path);
     };
@@ -172,12 +216,17 @@ var AssetDB;
     AssetDB.deleteAsset = function (path) {
         var rpath = _realpath(path);
         if ( rpath === null ) {
-            console.error("Failed to delete asset: " + path);
-            return;
+            throw "Failed to delete asset: " + path;
         }
 
-        // TODO: delete asset
-        // TODO: delete asset.json
+        if ( Fs.existsSync(rpath) === false ) {
+            throw "Faield to delete asset: " + path + ", the path not exists.";
+        }
+
+        _realdelete( rpath );
+
+        // dispatch event
+        EditorApp.fire( 'assetDeleted', { path: path } );
     };
 
     AssetDB.moveAsset = function (src, dest) {
@@ -187,7 +236,7 @@ var AssetDB;
         }
 
         if ( Fs.existsSync(rsrc) === false ) {
-            throw "Faield to move asset: " + src + ", the src is not exists.";
+            throw "Faield to move asset: " + src + ", the src not exists.";
         }
 
         var rdest = _realpath(dest);
