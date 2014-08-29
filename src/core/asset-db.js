@@ -136,7 +136,7 @@ var AssetDB;
         }
 
         var mountName = list[0];
-        var relativePath = Path.resolve(list[1]);
+        var relativePath = list[1];
         var mountPath = _mounts[mountName];
 
         if ( !mountPath ) {
