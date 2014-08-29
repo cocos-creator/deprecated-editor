@@ -69,10 +69,12 @@ var EditorApp;
             // init hot-keys
             document.addEventListener ( 'keydown', function ( event ) {
                 switch ( event.keyCode ) {
-                    // F12
-                    case 123:
-                        nativeMainWin.showDevTools();
-                        event.stopPropagation();
+                    // TEST
+                    // F3
+                    case 114:
+                        // AssetDB.moveAsset( 'assets://Characters/Ashe/Ashe.fbx',
+                        //                    'assets://Characters/Ashe1/foo/bar/Foobar.fbx' );
+                        // AssetDB.makedirs( 'assets://foo/bar/foobar' );
                     break;
 
                     // F5
@@ -80,15 +82,13 @@ var EditorApp;
                         nativeMainWin.reload();
                     break;
 
-                    // TEST
-                    // F2
-                    case 113:
-                        // AssetDB.moveAsset( 'assets://Characters/Ashe/Ashe.fbx',
-                        //                    'assets://Characters/Ashe1/foo/bar/Foobar.fbx' );
-                        // AssetDB.makedirs( 'assets://foo/bar/foobar' );
+                    // F12
+                    case 123:
+                        nativeMainWin.showDevTools();
+                        event.stopPropagation();
                     break;
                 }
-            } );
+            }, true );
 
             // init menu
             if ( FIRE.isDarwin ) {

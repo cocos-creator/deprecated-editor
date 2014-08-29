@@ -44,17 +44,6 @@
         return null;
     }
 
-    function _contextMenu ( event ) {
-        var menu = new nwGUI.Menu();
-
-        menu.append(new gui.MenuItem({ label: 'Item A' }));
-        menu.append(new gui.MenuItem({ label: 'Item B' }));
-        menu.append(new gui.MenuItem({ type: 'separator' }));
-        menu.append(new gui.MenuItem({ label: 'Item C' }));
-
-        menu.popup(event.x, event.y);
-    }
-
     function _newProjectItem ( name, isfolder ) {
         var newEL = new ProjectItem();
         var extname = Path.extname(name); 
@@ -68,14 +57,12 @@
             newEL.foldable = true;
             newEL.extname = extname;
             newEL.basename = basename;
-            newEL.$.name.innerHTML = basename;
             return newEL;
                 
         default:
             newEL.setIcon('fa-file-image-o');
             newEL.extname = extname;
             newEL.basename = basename;
-            newEL.$.name.innerHTML = basename;
             return newEL;
         }
     }
@@ -99,10 +86,6 @@
 
         ready: function () {
             this.tabIndex = EditorUI.getParentTabIndex(this)+1;
-
-            this.addEventListener('mousedown', function ( event ) {
-                this.focus();
-            }, true );
 
             this.addEventListener('mousemove', function ( event ) {
                 if ( this.startDragging ) {
@@ -149,7 +132,6 @@
                 var destBasename = Path.basename(event.detail.dest, destExtname);
                 srcEL.extname = destExtname;
                 srcEL.basename = destBasename;
-                srcEL.$.name.innerHTML = destBasename;
 
                 // binary insert
                 _binaryInsert ( destEL, srcEL );
@@ -217,6 +199,15 @@
             if ( this.focused === false )
                 return;
 
+            if ( event.relatedTarget === null &&
+                 event.target instanceof ProjectItem ) 
+            {
+                this.focus();
+
+                event.stopPropagation();
+                return;
+            }
+
             if ( EditorUI.find( this.shadowRoot, event.relatedTarget ) )
                 return;
 
@@ -224,6 +215,8 @@
         },
 
         selectingAction: function (event) {
+            this.focus();
+
             if ( event.target instanceof ProjectItem ) {
                 if ( event.detail.shift ) {
                     if ( !this.lastActive ) {
@@ -266,6 +259,16 @@
             }
 
             // TODO: confirm selection
+            event.stopPropagation();
+        },
+
+        namechangedAction: function (event) {
+            if ( event.target instanceof ProjectItem ) {
+                this.focus();
+                var srcPath = this.getPath(event.target);
+                var destPath = Path.dirname(srcPath) + "/" + event.detail.name + event.target.extname;
+                AssetDB.moveAsset( srcPath, destPath );
+            }
             event.stopPropagation();
         },
 
@@ -355,6 +358,15 @@
             }
             else {
                 switch ( event.which ) {
+                    // enter or F2
+                    case 13:
+                    case 113:
+                        if ( this.lastActive ) {
+                            this.lastActive.rename();
+                        }
+                        event.stopPropagation();
+                    break;
+
                     // key-up
                     case 38:
                         if ( this.lastActive ) {

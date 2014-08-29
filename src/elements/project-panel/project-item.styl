@@ -5,40 +5,6 @@
     margin-left: 24px
 
     .wrapper {
-        .item {
-            height: 16px
-            display: inline-block
-            white-space: nowrap
-            position: relative
-
-            font-family: Helvetica,Arial,sans-serif
-            color: #aaa
-            cursor: default 
-
-            .border {
-                display: flex
-                flex-direction: row
-                flex-wrap: nowrap     
-                align-items: center
-
-                .fold-icon {
-                    display: none
-                    width: 10px
-
-                    cursor: pointer
-                    text-align: center
-                }
-
-                .type-icon {
-                    color: #fff
-                    width: 14px
-                }
-
-                .fa-folder, .fa-folder-open {
-                    color: #09f
-                }
-            }
-        }
 
         .bar {
             display: block
@@ -56,17 +22,76 @@
         //         background: #333 - 20%
         //     }
         // }
+
+        .input-wrapper {
+            position: relative
+
+            .item {
+                display: inline-block
+                white-space: nowrap
+                position: relative
+                height: 16px
+
+                font-family: Helvetica,Arial,sans-serif
+                color: #aaa
+                cursor: default 
+
+                .item-wrapper {
+                    display: flex
+                    flex-direction: row
+                    flex-wrap: nowrap     
+                    align-items: center
+
+                    .fold-icon {
+                        display: none
+                        width: 10px
+
+                        cursor: pointer
+                        text-align: center
+                    }
+
+                    .type-icon {
+                        color: #fff
+                        width: 14px
+                    }
+
+                    .fa-folder, .fa-folder-open {
+                        color: #09f
+                    }
+                }
+            }
+
+            fire-ui-text-input {                         
+                position: absolute
+                top: -1px
+                left: 14px
+                height: 16px
+                min-height: 16px
+                width: calc(100% - 14px)
+
+                & /deep/ .input-area {                         
+                    padding: 0px 2px
+                }
+            }
+        }
     }
 
     &([foldable]) {
         margin-left: 14px
 
         .wrapper {
-            .item {
-                .border {
-                    .fold-icon {
-                        display: inline-block
+            .input-wrapper {
+                .item {
+                    .item-wrapper {
+                        .fold-icon {
+                            display: inline-block
+                        }
                     }
+                }
+
+                fire-ui-text-input {                         
+                    left: 24px
+                    width: calc(100% - 24px)
                 }
             }
         }

@@ -11,16 +11,23 @@
 
 <div class="wrapper">
     <div class="bar"></div>
-    <div class="item">
-        <div class="border">
-            <i id="foldIcon" 
-               class="fold-icon fa {{folded ? 'fa-caret-right' : 'fa-caret-down'}}"
-               on-mousedown="{{foldMousedownAction}}"
-               >
-           </i>
-            <i id="typeIcon" class="type-icon fa fa-folder"></i>
-            <span id="name" class="name"></span>
+    <div class="input-wrapper">
+        <div class="item">
+            <div class="item-wrapper">
+                <i id="foldIcon" 
+                   class="fold-icon fa {{folded ? 'fa-caret-right' : 'fa-caret-down'}}"
+                   on-mousedown="{{foldMousedownAction}}"
+                   >
+               </i>
+                <i id="typeIcon" class="type-icon fa fa-folder"></i>
+                <span id="name" class="name">{{basename}}</span>
+            </div>
         </div>
+        <fire-ui-text-input id="rename"
+            style="display: none"
+            on-confirm="{{renameConfirmAction}}"
+        >
+        </fire-ui-text-input>
     </div>
 </div>
 <div id="content"
