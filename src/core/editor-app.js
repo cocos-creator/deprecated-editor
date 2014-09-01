@@ -100,13 +100,25 @@ var EditorApp;
     };
 
     var _mainWin = null;
-    EditorApp.__defineGetter__('mainWin', function () { return _mainWin; } );
+    Object.defineProperty(EditorApp, 'mainWin', {
+        get: function () {
+            return _mainWin;
+        }
+    });
 
     var _cwd = null; // the path of current opened project
-    EditorApp.__defineGetter__('cwd', function () { return _cwd; } );
+    Object.defineProperty(EditorApp, 'cwd', {
+        get: function () {
+            return _cwd;
+        }
+    });
 
     var _appPath = null; // the path of fireball-x editor 
-    EditorApp.__defineGetter__('appPath', function () { return _appPath; } );
+    Object.defineProperty(EditorApp, 'appPath', {
+        get: function () {
+            return _appPath;
+        }
+    });
 
     //
     EditorApp.setMainWindow = function ( mainWin ) {
