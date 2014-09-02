@@ -1,9 +1,4 @@
-﻿var path = require('path');
-var Q = require('q');
-var es = require('event-stream');
-var stylish = require('jshint-stylish');
-
-var gulp = require('gulp');
+﻿var gulp = require('gulp');
 var gutil = require('gulp-util');
 var clean = require('gulp-clean');
 var jshint = require('gulp-jshint');
@@ -12,6 +7,11 @@ var concat = require('gulp-concat');
 var stylus = require('gulp-stylus');
 var rename = require('gulp-rename');
 var vulcanize = require('gulp-vulcanize');
+
+var path = require('path');
+var Q = require('q');
+var es = require('event-stream');
+var stylish = require('jshint-stylish');
 
 var paths = {
     ext_core: [ 
