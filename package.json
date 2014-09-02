@@ -28,7 +28,7 @@
     "gulp-util": "",
     "gulp-vulcanize": "",
     "jshint-stylish": "",
-    "event-stream": "^3.1.7",
+    "event-stream": "",
     "q": "",
     "express": ""
   }

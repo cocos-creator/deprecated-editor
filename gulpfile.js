@@ -195,9 +195,9 @@ var build_elements_html = function (strip) {
 // short tasks
 gulp.task('build-elements-html', ['cp-elements-html', 'elements-css', 'elements-js'], build_elements_html(true));
 gulp.task('build-elements-html-dev', ['cp-elements-html', 'elements-css', 'elements-js-dev'], build_elements_html(false));
-gulp.task('cp-all', ['cp-core', 'cp-engine', 'cp-editor-ui', 'cp-elements-img', 'cp-elements-html', 'cp-3rd'] );
-gulp.task('dev', ['cp-all', 'build-elements-html-dev', 'editor-js-dev' ] );
-gulp.task('default', ['cp-all', 'ext-min', 'build-elements-html', 'editor-js-min' ] );
+gulp.task('copy', ['cp-elements-img', 'cp-elements-html', 'cp-3rd'] );
+gulp.task('dev', ['copy', 'build-elements-html-dev', 'editor-js-dev' ] );
+gulp.task('default', ['copy', 'ext-min', 'build-elements-html', 'editor-js-min' ] );
 
 // watch
 gulp.task('watch', function() {
