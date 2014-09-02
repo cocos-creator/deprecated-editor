@@ -210,3 +210,10 @@ gulp.task('watch', function() {
     gulp.watch(paths.elements_html, ['build-elements-html-dev']).on ( 'error', gutil.log );
     gulp.watch(paths.editor_js, ['editor-js-dev']).on ( 'error', gutil.log );
 });
+gulp.task('watch-self', function() {
+    gulp.watch(paths.elements_img, ['cp-elements-img']).on ( 'error', gutil.log );
+    gulp.watch(paths.elements_css, ['elements-css', 'build-elements-html-dev']).on ( 'error', gutil.log );
+    gulp.watch(paths.elements_js, ['build-elements-html-dev']).on ( 'error', gutil.log );
+    gulp.watch(paths.elements_html, ['build-elements-html-dev']).on ( 'error', gutil.log );
+    gulp.watch(paths.editor_js, ['editor-js-dev']).on ( 'error', gutil.log );
+});
