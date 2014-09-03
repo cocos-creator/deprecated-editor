@@ -1,5 +1,6 @@
 (function () {
     var Path = require('path');
+    var Fs = require('fs');
     var nwGUI = require('nw.gui');
 
     function _binaryIndexOf ( elements, key ) {
@@ -354,8 +355,65 @@
                 label: 'Reimport',
                 click: function () {
                     if ( this.contextmenuAt instanceof ProjectItem ) {
-                        var rpath = AssetDB.rpath(this.getPath(this.contextmenuAt));
-                        AssetDB.importAsset(rpath);
+                        var selectedItemEl = this.contextmenuAt;
+                        var assetPath = this.getPath(selectedItemEl);
+                        var realPath = AssetDB.rpath(assetPath);
+
+                        // check realPath whether exists
+                        if (!Fs.existsSync(realPath)) {
+                            selectedItemEl.remove();
+                            return;
+                        }
+
+                        if (selectedItemEl.isFolder) {
+
+                            // remove assetdb items
+                            AssetDB.clean(realPath);
+
+                            // remove childnodes
+                            while (selectedItemEl.firstChild) {
+                                selectedItemEl.removeChild(selectedItemEl.firstChild);
+                            }
+
+                            var folderElements = {};
+                            AssetDB.walk( 
+                                assetPath, 
+
+                                function ( root, name, stat ) {
+
+                                    var itemEL = _newProjectItem( name, stat.isDirectory(), false );
+                                    if ( stat.isDirectory() ) {
+                                        folderElements[root+"/"+name] = itemEL;
+                                    }
+
+                                    var parentEL = folderElements[root];
+                                    if ( parentEL ) {
+                                        parentEL.appendChild(itemEL);
+                                    }
+                                    else {
+                                        selectedItemEl.appendChild(itemEL);
+                                    }
+
+                                    // reimport
+                                    if ( !stat.isDirectory() ) {
+                                        var rpath = Path.join(root, name);
+                                        info(rpath);
+                                        AssetDB.importAsset(rpath);
+                                    }
+
+                                }.bind(this), 
+
+                                function () {
+                                    // console.log("finish walk");
+                                }.bind(this)
+                            );
+
+                        }
+                        else {
+                            // reimport file
+                            AssetDB.importAsset(realPath);
+                        }
+                        
                     }
                 }.bind(this)
             }));

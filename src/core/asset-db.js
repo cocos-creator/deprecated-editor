@@ -315,6 +315,16 @@ var AssetDB;
         }
     };
 
+    AssetDB.clean = function (rpath) {
+        for (var k in _rpathToUuid) {
+            if (k.indexOf(rpath) === 0) {
+                var uuid = _rpathToUuid[k];
+                delete _rpathToUuid[k];
+                delete _uuidToRpath[uuid];
+            }
+        }
+    }
+
     // import any changes
     AssetDB.refresh = function () {
         var doImportAsset = function ( root, name, stat ) {
