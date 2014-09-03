@@ -9,24 +9,33 @@ var EditorApp;
     var eventListeners = {}; 
 
     EditorApp.options = {};
+    EditorApp.userProfile = {};
+    EditorApp.projectProfile = {};
+    EditorApp.projectName = '';
 
     EditorApp.start = function () {
-        // init and show main window
-        EditorApp.init();
+        // handle the error safely
+        process.on('uncaughtException', function(err) {
+            console.error(err);
+        });
+
+        // init EditorApp
+        try {
+            console.log('Initializing EditorApp...');
+            EditorApp.init();
+        }
+        catch ( err ) {
+            console.error(err);
+            process.exit(1);
+        }
+
+        // show native main window
         nativeMainWin.show();
         nativeMainWin.focus();
     };
 
     //
     EditorApp.init = function () {
-        console.log('editor-app initializing...');
-
-        // init node.js events
-        // handle the error safely
-        process.on('uncaughtException', function(err) {
-            console.error(err);
-        });
-
         // init native functions
         _appPath = process.cwd();
 
@@ -45,11 +54,14 @@ var EditorApp;
         // load user profile
         var profilePath = Path.join(_appPath,'profile.json');
         if ( !Fs.existsSync(profilePath) ) {
-            var profile = {
+            EditorApp.userProfile = {
                 recentlyOpened: [],
             };
             // create default user profile.
-            Fs.writeFileSync(profilePath, JSON.stringify(profile, null, 4));
+            Fs.writeFileSync(profilePath, JSON.stringify(EditorApp.userProfile, null, 4));
+        }
+        else {
+            EditorApp.userProfile = JSON.parse(Fs.readFileSync(profilePath));
         }
 
         // TODO:
@@ -59,13 +71,19 @@ var EditorApp;
         //     // TODO: run user .firerc
         // }
 
-        // TEMP
-        var defaultProjectPath = _appPath + "/projects/default";
-        if ( !Fs.existsSync(defaultProjectPath) ) {
-            EditorApp.newProject(defaultProjectPath);
+        var projectFile = EditorApp.options._[0];
+        if ( !projectFile ) {
+            throw 'No project file to open!';
         }
-        EditorApp.openProject(defaultProjectPath);
-        // TEMP
+
+        if ( Path.extname(projectFile) !== '.fireball' ) {
+            throw 'Invalid project ' + projectFile;
+        }
+
+        // change to fullpath projectFile
+        projectFile = Path.join(process.env.PWD, projectFile); 
+        EditorApp.checkProject(projectFile);
+        EditorApp.openProject(projectFile);
 
         // init menu
         if ( FIRE.isDarwin ) {
@@ -181,29 +199,60 @@ var EditorApp;
     };
 
     //
-    EditorApp.newProject = function ( path ) {
-        EditorUtils.mkdirpSync(path);
+    EditorApp.checkProject = function ( projectFile ) {
+        var projectDir = Path.dirname(projectFile);
 
-        var assetsPath = path+'/assets';
-        Fs.mkdirSync(assetsPath);
+        // if project dir not eixsts
+        if ( !Fs.existsSync(projectDir) || !Fs.statSync(projectDir).isDirectory() ) {
+            EditorUtils.mkdirpSync(projectDir);
+        }
 
-        var settingsPath = path+'/settings';
-        Fs.mkdirSync(settingsPath);
+        // if project file not exists
+        if ( !Fs.existsSync(projectFile) || Fs.statSync(projectFile).isDirectory() ) {
+            var profile = {};
+            Fs.writeFileSync(projectFile, JSON.stringify(profile, null, 4));
+        }
 
-        var projectFile = path+'/.fireball';
-        Fs.writeFileSync(projectFile, '');
+        // if assets/ not exists
+        var assetsPath = Path.join(projectDir, 'assets');
+        if ( !Fs.existsSync(assetsPath) || !Fs.statSync(assetsPath).isDirectory() ) {
+            Fs.mkdirSync(assetsPath);
+        }
+
+        // if settings/ not exists
+        var settingsPath = Path.join(projectDir, 'settings');
+        if ( !Fs.existsSync(settingsPath) || !Fs.statSync(settingsPath).isDirectory() ) {
+            Fs.mkdirSync(settingsPath);
+        }
+
+        // if .fireball/ not exists
+        var localPath = Path.join(projectDir, 'local');
+        if ( !Fs.existsSync(localPath) || !Fs.statSync(localPath).isDirectory() ) {
+            Fs.mkdirSync(localPath);
+        }
     };
 
     //
-    EditorApp.openProject = function ( path ) {
-        _cwd = path;
+    EditorApp.openProject = function ( projectFile ) {
+        var projectDir = Path.dirname(projectFile);
+        _cwd = projectDir;
+        EditorApp.projectName = Path.basename( projectFile, Path.extname(projectFile) );
+
+        // load project profile
+        var data = Fs.readFileSync(projectFile);
+        try {
+            EditorApp.projectProfile = JSON.parse(data);
+        }
+        catch ( err ) {
+            throw 'Failed to load project ' + projectFile;
+        }
 
         // TODO: load settings
         // TODO: load window layouts
 
         // mounting assets
-        AssetDB.mount(path+'/assets', 'assets');
-        // AssetDB.mount(appPath+'/shares', 'shares');
+        AssetDB.mount( Path.join(projectDir,'assets'), 'assets');
+        // AssetDB.mount( Path.join(appPath,'shares'), 'shares');
 
         AssetDB.refresh();
     };
