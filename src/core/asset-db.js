@@ -125,7 +125,8 @@ var AssetDB;
     };
 
     AssetDB.exists = function(path) {
-        return Fs.existsSync(path);
+        var rpath = _realpath(path);
+        return Fs.existsSync(rpath);
     };
 
     AssetDB.rpath = function (path) {
@@ -319,7 +320,8 @@ var AssetDB;
         }
     };
 
-    AssetDB.clean = function (rpath) {
+    AssetDB.clean = function (path) {
+        var rpath = _realpath(path);
         for (var k in _rpathToUuid) {
             if (k.indexOf(rpath) === 0) {
                 var uuid = _rpathToUuid[k];

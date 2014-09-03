@@ -356,10 +356,9 @@
                     if ( this.contextmenuAt instanceof ProjectItem ) {
                         var selectedItemEl = this.contextmenuAt;
                         var assetPath = this.getPath(selectedItemEl);
-                        var realPath = AssetDB.rpath(assetPath);
-
-                        // check realPath whether exists
-                        if (!AssetDB.exists(realPath)) {
+                        
+                        // check assetPath whether exists
+                        if (!AssetDB.exists(assetPath)) {
                             selectedItemEl.remove();
                             return;
                         }
@@ -367,7 +366,7 @@
                         if (selectedItemEl.isFolder) {
 
                             // remove assetdb items
-                            AssetDB.clean(realPath);
+                            AssetDB.clean(assetPath);
 
                             // remove childnodes
                             while (selectedItemEl.firstChild) {
@@ -409,6 +408,7 @@
                         }
                         else {
                             // reimport file
+                            var realPath = AssetDB.rpath(assetPath);
                             AssetDB.importAsset(realPath);
                         }
                         
