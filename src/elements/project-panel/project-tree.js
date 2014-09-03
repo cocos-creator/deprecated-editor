@@ -1,6 +1,5 @@
 (function () {
     var Path = require('path');
-    var Fs = require('fs');
     var nwGUI = require('nw.gui');
 
     function _binaryIndexOf ( elements, key ) {
@@ -360,7 +359,7 @@
                         var realPath = AssetDB.rpath(assetPath);
 
                         // check realPath whether exists
-                        if (!Fs.existsSync(realPath)) {
+                        if (!AssetDB.exists(realPath)) {
                             selectedItemEl.remove();
                             return;
                         }
@@ -397,7 +396,6 @@
                                     // reimport
                                     if ( !stat.isDirectory() ) {
                                         var rpath = Path.join(root, name);
-                                        info(rpath);
                                         AssetDB.importAsset(rpath);
                                     }
 

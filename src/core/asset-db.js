@@ -124,6 +124,10 @@ var AssetDB;
         }
     };
 
+    AssetDB.exists = function(path) {
+        return Fs.existsSync(path);
+    };
+
     AssetDB.rpath = function (path) {
         return _realpath(path);
     };
