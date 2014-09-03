@@ -54,12 +54,12 @@ var EditorApp;
             // TODO: choose project
 
             // load user-profile
-            if ( !Fs.existsSync(_appPath+"/user-profile.json") ) {
+            if ( !Fs.existsSync(_appPath+"/profile.json") ) {
                 // TODO: create default user profile.
             }
 
             // TEMP
-            var defaultProjectPath = _appPath + "/bin/projects/default";
+            var defaultProjectPath = _appPath + "/projects/default";
             if ( !Fs.existsSync(defaultProjectPath) ) {
                 EditorApp.newProject(defaultProjectPath);
             }
