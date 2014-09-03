@@ -1,26 +1,20 @@
 var EditorApp;
 (function (EditorApp) {
-    var nwGUI = null;
-    var Fs = null;
-    var nativeMainWin = null;
+    var nwGUI = require('nw.gui');
+    var Fs = require('fs');
+    var Path = require('path');
+    var Minimist = require('minimist');
+
+    var nativeMainWin = nwGUI.Window.get();
     var eventListeners = {}; 
 
-    if ( FIRE.isNw ) {
-        nwGUI = require('nw.gui');
-        Fs = require('fs');
-        nativeMainWin = nwGUI.Window.get();
-    }
+    EditorApp.options = {};
 
     EditorApp.start = function () {
-        if ( FIRE.isNw ) {
-            // DEBUG
-            nativeMainWin.showDevTools();
-
-            // init and show main window
-            EditorApp.init();
-            nativeMainWin.show();
-            nativeMainWin.focus();
-        }
+        // init and show main window
+        EditorApp.init();
+        nativeMainWin.show();
+        nativeMainWin.focus();
     };
 
     //
@@ -33,6 +27,52 @@ var EditorApp;
             console.error(err);
         });
 
+        // init native functions
+        _appPath = process.cwd();
+
+        // parse arguments
+        // -D, --showdevtools
+        EditorApp.options = Minimist( nwGUI.App.argv );
+
+        // process arguments
+        if ( EditorApp.options.D || EditorApp.options.showdevtools ) {
+            nativeMainWin.showDevTools();
+        }
+
+        // TODO: login
+        // TODO: choose project
+
+        // load user profile
+        var profilePath = Path.join(_appPath,'profile.json');
+        if ( !Fs.existsSync(profilePath) ) {
+            var profile = {
+                recentlyOpened: [],
+            };
+            // create default user profile.
+            Fs.writeFileSync(profilePath, JSON.stringify(profile, null, 4));
+        }
+
+        // TODO:
+        // // run user .firerc
+        // var rcPath = Path.join(_appPath,'.firerc');
+        // if ( Fs.existsSync(rcPath) ) {
+        //     // TODO: run user .firerc
+        // }
+
+        // TEMP
+        var defaultProjectPath = _appPath + "/projects/default";
+        if ( !Fs.existsSync(defaultProjectPath) ) {
+            EditorApp.newProject(defaultProjectPath);
+        }
+        EditorApp.openProject(defaultProjectPath);
+        // TEMP
+
+        // init menu
+        if ( FIRE.isDarwin ) {
+            var nativeMenuBar = new nwGUI.Menu({ type: "menubar" });
+            nativeMenuBar.createMacBuiltin("Fireball-X");
+            nativeMainWin.menu = nativeMenuBar;
+        }
 
         // init document events
         document.addEventListener( "drop", function (event) {
@@ -45,58 +85,28 @@ var EditorApp;
             event.preventDefault();
             event.stopPropagation();
         } );
+        document.addEventListener ( 'keydown', function ( event ) {
+            switch ( event.keyCode ) {
+                // TEST
+                // F3
+                case 114:
+                    // AssetDB.moveAsset( 'assets://Characters/Ashe/Ashe.fbx',
+                    //                    'assets://Characters/Ashe1/foo/bar/Foobar.fbx' );
+                    // AssetDB.makedirs( 'assets://foo/bar/foobar' );
+                break;
 
-        // init native functions
-        if ( FIRE.isNw ) {
-            _appPath = process.cwd();
+                // F5
+                case 116:
+                    nativeMainWin.reload();
+                break;
 
-            // TODO: login
-            // TODO: choose project
-
-            // load user-profile
-            if ( !Fs.existsSync(_appPath+"/profile.json") ) {
-                // TODO: create default user profile.
+                // F12
+                case 123:
+                    nativeMainWin.showDevTools();
+                    event.stopPropagation();
+                break;
             }
-
-            // TEMP
-            var defaultProjectPath = _appPath + "/projects/default";
-            if ( !Fs.existsSync(defaultProjectPath) ) {
-                EditorApp.newProject(defaultProjectPath);
-            }
-            EditorApp.openProject(defaultProjectPath);
-            // TEMP
-
-            // init hot-keys
-            document.addEventListener ( 'keydown', function ( event ) {
-                switch ( event.keyCode ) {
-                    // TEST
-                    // F3
-                    case 114:
-                        // AssetDB.moveAsset( 'assets://Characters/Ashe/Ashe.fbx',
-                        //                    'assets://Characters/Ashe1/foo/bar/Foobar.fbx' );
-                        // AssetDB.makedirs( 'assets://foo/bar/foobar' );
-                    break;
-
-                    // F5
-                    case 116:
-                        nativeMainWin.reload();
-                    break;
-
-                    // F12
-                    case 123:
-                        nativeMainWin.showDevTools();
-                        event.stopPropagation();
-                    break;
-                }
-            }, true );
-
-            // init menu
-            if ( FIRE.isDarwin ) {
-                var nativeMenuBar = new nwGUI.Menu({ type: "menubar" });
-                nativeMenuBar.createMacBuiltin("Fireball-X");
-                nativeMainWin.menu = nativeMenuBar;
-            }
-        }
+        }, true );
     };
 
     var _mainWin = null;
