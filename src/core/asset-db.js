@@ -124,6 +124,11 @@ var AssetDB;
         }
     };
 
+    AssetDB.exists = function(path) {
+        var rpath = _realpath(path);
+        return Fs.existsSync(rpath);
+    };
+
     AssetDB.rpath = function (path) {
         return _realpath(path);
     };
@@ -314,6 +319,17 @@ var AssetDB;
             }
         }
     };
+
+    AssetDB.clean = function (path) {
+        var rpath = _realpath(path);
+        for (var k in _rpathToUuid) {
+            if (k.indexOf(rpath) === 0) {
+                var uuid = _rpathToUuid[k];
+                delete _rpathToUuid[k];
+                delete _uuidToRpath[uuid];
+            }
+        }
+    }
 
     // import any changes
     AssetDB.refresh = function () {

@@ -354,8 +354,64 @@
                 label: 'Reimport',
                 click: function () {
                     if ( this.contextmenuAt instanceof ProjectItem ) {
-                        var rpath = AssetDB.rpath(this.getPath(this.contextmenuAt));
-                        AssetDB.importAsset(rpath);
+                        var selectedItemEl = this.contextmenuAt;
+                        var assetPath = this.getPath(selectedItemEl);
+                        
+                        // check assetPath whether exists
+                        if (!AssetDB.exists(assetPath)) {
+                            selectedItemEl.remove();
+                            return;
+                        }
+
+                        if (selectedItemEl.isFolder) {
+
+                            // remove assetdb items
+                            AssetDB.clean(assetPath);
+
+                            // remove childnodes
+                            while (selectedItemEl.firstChild) {
+                                selectedItemEl.removeChild(selectedItemEl.firstChild);
+                            }
+
+                            var folderElements = {};
+                            AssetDB.walk( 
+                                assetPath, 
+
+                                function ( root, name, stat ) {
+
+                                    var itemEL = _newProjectItem( name, stat.isDirectory(), false );
+                                    if ( stat.isDirectory() ) {
+                                        folderElements[root+"/"+name] = itemEL;
+                                    }
+
+                                    var parentEL = folderElements[root];
+                                    if ( parentEL ) {
+                                        parentEL.appendChild(itemEL);
+                                    }
+                                    else {
+                                        selectedItemEl.appendChild(itemEL);
+                                    }
+
+                                    // reimport
+                                    if ( !stat.isDirectory() ) {
+                                        var rpath = Path.join(root, name);
+                                        AssetDB.importAsset(rpath);
+                                    }
+
+                                }.bind(this), 
+
+                                function () {
+                                    // console.log("finish walk");
+                                }.bind(this)
+                            );
+
+                        }
+                        else {
+                            // reimport file
+                            var realPath = AssetDB.rpath(assetPath);
+                            AssetDB.importAsset(realPath);
+                        }
+                        
                     }
                 }.bind(this)
             }));
