@@ -329,7 +329,7 @@ var AssetDB;
                 delete _uuidToRpath[uuid];
             }
         }
-    }
+    };
 
     // import any changes
     AssetDB.refresh = function () {
@@ -340,6 +340,7 @@ var AssetDB;
         var doRefresh = function (root, statsArray, next) {
             for ( var i = 0; i < statsArray.length; ++i ) {
                 var stats = statsArray[i];
+
                 // skip hidden files
                 if ( stats.name[0] !== '.' ) {
                     var extname = Path.extname(stats.name);
@@ -349,7 +350,7 @@ var AssetDB;
                         // NOTE: we don't allow file asset with empty extname.
                         // it will lead to conflicts of .meta file when folder 
                         // and empty-ext file using same name.
-                        if ( extname === '.' || extname === '' ) {
+                        if ( extname === '.' || (stats.isDirectory() === false && extname === '') ) {
                             continue;
                         }
                         doImportAsset( root, stats.name, stats );

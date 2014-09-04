@@ -1,6 +1,20 @@
 // init express
 var express = require('express');
 var app = express();
+var cwd = process.cwd();
+var port = 8080;
+
+process.on('uncaughtException', function(err) {
+    switch (err.code) {
+    case 'EADDRINUSE':
+        console.error( 'Error: The listening port ' + port + ' is in used' );
+        break;
+
+    default:
+        console.error(err);
+        break;
+    }
+});
 
 // create an error with .status.
 function error(status, msg) {
@@ -11,13 +25,13 @@ function error(status, msg) {
 
 // routes
 app.get('/', function(req, res){
-    res.sendfile('index.html');
+    res.sendFile( cwd + '/index.html');
 });
 
 // serves all the static files
 app.get(/^(.+)$/, function(req, res){ 
     // console.log('static file request : ' + req.params);
-    res.sendfile( __dirname + req.params[0]); 
+    res.sendFile( cwd + req.params[0]); 
 });
 
 app.use(function(err, req, res, next){
@@ -31,6 +45,6 @@ app.use(function(req, res){
 });
 
 // start the server
-var server = app.listen(8080, function() {
+var server = app.listen(port, function() {
     console.log('Listening on port %d', server.address().port);
 });
