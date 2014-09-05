@@ -1,5 +1,5 @@
 (function () {
-    Polymer('project-item', {
+    Polymer({
         publish: {
             folded: false,
             foldable: {

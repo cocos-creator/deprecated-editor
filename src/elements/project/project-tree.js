@@ -75,7 +75,7 @@
         return newEL;
     }
 
-    Polymer('project-tree', {
+    Polymer({
         publish: {
             focused: {
                 value: false,

@@ -1,5 +1,5 @@
 (function () {
-    Polymer('main-window', {
+    Polymer({
         ready: function () {
             EditorApp.setMainWindow(this);
 

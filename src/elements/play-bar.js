@@ -1,5 +1,5 @@
 (function () {
-    Polymer('play-bar', {
+    Polymer({
 
         playAction: function ( event ) {
             this.$.play.setAttribute('active','');

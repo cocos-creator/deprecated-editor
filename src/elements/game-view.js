@@ -1,5 +1,5 @@
 (function () {
-    Polymer('game-view', {
+    Polymer({
         created: function () {
             this.canvas = null;
 
