@@ -81,7 +81,7 @@ var EditorApp;
         }
 
         // change to fullpath projectFile
-        projectFile = Path.join(process.env.PWD, projectFile); 
+        projectFile = Path.join(process.cwd(), projectFile); 
         EditorApp.checkProject(projectFile);
         EditorApp.openProject(projectFile);
 
