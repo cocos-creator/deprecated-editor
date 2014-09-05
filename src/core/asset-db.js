@@ -133,6 +133,19 @@ var AssetDB;
         return _fspath(url);
     };
 
+    AssetDB.uuidToFsysPath = function ( uuid ) {
+        return _uuidToPath[uuid];
+    };
+
+    AssetDB.fsysPathToUuid = function ( fspath ) {
+        return _pathToUuid[fspath];
+    };
+
+    AssetDB.urlToUuid = function ( url ) {
+        var fspath = _fspath(url);
+        return _pathToUuid[fspath];
+    };
+
     AssetDB.mountname = function (url) {
         var list = url.split(":");
         if ( list.length !== 2 ) {
