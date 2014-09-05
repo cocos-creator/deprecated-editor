@@ -1,0 +1,18 @@
+<polymer-element 
+    name="project-view" 
+    constructor="ProjectView"
+    >
+<template>
+<link rel="stylesheet" href="project-view.css">
+
+<div flex-row flex-stretch style="margin-bottom: 2px;">
+    <fire-ui-text-input flex-1></fire-ui-text-input>   
+    <span class="space"></span>
+    <fire-ui-button>Search</fire-ui-button>            
+</div>                                                 
+<project-tree id="projectTree" flex-1></project-tree>
+
+</template>
+
+<script type="text/javascript" src="project-view.js"></script>
+</polymer-element>
