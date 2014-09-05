@@ -124,20 +124,20 @@
             }, true );
 
             EditorApp.on('assetMoved', function ( event ) {
-                var srcEL = this.getElement( event.detail.src );
+                var srcEL = this.getElement( event.detail.srcUrl );
                 if ( srcEL === null ) {
-                    console.warn( 'Can not find source element: ' + event.detail.src );
+                    console.warn( 'Can not find source element: ' + event.detail.srcUrl );
                     return;
                 }
 
-                var destEL = this.getElement( Path.dirname(event.detail.dest) );
+                var destEL = this.getElement( Path.dirname(event.detail.destUrl) );
                 if ( destEL === null ) {
-                    console.warn( 'Can not find dest element: ' + event.detail.dest );
+                    console.warn( 'Can not find dest element: ' + event.detail.destUrl );
                     return;
                 }
 
-                var destExtname = Path.extname(event.detail.dest);
-                var destBasename = Path.basename(event.detail.dest, destExtname);
+                var destExtname = Path.extname(event.detail.destUrl);
+                var destBasename = Path.basename(event.detail.destUrl, destExtname);
                 srcEL.extname = destExtname;
                 srcEL.basename = destBasename;
 
@@ -146,16 +146,16 @@
             }.bind(this) );
 
             EditorApp.on('assetDeleted', function ( event ) {
-                var el = this.getElement( event.detail.path );
+                var el = this.getElement( event.detail.url );
                 if ( el === null ) {
-                    console.warn( 'Can not find source element: ' + event.detail.path );
+                    console.warn( 'Can not find source element: ' + event.detail.url );
                     return;
                 }
                 el.parentElement.removeChild(el);
             }.bind(this) );
 
             EditorApp.on('folderCreated', function ( event ) {
-                var parentPath = Path.dirname(event.detail.path);
+                var parentPath = Path.dirname(event.detail.url);
                 var parentEL = this.getElement(parentPath);
                 if ( parentEL === null ) {
                     console.warn( 'Can not find element at ' + parentPath );
@@ -163,7 +163,7 @@
                 }
 
                 // create new folder
-                var basename = Path.basename(event.detail.path);
+                var basename = Path.basename(event.detail.url);
                 var newEL = _newProjectItem(basename,true);
 
                 // binary insert
@@ -172,15 +172,15 @@
 
         },
 
-        load: function ( path ) {
+        load: function ( url ) {
             var folderElements = {};
-            var mountname = AssetDB.mountname(path);
+            var mountname = AssetDB.mountname(url);
             var rootEL = _newProjectItem( mountname, true, true );
             rootEL.style.marginLeft="0px";
             this.appendChild(rootEL);
 
             AssetDB.walk( 
-                path, 
+                url, 
 
                 function ( root, name, stat ) {
                     var itemEL = _newProjectItem( name, stat.isDirectory(), false );
@@ -277,7 +277,7 @@
         namechangedAction: function (event) {
             if ( event.target instanceof ProjectItem ) {
                 this.focus();
-                var srcPath = this.getPath(event.target);
+                var srcPath = this.getUrl(event.target);
                 var destPath = Path.dirname(srcPath) + "/" + event.detail.name + event.target.extname;
                 AssetDB.moveAsset( srcPath, destPath );
             }
@@ -327,7 +327,7 @@
                 label: 'Show in finder',
                 click: function () {
                     if ( this.contextmenuAt instanceof ProjectItem ) {
-                        var rpath = AssetDB.rpath(this.getPath(this.contextmenuAt));
+                        var rpath = AssetDB.rpath(this.getUrl(this.contextmenuAt));
                         nwGUI.Shell.showItemInFolder(rpath);
                     }
                 }.bind(this)
@@ -344,8 +344,8 @@
                 label: 'Delete',
                 click: function () {
                     if ( this.contextmenuAt instanceof ProjectItem ) {
-                        var assetPath = this.getPath(this.contextmenuAt);
-                        AssetDB.deleteAsset(assetPath);
+                        var url = this.getUrl(this.contextmenuAt);
+                        AssetDB.deleteAsset(url);
                     }
                 }.bind(this)
             }));
@@ -355,10 +355,10 @@
                 click: function () {
                     if ( this.contextmenuAt instanceof ProjectItem ) {
                         var selectedItemEl = this.contextmenuAt;
-                        var assetPath = this.getPath(selectedItemEl);
+                        var url = this.getUrl(selectedItemEl);
                         
-                        // check assetPath whether exists
-                        if (!AssetDB.exists(assetPath)) {
+                        // check url whether exists
+                        if (!AssetDB.exists(url)) {
                             selectedItemEl.remove();
                             return;
                         }
@@ -366,7 +366,7 @@
                         if (selectedItemEl.isFolder) {
 
                             // remove assetdb items
-                            AssetDB.clean(assetPath);
+                            AssetDB.clean(url);
 
                             // remove childnodes
                             while (selectedItemEl.firstChild) {
@@ -375,7 +375,7 @@
 
                             var folderElements = {};
                             AssetDB.walk( 
-                                assetPath, 
+                                url, 
 
                                 function ( root, name, stat ) {
 
@@ -408,7 +408,7 @@
                         }
                         else {
                             // reimport file
-                            var realPath = AssetDB.rpath(assetPath);
+                            var realPath = AssetDB.rpath(url);
                             AssetDB.importAsset(realPath);
                         }
                         
@@ -519,30 +519,30 @@
             this.selection = [];
         },
 
-        getPath: function ( element ) {
+        getUrl: function ( element ) {
             if ( element.isRoot ) {
                 return element.basename + "://"; 
             }
 
-            var path = element.basename + element.extname;
+            var url = element.basename + element.extname;
             var parentEL = element.parentElement;
             while ( parentEL instanceof ProjectItem ) {
                 if ( parentEL.isRoot ) {
-                    path = parentEL.basename + "://" + path;
+                    url = parentEL.basename + "://" + url;
                     break;
                 }
                 else {
-                    path = Path.join( parentEL.basename, path );
+                    url = Path.join( parentEL.basename, url );
                     parentEL = parentEL.parentElement;
                 }
             }
-            return path;
+            return url;
         },
 
-        getElement: function ( path ) {
-            var list = path.split(":");
+        getElement: function ( url ) {
+            var list = url.split(":");
             if ( list.length !== 2 ) {
-                console.warn("Invalid path " + path);
+                console.warn("Invalid url " + url);
                 return null;
             }
             var relativePath = Path.normalize(list[1]);
@@ -570,36 +570,35 @@
         getMostIncludeElements: function ( elements ) {
             var i,j;
             var resultELs = [];
-            var paths = [];
 
             for ( i = 0; i < elements.length; ++i ) {
                 var el = elements[i];
-                var path = this.getPath(el);
+                var url = this.getUrl(el);
                 var addEL = true;
                 var resultEL = null;
-                var resultPath = null;
+                var resultUrl = null;
                 var cmp = null;
 
                 if ( el.isFolder ) {
                     for ( j = 0; j < resultELs.length; ++j ) {
                         resultEL = resultELs[j];
-                        resultPath = this.getPath(resultEL);
+                        resultUrl = this.getUrl(resultEL);
 
-                        // path is child of resultPath
-                        cmp = EditorUtils.includePath( resultPath, path );
+                        // url is child of resultUrl
+                        cmp = EditorUtils.includePath( resultUrl, url );
                         if ( cmp ) {
                             addEL = false;
                             break;
                         }
 
-                        // path is parent or same of resultPath
-                        cmp = EditorUtils.includePath( path, resultPath );
+                        // url is parent or same of resultUrl
+                        cmp = EditorUtils.includePath( url, resultUrl );
                         if ( cmp ) {
                             resultELs.splice(j,1);
                             --j;
                         }
 
-                        // path is not relative with resultPath
+                        // url is not relative with resultUrl
                     }
 
                     if ( addEL ) {
@@ -609,16 +608,16 @@
                 else {
                     for ( j = 0; j < resultELs.length; ++j ) {
                         resultEL = resultELs[j];
-                        resultPath = this.getPath(resultEL);
+                        resultUrl = this.getUrl(resultEL);
 
-                        // path is child of resultPath
-                        cmp = EditorUtils.includePath( resultPath, path );
+                        // url is child of resultUrl
+                        cmp = EditorUtils.includePath( resultUrl, url );
                         if ( cmp ) {
                             addEL = false;
                             break;
                         }
 
-                        // path is not relative with resultPath
+                        // url is not relative with resultUrl
                     }
 
                     if ( addEL ) {
@@ -640,7 +639,7 @@
 
         moveSelection: function ( targetEL ) {
             var elements = this.getMostIncludeElements(this.selection);
-            var targetPath = this.getPath(targetEL);
+            var targetUrl = this.getUrl(targetEL);
             for ( var i = 0; i < elements.length; ++i ) {
                 var el = elements[i];
 
@@ -648,12 +647,12 @@
                 if ( el.parentElement === targetEL )
                     continue;
 
-                var path = this.getPath(el);
-                if ( EditorUtils.includePath(path,targetPath) === false ) {
-                    var srcPath = path;
-                    var destPath = Path.join( targetPath, el.basename + el.extname );
+                var url = this.getUrl(el);
+                if ( EditorUtils.includePath(url,targetUrl) === false ) {
+                    var srcUrl = url;
+                    var destUrl = Path.join( targetUrl, el.basename + el.extname );
                     try {
-                        AssetDB.moveAsset( srcPath, destPath );
+                        AssetDB.moveAsset( srcUrl, destUrl );
                     }
                     catch (err) {
                         console.error(err);

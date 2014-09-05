@@ -25,10 +25,10 @@ var AssetDB;
         }
     };
 
-    var _realpath = function ( path ) {
-        var list = path.split(":");
+    var _realpath = function ( url ) {
+        var list = url.split(":");
         if ( list.length !== 2 ) {
-            console.warn("Invalid path " + path);
+            console.warn("Invalid url " + url);
             return null;
         }
 
@@ -124,29 +124,29 @@ var AssetDB;
         }
     };
 
-    AssetDB.exists = function(path) {
-        var rpath = _realpath(path);
+    AssetDB.exists = function(url) {
+        var rpath = _realpath(url);
         return Fs.existsSync(rpath);
     };
 
-    AssetDB.rpath = function (path) {
-        return _realpath(path);
+    AssetDB.rpath = function (url) {
+        return _realpath(url);
     };
 
-    AssetDB.mountname = function (path) {
-        var list = path.split(":");
+    AssetDB.mountname = function (url) {
+        var list = url.split(":");
         if ( list.length !== 2 ) {
-            throw "Invalid path " + path;
+            throw "Invalid url " + url;
         }
 
         return list[0];
     };
 
     // 
-    AssetDB.makedirs = function ( path ) {
-        var list = path.split(":");
+    AssetDB.makedirs = function ( url ) {
+        var list = url.split(":");
         if ( list.length !== 2 ) {
-            throw "Invalid path " + path;
+            throw "Invalid url " + url;
         }
 
         var mountName = list[0];
@@ -186,7 +186,7 @@ var AssetDB;
             Fs.writeFileSync(metaPath, data);
 
             // dispatch event
-            EditorApp.fire( 'folderCreated', { path: mountName + "://" + assetPath } );
+            EditorApp.fire( 'folderCreated', { url: mountName + "://" + assetPath } );
         }
     };
 
@@ -216,10 +216,10 @@ var AssetDB;
         }
     };
 
-    AssetDB.newAsset = function (path) {
-        var rpath = _realpath(path);
+    AssetDB.newAsset = function (url) {
+        var rpath = _realpath(url);
         if ( rpath === null ) {
-            console.error("Failed to create new asset: " + path);
+            console.error("Failed to create new asset: " + url);
             return;
         }
 
@@ -227,49 +227,49 @@ var AssetDB;
         // TODO: create asset.json
     };
 
-    AssetDB.deleteAsset = function (path) {
-        var rpath = _realpath(path);
+    AssetDB.deleteAsset = function (url) {
+        var rpath = _realpath(url);
         if ( rpath === null ) {
-            throw "Failed to delete asset: " + path;
+            throw "Failed to delete asset: " + url;
         }
 
         if ( Fs.existsSync(rpath) === false ) {
-            throw "Faield to delete asset: " + path + ", the path not exists.";
+            throw "Faield to delete asset: " + url + ", the url not exists.";
         }
 
         _realdelete( rpath );
 
         // dispatch event
-        EditorApp.fire( 'assetDeleted', { path: path } );
+        EditorApp.fire( 'assetDeleted', { url: url } );
     };
 
-    AssetDB.moveAsset = function (src, dest) {
-        var rsrc = _realpath(src);
+    AssetDB.moveAsset = function (srcUrl, destUrl) {
+        var rsrc = _realpath(srcUrl);
         if ( rsrc === null ) {
-            throw "Failed to move asset: " + src;
+            throw "Failed to move asset: " + srcUrl;
         }
 
         if ( Fs.existsSync(rsrc) === false ) {
-            throw "Faield to move asset: " + src + ", the src not exists.";
+            throw "Faield to move asset: " + srcUrl + ", the src url not exists.";
         }
 
-        var rdest = _realpath(dest);
+        var rdest = _realpath(destUrl);
         if ( rdest === null ) {
-            throw "Invalid dest path: " + dest;
+            throw "Invalid dest url path: " + destUrl;
         }
 
         if ( Fs.existsSync(rdest) ) {
-            throw "Faield to move asset to: " + dest + ", the dest already exists.";
+            throw "Faield to move asset to: " + destUrl + ", the dest url already exists.";
         }
 
-        // make sure the dest parent path exists 
-        AssetDB.makedirs( Path.dirname(dest) );
+        // make sure the destUrl parent path exists 
+        AssetDB.makedirs( Path.dirname(destUrl) );
 
         //
         _realmove ( rsrc, rdest );
 
         // dispatch event
-        EditorApp.fire( 'assetMoved', { src: src, dest: dest } );
+        EditorApp.fire( 'assetMoved', { srcUrl: srcUrl, destUrl: destUrl } );
     };
 
     AssetDB.importAsset = function ( rpath ) {
@@ -320,8 +320,8 @@ var AssetDB;
         }
     };
 
-    AssetDB.clean = function (path) {
-        var rpath = _realpath(path);
+    AssetDB.clean = function (url) {
+        var rpath = _realpath(url);
         for (var k in _rpathToUuid) {
             if (k.indexOf(rpath) === 0) {
                 var uuid = _rpathToUuid[k];
@@ -381,10 +381,10 @@ var AssetDB;
         }
     };
 
-    AssetDB.walk = function ( path, callback, finished ) {
-        var rpath = _realpath(path);
+    AssetDB.walk = function ( url, callback, finished ) {
+        var rpath = _realpath(url);
         if ( rpath === null ) {
-            console.error("Failed to walk path: " + path);
+            console.error("Failed to walk url: " + url);
             return;
         }
 
