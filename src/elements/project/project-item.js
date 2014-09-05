@@ -153,7 +153,7 @@
                     // console.log("node :", node);
                     // console.log("node.basename :", node.basename);
                     // console.log("node.extname :", node.extname);
-                    // console.log("fullname", node.basename + '.' + node.extname);
+                    // console.log("fullname", node.basename + node.extname);
                     // console.log("filename", file.name);
 
                     if (!node.isFolder && node.basename + node.extname === file.name) {
@@ -206,7 +206,8 @@
 
             // TODO: 考虑当前选中的是否是为 文件夹 ，如果是文件夹泽 导入进去 ，不是，则 导入同级。
 
-            That = this;
+            // debug
+            //That = this;
             //var dstDir = AssetDB.rpath(this.basename + "://");
             
             var files = event.dataTransfer.files;
