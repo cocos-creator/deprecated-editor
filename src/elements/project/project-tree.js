@@ -327,8 +327,8 @@
                 label: 'Show in finder',
                 click: function () {
                     if ( this.contextmenuAt instanceof ProjectItem ) {
-                        var rpath = AssetDB.rpath(this.getUrl(this.contextmenuAt));
-                        nwGUI.Shell.showItemInFolder(rpath);
+                        var fspath = AssetDB.fspath(this.getUrl(this.contextmenuAt));
+                        nwGUI.Shell.showItemInFolder(fspath);
                     }
                 }.bind(this)
             }));
@@ -394,8 +394,8 @@
 
                                     // reimport
                                     if ( !stat.isDirectory() ) {
-                                        var rpath = Path.join(root, name);
-                                        AssetDB.importAsset(rpath);
+                                        var fspath = Path.join(root, name);
+                                        AssetDB.importAsset(fspath);
                                     }
 
                                 }.bind(this), 
@@ -408,8 +408,8 @@
                         }
                         else {
                             // reimport file
-                            var realPath = AssetDB.rpath(url);
-                            AssetDB.importAsset(realPath);
+                            var fspath = AssetDB.fspath(url);
+                            AssetDB.importAsset(fspath);
                         }
                         
                     }

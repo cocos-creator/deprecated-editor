@@ -7,8 +7,8 @@ var AssetDB;
     var Uuid = require('node-uuid');
 
     var _mounts = {};
-    var _uuidToRpath = {};
-    var _rpathToUuid = {};
+    var _uuidToPath = {};
+    var _pathToUuid = {};
 
     var _newMeta = function ( type ) {
         switch ( type ) {
@@ -25,7 +25,7 @@ var AssetDB;
         }
     };
 
-    var _realpath = function ( url ) {
+    var _fspath = function ( url ) {
         var list = url.split(":");
         if ( list.length !== 2 ) {
             console.warn("Invalid url " + url);
@@ -43,7 +43,7 @@ var AssetDB;
         return Path.resolve( Path.join(_mounts[mountName],relativePath) );
     }; 
 
-    var _realmove = function (rsrc, rdest) {
+    var _fsmove = function (rsrc, rdest) {
         var rstat = Fs.statSync(rsrc);
         if ( rstat.isDirectory() ) {
             var options = {
@@ -54,10 +54,10 @@ var AssetDB;
                             var rel = Path.relative( rsrc, rawfile );
                             var dest = Path.join(rdest,rel);
 
-                            var uuid = _rpathToUuid[rawfile];
-                            delete _rpathToUuid[rawfile];
-                            _rpathToUuid[dest] = uuid;
-                            _uuidToRpath[uuid] = dest;
+                            var uuid = _pathToUuid[rawfile];
+                            delete _pathToUuid[rawfile];
+                            _pathToUuid[dest] = uuid;
+                            _uuidToPath[uuid] = dest;
                         }
                         next();
                     },
@@ -69,33 +69,33 @@ var AssetDB;
             Fs.renameSync( rsrc + ".meta", rdest + ".meta" );
         }
         else {
-            var uuid = _rpathToUuid[rsrc];
-            delete _rpathToUuid[rsrc];
-            delete _uuidToRpath[uuid];
+            var uuid = _pathToUuid[rsrc];
+            delete _pathToUuid[rsrc];
+            delete _uuidToPath[uuid];
 
             Fs.renameSync( rsrc, rdest );
             Fs.renameSync( rsrc + ".meta", rdest + ".meta" );
-            _rpathToUuid[rdest] = uuid;
-            _rpathToUuid[uuid] = rdest;
+            _pathToUuid[rdest] = uuid;
+            _pathToUuid[uuid] = rdest;
         }
     };
 
-    var _rmfile = function ( rpath ) {
-        var basename = Path.basename(rpath);
+    var _rmfile = function ( fspath ) {
+        var basename = Path.basename(fspath);
         if ( basename[0] !== '.' ) {
             if ( Path.extname(basename) !== '.meta' ) {
-                var uuid = _rpathToUuid[rpath];
-                delete _rpathToUuid[rpath];
-                delete _uuidToRpath[uuid];
+                var uuid = _pathToUuid[fspath];
+                delete _pathToUuid[fspath];
+                delete _uuidToPath[uuid];
             }
         }
         Fs.unlinkSync( rpath );
     };
 
-    var _rmdirRecursively = function ( rpath ) {
-        var files = Fs.readdirSync(rpath);
+    var _rmdirRecursively = function ( fspath ) {
+        var files = Fs.readdirSync(fspath);
         files.forEach( function( file, index ) {
-            var curPath = rpath + "/" + file;
+            var curPath = fspath + "/" + file;
 
             // recurse
             if ( Fs.statSync(curPath).isDirectory() ) {
@@ -107,30 +107,30 @@ var AssetDB;
             }
         });
 
-        Fs.rmdirSync(rpath);
+        Fs.rmdirSync(fspath);
     };
 
-    var _realdelete = function ( rpath ) {
-        var rstat = Fs.statSync(rpath);
+    var _fsdelete = function ( fspath ) {
+        var rstat = Fs.statSync(fspath);
         if ( rstat.isDirectory() ) {
-            _rmdirRecursively(rpath);
+            _rmdirRecursively(fspath);
         }
         else {
-            _rmfile(rpath);
+            _rmfile(fspath);
         }
 
-        if ( Fs.existsSync(rpath + ".meta") ) {
-            Fs.unlinkSync( rpath + ".meta" );
+        if ( Fs.existsSync(fspath + ".meta") ) {
+            Fs.unlinkSync( fspath + ".meta" );
         }
     };
 
     AssetDB.exists = function(url) {
-        var rpath = _realpath(url);
-        return Fs.existsSync(rpath);
+        var fspath = _fspath(url);
+        return Fs.existsSync(fspath);
     };
 
-    AssetDB.rpath = function (url) {
-        return _realpath(url);
+    AssetDB.fspath = function (url) {
+        return _fspath(url);
     };
 
     AssetDB.mountname = function (url) {
@@ -217,8 +217,8 @@ var AssetDB;
     };
 
     AssetDB.newAsset = function (url) {
-        var rpath = _realpath(url);
-        if ( rpath === null ) {
+        var fspath = _fspath(url);
+        if ( fspath === null ) {
             console.error("Failed to create new asset: " + url);
             return;
         }
@@ -228,23 +228,23 @@ var AssetDB;
     };
 
     AssetDB.deleteAsset = function (url) {
-        var rpath = _realpath(url);
-        if ( rpath === null ) {
+        var fspath = _fspath(url);
+        if ( fspath === null ) {
             throw "Failed to delete asset: " + url;
         }
 
-        if ( Fs.existsSync(rpath) === false ) {
+        if ( Fs.existsSync(fspath) === false ) {
             throw "Faield to delete asset: " + url + ", the url not exists.";
         }
 
-        _realdelete( rpath );
+        _fsdelete( fspath );
 
         // dispatch event
         EditorApp.fire( 'assetDeleted', { url: url } );
     };
 
     AssetDB.moveAsset = function (srcUrl, destUrl) {
-        var rsrc = _realpath(srcUrl);
+        var rsrc = _fspath(srcUrl);
         if ( rsrc === null ) {
             throw "Failed to move asset: " + srcUrl;
         }
@@ -253,7 +253,7 @@ var AssetDB;
             throw "Faield to move asset: " + srcUrl + ", the src url not exists.";
         }
 
-        var rdest = _realpath(destUrl);
+        var rdest = _fspath(destUrl);
         if ( rdest === null ) {
             throw "Invalid dest url path: " + destUrl;
         }
@@ -266,19 +266,19 @@ var AssetDB;
         AssetDB.makedirs( Path.dirname(destUrl) );
 
         //
-        _realmove ( rsrc, rdest );
+        _fsmove ( rsrc, rdest );
 
         // dispatch event
         EditorApp.fire( 'assetMoved', { srcUrl: srcUrl, destUrl: destUrl } );
     };
 
-    AssetDB.importAsset = function ( rpath ) {
+    AssetDB.importAsset = function ( fspath ) {
         // check if we have .meta
         var data = null;
         var meta = null;
         var createNewMeta = false;
-        var metaPath = rpath + ".meta";
-        var stat = Fs.statSync(rpath);
+        var metaPath = fspath + ".meta";
+        var stat = Fs.statSync(fspath);
 
         if ( Fs.existsSync(metaPath) ) {
             data = Fs.readFileSync(metaPath);
@@ -300,7 +300,7 @@ var AssetDB;
                 meta = _newMeta ('folder');
             }
             else {
-                meta = _newMeta (Path.extname(rpath));
+                meta = _newMeta (Path.extname(fspath));
             }
             data = JSON.stringify(meta,null,'  ');
             Fs.writeFileSync(metaPath, data);
@@ -309,24 +309,24 @@ var AssetDB;
         // import asset by its meta data
         if ( meta && stat.isDirectory() === false ) {
             // reimport the asset if we found uuid collision
-            if ( _uuidToRpath[meta.uuid] ) {
+            if ( _uuidToPath[meta.uuid] ) {
                 Fs.unlinkSync(metaPath);
-                AssetDB.importAsset(rpath);
+                AssetDB.importAsset(fspath);
             }
             else {
-                _uuidToRpath[meta.uuid] = rpath;
-                _rpathToUuid[rpath] = meta.uuid;
+                _uuidToPath[meta.uuid] = fspath;
+                _pathToUuid[fspath] = meta.uuid;
             }
         }
     };
 
     AssetDB.clean = function (url) {
-        var rpath = _realpath(url);
-        for (var k in _rpathToUuid) {
-            if (k.indexOf(rpath) === 0) {
-                var uuid = _rpathToUuid[k];
-                delete _rpathToUuid[k];
-                delete _uuidToRpath[uuid];
+        var fspath = _fspath(url);
+        for (var k in _pathToUuid) {
+            if (k.indexOf(fspath) === 0) {
+                var uuid = _pathToUuid[k];
+                delete _pathToUuid[k];
+                delete _uuidToPath[uuid];
             }
         }
     };
@@ -376,14 +376,14 @@ var AssetDB;
         };
         for ( var name in _mounts ) {
             // AssetDB.walk ( name + ":/", doImport );
-            var rpath = _realpath( name + ":/" );
-            Walk.walk(rpath, options);
+            var fspath = _fspath( name + ":/" );
+            Walk.walk(fspath, options);
         }
     };
 
     AssetDB.walk = function ( url, callback, finished ) {
-        var rpath = _realpath(url);
-        if ( rpath === null ) {
+        var fspath = _fspath(url);
+        if ( fspath === null ) {
             console.error("Failed to walk url: " + url);
             return;
         }
@@ -450,8 +450,8 @@ var AssetDB;
                 // }, 
             }
         };
-        Walk.walk(rpath, options);
-        // Walk.walkSync(rpath, options);
+        Walk.walk(fspath, options);
+        // Walk.walkSync(fspath, options);
     };
 
 })(AssetDB || (AssetDB = {}));
