@@ -397,7 +397,6 @@
                                         var fspath = Path.join(root, name);
                                         AssetDB.importAsset(fspath);
                                     }
-
                                 }.bind(this), 
 
                                 function () {
