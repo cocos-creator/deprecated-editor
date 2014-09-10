@@ -42,8 +42,14 @@
             this.renaming = true;
         },
 
-        setIcon: function ( className ) {
-            this.$.typeIcon.className = "type-icon fa " + className;
+        setIcon: function ( icon ) {
+            if ( icon instanceof Image ) {
+                icon.width=14
+                this.$.typeIcon.appendChild(icon);
+            }
+            else {
+                this.$.typeIcon.className = "type-icon fa " + icon;
+            }
         },
 
         mousedownAction: function ( event ) {

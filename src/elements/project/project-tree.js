@@ -70,9 +70,9 @@
             break;
 
         case '.png':
-            // var img = new Image();
-            // img.src = 
-            newEL.setIcon('fa-file-image-o');
+            var img = new Image();
+            img.src = fspath; 
+            newEL.setIcon(img);
             break;
                 
         default:
