@@ -102,6 +102,7 @@
         dragoverAction: function ( event ) {
             this.fire('draghover');
 
+            event.preventDefault();
             event.stopPropagation();
         },
 
