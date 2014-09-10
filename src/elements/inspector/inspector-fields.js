@@ -23,23 +23,23 @@
                         continue;
                     }
 
-                    // skip editor only when exporting
-                    if (self._exporting && attrs.editorOnly) {
-                        continue;
+                    var propEL = new FireProp();
+                    if ( attrs.displayName ) {
+                        propEL.name = attrs.displayName;
                     }
-
-                    // this.target[propName];
+                    else {
+                        propEL.name = EditorUI.camelCaseToHuman(propName);
+                    }
+                    propEL.bind( 'value', new PathObserver( this.target, propName ) );
+                    propEL.setAttribute( 'type', attrs.type );
+                    if ( attrs.type === 'enum' ) {
+                        propEL.enumList = attrs.enumList;
+                    }
+                    propEL.id = propName;
+                    this.$[propName] = propEL;
+                    this.appendChild( propEL );
                 }
             }
-
-            // var fieldEL = new FireField();
-            // fieldEL.setAttribute('flex-2','');
-            // fieldEL.type = 'int';
-            // fieldEL.bind( 'value', new PathObserver(this,'value') );
-            // fieldEL.id = "field";
-            // this.$.field = fieldEL;
-
-            // this.appendChild( fieldEL );
         },
 
         targetChanged: function () {
