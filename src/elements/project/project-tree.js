@@ -386,6 +386,12 @@
                                 selectedItemEl.removeChild(selectedItemEl.firstChild);
                             }
 
+                            // reimport self
+                            if(!selectedItemEl.isRoot) {
+                                var fspath = AssetDB.fspath(url);
+                                AssetDB.importAsset(fspath);
+                            }
+
                             var folderElements = {};
                             AssetDB.walk( 
                                 url, 
