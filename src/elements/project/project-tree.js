@@ -53,7 +53,7 @@
             type = extname;
         }
 
-        newEL.isFolder = type === 'folder';
+        newEL.isFolder = (type === 'folder' || type === 'root');
         newEL.isRoot = type === 'root';
         newEL.extname = extname;
         newEL.basename = basename;
@@ -384,6 +384,12 @@
                             // remove childnodes
                             while (selectedItemEl.firstChild) {
                                 selectedItemEl.removeChild(selectedItemEl.firstChild);
+                            }
+
+                            // reimport self
+                            if(!selectedItemEl.isRoot) {
+                                var fspath = AssetDB.fspath(url);
+                                AssetDB.importAsset(fspath);
                             }
 
                             var folderElements = {};
