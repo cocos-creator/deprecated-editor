@@ -44,7 +44,6 @@
 
         setIcon: function ( icon ) {
             if ( icon instanceof Image ) {
-                icon.width=14
                 this.$.typeIcon.appendChild(icon);
             }
             else {

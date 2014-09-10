@@ -375,6 +375,7 @@
                             selectedItemEl.remove();
                             return;
                         }
+                        var fspath = AssetDB.fspath(url);
 
                         if (selectedItemEl.isFolder) {
 
@@ -387,8 +388,7 @@
                             }
 
                             // reimport self
-                            if(!selectedItemEl.isRoot) {
-                                var fspath = AssetDB.fspath(url);
+                            if( !selectedItemEl.isRoot ) {
                                 AssetDB.importAsset(fspath);
                             }
 
@@ -429,7 +429,6 @@
                         }
                         else {
                             // reimport file
-                            var fspath = AssetDB.fspath(url);
                             AssetDB.importAsset(fspath);
                         }
                         
