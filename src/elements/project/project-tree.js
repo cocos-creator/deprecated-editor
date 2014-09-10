@@ -53,7 +53,7 @@
             type = extname;
         }
 
-        newEL.isFolder = type === 'folder';
+        newEL.isFolder = (type === 'folder' || type === 'root');
         newEL.isRoot = type === 'root';
         newEL.extname = extname;
         newEL.basename = basename;
