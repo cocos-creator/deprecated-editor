@@ -14,6 +14,9 @@ var EditorApp;
     EditorApp.projectName = '';
 
     EditorApp.start = function () {
+        console.log("%cWelcome to Fireball-x!\n%cThe next-gen html5 game engine.",
+                    "font-size:1.5em;color:#4558c9;", "color:#d61a7f;font-size:1em;");
+
         // handle the error safely
         process.on('uncaughtException', function(err) {
             console.error(err);
@@ -21,7 +24,7 @@ var EditorApp;
 
         // init EditorApp
         try {
-            console.log('Initializing EditorApp...');
+            console.log( 'Initializing EditorApp...' );
             EditorApp.init();
         }
         catch ( err ) {

@@ -11,7 +11,10 @@
         },
 
         refresh: function () {
-            console.log("refresh...");
+            var fireSectionEL = new FireSection();
+            fireSectionEL.setAttribute('name', 'Properties' );
+            this.appendChild( fireSectionEL );
+
             var klass = this.target.constructor;
             if (klass.__props__) {
                 for (var p = 0; p < klass.__props__.length; p++) {
@@ -31,13 +34,14 @@
                         propEL.name = EditorUI.camelCaseToHuman(propName);
                     }
                     propEL.bind( 'value', new PathObserver( this.target, propName ) );
+                    propEL.setAttribute( 'value', '{{target.'+propName+'}}' );
                     propEL.setAttribute( 'type', attrs.type );
                     if ( attrs.type === 'enum' ) {
                         propEL.enumList = attrs.enumList;
                     }
                     propEL.id = propName;
-                    this.$[propName] = propEL;
-                    this.appendChild( propEL );
+                    fireSectionEL.$[propName] = propEL;
+                    fireSectionEL.appendChild( propEL );
                 }
             }
         },
