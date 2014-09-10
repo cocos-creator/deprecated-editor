@@ -44,15 +44,17 @@
         return null;
     }
 
-    function _newProjectItem ( name, isfolder, isroot ) {
-        var extname = Path.extname(name); 
-        var basename = Path.basename(name,extname); 
-        var type = isfolder ? 'folder' : extname;
-        type = isroot ? 'root' : type;
+    function _newProjectItem ( fspath, type ) {
+        var extname = Path.extname(fspath); 
+        var basename = Path.basename(fspath,extname); 
 
         var newEL = new ProjectItem();
-        newEL.isFolder = isfolder;
-        newEL.isRoot = isroot;
+        if ( !type ) {
+            type = extname;
+        }
+
+        newEL.isFolder = type === 'folder';
+        newEL.isRoot = type === 'root';
         newEL.extname = extname;
         newEL.basename = basename;
 
@@ -66,9 +68,15 @@
             newEL.setIcon('fa-folder');
             newEL.foldable = true;
             break;
+
+        case '.png':
+            // var img = new Image();
+            // img.src = 
+            newEL.setIcon('fa-file-image-o');
+            break;
                 
         default:
-            newEL.setIcon('fa-file-image-o');
+            newEL.setIcon('fa-cube');
             break;
         }
 
@@ -155,16 +163,16 @@
             }.bind(this) );
 
             EditorApp.on('folderCreated', function ( event ) {
-                var parentPath = Path.dirname(event.detail.url);
-                var parentEL = this.getElement(parentPath);
+                var parentUrl = Path.dirname(event.detail.url);
+                var parentEL = this.getElement(parentUrl);
                 if ( parentEL === null ) {
-                    console.warn( 'Can not find element at ' + parentPath );
+                    console.warn( 'Can not find element at ' + parentUrl );
                     return;
                 }
 
                 // create new folder
-                var basename = Path.basename(event.detail.url);
-                var newEL = _newProjectItem(basename,true);
+                var fspath = AssetDB.fspath(event.detail.url);
+                var newEL = _newProjectItem( fspath, 'folder' );
 
                 // binary insert
                 _binaryInsert ( parentEL, newEL );
@@ -175,7 +183,7 @@
         load: function ( url ) {
             var folderElements = {};
             var mountname = AssetDB.mountname(url);
-            var rootEL = _newProjectItem( mountname, true, true );
+            var rootEL = _newProjectItem( mountname, 'root' );
             rootEL.style.marginLeft="0px";
             this.appendChild(rootEL);
 
@@ -183,9 +191,14 @@
                 url, 
 
                 function ( root, name, stat ) {
-                    var itemEL = _newProjectItem( name, stat.isDirectory(), false );
+                    var itemEL = null;
+                    var fspath = Path.join(root,name);
                     if ( stat.isDirectory() ) {
-                        folderElements[root+"/"+name] = itemEL;
+                        itemEL = _newProjectItem( fspath, 'folder' );
+                        folderElements[fspath] = itemEL;
+                    }
+                    else {
+                        itemEL = _newProjectItem( fspath );
                     }
 
                     var parentEL = folderElements[root];
@@ -378,10 +391,15 @@
                                 url, 
 
                                 function ( root, name, stat ) {
+                                    var itemEL = null;
+                                    var fspath = Path.join(root, name);
 
-                                    var itemEL = _newProjectItem( name, stat.isDirectory(), false );
                                     if ( stat.isDirectory() ) {
-                                        folderElements[root+"/"+name] = itemEL;
+                                        itemEL = _newProjectItem( fspath, 'folder' );
+                                        folderElements[fspath] = itemEL;
+                                    }
+                                    else {
+                                        itemEL = _newProjectItem( fspath );
                                     }
 
                                     var parentEL = folderElements[root];
@@ -393,10 +411,7 @@
                                     }
 
                                     // reimport
-                                    if ( !stat.isDirectory() ) {
-                                        var fspath = Path.join(root, name);
-                                        AssetDB.importAsset(fspath);
-                                    }
+                                    AssetDB.importAsset(fspath);
 
                                 }.bind(this), 
 
@@ -454,6 +469,7 @@
                             this.lastActive = prev;
                             this.select([this.lastActive]);
                         }
+                        event.preventDefault();
                         event.stopPropagation();
                     break;
 
@@ -468,6 +484,7 @@
                             this.lastActive = next;
                             this.select([this.lastActive]);
                         }
+                        event.preventDefault();
                         event.stopPropagation();
                     break;
                 }
