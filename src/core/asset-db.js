@@ -161,6 +161,8 @@ var AssetDB;
 
         // import asset by its meta data
         if ( meta && stat.isDirectory() === false ) {
+            // TODO: copy asset to library
+
             // reimport the asset if we found uuid collision
             if ( _uuidToPath[meta.uuid] ) {
                 Fs.unlinkSync(metaPath);
