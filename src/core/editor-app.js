@@ -259,13 +259,14 @@ var EditorApp;
         // TODO: load settings
         // TODO: load window layouts
 
+        // init asset library
+        FIRE.AssetLibrary.init( Path.join(projectDir,'library') );
+
         // mounting assets
         AssetDB.mount( Path.join(projectDir,'assets'), 'assets');
         // AssetDB.mount( Path.join(appPath,'shares'), 'shares');
 
         AssetDB.refresh();
-
-        FIRE.AssetLibrary.init( Path.join(projectDir,'library') );
     };
 
 })(EditorApp || (EditorApp = {}));
