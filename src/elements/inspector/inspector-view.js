@@ -16,7 +16,9 @@
         },
 
         inspect: function ( obj ) {
-            this.$.fields.target = obj;
+            if ( this.$.fields.target !== obj ) {
+                this.$.fields.target = obj;
+            }
         },
     });
 })();

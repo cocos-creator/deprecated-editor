@@ -11,6 +11,16 @@
         },
 
         refresh: function () {
+            if ( !this.target ) {
+                return;
+            }
+
+            // remove all children
+            while (this.firstElementChild) {
+                this.removeChild(this.firstElementChild);
+            }
+
+            //
             var fireSectionEL = new FireSection();
             fireSectionEL.setAttribute('name', 'Properties' );
             this.appendChild( fireSectionEL );

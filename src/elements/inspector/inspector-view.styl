@@ -1,5 +1,8 @@
 :host {
-    position: relative
+    display: flex
+    flex-direction: column
+    flex-wrap: nowrap     
+    align-items: stretch
 
     font-size: 12px
     margin-top: 2px
@@ -8,4 +11,14 @@
     color: #aaa
     cursor: default 
     outline: none
+
+    .fields {
+        position: relative
+    }
+
+    .preview {
+        min-height: 200px
+
+        background-color: #000
+    }
 }

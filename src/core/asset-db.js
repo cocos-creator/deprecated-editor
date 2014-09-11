@@ -125,7 +125,55 @@ var AssetDB;
         }
     };
 
-    AssetDB.exists = function(url) {
+    AssetDB.importAsset = function ( fspath ) {
+        // check if we have .meta
+        var data = null;
+        var meta = null;
+        var createNewMeta = false;
+        var metaPath = fspath + ".meta";
+        var stat = Fs.statSync(fspath);
+
+        if ( Fs.existsSync(metaPath) ) {
+            data = Fs.readFileSync(metaPath);
+            try {
+                meta = JSON.parse(data);
+            }
+            catch (err) {
+                meta = null;
+                createNewMeta = true;
+            }
+        }
+        else {
+            createNewMeta = true;
+        }
+
+        // create new .meta file if needed
+        if (createNewMeta) {
+            if ( stat.isDirectory() ) {
+                meta = _newMeta ('folder');
+            }
+            else {
+                meta = _newMeta (Path.extname(fspath));
+            }
+            data = JSON.stringify(meta,null,'  ');
+            Fs.writeFileSync(metaPath, data);
+        }
+
+        // import asset by its meta data
+        if ( meta && stat.isDirectory() === false ) {
+            // reimport the asset if we found uuid collision
+            if ( _uuidToPath[meta.uuid] ) {
+                Fs.unlinkSync(metaPath);
+                AssetDB.importAsset(fspath);
+            }
+            else {
+                _uuidToPath[meta.uuid] = fspath;
+                _pathToUuid[fspath] = meta.uuid;
+            }
+        }
+    };
+
+    AssetDB.exists = function (url) {
         var fspath = _fspath(url);
         return Fs.existsSync(fspath);
     };
@@ -286,52 +334,8 @@ var AssetDB;
         EditorApp.fire( 'assetMoved', { srcUrl: srcUrl, destUrl: destUrl } );
     };
 
-    AssetDB.importAsset = function ( fspath ) {
-        // check if we have .meta
-        var data = null;
-        var meta = null;
-        var createNewMeta = false;
-        var metaPath = fspath + ".meta";
-        var stat = Fs.statSync(fspath);
-
-        if ( Fs.existsSync(metaPath) ) {
-            data = Fs.readFileSync(metaPath);
-            try {
-                meta = JSON.parse(data);
-            }
-            catch (err) {
-                meta = null;
-                createNewMeta = true;
-            }
-        }
-        else {
-            createNewMeta = true;
-        }
-
-        // create new .meta file if needed
-        if (createNewMeta) {
-            if ( stat.isDirectory() ) {
-                meta = _newMeta ('folder');
-            }
-            else {
-                meta = _newMeta (Path.extname(fspath));
-            }
-            data = JSON.stringify(meta,null,'  ');
-            Fs.writeFileSync(metaPath, data);
-        }
-
-        // import asset by its meta data
-        if ( meta && stat.isDirectory() === false ) {
-            // reimport the asset if we found uuid collision
-            if ( _uuidToPath[meta.uuid] ) {
-                Fs.unlinkSync(metaPath);
-                AssetDB.importAsset(fspath);
-            }
-            else {
-                _uuidToPath[meta.uuid] = fspath;
-                _pathToUuid[fspath] = meta.uuid;
-            }
-        }
+    AssetDB.loadAsset = function (url) {
+        // var fspath = _fspath(url);
     };
 
     AssetDB.clean = function (url) {

@@ -28,8 +28,8 @@ var EditorApp;
             EditorApp.init();
         }
         catch ( err ) {
-            console.error(err);
-            process.exit(1);
+            console.error(err.message);
+            // process.exit(1);
         }
 
         // show native main window
@@ -228,7 +228,13 @@ var EditorApp;
             Fs.mkdirSync(settingsPath);
         }
 
-        // if .fireball/ not exists
+        // if library/ not exists
+        var libraryPath = Path.join(projectDir, 'library');
+        if ( !Fs.existsSync(libraryPath) || !Fs.statSync(libraryPath).isDirectory() ) {
+            Fs.mkdirSync(libraryPath);
+        }
+
+        // if local/ not exists
         var localPath = Path.join(projectDir, 'local');
         if ( !Fs.existsSync(localPath) || !Fs.statSync(localPath).isDirectory() ) {
             Fs.mkdirSync(localPath);
@@ -258,6 +264,8 @@ var EditorApp;
         // AssetDB.mount( Path.join(appPath,'shares'), 'shares');
 
         AssetDB.refresh();
+
+        FIRE.AssetLibrary.init( Path.join(projectDir,'library') );
     };
 
 })(EditorApp || (EditorApp = {}));
