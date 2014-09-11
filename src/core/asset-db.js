@@ -351,6 +351,24 @@ var AssetDB;
         }
     };
 
+    AssetDB.copyRecursively = function (src, dest) {
+
+        var exists = Fs.existsSync(src);
+        var stats = exists && Fs.statSync(src);
+        var isDirectory = exists && stats.isDirectory();
+
+        if (exists && isDirectory) {
+            Fs.mkdirSync(dest);
+            Fs.readdirSync(src).forEach(function(childItemName) {
+                AssetDB.copyRecursively(Path.join(src, childItemName), Path.join(dest, childItemName));
+            });
+        }
+        else {
+            Fs.linkSync(src, dest);
+        }
+        
+    };
+
     // import any changes
     AssetDB.refresh = function () {
         var doImportAsset = function ( root, name, stat ) {
