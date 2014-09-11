@@ -26,6 +26,8 @@
             this.isRoot = false;
 
             this.renaming = false;
+
+            this._isValidForDrop = true;
         },
 
         domReady: function () {
@@ -164,6 +166,48 @@
                 this.fire('namechanged', { name: this.$.rename.value } );
             }
             event.stopPropagation();
+        },
+
+        isValidForDrop: function() {
+            return this._isValidForDrop;
+        },
+
+        getNameCollisions: function( list ) {
+            // list if from event.dataTransfer.files
+
+            var nodes;
+            if(this.isFolder) {
+                nodes = this.childNodes;
+            }
+            else {
+                nodes = this.parentElement.childNodes;
+            }
+            
+            var nodesLen = nodes.length;
+            var len = list.length;
+            var i;
+            var item;
+            var node;
+            var collisions = [];
+
+            for(i = 0; i < len; i++) {
+                item = list[i];
+            
+                for(j = 0; j < nodesLen; j++) {
+                    
+                    node = nodes[j];
+                    if (node.basename + node.extname === item.name) {
+                        collisions.push(node);
+                    }
+
+                }
+            }
+
+            if (collisions.length > 0) {
+                this._isValidForDrop = false;
+            }
+
+            return collisions;
         },
     });
 })();
