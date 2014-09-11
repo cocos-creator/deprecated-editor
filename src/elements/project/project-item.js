@@ -185,18 +185,18 @@
             
             var nodesLen = nodes.length;
             var len = list.length;
-            var i;
-            var item;
+            var i,j;
+            var file;
             var node;
             var collisions = [];
 
             for(i = 0; i < len; i++) {
-                item = list[i];
+                file = list[i];
             
                 for(j = 0; j < nodesLen; j++) {
                     
                     node = nodes[j];
-                    if (node.basename + node.extname === item.name) {
+                    if (node.basename + node.extname === file.name) {
                         collisions.push(node);
                     }
 
