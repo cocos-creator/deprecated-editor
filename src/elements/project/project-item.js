@@ -173,7 +173,7 @@
         },
 
         getNameCollisions: function( list ) {
-            // list if from event.dataTransfer.files
+            // list is an array of names needed to check
 
             var nodes;
             if(this.isFolder) {
@@ -186,17 +186,17 @@
             var nodesLen = nodes.length;
             var len = list.length;
             var i,j;
-            var file;
+            var name;
             var node;
             var collisions = [];
 
             for(i = 0; i < len; i++) {
-                file = list[i];
+                name = list[i];
             
                 for(j = 0; j < nodesLen; j++) {
                     
                     node = nodes[j];
-                    if (node.basename + node.extname === file.name) {
+                    if (node.basename + node.extname === name) {
                         collisions.push(node);
                     }
 
