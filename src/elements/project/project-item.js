@@ -1,46 +1,4 @@
 (function () {
-    var Path = require('path');
-
-    // redundant 
-    function _newProjectItem ( fspath, type ) {
-        var extname = Path.extname(fspath); 
-        var basename = Path.basename(fspath,extname); 
-
-        var newEL = new ProjectItem();
-        if ( !type ) {
-            type = extname;
-        }
-
-        newEL.isFolder = (type === 'folder' || type === 'root');
-        newEL.isRoot = type === 'root';
-        newEL.extname = extname;
-        newEL.basename = basename;
-
-        switch ( type ) {
-        case 'root':
-            newEL.setIcon('fa-database');
-            newEL.foldable = true;
-            break;
-
-        case 'folder':
-            newEL.setIcon('fa-folder');
-            newEL.foldable = true;
-            break;
-
-        case '.png':
-            var img = new Image();
-            img.src = fspath; 
-            newEL.setIcon(img);
-            break;
-                
-        default:
-            newEL.setIcon('fa-cube');
-            break;
-        }
-
-        return newEL;
-    }
-
     Polymer({
         publish: {
             folded: false,
@@ -157,69 +115,19 @@
             event.preventDefault();
             event.stopPropagation();
             
-            var url;
+            var folderEl;
             if(this.isFolder) {
-                url = this.getUrl();
+                folderEl = this;
             }
             else {
-                url = this.parentElement.getUrl();
+                folderEl = this.parentElement;
             }
 
-            var dstFsDir = AssetDB.fspath(url);
+            var url = folderEl.getUrl();
             var files = event.dataTransfer.files;
-            var filesLen = files.length;
-            var i;
-            var dstFsPath
+            
+            this.fire("dndimport", {folderEl:folderEl, url:url, files:files});
 
-            for(i = 0; i < filesLen; i++) {
-                dstFsPath = Path.join(dstFsDir, files[i].name);
-                AssetDB.copyRecursively(files[i].path, dstFsPath);
-            }
-
-            // reimport
-            AssetDB.clean(url);
-
-            while (this.firstChild) {
-                this.removeChild(this.firstChild);
-            }
-
-            if( !this.isRoot ) {
-                AssetDB.importAsset(dstFsDir);
-            }
-
-            var folderElements = {};
-            AssetDB.walk( 
-                url, 
-
-                function ( root, name, stat ) {
-                    var itemEL = null;
-                    var fspath = Path.join(root, name);
-
-                    if ( stat.isDirectory() ) {
-                        itemEL = _newProjectItem( fspath, 'folder' );
-                        folderElements[fspath] = itemEL;
-                    }
-                    else {
-                        itemEL = _newProjectItem( fspath );
-                    }
-
-                    var parentEL = folderElements[root];
-                    if ( parentEL ) {
-                        parentEL.appendChild(itemEL);
-                    }
-                    else {
-                        this.appendChild(itemEL);
-                    }
-
-                    // reimport
-                    AssetDB.importAsset(fspath);
-
-                }.bind(this), 
-
-                function () {
-                    // console.log("finish walk");
-                }.bind(this)
-            );
         },
 
         getUrl: function () {

@@ -351,6 +351,10 @@ var AssetDB;
         }
     };
 
+    AssetDB.copy = function (src, dest) {
+        Fs.createReadStream(src).pipe(Fs.createWriteStream(dest));
+    };
+
     AssetDB.copyRecursively = function (src, dest) {
 
         var exists = Fs.existsSync(src);
@@ -364,7 +368,7 @@ var AssetDB;
             });
         }
         else {
-            Fs.linkSync(src, dest);
+            AssetDB.copy(src, dest);
         }
         
     };
