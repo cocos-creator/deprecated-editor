@@ -50,6 +50,7 @@ var AssetDB;
                 listeners: {
                     file: function ( root, stats, next ) {
                         if ( Path.extname(stats.name) !== '.meta' ) {
+                            root = Path.resolve(root); // NOTE: bug for windows in Walk
                             var rawfile = Path.join(root,stats.name);
                             var rel = Path.relative( rsrc, rawfile );
                             var dest = Path.join(rdest,rel);
@@ -351,6 +352,7 @@ var AssetDB;
         };
 
         var doRefresh = function (root, statsArray, next) {
+            root = Path.resolve(root); // NOTE: bug for windows in Walk
             for ( var i = 0; i < statsArray.length; ++i ) {
                 var stats = statsArray[i];
 
@@ -424,6 +426,8 @@ var AssetDB;
                 node: function ( root, stats, next ) {
                     // skip .dirs, .files
                     if ( stats.name[0] !== '.' ) {
+                        root = Path.resolve(root); // NOTE: bug for windows in Walk
+
                         // skip xxx.meta files
                         if ( stats.isFile ) {
                             if ( Path.extname(stats.name) !== '.meta' ) {
