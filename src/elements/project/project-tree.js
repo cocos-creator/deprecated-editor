@@ -734,5 +734,67 @@
 
             return curItem;
         },
+
+        dndimportAction: function( event ) {
+
+            var folderEl = event.detail.folderEl;
+            var url = event.detail.url;
+            var dstFsDir = AssetDB.fspath(url);
+            var files = event.detail.files;
+            var filesLen = files.length;
+            var i;
+            var dstFsPath
+
+            for(i = 0; i < filesLen; i++) {
+                dstFsPath = Path.join(dstFsDir, files[i].name);
+                AssetDB.copyRecursively(files[i].path, dstFsPath);
+            }
+
+            // reimport
+            AssetDB.clean(url);
+
+            while (folderEl.firstChild) {
+                folderEl.removeChild(folderEl.firstChild);
+            }
+
+            if( !folderEl.isRoot ) {
+                AssetDB.importAsset(dstFsDir);
+            }
+
+            var folderElements = {};
+            AssetDB.walk( 
+                url, 
+
+                function ( root, name, stat ) {
+                    var itemEL = null;
+                    var fspath = Path.join(root, name);
+
+                    if ( stat.isDirectory() ) {
+                        itemEL = _newProjectItem( fspath, 'folder' );
+                        folderElements[fspath] = itemEL;
+                    }
+                    else {
+                        itemEL = _newProjectItem( fspath );
+                    }
+
+                    var parentEL = folderElements[root];
+                    if ( parentEL ) {
+                        parentEL.appendChild(itemEL);
+                    }
+                    else {
+                        folderEl.appendChild(itemEL);
+                    }
+
+                    // reimport
+                    AssetDB.importAsset(fspath);
+
+                }.bind(folderEl), 
+
+                function () {
+                    // console.log("finish walk");
+                }.bind(folderEl)
+            );
+        },
+
     });
 })();
