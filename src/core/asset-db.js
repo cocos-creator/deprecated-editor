@@ -119,8 +119,8 @@ var AssetDB;
     };
 
     AssetDB.init = function () {
-        AssetDB.registerImporter( ['default'], new FIRE_ED.Importer() );
-        AssetDB.registerImporter( ['.png', '.jpg'], new FIRE_ED.TextureImporter() );
+        AssetDB.registerImporter( ['default'], FIRE_ED.Importer );
+        AssetDB.registerImporter( ['.png', '.jpg'], FIRE_ED.TextureImporter );
     };
 
     //
@@ -134,61 +134,81 @@ var AssetDB;
         }
     };
 
-    AssetDB.importAsset = function ( fspath ) {
-        // check if we have .meta
-        var data = null;
-        var meta = null;
-        var createNewMeta = false;
-        var stat = Fs.statSync(fspath);
+    //
+    AssetDB.getImporter = function ( fspath ) {
         var extname = Path.extname(fspath);
         var metaPath = fspath + ".meta";
+        var meta = null;
 
+        //
         if ( Fs.existsSync(metaPath) ) {
-            data = Fs.readFileSync(metaPath);
+            var data = Fs.readFileSync(metaPath);
             try {
-                meta = JSON.parse(data);
+                var jsonObj = JSON.parse(data);
+                meta = FIRE.deserialize(jsonObj);
             }
             catch (err) {
                 meta = null;
-                createNewMeta = true;
             }
         }
-        else {
-            createNewMeta = true;
+
+        //
+        if ( !meta ) {
+            var cls = _importers[extname];
+            if ( !cls ) {
+                cls = _importers['default'];
+            }
+            meta = new cls();
+            meta.uuid = Uuid.v4();
         }
+        return meta;
+    };
+
+    AssetDB.importAsset = function ( fspath ) {
+        // check if we have .meta
+        var data = null;
+        var stat = Fs.statSync(fspath);
+        var metaPath = fspath + ".meta";
 
         // import asset by its meta data
         if ( stat.isDirectory() ) {
-            if ( createNewMeta ) {
+            var meta = null;
+            if ( Fs.existsSync(metaPath) ) {
+                data = Fs.readFileSync(metaPath);
+                try {
+                    meta = JSON.parse(data);
+                }
+                catch (err) {
+                    meta = null;
+                }
+            }
+
+            if ( !meta ) {
                 meta = _newFolderMeta();
                 data = JSON.stringify(meta,null,'  ');
                 Fs.writeFileSync(metaPath, data);
             }
         }
         else {
-            // reimport the asset if we found uuid collision
-            if ( meta && _uuidToPath[meta.uuid] ) {
-                Fs.unlinkSync(metaPath);
-                createNewMeta = true;
-            }
+            var importer = this.getImporter(fspath);
 
-            // if we don't have importer, use default
-            var importer = _importers[extname];
-            if ( !importer ) {
-                importer = _importers['default'];
+            // reimport the asset if we found uuid collision
+            if ( _uuidToPath[importer.uuid] ) {
+                Fs.unlinkSync(metaPath);
             }
 
             // create meta if needed
-            if ( createNewMeta ) {
-                meta = importer.newMeta();
-                data = JSON.stringify(meta,null,'  ');
+            if ( !Fs.existsSync(metaPath) ) {
+                data = FIRE.serialize(importer);
                 Fs.writeFileSync(metaPath, data);
             }
-            importer.exec( fspath, meta );
+
+            // TODO:
+            // importer.exec();
 
             // finish import
-            _uuidToPath[meta.uuid] = fspath;
-            _pathToUuid[fspath] = meta.uuid;
+            _uuidToPath[importer.uuid] = fspath;
+            _pathToUuid[fspath] = importer.uuid;
         }
     };
 
