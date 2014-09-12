@@ -35,6 +35,10 @@ var paths = {
         'src/core/utils.js',
         'src/core/asset-db.js',
         'src/core/editor-app.js',
+        'src/builtin/__intro.js',
+        'src/builtin/importer/importer.js',
+        'src/builtin/importer/texture-importer.js',
+        'src/builtin/__outro.js',
     ],
 };
 

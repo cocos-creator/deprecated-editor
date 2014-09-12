@@ -1,6 +1,6 @@
 (function () {
     Polymer({
-        ready: function () {
+        domReady: function () {
             EditorApp.setMainWindow(this);
 
             // init project-tree

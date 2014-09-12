@@ -3,8 +3,6 @@ var EditorUtils;
     var Fs = require('fs');
     var Path = require('path');
 
-    EditorUtils.metaVer = 0;
-
     function _mkdirp (p, opts, f) {
         if (typeof opts === 'function') {
             f = opts;

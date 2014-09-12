@@ -19,7 +19,7 @@ var EditorApp;
 
         // handle the error safely
         process.on('uncaughtException', function(err) {
-            console.error(err);
+            console.error(err.message);
         });
 
         // init EditorApp
@@ -50,6 +50,9 @@ var EditorApp;
         if ( EditorApp.options.D || EditorApp.options.showdevtools ) {
             nativeMainWin.showDevTools();
         }
+
+        // init asset-db
+        AssetDB.init();
 
         // TODO: login
         // TODO: choose project
