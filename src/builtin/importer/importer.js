@@ -1,4 +1,4 @@
-FIRE_ED.Importer = (function () {
+var Importer = (function () {
     
     // constructor
 
@@ -22,4 +22,4 @@ FIRE_ED.Importer = (function () {
     return Importer;
 })();
 
-
+FIRE_ED.Importer = Importer;

@@ -1,4 +1,4 @@
-FIRE_ED.TextureImporter = (function () {
+TextureImporter = (function () {
 
     var TextureImporter = FIRE.define('FIRE_ED.TextureImporter', Importer, function () {
         Sprite.$super.call(this);
@@ -6,3 +6,5 @@ FIRE_ED.TextureImporter = (function () {
     
     return TextureImporter;
 })();
+
+FIRE_ED.TextureImporter = TextureImporter;

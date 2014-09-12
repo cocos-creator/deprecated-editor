@@ -156,6 +156,8 @@ var EditorApp;
         _mainWin = mainWin;
     };
 
+    // event operation
+
     //
     EditorApp.on = function ( name, fn ) {
         var list = eventListeners[name];
@@ -200,6 +202,8 @@ var EditorApp;
             }
         }
     };
+
+    // project operation
 
     //
     EditorApp.checkProject = function ( projectFile ) {

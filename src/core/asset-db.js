@@ -125,6 +125,11 @@ var AssetDB;
         }
     };
 
+    //
+    AssetDB.registerImporter = function ( extnames, importer ) {
+        // TODO:
+    };
+
     AssetDB.importAsset = function ( fspath ) {
         // check if we have .meta
         var data = null;
