@@ -70,6 +70,7 @@
             break;
 
         case '.png':
+        case '.jpg':
             var img = new Image();
             img.src = fspath; 
             newEL.setIcon(img);
@@ -738,35 +739,28 @@
         dropAction: function ( event ) {
             event.preventDefault();
             event.stopPropagation();
-            
-            var targetEl = event.target;
-            var folderEl;
-            if(targetEl.isFolder) {
-                folderEl = targetEl;
-            }
-            else {
-                folderEl = targetEl.parentElement;
-            }
 
-            var url = this.getUrl(folderEl);
+            var targetEl = this.curDragoverEL;
+            this.cancelHighligting();
+            
+            // TODO: we should have better solution { 
+            var url = this.getUrl(targetEl);
             var files = event.dataTransfer.files;
             var dstFsDir = AssetDB.fspath(url);
-            var filesLen = files.length;
-            var i;
-            var dstFsPath
 
-            for(i = 0; i < filesLen; i++) {
-                dstFsPath = Path.join(dstFsDir, files[i].name);
+
+            for ( var i = 0; i < files.length; i++ ) {
+                var dstFsPath = Path.join(dstFsDir, files[i].name);
                 EditorUtils.copyRecursively(files[i].path, dstFsPath);
             }
 
             AssetDB.clean(url);
 
-            while (folderEl.firstChild) {
-                folderEl.removeChild(folderEl.firstChild);
+            while (targetEl.firstChild) {
+                targetEl.removeChild(targetEl.firstChild);
             }
 
-            if( !folderEl.isRoot ) {
+            if( !targetEl.isRoot ) {
                 AssetDB.importAsset(dstFsDir);
             }
 
@@ -791,20 +785,19 @@
                         parentEL.appendChild(itemEL);
                     }
                     else {
-                        folderEl.appendChild(itemEL);
+                        targetEl.appendChild(itemEL);
                     }
 
                     // reimport
                     AssetDB.importAsset(fspath);
 
-                }.bind(folderEl), 
+                }.bind(targetEl), 
 
                 function () {
                     // console.log("finish walk");
-                }.bind(folderEl)
+                }.bind(targetEl)
             );
-
-            this.cancelHighligting();
+            // TODO }: 
 
         },
 

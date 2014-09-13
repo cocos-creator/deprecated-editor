@@ -83,7 +83,7 @@ var AssetDB;
                 delete _uuidToPath[uuid];
             }
         }
-        Fs.unlinkSync( rpath );
+        Fs.unlinkSync( fspath );
     };
 
     var _rmdirRecursively = function ( fspath ) {
@@ -125,6 +125,11 @@ var AssetDB;
 
     //
     AssetDB.registerImporter = function ( extnames, importer ) {
+        if ( importer !== FIRE_ED.Importer && FIRE.childof(importer, FIRE_ED.Importer) === false ) {
+            console.warn( "The importer is not extended from FIRE_ED.Importer" );
+            return;
+        }
+
         for ( var i = 0; i < extnames.length; ++i ) {
             var name = extnames[i];
             if ( _importers[name] ) {
@@ -148,6 +153,10 @@ var AssetDB;
                 meta = FIRE.deserialize(jsonObj);
             }
             catch (err) {
+                meta = null;
+            }
+
+            if ( !(meta instanceof FIRE_ED.Importer) ) {
                 meta = null;
             }
         }
