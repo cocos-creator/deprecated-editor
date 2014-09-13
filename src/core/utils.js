@@ -104,4 +104,26 @@ var EditorUtils;
         return false;
     };
 
+    EditorUtils.copy = function ( src, dest ) {
+        Fs.createReadStream(src).pipe(Fs.createWriteStream(dest));
+    };
+
+    EditorUtils.copyRecursively = function ( src, dest ) {
+
+        var exists = Fs.existsSync(src);
+        var stats = exists && Fs.statSync(src);
+        var isDirectory = exists && stats.isDirectory();
+
+        if (exists && isDirectory) {
+            Fs.mkdirSync(dest);
+            Fs.readdirSync(src).forEach(function(childItemName) {
+                EditorUtils.copyRecursively(Path.join(src, childItemName), Path.join(dest, childItemName));
+            });
+        }
+        else {
+            EditorUtils.copy(src, dest);
+        }
+        
+    };
+
 })(EditorUtils || (EditorUtils = {}));

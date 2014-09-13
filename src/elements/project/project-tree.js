@@ -734,5 +734,79 @@
 
             return curItem;
         },
+
+        dropAction: function ( event ) {
+            event.preventDefault();
+            event.stopPropagation();
+            
+            var targetEl = event.target;
+            var folderEl;
+            if(targetEl.isFolder) {
+                folderEl = targetEl;
+            }
+            else {
+                folderEl = targetEl.parentElement;
+            }
+
+            var url = this.getUrl(folderEl);
+            var files = event.dataTransfer.files;
+            var dstFsDir = AssetDB.fspath(url);
+            var filesLen = files.length;
+            var i;
+            var dstFsPath
+
+            for(i = 0; i < filesLen; i++) {
+                dstFsPath = Path.join(dstFsDir, files[i].name);
+                EditorUtils.copyRecursively(files[i].path, dstFsPath);
+            }
+
+            AssetDB.clean(url);
+
+            while (folderEl.firstChild) {
+                folderEl.removeChild(folderEl.firstChild);
+            }
+
+            if( !folderEl.isRoot ) {
+                AssetDB.importAsset(dstFsDir);
+            }
+
+            var folderElements = {};
+            AssetDB.walk( 
+                url, 
+
+                function ( root, name, stat ) {
+                    var itemEL = null;
+                    var fspath = Path.join(root, name);
+
+                    if ( stat.isDirectory() ) {
+                        itemEL = _newProjectItem( fspath, 'folder' );
+                        folderElements[fspath] = itemEL;
+                    }
+                    else {
+                        itemEL = _newProjectItem( fspath );
+                    }
+
+                    var parentEL = folderElements[root];
+                    if ( parentEL ) {
+                        parentEL.appendChild(itemEL);
+                    }
+                    else {
+                        folderEl.appendChild(itemEL);
+                    }
+
+                    // reimport
+                    AssetDB.importAsset(fspath);
+
+                }.bind(folderEl), 
+
+                function () {
+                    // console.log("finish walk");
+                }.bind(folderEl)
+            );
+
+            this.cancelHighligting();
+
+        },
+
     });
 })();
