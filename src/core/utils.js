@@ -109,21 +109,18 @@ var EditorUtils;
     };
 
     EditorUtils.copyRecursively = function ( src, dest ) {
-
-        var exists = Fs.existsSync(src);
-        var stats = exists && Fs.statSync(src);
-        var isDirectory = exists && stats.isDirectory();
-
-        if (exists && isDirectory) {
-            Fs.mkdirSync(dest);
-            Fs.readdirSync(src).forEach(function(childItemName) {
-                EditorUtils.copyRecursively(Path.join(src, childItemName), Path.join(dest, childItemName));
-            });
+        if ( Fs.existsSync(src) ) {
+            var stats = Fs.statSync(src);
+            if ( stats.isDirectory() ) {
+                Fs.mkdirSync(dest);
+                Fs.readdirSync(src).forEach(function(name) {
+                    EditorUtils.copyRecursively ( Path.join(src, name), Path.join(dest, name) );
+                });
+            }
+            else {
+                EditorUtils.copy(src, dest);
+            }
         }
-        else {
-            EditorUtils.copy(src, dest);
-        }
-        
     };
 
 })(EditorUtils || (EditorUtils = {}));
