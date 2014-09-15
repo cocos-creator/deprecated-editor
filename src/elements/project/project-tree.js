@@ -521,9 +521,14 @@
                         this.select( [event.target] );
                     }
                 } 
+
+                // TODO: confirm selection
+                if ( this.selection.length > 0 ) {
+                    var uuid = AssetDB.urlToUuid(this.getUrl(this.selection[0]));
+                    EditorApp.fire( 'selected', { uuid: uuid } );
+                }
             }
 
-            // TODO: confirm selection
             event.stopPropagation();
         },
 
