@@ -97,8 +97,14 @@
             this.selection = [];
             this.lastActive = null;
             this.startDragging = false;
-            this.curDragoverEL = null; 
+            this.draggingEL = null;
+            this.curDragoverEL = null;
+            this.lastDragoverEL = null;
+
             this.contextmenuAt = null;
+
+            this._isValidForDrop = true;
+            this.redBarItems = [];
         },
 
         ready: function () {
@@ -128,6 +134,11 @@
 
                     this.cancelHighligting();
                     this.startDragging = false;
+                    this.draggingEL = null;
+                    this.unRedBar(this.redBarItems);
+                    this.clearRedBar();
+                    this._isValidForDrop = true;
+                    this.lastDragoverEL = null;
                     event.stopPropagation();
                 }
             }, true );
@@ -260,6 +271,34 @@
                 this.selection[i].selected = false;
             }
             this.selection = [];
+        },
+
+        redBar: function ( items ) {
+            for ( var i = 0; i < items.length; ++i ) {
+                var item = items[i];
+
+                // TODO:
+                item.style.backgroundColor = 'red';
+
+                this.redBarItems.push(item);
+            }
+        },
+
+        unRedBar: function ( items ) {
+            for ( var i = 0; i < items.length; ++i ) {
+                var item = items[i];
+        
+                // TODO:
+                item.style.backgroundColor = '#333';
+
+                var idx = this.redBarItems.indexOf(item); 
+                this.redBarItems.splice(idx,1);
+                
+            }
+        },
+
+        clearRedBar: function () {
+            this.redBarItems = [];
         },
 
         getUrl: function ( element ) {
@@ -395,6 +434,13 @@
                     var srcUrl = url;
                     var destUrl = Path.join( targetUrl, el.basename + el.extname );
                     try {
+
+                        // check
+                        if(!this.isValidForDrop()) {
+                            //console.log("cant move");
+                            return;
+                        }
+
                         AssetDB.moveAsset( srcUrl, destUrl );
                     }
                     catch (err) {
@@ -497,6 +543,7 @@
                 }
                 else {
                     this.startDragging = true;
+                    this.draggingEL = event.target;
                     if ( this.selection.indexOf(event.target) === -1 ) {
                         this.clearSelect();
                         this.select( [event.target] );
@@ -554,6 +601,40 @@
                 }
                 target.highlighted = true;
                 this.curDragoverEL = target;
+
+                // name collision check
+                if (this.curDragoverEL !== this.lastDragoverEL) {
+                    this.lastDragoverEL = this.curDragoverEL;
+
+                    var names = [];
+                    if (event.detail.files) {
+                        console.log("files", event.detail.files);
+                        var files = event.detail.files;
+                        for (var i = 0; i < files.length; i++) {
+                            names.push(files[i].name);
+                        }
+                    }
+                    else {
+                        var srcEL = this.draggingEL;
+
+                        if (target != srcEL.parentElement) {
+                            names.push(srcEL.basename + srcEL.extname);
+                            console.log("[names list]", names);
+                        }
+                    }
+
+                    if (names.length > 0) {
+                        var collisions = this.getNameCollisions( target, names);
+                        console.log("collision", collisions);
+                        //MyItem = collisions[0];
+                        if (collisions.length > 0) {
+                            this.redBar(collisions);
+                        }
+                    }
+
+                }
+
+
             }
             event.stopPropagation();
         },
@@ -565,6 +646,10 @@
         contextmenuAction: function (event) {
             this.cancelHighligting();
             this.startDragging = false;
+            this.draggingEL = null;
+            this.unRedBar(this.redBarItems);
+            this.clearRedBar();
+            this._isValidForDrop = true;
 
             //
             this.contextmenuAt = null;
@@ -688,6 +773,10 @@
                     case 27:
                         this.cancelHighligting();
                         this.startDragging = false;
+                        this.draggingEL = null;
+                        this.unRedBar(this.redBarItems);
+                        this.clearRedBar();
+                        this._isValidForDrop = true;
                         event.stopPropagation();
                     break;
                 }
@@ -739,6 +828,12 @@
         dropAction: function ( event ) {
             event.preventDefault();
             event.stopPropagation();
+
+            // check
+            if(!this.isValidForDrop()) {
+                //console.log("cant drop");
+                return;
+            }
 
             var targetEl = this.curDragoverEL;
             this.cancelHighligting();
@@ -797,6 +892,41 @@
             );
             // TODO }: 
 
+        },
+
+        isValidForDrop: function() {
+            return this._isValidForDrop;
+        },
+
+        getNameCollisions: function( target, list ) {
+
+            var nodes = target.childNodes;
+            
+            var nodesLen = nodes.length;
+            var len = list.length;
+            var i,j;
+            var name;
+            var node;
+            var collisions = [];
+
+            for(i = 0; i < len; i++) {
+                name = list[i];
+            
+                for(j = 0; j < nodesLen; j++) {
+                    
+                    node = nodes[j];
+                    if (node.basename + node.extname === name) {
+                        collisions.push(node);
+                    }
+
+                }
+            }
+
+            if (collisions.length > 0) {
+                this._isValidForDrop = false;
+            }
+
+            return collisions;
         },
 
     });

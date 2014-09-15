@@ -105,7 +105,7 @@
         },
 
         dragoverAction: function ( event ) {
-            this.fire('draghover');
+            this.fire('draghover', {files : event.dataTransfer.files});
 
             event.preventDefault();
             event.stopPropagation();
