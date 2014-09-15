@@ -111,11 +111,20 @@
         }
     }
 
+    &([conflicted]) {
+        .wrapper {
+            .bar {
+                visibility: visible
+                background: #f00 !important
+            }
+        }
+    }
+
     &([selected]) {
         .wrapper {
             .bar {
                 visibility: visible
-                background: #555
+                background: #555 
             }
         }
     }
