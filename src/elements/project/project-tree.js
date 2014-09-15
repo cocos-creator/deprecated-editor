@@ -99,6 +99,7 @@
             this.startDragging = false;
             this.curDragoverEL = null; 
             this.contextmenuAt = null;
+            this.dragcount = 0;
         },
 
         ready: function () {
@@ -131,6 +132,17 @@
                     event.stopPropagation();
                 }
             }, true );
+
+            this.addEventListener( "dragenter", function (event) {
+                ++this.dragcount;
+            }, true);
+
+            this.addEventListener( "dragleave", function (event) {
+                --this.dragcount;
+                if ( this.dragcount === 0 ) {
+                    this.cancelHighligting();
+                }
+            }, true);
 
             EditorApp.on('assetMoved', function ( event ) {
                 var srcEL = this.getElement( event.detail.srcUrl );
