@@ -124,6 +124,10 @@ var EditorUtils;
     //     }
     // };
 
+    function _copySync ( src, dest ) {
+        Fs.writeFileSync(dest, Fs.readFileSync(src));
+    }
+
     function _copySyncR ( src, dest ) {
         if ( Fs.statSync(src).isDirectory() ) {
             Fs.mkdirSync(dest);
@@ -132,17 +136,31 @@ var EditorUtils;
             });
         }
         else {
-            Fs.writeFileSync(dest, Fs.readFileSync(src));
+            _copySync ( src, dest );
         }
     }
 
-    EditorUtils.copySync = function ( src, destDir ) {
+    // a copy function just like bash's cp 
+    EditorUtils.copySync = function ( src, dest ) {
         if ( Fs.existsSync(src) ) {
-            if ( !Fs.existsSync(destDir) ) {
-                _mkdirpSync(destDir);
+            if ( Fs.statSync(src).isDirectory() ) {
+                if ( Fs.existsSync(dest) && Fs.statSync(dest).isDirectory() ) {
+                    _copySyncR ( src, Path.join(dest, Path.basename(src)) );
+                }
+                else {
+                    _mkdirpSync(Path.dirname(dest));
+                    _copySyncR ( src, dest );
+                }
             }
-
-            _copySyncR ( src, Path.join(destDir, Path.basename(src)) );
+            else {
+                if ( Fs.existsSync(dest) && Fs.statSync(dest).isDirectory() ) {
+                    _copySync ( src, Path.join(dest, Path.basename(src)) );
+                }
+                else {
+                    _mkdirpSync(Path.dirname(dest));
+                    _copySync ( src, dest );
+                }
+            }
         }
     };
 

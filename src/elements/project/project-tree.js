@@ -217,6 +217,245 @@
             );
         },
 
+        toggle: function ( items ) {
+            for ( var i = 0; i < items.length; ++i ) {
+                var item = items[i];
+                if ( item.selected === false ) {
+                    item.selected = true;
+                    this.selection.push(item);
+                }
+                else {
+                    item.selected = false;
+
+                    var idx = this.selection.indexOf(item); 
+                    this.selection.splice(idx,1);
+                }
+            }
+        },
+
+        select: function ( items ) {
+            for ( var i = 0; i < items.length; ++i ) {
+                var item = items[i];
+                if ( item.selected === false ) {
+                    item.selected = true;
+                    this.selection.push(item);
+                }
+            }
+        },
+
+        unselect: function ( items ) {
+            for ( var i = 0; i < items.length; ++i ) {
+                var item = items[i];
+                if ( item.selected ) {
+                    item.selected = false;
+
+                    var idx = this.selection.indexOf(item); 
+                    this.selection.splice(idx,1);
+                }
+            }
+        },
+
+        clearSelect: function () {
+            for ( var i = 0; i < this.selection.length; ++i ) {
+                this.selection[i].selected = false;
+            }
+            this.selection = [];
+        },
+
+        getUrl: function ( element ) {
+            if ( element.isRoot ) {
+                return element.basename + "://"; 
+            }
+
+            var url = element.basename + element.extname;
+            var parentEL = element.parentElement;
+            while ( parentEL instanceof ProjectItem ) {
+                if ( parentEL.isRoot ) {
+                    url = parentEL.basename + "://" + url;
+                    break;
+                }
+                else {
+                    url = Path.join( parentEL.basename, url );
+                    parentEL = parentEL.parentElement;
+                }
+            }
+            return url;
+        },
+
+        getElement: function ( url ) {
+            var list = url.split(":");
+            if ( list.length !== 2 ) {
+                console.warn("Invalid url " + url);
+                return null;
+            }
+            var relativePath = Path.normalize(list[1]);
+            if ( relativePath[0] === '/' ) {
+                relativePath = relativePath.slice(1);
+            }
+            var names = relativePath.split("/");
+            names.unshift(list[0]);
+            var el = this;
+
+            for ( var i = 0; i < names.length; ++i ) {
+                var name = names[i];
+
+                if ( name === '' || name === '.' )
+                    continue;
+
+                el = _findElement ( el.children, name );
+                if ( !el )
+                    return null;
+            }
+
+            return el;
+        },
+
+        getMostIncludeElements: function ( elements ) {
+            var i,j;
+            var resultELs = [];
+
+            for ( i = 0; i < elements.length; ++i ) {
+                var el = elements[i];
+                var url = this.getUrl(el);
+                var addEL = true;
+                var resultEL = null;
+                var resultUrl = null;
+                var cmp = null;
+
+                if ( el.isFolder ) {
+                    for ( j = 0; j < resultELs.length; ++j ) {
+                        resultEL = resultELs[j];
+                        resultUrl = this.getUrl(resultEL);
+
+                        // url is child of resultUrl
+                        cmp = EditorUtils.includePath( resultUrl, url );
+                        if ( cmp ) {
+                            addEL = false;
+                            break;
+                        }
+
+                        // url is parent or same of resultUrl
+                        cmp = EditorUtils.includePath( url, resultUrl );
+                        if ( cmp ) {
+                            resultELs.splice(j,1);
+                            --j;
+                        }
+
+                        // url is not relative with resultUrl
+                    }
+
+                    if ( addEL ) {
+                        resultELs.push(el);
+                    }
+                }
+                else {
+                    for ( j = 0; j < resultELs.length; ++j ) {
+                        resultEL = resultELs[j];
+                        resultUrl = this.getUrl(resultEL);
+
+                        // url is child of resultUrl
+                        cmp = EditorUtils.includePath( resultUrl, url );
+                        if ( cmp ) {
+                            addEL = false;
+                            break;
+                        }
+
+                        // url is not relative with resultUrl
+                    }
+
+                    if ( addEL ) {
+                        resultELs.push(el);
+                    }
+                }
+            }
+
+            return resultELs;
+        },
+
+        cancelHighligting: function () {
+            if ( this.curDragoverEL ) {
+                this.curDragoverEL.highlighted = false;
+                this.curDragoverEL = null;
+                this.$.highlightMask.style.display = "none";
+            }
+        },
+
+        moveSelection: function ( targetEL ) {
+            var elements = this.getMostIncludeElements(this.selection);
+            var targetUrl = this.getUrl(targetEL);
+            for ( var i = 0; i < elements.length; ++i ) {
+                var el = elements[i];
+
+                // do nothing if we already here
+                if ( el.parentElement === targetEL )
+                    continue;
+
+                var url = this.getUrl(el);
+                if ( EditorUtils.includePath(url,targetUrl) === false ) {
+                    var srcUrl = url;
+                    var destUrl = Path.join( targetUrl, el.basename + el.extname );
+                    try {
+                        AssetDB.moveAsset( srcUrl, destUrl );
+                    }
+                    catch (err) {
+                        console.error(err);
+                        // TODO: failed
+                    }
+                }
+            }
+        },
+
+        nextItem: function ( curItem, checkFolded ) {
+            if ( checkFolded &&
+                 curItem.foldable && 
+                 curItem.folded === false && 
+                 curItem.children.length > 0 ) 
+            {
+                return curItem.firstElementChild;
+            }
+
+            if ( curItem.nextElementSibling )
+                return curItem.nextElementSibling;
+
+            var parentEL = curItem.parentElement;
+            if ( parentEL instanceof ProjectItem === false ) {
+                return null;
+            }
+
+            return this.nextItem(parentEL,false);
+        },
+
+        prevItem: function ( curItem ) {
+            if ( curItem.previousElementSibling ) {
+                if ( curItem.previousElementSibling.foldable && 
+                     curItem.previousElementSibling.folded === false && 
+                     curItem.previousElementSibling.children.length > 0 ) 
+                {
+                    return this.getLastElementRecursively(curItem.previousElementSibling);
+                }
+
+                return curItem.previousElementSibling;
+            }
+
+            var parentEL = curItem.parentElement;
+            if ( parentEL instanceof ProjectItem === false ) {
+                return null;
+            }
+
+            return parentEL;
+        },
+
+        getLastElementRecursively: function ( curItem ) {
+            if ( curItem.foldable && 
+                 curItem.folded === false && 
+                 curItem.children.length > 0 ) 
+            {
+                return this.getLastElementRecursively (curItem.lastElementChild);
+            }
+
+            return curItem;
+        },
+
         focusinAction: function (event) {
             this.focused = true;
         },
@@ -497,245 +736,6 @@
             }
         },
 
-        toggle: function ( items ) {
-            for ( var i = 0; i < items.length; ++i ) {
-                var item = items[i];
-                if ( item.selected === false ) {
-                    item.selected = true;
-                    this.selection.push(item);
-                }
-                else {
-                    item.selected = false;
-
-                    var idx = this.selection.indexOf(item); 
-                    this.selection.splice(idx,1);
-                }
-            }
-        },
-
-        select: function ( items ) {
-            for ( var i = 0; i < items.length; ++i ) {
-                var item = items[i];
-                if ( item.selected === false ) {
-                    item.selected = true;
-                    this.selection.push(item);
-                }
-            }
-        },
-
-        unselect: function ( items ) {
-            for ( var i = 0; i < items.length; ++i ) {
-                var item = items[i];
-                if ( item.selected ) {
-                    item.selected = false;
-
-                    var idx = this.selection.indexOf(item); 
-                    this.selection.splice(idx,1);
-                }
-            }
-        },
-
-        clearSelect: function () {
-            for ( var i = 0; i < this.selection.length; ++i ) {
-                this.selection[i].selected = false;
-            }
-            this.selection = [];
-        },
-
-        getUrl: function ( element ) {
-            if ( element.isRoot ) {
-                return element.basename + "://"; 
-            }
-
-            var url = element.basename + element.extname;
-            var parentEL = element.parentElement;
-            while ( parentEL instanceof ProjectItem ) {
-                if ( parentEL.isRoot ) {
-                    url = parentEL.basename + "://" + url;
-                    break;
-                }
-                else {
-                    url = Path.join( parentEL.basename, url );
-                    parentEL = parentEL.parentElement;
-                }
-            }
-            return url;
-        },
-
-        getElement: function ( url ) {
-            var list = url.split(":");
-            if ( list.length !== 2 ) {
-                console.warn("Invalid url " + url);
-                return null;
-            }
-            var relativePath = Path.normalize(list[1]);
-            if ( relativePath[0] === '/' ) {
-                relativePath = relativePath.slice(1);
-            }
-            var names = relativePath.split("/");
-            names.unshift(list[0]);
-            var el = this;
-
-            for ( var i = 0; i < names.length; ++i ) {
-                var name = names[i];
-
-                if ( name === '' || name === '.' )
-                    continue;
-
-                el = _findElement ( el.children, name );
-                if ( !el )
-                    return null;
-            }
-
-            return el;
-        },
-
-        getMostIncludeElements: function ( elements ) {
-            var i,j;
-            var resultELs = [];
-
-            for ( i = 0; i < elements.length; ++i ) {
-                var el = elements[i];
-                var url = this.getUrl(el);
-                var addEL = true;
-                var resultEL = null;
-                var resultUrl = null;
-                var cmp = null;
-
-                if ( el.isFolder ) {
-                    for ( j = 0; j < resultELs.length; ++j ) {
-                        resultEL = resultELs[j];
-                        resultUrl = this.getUrl(resultEL);
-
-                        // url is child of resultUrl
-                        cmp = EditorUtils.includePath( resultUrl, url );
-                        if ( cmp ) {
-                            addEL = false;
-                            break;
-                        }
-
-                        // url is parent or same of resultUrl
-                        cmp = EditorUtils.includePath( url, resultUrl );
-                        if ( cmp ) {
-                            resultELs.splice(j,1);
-                            --j;
-                        }
-
-                        // url is not relative with resultUrl
-                    }
-
-                    if ( addEL ) {
-                        resultELs.push(el);
-                    }
-                }
-                else {
-                    for ( j = 0; j < resultELs.length; ++j ) {
-                        resultEL = resultELs[j];
-                        resultUrl = this.getUrl(resultEL);
-
-                        // url is child of resultUrl
-                        cmp = EditorUtils.includePath( resultUrl, url );
-                        if ( cmp ) {
-                            addEL = false;
-                            break;
-                        }
-
-                        // url is not relative with resultUrl
-                    }
-
-                    if ( addEL ) {
-                        resultELs.push(el);
-                    }
-                }
-            }
-
-            return resultELs;
-        },
-
-        cancelHighligting: function () {
-            if ( this.curDragoverEL ) {
-                this.curDragoverEL.highlighted = false;
-                this.curDragoverEL = null;
-                this.$.highlightMask.style.display = "none";
-            }
-        },
-
-        moveSelection: function ( targetEL ) {
-            var elements = this.getMostIncludeElements(this.selection);
-            var targetUrl = this.getUrl(targetEL);
-            for ( var i = 0; i < elements.length; ++i ) {
-                var el = elements[i];
-
-                // do nothing if we already here
-                if ( el.parentElement === targetEL )
-                    continue;
-
-                var url = this.getUrl(el);
-                if ( EditorUtils.includePath(url,targetUrl) === false ) {
-                    var srcUrl = url;
-                    var destUrl = Path.join( targetUrl, el.basename + el.extname );
-                    try {
-                        AssetDB.moveAsset( srcUrl, destUrl );
-                    }
-                    catch (err) {
-                        console.error(err);
-                        // TODO: failed
-                    }
-                }
-            }
-        },
-
-        nextItem: function ( curItem, checkFolded ) {
-            if ( checkFolded &&
-                 curItem.foldable && 
-                 curItem.folded === false && 
-                 curItem.children.length > 0 ) 
-            {
-                return curItem.firstElementChild;
-            }
-
-            if ( curItem.nextElementSibling )
-                return curItem.nextElementSibling;
-
-            var parentEL = curItem.parentElement;
-            if ( parentEL instanceof ProjectItem === false ) {
-                return null;
-            }
-
-            return this.nextItem(parentEL,false);
-        },
-
-        prevItem: function ( curItem ) {
-            if ( curItem.previousElementSibling ) {
-                if ( curItem.previousElementSibling.foldable && 
-                     curItem.previousElementSibling.folded === false && 
-                     curItem.previousElementSibling.children.length > 0 ) 
-                {
-                    return this.getLastElementRecursively(curItem.previousElementSibling);
-                }
-
-                return curItem.previousElementSibling;
-            }
-
-            var parentEL = curItem.parentElement;
-            if ( parentEL instanceof ProjectItem === false ) {
-                return null;
-            }
-
-            return parentEL;
-        },
-
-        getLastElementRecursively: function ( curItem ) {
-            if ( curItem.foldable && 
-                 curItem.folded === false && 
-                 curItem.children.length > 0 ) 
-            {
-                return this.getLastElementRecursively (curItem.lastElementChild);
-            }
-
-            return curItem;
-        },
-
         dropAction: function ( event ) {
             event.preventDefault();
             event.stopPropagation();
@@ -748,10 +748,8 @@
             var files = event.dataTransfer.files;
             var dstFsDir = AssetDB.fspath(url);
 
-
             for ( var i = 0; i < files.length; i++ ) {
-                var dstFsPath = Path.join(dstFsDir, files[i].name);
-                EditorUtils.copyRecursively(files[i].path, dstFsPath);
+                EditorUtils.copySync(files[i].path, dstFsDir);
             }
 
             AssetDB.clean(url);

@@ -19,18 +19,21 @@ var EditorApp;
 
         // handle the error safely
         process.on('uncaughtException', function(err) {
-            console.error(err.message);
+            console.error(err.stack);
         });
 
         // init EditorApp
-        try {
-            console.log( 'Initializing EditorApp...' );
-            EditorApp.init();
-        }
-        catch ( err ) {
-            console.error(err.message);
-            // process.exit(1);
-        }
+        console.log( 'Initializing EditorApp...' );
+        EditorApp.init();
+        // DISABLE
+        // try {
+        //     console.log( 'Initializing EditorApp...' );
+        //     EditorApp.init();
+        // }
+        // catch ( err ) {
+        //     console.error(err);
+        //     process.exit(1);
+        // }
 
         // show native main window
         nativeMainWin.show();
@@ -50,9 +53,6 @@ var EditorApp;
         if ( EditorApp.options.D || EditorApp.options.showdevtools ) {
             nativeMainWin.showDevTools();
         }
-
-        // init asset-db
-        AssetDB.init();
 
         // TODO: login
         // TODO: choose project
@@ -266,11 +266,10 @@ var EditorApp;
         // TODO: load settings
         // TODO: load window layouts
 
-        // init asset library
-        FIRE.AssetLibrary.init( Path.join(projectDir,'library') );
+        // init asset-db
+        AssetDB.init(projectDir);
 
         // mounting assets
-        AssetDB.mount( Path.join(projectDir,'assets'), 'assets');
         // AssetDB.mount( Path.join(appPath,'shares'), 'shares');
 
         AssetDB.refresh();

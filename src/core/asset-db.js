@@ -10,6 +10,7 @@ var AssetDB;
     var _uuidToPath = {};
     var _pathToUuid = {};
     var _importers = {};
+    var _libraryPath = ""; // the path of library
 
     var _newFolderMeta = function ( type ) {
         return {
@@ -118,9 +119,14 @@ var AssetDB;
         }
     };
 
-    AssetDB.init = function () {
+    AssetDB.init = function ( projectDir ) {
         AssetDB.registerImporter( ['default'], FIRE_ED.Importer );
         AssetDB.registerImporter( ['.png', '.jpg'], FIRE_ED.TextureImporter );
+
+        AssetDB.mount( Path.join(projectDir,'assets'), 'assets');
+
+        _libraryPath = Path.join(projectDir,'library');
+        FIRE.AssetLibrary.init(_libraryPath);
     };
 
     //
@@ -170,6 +176,8 @@ var AssetDB;
             meta = new cls();
             meta.uuid = Uuid.v4();
         }
+
+        meta.rawfile = fspath;
         return meta;
     };
 
@@ -212,8 +220,8 @@ var AssetDB;
                 Fs.writeFileSync(metaPath, data);
             }
 
-            // TODO:
-            // importer.exec();
+            // execute the importer 
+            importer.exec();
 
             // finish import
             _uuidToPath[importer.uuid] = fspath;
@@ -250,6 +258,40 @@ var AssetDB;
         }
 
         return list[0];
+    };
+
+    AssetDB.importToLibrary = function ( uuid, asset ) {
+        if ( !asset instanceof FIRE.Asset )
+            return;
+
+        if ( uuid && uuid !== "" ) {
+            // check and create a folder with the first two character of uuid
+            var folder = uuid.substring(0,2);
+            var dest = Path.join(_libraryPath,folder);
+            if ( !Fs.existsSync(dest) ) {
+                Fs.mkdirSync(dest);
+            }
+
+            // write file
+            dest = Path.join( dest, uuid );
+            var json = FIRE.serialize(asset);
+            Fs.writeFileSync(dest, json);
+        } 
+    };
+
+    AssetDB.importHostData = function ( uuid, fspath ) {
+        if ( uuid && uuid !== "" ) {
+            // check and create a folder with the first two character of uuid
+            var folder = uuid.substring(0,2);
+            var dest = Path.join(_libraryPath,folder);
+            if ( !Fs.existsSync(dest) ) {
+                Fs.mkdirSync(dest);
+            }
+
+            // write file
+            dest = Path.join( dest, uuid + ".host" );
+            EditorUtils.copySync( fspath, dest );
+        } 
     };
 
     // 
