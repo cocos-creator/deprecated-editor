@@ -22,10 +22,12 @@
                     this.inspect(importer);
 
                     if ( importer instanceof FIRE_ED.TextureImporter ) {
-                        this.$.preview.removeChild(this.$.preview.firstChild);
-                        var img = new Image(); 
-                        img.src = fspath;
-                        this.$.preview.appendChild(img);
+                        if ( this.$.preview.firstChild ) {
+                            this.$.preview.removeChild(this.$.preview.firstChild);
+                            var img = new Image(); 
+                            img.src = fspath;
+                            this.$.preview.appendChild(img);
+                        }
                     }
                 }
             }.bind(this) );
