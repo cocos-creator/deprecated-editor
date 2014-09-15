@@ -123,4 +123,23 @@ var EditorUtils;
         }
     };
 
+    EditorUtils.copySync = function ( src, dest ) {
+        Fs.writeFileSync(dest, Fs.readFileSync(src));
+    };
+
+    EditorUtils.copyRecursivelySync = function ( src, dest ) {
+        if ( Fs.existsSync(src) ) {
+            var stats = Fs.statSync(src);
+            if ( stats.isDirectory() ) {
+                Fs.mkdirSync(dest);
+                Fs.readdirSync(src).forEach(function(name) {
+                    EditorUtils.copyRecursivelySync ( Path.join(src, name), Path.join(dest, name) );
+                });
+            }
+            else {
+                EditorUtils.copySync(src, dest);
+            }
+        }
+    };
+
 })(EditorUtils || (EditorUtils = {}));
