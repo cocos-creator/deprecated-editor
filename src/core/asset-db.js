@@ -71,7 +71,7 @@ var AssetDB;
             Fs.renameSync( rsrc, rdest );
             Fs.renameSync( rsrc + ".meta", rdest + ".meta" );
             _pathToUuid[rdest] = uuid;
-            _pathToUuid[uuid] = rdest;
+            _uuidToPath[uuid] = rdest;
         }
     };
 
