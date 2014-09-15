@@ -750,8 +750,7 @@
 
 
             for ( var i = 0; i < files.length; i++ ) {
-                var dstFsPath = Path.join(dstFsDir, files[i].name);
-                EditorUtils.copyRecursively(files[i].path, dstFsPath);
+                EditorUtils.copySync(files[i].path, dstFsDir);
             }
 
             AssetDB.clean(url);
