@@ -6,6 +6,10 @@
                 value: false,
                 reflect: true
             },
+            conflicted: {
+                value: false,
+                reflect: true
+            },
             selected: {
                 value: false,
                 reflect: true
@@ -105,7 +109,7 @@
         },
 
         dragoverAction: function ( event ) {
-            this.fire('draghover');
+            this.fire('draghover', {files : event.dataTransfer.files});
 
             event.preventDefault();
             event.stopPropagation();
