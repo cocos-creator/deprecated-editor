@@ -104,41 +104,45 @@ var EditorUtils;
         return false;
     };
 
-    EditorUtils.copy = function ( src, dest ) {
-        Fs.createReadStream(src).pipe(Fs.createWriteStream(dest));
-    };
+    // TODO: async version
+    // function _copy ( src, dest ) {
+    //     Fs.createReadStream(src).pipe(Fs.createWriteStream(dest));
+    // }
 
-    EditorUtils.copyRecursively = function ( src, dest ) {
-        if ( Fs.existsSync(src) ) {
-            var stats = Fs.statSync(src);
-            if ( stats.isDirectory() ) {
-                Fs.mkdirSync(dest);
-                Fs.readdirSync(src).forEach(function(name) {
-                    EditorUtils.copyRecursively ( Path.join(src, name), Path.join(dest, name) );
-                });
-            }
-            else {
-                EditorUtils.copy(src, dest);
-            }
+    // EditorUtils.copy = function ( src, dest, callback ) {
+    //     if ( Fs.existsSync(src) ) {
+    //         var stats = Fs.statSync(src);
+    //         if ( stats.isDirectory() ) {
+    //             Fs.mkdirSync(dest);
+    //             Fs.readdirSync(src).forEach(function(name) {
+    //                 EditorUtils.copy ( Path.join(src, name), Path.join(dest, name) );
+    //             });
+    //         }
+    //         else {
+    //             _copy(src, dest);
+    //         }
+    //     }
+    // };
+
+    function _copySyncR ( src, dest ) {
+        if ( Fs.statSync(src).isDirectory() ) {
+            Fs.mkdirSync(dest);
+            Fs.readdirSync(src).forEach(function(name) {
+                _copySyncR ( Path.join(src, name), Path.join(dest, name) );
+            });
         }
-    };
+        else {
+            Fs.writeFileSync(dest, Fs.readFileSync(src));
+        }
+    }
 
-    EditorUtils.copySync = function ( src, dest ) {
-        Fs.writeFileSync(dest, Fs.readFileSync(src));
-    };
-
-    EditorUtils.copyRecursivelySync = function ( src, dest ) {
+    EditorUtils.copySync = function ( src, destDir ) {
         if ( Fs.existsSync(src) ) {
-            var stats = Fs.statSync(src);
-            if ( stats.isDirectory() ) {
-                Fs.mkdirSync(dest);
-                Fs.readdirSync(src).forEach(function(name) {
-                    EditorUtils.copyRecursivelySync ( Path.join(src, name), Path.join(dest, name) );
-                });
+            if ( !Fs.existsSync(destDir) ) {
+                _mkdirpSync(destDir);
             }
-            else {
-                EditorUtils.copySync(src, dest);
-            }
+
+            _copySyncR ( src, Path.join(destDir, Path.basename(src)) );
         }
     };
 
