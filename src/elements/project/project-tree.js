@@ -104,6 +104,12 @@
             this.startDragging = false;
             this.curDragoverEL = null; 
             this.dragenterCnt = 0;
+            this.draggingEL = null;
+            this.lastDragoverEL = null;
+
+            // confliction
+            this._isValidForDrop = true;
+            this.confliction = [];
         },
 
         ready: function () {
@@ -121,6 +127,8 @@
             this.addEventListener('mouseleave', function ( event ) {
                 if ( this.startDragging ) {
                     this.cancelHighligting();
+                    this.unconflict(this.confliction);
+                    this.clearConflict();
                     event.stopPropagation();
                 }
             }, true );
@@ -133,6 +141,11 @@
 
                     this.cancelHighligting();
                     this.startDragging = false;
+                    this.draggingEL = null;
+                    this.unconflict(this.confliction);
+                    this.clearConflict();
+                    this._isValidForDrop = true;
+                    this.lastDragoverEL = null;
                     event.stopPropagation();
                 }
             }, true );
@@ -145,6 +158,8 @@
                 --this.dragenterCnt;
                 if ( this.dragenterCnt === 0 ) {
                     this.cancelHighligting();
+                    this.unconflict(this.confliction);
+                    this.clearConflict();
                 }
             }, true);
 
@@ -276,6 +291,38 @@
                 this.selection[i].selected = false;
             }
             this.selection = [];
+        },
+
+        conflict: function ( items ) {
+            for ( var i = 0; i < items.length; ++i ) {
+                var item = items[i];
+                if ( item.conflicted === false ) {
+                    item.conflicted = true;
+                    item.parentElement.$.wrapper.style.background = '#ddd';
+                    this.confliction.push(item);
+                }
+
+            }
+        },
+
+        unconflict: function ( items ) {
+            for ( var i = 0; i < items.length; ++i ) {
+                var item = items[i];
+                if ( item.conflicted ) {
+                    item.conflicted = false;
+                    item.parentElement.$.wrapper.style.background = 'none';
+                    var idx = this.confliction.indexOf(item); 
+                    this.confliction.splice(idx,1);
+                }
+            }
+        },
+
+        clearConflict: function () {
+            for ( var i = 0; i < this.confliction.length; ++i ) {
+                this.confliction[i].conflicted = false;
+            }
+            this.confliction = [];
+            this.$.highlightMask.style['border-color'] = '#c7722c';
         },
 
         getUrl: function ( element ) {
@@ -411,6 +458,13 @@
                     var srcUrl = url;
                     var destUrl = Path.join( targetUrl, el.basename + el.extname );
                     try {
+
+                        // check
+                        if(!this.isValidForDrop()) {
+                            //console.log("cant move");
+                            return;
+                        }
+
                         AssetDB.moveAsset( srcUrl, destUrl );
                     }
                     catch (err) {
@@ -517,6 +571,7 @@
                 }
                 else {
                     this.startDragging = true;
+                    this.draggingEL = event.target;
                     if ( this.selection.indexOf(event.target) === -1 ) {
                         this.clearSelect();
                         this.select( [event.target] );
@@ -579,17 +634,58 @@
                 }
                 target.highlighted = true;
                 this.curDragoverEL = target;
+
+                // name collision check
+                if (this.curDragoverEL !== this.lastDragoverEL) {
+                    
+                    this.unconflict(this.confliction);
+                    this.clearConflict();
+
+                    this.lastDragoverEL = this.curDragoverEL;
+
+                    var names = [];
+                    if (event.detail.files) {
+                        var files = event.detail.files;
+                        for (var i = 0; i < files.length; i++) {
+                            names.push(files[i].name);
+                        }
+                    }
+                    else {
+                        var srcEL = this.draggingEL;
+
+                        if (target != srcEL.parentElement) {
+                            names.push(srcEL.basename + srcEL.extname);
+                        }
+                    }
+
+                    if (names.length > 0) {
+                        var collisions = this.getNameCollisions( target, names);
+                        if (collisions.length > 0) {
+                            this.$.highlightMask.style['border-color'] = '#ddd';
+                            this.conflict(collisions);
+                        }
+                    }
+
+                }
+
+
             }
             event.stopPropagation();
         },
 
         dragcancelAction: function (event) {
             this.cancelHighligting();
+            this.unconflict(this.confliction);
+            this.clearConflict();
         },
 
         contextmenuAction: function (event) {
             this.cancelHighligting();
             this.startDragging = false;
+            this.draggingEL = null;
+            this.unconflict(this.confliction);
+            this.clearConflict();
+            this._isValidForDrop = true;
 
             //
             this.contextmenuAt = null;
@@ -713,6 +809,10 @@
                     case 27:
                         this.cancelHighligting();
                         this.startDragging = false;
+                        this.draggingEL = null;
+                        this.unconflict(this.confliction);
+                        this.clearConflict();
+                        this._isValidForDrop = true;
                         event.stopPropagation();
                     break;
                 }
@@ -764,6 +864,19 @@
         dropAction: function ( event ) {
             event.preventDefault();
             event.stopPropagation();
+
+            // check
+            if(!this.isValidForDrop()) {
+                //console.log("cant drop");
+                this.cancelHighligting();
+                this.startDragging = false;
+                this.draggingEL = null;
+                this.unconflict(this.confliction);
+                this.clearConflict();
+                this._isValidForDrop = true;
+                this.lastDragoverEL = null;
+                return;
+            }
 
             var targetEl = this.curDragoverEL;
             this.cancelHighligting();
@@ -822,6 +935,41 @@
             );
             // TODO }: 
 
+        },
+
+        isValidForDrop: function() {
+            return this._isValidForDrop;
+        },
+
+        getNameCollisions: function( target, list ) {
+
+            var nodes = target.childNodes;
+            
+            var nodesLen = nodes.length;
+            var len = list.length;
+            var i,j;
+            var name;
+            var node;
+            var collisions = [];
+
+            for(i = 0; i < len; i++) {
+                name = list[i];
+            
+                for(j = 0; j < nodesLen; j++) {
+                    
+                    node = nodes[j];
+                    if (node.basename + node.extname === name) {
+                        collisions.push(node);
+                    }
+
+                }
+            }
+
+            if (collisions.length > 0) {
+                this._isValidForDrop = false;
+            }
+
+            return collisions;
         },
 
     });
