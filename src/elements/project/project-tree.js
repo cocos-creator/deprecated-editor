@@ -786,6 +786,7 @@
 
             var targetEl = this.curDragoverEL;
             this.cancelHighligting();
+            this.dragenterCnt = 0;
             
             // TODO: we should have better solution { 
             var url = this.getUrl(targetEl);
