@@ -106,6 +106,11 @@
             this.dragging = false;
             this.curDragoverEL = null; 
             this.dragenterCnt = 0;
+            this.lastDragoverEL = null;
+
+            // confliction
+            this._isValidForDrop = true;
+            this.confliction = [];
         },
 
         ready: function () {
@@ -132,6 +137,7 @@
             this.addEventListener('mouseleave', function ( event ) {
                 if ( this.dragging ) {
                     this.cancelHighligting();
+                    this.clearConflict();
                     event.stopPropagation();
                 }
             }, true );
@@ -145,6 +151,8 @@
 
                     this.cancelHighligting();
                     this.dragging = false;
+                    this.clearConflict();
+                    this.lastDragoverEL = null;
                     event.stopPropagation();
                 }
             }, true );
@@ -157,6 +165,8 @@
                 --this.dragenterCnt;
                 if ( this.dragenterCnt === 0 ) {
                     this.cancelHighligting();
+                    this.clearConflict();
+                    this.lastDragoverEL = null;
                 }
             }, true);
 
@@ -297,6 +307,28 @@
             }
         },
 
+        conflict: function ( items ) {
+            for ( var i = 0; i < items.length; ++i ) {
+                var item = items[i];
+                if ( item.conflicted === false ) {
+                    item.conflicted = true;
+                    item.parentElement.invalid = true;
+                    this.confliction.push(item);
+                }
+
+            }
+        },
+
+        clearConflict: function () {
+            for ( var i = 0; i < this.confliction.length; ++i ) {
+                this.confliction[i].conflicted = false;
+                this.confliction[i].parentElement.invalid = false;
+            }
+            this.confliction = [];
+            this.$.highlightMask.style['border-color'] = '#c7722c';
+            this._isValidForDrop = true;
+        },
+
         getUrl: function ( element ) {
             if ( element.isRoot ) {
                 return element.basename + "://"; 
@@ -430,6 +462,13 @@
                     var srcUrl = url;
                     var destUrl = Path.join( targetUrl, el.basename + el.extname );
                     try {
+
+                        // check
+                        if(!this.isValidForDrop()) {
+                            //console.log("cant move");
+                            return;
+                        }
+
                         AssetDB.moveAsset( srcUrl, destUrl );
                     }
                     catch (err) {
@@ -595,18 +634,59 @@
                 }
                 target.highlighted = true;
                 this.curDragoverEL = target;
+
+                // name collision check
+                if (this.curDragoverEL !== this.lastDragoverEL) {
+                    
+                    this.clearConflict();
+
+                    this.lastDragoverEL = this.curDragoverEL;
+
+                    var names = [];
+                    if (event.detail.files) {
+                        var files = event.detail.files;
+                        for (var i = 0; i < files.length; i++) {
+                            names.push(files[i].name);
+                        }
+                    }
+                    else {
+                        var srcELs = this.getMostIncludeElements(this.selection);
+                        for (var i = 0; i < srcELs.length; i++) {
+                            var srcEL = srcELs[i];
+                            if (target != srcEL.parentElement) {
+                                names.push(srcEL.basename + srcEL.extname);
+                            }
+                        }
+                    }
+
+                    if (names.length > 0) {
+                        var collisions = this.getNameCollisions( target, names);
+                        if (collisions.length > 0) {
+                            this.$.highlightMask.style['border-color'] = '#ddd';
+                            this.conflict(collisions);
+                        }
+                    }
+                    else {
+                        this._isValidForDrop = true;
+                    }
+
+                }
+
+
             }
             event.stopPropagation();
         },
 
         dragcancelAction: function (event) {
             this.cancelHighligting();
+            this.clearConflict();
         },
 
         contextmenuAction: function (event) {
             this.cancelHighligting();
             this.startDragging = false;
             this.dragging = false;
+            this.clearConflict();
 
             //
             this.contextmenuAt = null;
@@ -730,6 +810,7 @@
                     case 27:
                         this.cancelHighligting();
                         this.dragging = false;
+                        this.clearConflict();
                         event.stopPropagation();
                     break;
                 }
@@ -783,6 +864,16 @@
         dropAction: function ( event ) {
             event.preventDefault();
             event.stopPropagation();
+
+            // check
+            if(!this.isValidForDrop()) {
+                //console.log("cant drop");
+                this.cancelHighligting();
+                this.startDragging = false;
+                this.clearConflict();
+                this.lastDragoverEL = null;
+                return;
+            }
 
             var targetEl = this.curDragoverEL;
             this.cancelHighligting();
@@ -842,6 +933,41 @@
             );
             // TODO }: 
 
+        },
+
+        isValidForDrop: function() {
+            return this._isValidForDrop;
+        },
+
+        getNameCollisions: function( target, list ) {
+
+            var nodes = target.childNodes;
+            
+            var nodesLen = nodes.length;
+            var len = list.length;
+            var i,j;
+            var name;
+            var node;
+            var collisions = [];
+
+            for(i = 0; i < len; i++) {
+                name = list[i];
+            
+                for(j = 0; j < nodesLen; j++) {
+                    
+                    node = nodes[j];
+                    if (node.basename + node.extname === name) {
+                        collisions.push(node);
+                    }
+
+                }
+            }
+
+            if (collisions.length > 0) {
+                this._isValidForDrop = false;
+            }
+
+            return collisions;
         },
 
     });
