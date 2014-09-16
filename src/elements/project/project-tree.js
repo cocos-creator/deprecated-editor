@@ -165,8 +165,10 @@
                 if ( this.dragging ) {
                     this.cancelHighligting();
                     this.cancelConflictsHighliting();
+
                     this.curDragoverEL = null;
                     this.lastDragoverEL = null;
+                    this.isValidForDrop = true;
 
                     event.stopPropagation();
                 }
@@ -184,8 +186,10 @@
 
                     this.cancelHighligting();
                     this.cancelConflictsHighliting();
+
                     this.curDragoverEL = null;
                     this.lastDragoverEL = null;
+                    this.isValidForDrop = true;
                     this.dragging = false;
 
                     event.stopPropagation();
@@ -201,8 +205,10 @@
                 if ( this.dragenterCnt === 0 ) {
                     this.cancelHighligting();
                     this.cancelConflictsHighliting();
+
                     this.curDragoverEL = null;
                     this.lastDragoverEL = null;
+                    this.isValidForDrop = true;
                 }
             }, true);
 
@@ -497,7 +503,6 @@
                 this.curDragoverEL.invalid = false;
                 this.$.highlightMask.removeAttribute('invalid');
             }
-            this.isValidForDrop = true;
         },
 
         moveSelection: function ( targetEL ) {
@@ -679,6 +684,7 @@
                     this.cancelHighligting();
                     this.cancelConflictsHighliting();
 
+                    this.isValidForDrop = true;
                     this.curDragoverEL = target;
                     this.highlight(this.curDragoverEL);
 
@@ -700,14 +706,12 @@
                         }
                     }
 
-                    this.isValidForDrop = true;
-
                     // check if we have conflicts names
                     if ( names.length > 0 ) {
                         var collisions = _getNameCollisions( target, names);
                         if ( collisions.length > 0 ) {
-                            this.isValidForDrop = false;
                             this.highlightConflicts(collisions);
+                            this.isValidForDrop = false;
                         }
                     }
                 }
@@ -720,15 +724,19 @@
         dragcancelAction: function (event) {
             this.cancelHighligting();
             this.cancelConflictsHighliting();
+
             this.curDragoverEL = null;
             this.lastDragoverEL = null;
+            this.isValidForDrop = true;
         },
 
         contextmenuAction: function (event) {
             this.cancelHighligting();
             this.cancelConflictsHighliting();
+
             this.curDragoverEL = null;
             this.lastDragoverEL = null;
+            this.isValidForDrop = true;
             this.startDragging = false;
             this.dragging = false;
 
@@ -854,8 +862,10 @@
                     case 27:
                         this.cancelHighligting();
                         this.cancelConflictsHighliting();
+
                         this.curDragoverEL = null;
                         this.lastDragoverEL = null;
+                        this.isValidForDrop = true;
                         this.dragging = false;
                         event.stopPropagation();
                     break;
@@ -911,19 +921,22 @@
             event.preventDefault();
             event.stopPropagation();
 
+            var targetEl = this.curDragoverEL;
+
             this.cancelHighligting();
             this.cancelConflictsHighliting();
+
             this.curDragoverEL = null;
             this.lastDragoverEL = null;
             this.startDragging = false;
+            this.dragging = false;
             this.dragenterCnt = 0;
 
             // check
             if( !this.isValidForDrop ) {
+                this.isValidForDrop = true;
                 return;
             }
-
-            var targetEl = this.curDragoverEL;
             
             // TODO: we should have better solution { 
             var url = this.getUrl(targetEl);
