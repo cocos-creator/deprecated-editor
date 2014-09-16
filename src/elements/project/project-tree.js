@@ -84,6 +84,33 @@
         return newEL;
     }
 
+    function _getNameCollisions ( target, list ) {
+
+        var nodes = target.childNodes;
+        
+        var nodesLen = nodes.length;
+        var len = list.length;
+        var i,j;
+        var name;
+        var node;
+        var collisions = [];
+
+        for(i = 0; i < len; i++) {
+            name = list[i];
+        
+            for(j = 0; j < nodesLen; j++) {
+                
+                node = nodes[j];
+                if (node.basename + node.extname === name) {
+                    collisions.push(node);
+                }
+
+            }
+        }
+
+        return collisions;
+    }
+
     Polymer({
         publish: {
             focused: {
@@ -109,7 +136,7 @@
             this.lastDragoverEL = null;
 
             // confliction
-            this._isValidForDrop = true;
+            this.isValidForDrop = true;
             this.confliction = [];
         },
 
@@ -137,7 +164,10 @@
             this.addEventListener('mouseleave', function ( event ) {
                 if ( this.dragging ) {
                     this.cancelHighligting();
-                    this.clearConflict();
+                    this.cancelConflictsHighliting();
+                    this.curDragoverEL = null;
+                    this.lastDragoverEL = null;
+
                     event.stopPropagation();
                 }
             }, true );
@@ -145,14 +175,19 @@
             this.addEventListener('mouseup', function ( event ) {
                 this.startDragging = false;
                 if ( this.dragging ) {
-                    if ( this.curDragoverEL ) {
-                        this.moveSelection( this.curDragoverEL );
+                    // check
+                    if ( this.isValidForDrop ) {
+                        if ( this.curDragoverEL ) {
+                            this.moveSelection( this.curDragoverEL );
+                        }
                     }
 
                     this.cancelHighligting();
-                    this.dragging = false;
-                    this.clearConflict();
+                    this.cancelConflictsHighliting();
+                    this.curDragoverEL = null;
                     this.lastDragoverEL = null;
+                    this.dragging = false;
+
                     event.stopPropagation();
                 }
             }, true );
@@ -165,7 +200,8 @@
                 --this.dragenterCnt;
                 if ( this.dragenterCnt === 0 ) {
                     this.cancelHighligting();
-                    this.clearConflict();
+                    this.cancelConflictsHighliting();
+                    this.curDragoverEL = null;
                     this.lastDragoverEL = null;
                 }
             }, true);
@@ -307,28 +343,6 @@
             }
         },
 
-        conflict: function ( items ) {
-            for ( var i = 0; i < items.length; ++i ) {
-                var item = items[i];
-                if ( item.conflicted === false ) {
-                    item.conflicted = true;
-                    item.parentElement.invalid = true;
-                    this.confliction.push(item);
-                }
-
-            }
-        },
-
-        clearConflict: function () {
-            for ( var i = 0; i < this.confliction.length; ++i ) {
-                this.confliction[i].conflicted = false;
-                this.confliction[i].parentElement.invalid = false;
-            }
-            this.confliction = [];
-            this.$.highlightMask.style['border-color'] = '#c7722c';
-            this._isValidForDrop = true;
-        },
-
         getUrl: function ( element ) {
             if ( element.isRoot ) {
                 return element.basename + "://"; 
@@ -439,17 +453,57 @@
             return resultELs;
         },
 
+        highlight: function ( item ) {
+            if ( item ) {
+                this.$.highlightMask.style.display = "block";
+                this.$.highlightMask.style.left = item.offsetLeft + "px";
+                this.$.highlightMask.style.top = item.offsetTop + "px";
+                this.$.highlightMask.style.width = item.offsetWidth + "px";
+                this.$.highlightMask.style.height = item.offsetHeight + "px";
+
+                item.highlighted = true;
+            }
+        },
+
+        highlightConflicts: function ( items ) {
+            for ( var i = 0; i < items.length; ++i ) {
+                var item = items[i];
+                if ( item.conflicted === false ) {
+                    item.conflicted = true;
+                    this.confliction.push(item);
+                }
+            }
+
+            if ( this.curDragoverEL ) {
+                this.curDragoverEL.invalid = true;
+            }
+
+            this.$.highlightMask.setAttribute('invalid','');
+        },
+
         cancelHighligting: function () {
             if ( this.curDragoverEL ) {
                 this.curDragoverEL.highlighted = false;
-                this.curDragoverEL = null;
                 this.$.highlightMask.style.display = "none";
             }
+        },
+
+        cancelConflictsHighliting: function () {
+            for ( var i = 0; i < this.confliction.length; ++i ) {
+                this.confliction[i].conflicted = false;
+            }
+            this.confliction = [];
+            if ( this.curDragoverEL ) {
+                this.curDragoverEL.invalid = false;
+                this.$.highlightMask.removeAttribute('invalid');
+            }
+            this.isValidForDrop = true;
         },
 
         moveSelection: function ( targetEL ) {
             var elements = this.getMostIncludeElements(this.selection);
             var targetUrl = this.getUrl(targetEL);
+
             for ( var i = 0; i < elements.length; ++i ) {
                 var el = elements[i];
 
@@ -461,14 +515,9 @@
                 if ( EditorUtils.includePath(url,targetUrl) === false ) {
                     var srcUrl = url;
                     var destUrl = Path.join( targetUrl, el.basename + el.extname );
+
+                    //
                     try {
-
-                        // check
-                        if(!this.isValidForDrop()) {
-                            //console.log("cant move");
-                            return;
-                        }
-
                         AssetDB.moveAsset( srcUrl, destUrl );
                     }
                     catch (err) {
@@ -619,39 +668,31 @@
 
         draghoverAction: function (event) {
             if ( event.target ) {
+                this.lastDragoverEL = this.curDragoverEL;
                 var target = event.target;
                 if ( event.target.foldable === false )
                     target = event.target.parentElement;
-                if ( target ) {
-                    this.$.highlightMask.style.display = "block";
-                    this.$.highlightMask.style.left = target.offsetLeft + "px";
-                    this.$.highlightMask.style.top = target.offsetTop + "px";
-                    this.$.highlightMask.style.width = target.offsetWidth + "px";
-                    this.$.highlightMask.style.height = target.offsetHeight + "px";
-                }
-                if ( this.curDragoverEL ) {
-                    this.curDragoverEL.highlighted = false;
-                }
-                target.highlighted = true;
-                this.curDragoverEL = target;
 
                 // name collision check
-                if (this.curDragoverEL !== this.lastDragoverEL) {
-                    
-                    this.clearConflict();
+                if ( target !== this.lastDragoverEL ) {
 
-                    this.lastDragoverEL = this.curDragoverEL;
+                    this.cancelHighligting();
+                    this.cancelConflictsHighliting();
+
+                    this.curDragoverEL = target;
+                    this.highlight(this.curDragoverEL);
 
                     var names = [];
+                    var i = 0;
                     if (event.detail.files) {
                         var files = event.detail.files;
-                        for (var i = 0; i < files.length; i++) {
+                        for (i = 0; i < files.length; i++) {
                             names.push(files[i].name);
                         }
                     }
                     else {
                         var srcELs = this.getMostIncludeElements(this.selection);
-                        for (var i = 0; i < srcELs.length; i++) {
+                        for (i = 0; i < srcELs.length; i++) {
                             var srcEL = srcELs[i];
                             if (target != srcEL.parentElement) {
                                 names.push(srcEL.basename + srcEL.extname);
@@ -659,17 +700,16 @@
                         }
                     }
 
-                    if (names.length > 0) {
-                        var collisions = this.getNameCollisions( target, names);
-                        if (collisions.length > 0) {
-                            this.$.highlightMask.style['border-color'] = '#ddd';
-                            this.conflict(collisions);
+                    this.isValidForDrop = true;
+
+                    // check if we have conflicts names
+                    if ( names.length > 0 ) {
+                        var collisions = _getNameCollisions( target, names);
+                        if ( collisions.length > 0 ) {
+                            this.isValidForDrop = false;
+                            this.highlightConflicts(collisions);
                         }
                     }
-                    else {
-                        this._isValidForDrop = true;
-                    }
-
                 }
 
 
@@ -679,14 +719,18 @@
 
         dragcancelAction: function (event) {
             this.cancelHighligting();
-            this.clearConflict();
+            this.cancelConflictsHighliting();
+            this.curDragoverEL = null;
+            this.lastDragoverEL = null;
         },
 
         contextmenuAction: function (event) {
             this.cancelHighligting();
+            this.cancelConflictsHighliting();
+            this.curDragoverEL = null;
+            this.lastDragoverEL = null;
             this.startDragging = false;
             this.dragging = false;
-            this.clearConflict();
 
             //
             this.contextmenuAt = null;
@@ -809,8 +853,10 @@
                     // esc
                     case 27:
                         this.cancelHighligting();
+                        this.cancelConflictsHighliting();
+                        this.curDragoverEL = null;
+                        this.lastDragoverEL = null;
                         this.dragging = false;
-                        this.clearConflict();
                         event.stopPropagation();
                     break;
                 }
@@ -865,19 +911,19 @@
             event.preventDefault();
             event.stopPropagation();
 
+            this.cancelHighligting();
+            this.cancelConflictsHighliting();
+            this.curDragoverEL = null;
+            this.lastDragoverEL = null;
+            this.startDragging = false;
+            this.dragenterCnt = 0;
+
             // check
-            if(!this.isValidForDrop()) {
-                //console.log("cant drop");
-                this.cancelHighligting();
-                this.startDragging = false;
-                this.clearConflict();
-                this.lastDragoverEL = null;
+            if( !this.isValidForDrop ) {
                 return;
             }
 
             var targetEl = this.curDragoverEL;
-            this.cancelHighligting();
-            this.dragenterCnt = 0;
             
             // TODO: we should have better solution { 
             var url = this.getUrl(targetEl);
@@ -933,41 +979,6 @@
             );
             // TODO }: 
 
-        },
-
-        isValidForDrop: function() {
-            return this._isValidForDrop;
-        },
-
-        getNameCollisions: function( target, list ) {
-
-            var nodes = target.childNodes;
-            
-            var nodesLen = nodes.length;
-            var len = list.length;
-            var i,j;
-            var name;
-            var node;
-            var collisions = [];
-
-            for(i = 0; i < len; i++) {
-                name = list[i];
-            
-                for(j = 0; j < nodesLen; j++) {
-                    
-                    node = nodes[j];
-                    if (node.basename + node.extname === name) {
-                        collisions.push(node);
-                    }
-
-                }
-            }
-
-            if (collisions.length > 0) {
-                this._isValidForDrop = false;
-            }
-
-            return collisions;
         },
 
     });
