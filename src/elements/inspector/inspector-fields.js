@@ -31,8 +31,13 @@
                     var propName = klass.__props__[p];
                     var attrs = FIRE.attr(klass, propName);
 
-                    // skip nonSerialized
-                    if (attrs.serializable === false) {
+                    // skip non-serializable
+                    if ( attrs.serializable === false ) {
+                        continue;
+                    }
+
+                    // skip hide-in-inspector
+                    if ( attrs.hideInInspector ) {
                         continue;
                     }
 
