@@ -20,22 +20,37 @@
                     var fspath = AssetDB.uuidToFsysPath(event.detail.uuid);
                     var importer = AssetDB.getImporter(fspath);
                     this.inspect(importer);
-
-                    if ( importer instanceof FIRE_ED.TextureImporter ) {
-                        if ( this.$.preview.firstChild ) {
-                            this.$.preview.removeChild(this.$.preview.firstChild);
-                            var img = new Image(); 
-                            img.src = fspath;
-                            this.$.preview.appendChild(img);
-                        }
-                    }
                 }
             }.bind(this) );
         },
 
         inspect: function ( obj ) {
-            if ( this.$.fields.target !== obj ) {
-                this.$.fields.target = obj;
+            if ( this.$.fields.target === obj ) {
+                return;
+            }
+
+            if ( this.$.fields.target instanceof FIRE_ED.Importer &&
+                 obj instanceof FIRE_ED.Importer ) 
+            {
+                if ( this.$.fields.target.uuid === obj.uuid ) {
+                    return;
+                }
+            }
+
+            //
+            if ( this.$.preview.firstChild ) {
+                this.$.preview.removeChild(this.$.preview.firstChild);
+            }
+
+            this.$.fields.target = obj;
+
+            if ( obj instanceof FIRE_ED.TextureImporter ) {
+                var img = new Image(); 
+                img.src = obj.rawfile;
+                var div = document.createElement('div'); 
+                div.classList.add('background');
+                div.appendChild(img);
+                this.$.preview.appendChild(div);
             }
         },
     });

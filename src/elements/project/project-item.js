@@ -73,7 +73,9 @@
 
             this.fire('selecting', { 
                 toggle: this._isToggle, 
-                shift: this._isShift
+                shift: this._isShift,
+                x: event.x,
+                y: event.y,
             } );
 
             event.preventDefault();

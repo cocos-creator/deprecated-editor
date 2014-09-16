@@ -102,6 +102,8 @@
 
             // dragging
             this.startDragging = false;
+            this.startDragAt = [-1,-1];
+            this.dragging = false;
             this.curDragoverEL = null; 
             this.dragenterCnt = 0;
         },
@@ -111,7 +113,16 @@
 
             this.addEventListener('mousemove', function ( event ) {
                 if ( this.startDragging ) {
-                    // TODO: go to dragging state by distance
+                    var dx = event.x - this.startDragAt[0]; 
+                    var dy = event.y - this.startDragAt[1]; 
+                    if ( dx * dx  + dy * dy >= 100.0 ) {
+                        this.dragging = true;
+                        this.startDragging = false;
+                    }
+                    event.stopPropagation();
+                }
+                else if ( this.dragging ) {
+                    // do nothing here
                 }
                 else {
                     event.stopPropagation();
@@ -119,20 +130,21 @@
             }, true );
 
             this.addEventListener('mouseleave', function ( event ) {
-                if ( this.startDragging ) {
+                if ( this.dragging ) {
                     this.cancelHighligting();
                     event.stopPropagation();
                 }
             }, true );
 
             this.addEventListener('mouseup', function ( event ) {
-                if ( this.startDragging ) {
+                this.startDragging = false;
+                if ( this.dragging ) {
                     if ( this.curDragoverEL ) {
                         this.moveSelection( this.curDragoverEL );
                     }
 
                     this.cancelHighligting();
-                    this.startDragging = false;
+                    this.dragging = false;
                     event.stopPropagation();
                 }
             }, true );
@@ -276,6 +288,13 @@
                 this.selection[i].selected = false;
             }
             this.selection = [];
+        },
+
+        confirmSelect: function () {
+            if ( this.selection.length > 0 ) {
+                var uuid = AssetDB.urlToUuid(this.getUrl(this.selection[0]));
+                EditorApp.fire( 'selected', { uuid: uuid } );
+            }
         },
 
         getUrl: function ( element ) {
@@ -517,6 +536,7 @@
                 }
                 else {
                     this.startDragging = true;
+                    this.startDragAt = [event.detail.x, event.detail.y];
                     if ( this.selection.indexOf(event.target) === -1 ) {
                         this.clearSelect();
                         this.select( [event.target] );
@@ -542,11 +562,7 @@
                     }
                 } 
 
-                // TODO: confirm selection
-                if ( this.selection.length > 0 ) {
-                    var uuid = AssetDB.urlToUuid(this.getUrl(this.selection[0]));
-                    EditorApp.fire( 'selected', { uuid: uuid } );
-                }
+                this.confirmSelect();
             }
 
             event.stopPropagation();
@@ -590,6 +606,7 @@
         contextmenuAction: function (event) {
             this.cancelHighligting();
             this.startDragging = false;
+            this.dragging = false;
 
             //
             this.contextmenuAt = null;
@@ -707,12 +724,12 @@
         },
 
         keydownAction: function (event) {
-            if ( this.startDragging ) {
+            if ( this.dragging ) {
                 switch ( event.which ) {
                     // esc
                     case 27:
                         this.cancelHighligting();
-                        this.startDragging = false;
+                        this.dragging = false;
                         event.stopPropagation();
                     break;
                 }
@@ -738,6 +755,7 @@
                             }
                             this.lastActive = prev;
                             this.select([this.lastActive]);
+                            // this.confirmSelect();
                         }
                         event.preventDefault();
                         event.stopPropagation();
@@ -753,6 +771,7 @@
                             }
                             this.lastActive = next;
                             this.select([this.lastActive]);
+                            // this.confirmSelect();
                         }
                         event.preventDefault();
                         event.stopPropagation();
