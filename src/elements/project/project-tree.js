@@ -94,12 +94,16 @@
 
         created: function () {
             this.focused = false;
+
+            // selection
             this.selection = [];
             this.lastActive = null;
+            this.contextmenuAt = null;
+
+            // dragging
             this.startDragging = false;
             this.curDragoverEL = null; 
-            this.contextmenuAt = null;
-            this.dragcount = 0;
+            this.dragenterCnt = 0;
         },
 
         ready: function () {
@@ -134,12 +138,12 @@
             }, true );
 
             this.addEventListener( "dragenter", function (event) {
-                ++this.dragcount;
+                ++this.dragenterCnt;
             }, true);
 
             this.addEventListener( "dragleave", function (event) {
-                --this.dragcount;
-                if ( this.dragcount === 0 ) {
+                --this.dragenterCnt;
+                if ( this.dragenterCnt === 0 ) {
                     this.cancelHighligting();
                 }
             }, true);
@@ -489,6 +493,10 @@
                 return;
 
             this.focused = false;
+        },
+
+        scrollAction: function (event) {
+            this.scrollLeft = 0;
         },
 
         selectingAction: function (event) {
