@@ -486,7 +486,7 @@ var AssetDB;
         for ( var name in _mounts ) {
             // AssetDB.walk ( name + ":/", doImport );
             var fspath = _fspath( name + ":/" );
-            Walk.walk(fspath, options);
+            Walk.walkSync(fspath, options);
         }
     };
 
