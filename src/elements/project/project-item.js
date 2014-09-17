@@ -86,7 +86,6 @@
                 y: event.y,
             } );
 
-            event.preventDefault();
             event.stopPropagation();
         },
 
@@ -111,6 +110,11 @@
         mousemoveAction: function ( event ) {
             this.fire('draghover');
 
+            event.stopPropagation();
+        },
+
+        dblclickAction: function ( event ) {
+            this.fire('open');
             event.stopPropagation();
         },
 

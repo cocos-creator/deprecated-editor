@@ -75,6 +75,10 @@
             img.src = fspath; 
             newEL.setIcon(img);
             break;
+
+        case '.fire':
+            newEL.setIcon('fa-fire');
+            break;
                 
         default:
             newEL.setIcon('fa-cube');
@@ -291,6 +295,15 @@
                     }
                 }.bind(this)
             }));
+            menu.append(new nwGUI.MenuItem({ 
+                label: 'New Folder',
+                click: function () {
+                    if ( this.contextmenuAt instanceof ProjectItem ) {
+                        var fspath = this.getUrl(this.contextmenuAt);
+                        AssetDB.makedirs( Path.join( fspath, 'New Folder' ) );
+                    }
+                }.bind(this)
+            }));
 
             menu.append(new nwGUI.MenuItem({ type: 'separator' })); 
             menu.append(new nwGUI.MenuItem({ 
@@ -481,6 +494,8 @@
         confirmSelect: function () {
             if ( this.selection.length > 0 ) {
                 var uuid = AssetDB.urlToUuid(this.getUrl(this.selection[0]));
+
+                // TEMP TODO 
                 EditorApp.fire( 'selected', { uuid: uuid } );
             }
         },
@@ -803,6 +818,23 @@
                 var srcPath = this.getUrl(event.target);
                 var destPath = Path.dirname(srcPath) + "/" + event.detail.name + event.target.extname;
                 AssetDB.moveAsset( srcPath, destPath );
+            }
+            event.stopPropagation();
+        },
+
+        openAction: function (event) {
+            if ( event.target instanceof ProjectItem ) {
+                // TODO: EditorApp.fire( 'loadScene', { uuid: uuid } );
+                var url = this.getUrl(event.target);
+                var uuid = AssetDB.urlToUuid(url);
+                FIRE.AssetLibrary.loadAssetByUuid(uuid, function (scene, error) {
+                    if (error) {
+                        console.error('Failed to load scene: ' + error);
+                        return;
+                    }
+                    FIRE.Engine._setCurrentScene(scene);
+                });
+
             }
             event.stopPropagation();
         },
