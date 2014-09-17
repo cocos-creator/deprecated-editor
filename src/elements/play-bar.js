@@ -2,20 +2,35 @@
     Polymer({
 
         playAction: function ( event ) {
-            this.$.play.setAttribute('active','');
-            this.setAttribute('active','');
+            if ( !FIRE.Engine.isPlaying ) {
+                this.$.play.setAttribute('active','');
+                this.setAttribute('active','');
+                FIRE.Engine.play();
+            }
+            else {
+                this.$.play.removeAttribute('active');
+                this.$.pause.removeAttribute('active');
+                this.removeAttribute('active');
+                FIRE.Engine.stop();
+            }
         },
 
         pauseAction: function ( event ) {
-            if ( this.$.pause.getAttribute('active') !== null ) {
-                this.$.pause.removeAttribute('active');
+            if ( !FIRE.Engine.isPaused ) {
+                this.$.pause.setAttribute('active','');
+                FIRE.Engine.pause();
             }
             else {
-                this.$.pause.setAttribute('active','');
+                this.$.pause.removeAttribute('active');
+                FIRE.Engine.play();
             }
         },
 
         stepAction: function ( event ) {
+            this.$.pause.setAttribute('active','');
+            this.$.play.setAttribute('active','');
+            this.setAttribute('active','');
+            FIRE.Engine.step();
         },
 
     });

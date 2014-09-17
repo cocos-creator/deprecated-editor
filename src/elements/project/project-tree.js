@@ -259,6 +259,142 @@
                 _binaryInsert ( parentEL, newEL );
             }.bind(this) );
 
+            EditorApp.on('assetCreated', function ( event ) {
+                var parentUrl = Path.dirname(event.detail.url);
+                var parentEL = this.getElement(parentUrl);
+                if ( parentEL === null ) {
+                    console.warn( 'Can not find element at ' + parentUrl );
+                    return;
+                }
+                var extname = Path.extname(event.detail.url);
+
+                // create new folder
+                var fspath = AssetDB.fspath(event.detail.url);
+                var newEL = _newProjectItem( fspath, extname );
+
+                // binary insert
+                _binaryInsert ( parentEL, newEL );
+            }.bind(this) );
+
+            this.initContextMenu();
+        },
+
+        initContextMenu: function () {
+            var menu = new nwGUI.Menu();
+
+            menu.append(new nwGUI.MenuItem({ 
+                label: 'New Scene',
+                click: function () {
+                    if ( this.contextmenuAt instanceof ProjectItem ) {
+                        var fspath = this.getUrl(this.contextmenuAt);
+                        AssetDB.saveAsset( Path.join( fspath, 'New Scene.fire' ), new FIRE._Scene() );
+                    }
+                }.bind(this)
+            }));
+
+            menu.append(new nwGUI.MenuItem({ type: 'separator' })); 
+            menu.append(new nwGUI.MenuItem({ 
+                label: 'Show in finder',
+                click: function () {
+                    if ( this.contextmenuAt instanceof ProjectItem ) {
+                        var fspath = AssetDB.fspath(this.getUrl(this.contextmenuAt));
+                        nwGUI.Shell.showItemInFolder(fspath);
+                    }
+                }.bind(this)
+            }));
+            menu.append(new nwGUI.MenuItem({ 
+                label: 'Rename',
+                click: function () {
+                    if ( this.contextmenuAt instanceof ProjectItem ) {
+                        this.contextmenuAt.rename();
+                    }
+                }.bind(this)
+            }));
+            menu.append(new nwGUI.MenuItem({ 
+                label: 'Delete',
+                click: function () {
+                    if ( this.contextmenuAt instanceof ProjectItem ) {
+                        var url = this.getUrl(this.contextmenuAt);
+                        AssetDB.deleteAsset(url);
+                    }
+                }.bind(this)
+            }));
+
+            menu.append(new nwGUI.MenuItem({ type: 'separator' })); 
+            menu.append(new nwGUI.MenuItem({ 
+                label: 'Reimport',
+                click: function () {
+                    if ( this.contextmenuAt instanceof ProjectItem ) {
+                        var selectedItemEl = this.contextmenuAt;
+                        var url = this.getUrl(selectedItemEl);
+                        
+                        // check url whether exists
+                        if (!AssetDB.exists(url)) {
+                            selectedItemEl.remove();
+                            return;
+                        }
+                        var fspath = AssetDB.fspath(url);
+
+                        if (selectedItemEl.isFolder) {
+
+                            // remove assetdb items
+                            AssetDB.clean(url);
+
+                            // remove childnodes
+                            while (selectedItemEl.firstChild) {
+                                selectedItemEl.removeChild(selectedItemEl.firstChild);
+                            }
+
+                            // reimport self
+                            if( !selectedItemEl.isRoot ) {
+                                AssetDB.importAsset(fspath);
+                            }
+
+                            var folderElements = {};
+                            AssetDB.walk( 
+                                url, 
+
+                                function ( root, name, stat ) {
+                                    var itemEL = null;
+                                    var fspath = Path.join(root, name);
+
+                                    if ( stat.isDirectory() ) {
+                                        itemEL = _newProjectItem( fspath, 'folder' );
+                                        folderElements[fspath] = itemEL;
+                                    }
+                                    else {
+                                        itemEL = _newProjectItem( fspath );
+                                    }
+
+                                    var parentEL = folderElements[root];
+                                    if ( parentEL ) {
+                                        parentEL.appendChild(itemEL);
+                                    }
+                                    else {
+                                        selectedItemEl.appendChild(itemEL);
+                                    }
+
+                                    // reimport
+                                    AssetDB.importAsset(fspath);
+
+                                }.bind(this), 
+
+                                function () {
+                                    // console.log("finish walk");
+                                }.bind(this)
+                            );
+
+                        }
+                        else {
+                            // reimport file
+                            AssetDB.importAsset(fspath);
+                        }
+                        
+                    }
+                }.bind(this)
+            }));
+
+            this.contextmenu = menu;
         },
 
         load: function ( url ) {
@@ -749,109 +885,7 @@
                 this.select([this.contextmenuAt]);
             }
 
-            var menu = new nwGUI.Menu();
-            menu.append(new nwGUI.MenuItem({ 
-                label: 'Show in finder',
-                click: function () {
-                    if ( this.contextmenuAt instanceof ProjectItem ) {
-                        var fspath = AssetDB.fspath(this.getUrl(this.contextmenuAt));
-                        nwGUI.Shell.showItemInFolder(fspath);
-                    }
-                }.bind(this)
-            }));
-            menu.append(new nwGUI.MenuItem({ 
-                label: 'Rename',
-                click: function () {
-                    if ( this.contextmenuAt instanceof ProjectItem ) {
-                        this.contextmenuAt.rename();
-                    }
-                }.bind(this)
-            }));
-            menu.append(new nwGUI.MenuItem({ 
-                label: 'Delete',
-                click: function () {
-                    if ( this.contextmenuAt instanceof ProjectItem ) {
-                        var url = this.getUrl(this.contextmenuAt);
-                        AssetDB.deleteAsset(url);
-                    }
-                }.bind(this)
-            }));
-            menu.append(new nwGUI.MenuItem({ type: 'separator' })); 
-            menu.append(new nwGUI.MenuItem({ 
-                label: 'Reimport',
-                click: function () {
-                    if ( this.contextmenuAt instanceof ProjectItem ) {
-                        var selectedItemEl = this.contextmenuAt;
-                        var url = this.getUrl(selectedItemEl);
-                        
-                        // check url whether exists
-                        if (!AssetDB.exists(url)) {
-                            selectedItemEl.remove();
-                            return;
-                        }
-                        var fspath = AssetDB.fspath(url);
-
-                        if (selectedItemEl.isFolder) {
-
-                            // remove assetdb items
-                            AssetDB.clean(url);
-
-                            // remove childnodes
-                            while (selectedItemEl.firstChild) {
-                                selectedItemEl.removeChild(selectedItemEl.firstChild);
-                            }
-
-                            // reimport self
-                            if( !selectedItemEl.isRoot ) {
-                                AssetDB.importAsset(fspath);
-                            }
-
-                            var folderElements = {};
-                            AssetDB.walk( 
-                                url, 
-
-                                function ( root, name, stat ) {
-                                    var itemEL = null;
-                                    var fspath = Path.join(root, name);
-
-                                    if ( stat.isDirectory() ) {
-                                        itemEL = _newProjectItem( fspath, 'folder' );
-                                        folderElements[fspath] = itemEL;
-                                    }
-                                    else {
-                                        itemEL = _newProjectItem( fspath );
-                                    }
-
-                                    var parentEL = folderElements[root];
-                                    if ( parentEL ) {
-                                        parentEL.appendChild(itemEL);
-                                    }
-                                    else {
-                                        selectedItemEl.appendChild(itemEL);
-                                    }
-
-                                    // reimport
-                                    AssetDB.importAsset(fspath);
-
-                                }.bind(this), 
-
-                                function () {
-                                    // console.log("finish walk");
-                                }.bind(this)
-                            );
-
-                        }
-                        else {
-                            // reimport file
-                            AssetDB.importAsset(fspath);
-                        }
-                        
-                    }
-                }.bind(this)
-            }));
-
-            menu.popup(event.x, event.y);
-
+            this.contextmenu.popup(event.x, event.y);
             event.stopPropagation();
         },
 

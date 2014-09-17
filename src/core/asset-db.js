@@ -77,51 +77,98 @@ var AssetDB;
 
     var _rmfile = function ( fspath ) {
         var basename = Path.basename(fspath);
-        if ( basename[0] !== '.' ) {
-            if ( Path.extname(basename) !== '.meta' ) {
-                var uuid = _pathToUuid[fspath];
-                delete _pathToUuid[fspath];
-                delete _uuidToPath[uuid];
+        if ( basename[0] !== '.' &&
+             Path.extname(basename) !== '.meta' ) 
+        {
+            // remove fspath from uuid table
+            var uuid = _pathToUuid[fspath];
+            delete _pathToUuid[fspath];
+            delete _uuidToPath[uuid];
+
+            // delete library file
+            var folder = uuid.substring(0,2);
+            var destFolder = Path.join(_libraryPath,folder);
+            var dest = Path.join(destFolder,uuid);
+
+            if ( Fs.existsSync(dest) ) {
+                Fs.unlinkSync(dest);
+            }
+
+            dest = dest + '.host';
+            if ( Fs.existsSync(dest) ) {
+                Fs.unlinkSync(dest);
+            }
+
+            // delete meta 
+            if ( Fs.existsSync(fspath + ".meta") ) {
+                Fs.unlinkSync( fspath + ".meta" );
             }
         }
-        Fs.unlinkSync( fspath );
-    };
 
-    var _rmdirRecursively = function ( fspath ) {
-        var files = Fs.readdirSync(fspath);
-        files.forEach( function( file, index ) {
-            var curPath = fspath + "/" + file;
-
-            // recurse
-            if ( Fs.statSync(curPath).isDirectory() ) {
-                _rmdirRecursively(curPath);
-            } 
-            // delete file
-            else {
-                _rmfile(curPath);
-            }
-        });
-
-        Fs.rmdirSync(fspath);
+        // delete the file
+        if ( Fs.existsSync(fspath) ) {
+            Fs.unlinkSync( fspath );
+        }
     };
 
     var _fsdelete = function ( fspath ) {
-        var rstat = Fs.statSync(fspath);
-        if ( rstat.isDirectory() ) {
-            _rmdirRecursively(fspath);
+        if ( !Fs.existsSync(fspath) ) {
+            return;
+        }
+
+        if ( Fs.statSync(fspath).isDirectory() ) {
+            var files = Fs.readdirSync(fspath);
+
+            for ( var i = 0; i < files.length; ++i ) {
+                var curPath = fspath + "/" + files[i];
+                _fsdelete(curPath);
+            }
+
+            // delete folder and .meta
+            Fs.rmdirSync(fspath);
+            if ( Fs.existsSync(fspath + ".meta") ) {
+                Fs.unlinkSync( fspath + ".meta" );
+            }
         }
         else {
             _rmfile(fspath);
         }
+    };
 
-        if ( Fs.existsSync(fspath + ".meta") ) {
-            Fs.unlinkSync( fspath + ".meta" );
+    //
+    var _loadmeta = function ( fspath ) {
+        var meta = null;
+        var extname = Path.extname(fspath);
+        var metapath = fspath + ".meta";
+        var importerDef = _importers[extname];
+        if ( !importerDef ) {
+            importerDef = _importers.unknown;
         }
+
+        //
+        if ( Fs.existsSync(metapath) ) {
+            var data = Fs.readFileSync(metapath);
+            try {
+                var jsonObj = JSON.parse(data);
+                meta = FIRE.deserialize(jsonObj);
+            }
+            catch (err) {
+                meta = null;
+            }
+
+            // NOTE: do not use `!(meta instanceof FIRE_ED.Importer)` here
+            if ( meta.constructor !== importerDef ) {
+                meta = null;
+            }
+        }
+
+        return meta;
     };
 
     AssetDB.init = function ( projectDir ) {
-        AssetDB.registerImporter( ['default'], FIRE_ED.Importer );
+        AssetDB.registerImporter( ['unknown'], FIRE_ED.Importer );
         AssetDB.registerImporter( ['.png', '.jpg'], FIRE_ED.TextureImporter );
+        AssetDB.registerImporter( ['.fire'], FIRE_ED.JsonImporter );
 
         AssetDB.mount( Path.join(projectDir,'assets'), 'assets');
 
@@ -147,33 +194,17 @@ var AssetDB;
 
     //
     AssetDB.getImporter = function ( fspath ) {
+        var meta = _loadmeta(fspath);
         var extname = Path.extname(fspath);
-        var metaPath = fspath + ".meta";
-        var meta = null;
-
-        //
-        if ( Fs.existsSync(metaPath) ) {
-            var data = Fs.readFileSync(metaPath);
-            try {
-                var jsonObj = JSON.parse(data);
-                meta = FIRE.deserialize(jsonObj);
-            }
-            catch (err) {
-                meta = null;
-            }
-
-            if ( !(meta instanceof FIRE_ED.Importer) ) {
-                meta = null;
-            }
-        }
 
         //
         if ( !meta ) {
-            var cls = _importers[extname];
-            if ( !cls ) {
-                cls = _importers['default'];
+            var importerDef = _importers[extname];
+            if ( !importerDef ) {
+                importerDef = _importers.unknown;
             }
-            meta = new cls();
+
+            meta = new importerDef();
             meta.uuid = Uuid.v4();
         }
 
@@ -185,13 +216,13 @@ var AssetDB;
         // check if we have .meta
         var data = null;
         var stat = Fs.statSync(fspath);
-        var metaPath = fspath + ".meta";
+        var metapath = fspath + ".meta";
 
         // import asset by its meta data
         if ( stat.isDirectory() ) {
             var meta = null;
-            if ( Fs.existsSync(metaPath) ) {
-                data = Fs.readFileSync(metaPath);
+            if ( Fs.existsSync(metapath) ) {
+                data = Fs.readFileSync(metapath);
                 try {
                     meta = JSON.parse(data);
                 }
@@ -203,21 +234,43 @@ var AssetDB;
             if ( !meta ) {
                 meta = _newFolderMeta();
                 data = JSON.stringify(meta,null,'  ');
-                Fs.writeFileSync(metaPath, data);
+                Fs.writeFileSync(metapath, data);
             }
         }
         else {
-            var importer = this.getImporter(fspath);
+            // var importer = this.getImporter(fspath);
+            var importer = _loadmeta(fspath);
+            var extname = Path.extname(fspath);
+            var savemeta = false;
+
+            //
+            if ( !importer ) {
+                var importerDef = _importers[extname];
+                if ( !importerDef ) {
+                    importerDef = _importers.unknown;
+                }
+
+                importer = new importerDef();
+                importer.uuid = Uuid.v4();
+                savemeta = true;
+            }
+            importer.rawfile = fspath;
 
             // reimport the asset if we found uuid collision
             if ( _uuidToPath[importer.uuid] ) {
-                Fs.unlinkSync(metaPath);
+                savemeta = true;
+                // Fs.unlinkSync(metapath);
             }
 
             // create meta if needed
-            if ( !Fs.existsSync(metaPath) ) {
+            if ( !Fs.existsSync(metapath) ) {
+                savemeta = true;
+            }
+
+            //
+            if ( savemeta ) {
                 data = FIRE.serialize(importer);
-                Fs.writeFileSync(metaPath, data);
+                Fs.writeFileSync(metapath, data);
             }
 
             // execute the importer 
@@ -279,7 +332,10 @@ var AssetDB;
         } 
     };
 
-    AssetDB.importHostData = function ( uuid, fspath ) {
+    AssetDB.copyToLibrary = function ( uuid, fspath, extname ) {
+        if ( !extname )
+            extname = "";
+
         if ( uuid && uuid !== "" ) {
             // check and create a folder with the first two character of uuid
             var folder = uuid.substring(0,2);
@@ -289,7 +345,7 @@ var AssetDB;
             }
 
             // write file
-            dest = Path.join( dest, uuid + ".host" );
+            dest = Path.join( dest, uuid + extname );
             EditorUtils.copySync( fspath, dest );
         } 
     };
@@ -368,15 +424,26 @@ var AssetDB;
         }
     };
 
-    AssetDB.newAsset = function (url) {
+    AssetDB.saveAsset = function ( url, asset ) {
         var fspath = _fspath(url);
         if ( fspath === null ) {
             console.error("Failed to create new asset: " + url);
             return;
         }
 
-        // TODO: create asset
-        // TODO: create asset.json
+        if ( Fs.existsSync(fspath) === false ) {
+            if ( asset instanceof FIRE._Scene ) {
+                var data = FIRE.serialize(asset);
+                Fs.writeFileSync(fspath, data);
+                AssetDB.importAsset(fspath);
+            }
+
+            // dispatch event
+            EditorApp.fire( 'assetCreated', { url: url } );
+        }
+        else {
+            // TODO
+        }
     };
 
     AssetDB.deleteAsset = function (url) {

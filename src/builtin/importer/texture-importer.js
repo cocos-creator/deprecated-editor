@@ -13,7 +13,7 @@ TextureImporter.prototype.exec = function () {
         AssetDB.importToLibrary( this.uuid, tex );
 
         // copy host file to library/{{this.uuid}}.host 
-        AssetDB.importHostData( this.uuid, this.rawfile );
+        AssetDB.copyToLibrary( this.uuid, this.rawfile, '.host' );
     }.bind(this);
     img.src = this.rawfile; 
 };
