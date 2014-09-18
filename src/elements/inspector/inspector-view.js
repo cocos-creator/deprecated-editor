@@ -51,6 +51,10 @@
                 div.classList.add('background');
                 div.appendChild(img);
                 this.$.preview.appendChild(div);
+                this.$.preview.removeAttribute('hidden');
+            }
+            else {
+                this.$.preview.setAttribute('hidden','');
             }
         },
     });

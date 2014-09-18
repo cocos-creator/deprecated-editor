@@ -12,23 +12,30 @@
                                            this.$.gameView.$.view.clientHeight );
             this.$.gameView.setCanvas(canvas);
 
-            // TEMP TODO:
-            // var uuid = AssetDB.urlToUuid("assets://white-sheep/ip3_a_sheep_down_loop01.png");
-            // FIRE.AssetLibrary.loadAssetByUuid(uuid, function ( asset ) {
-            //     var ent = new FIRE.Entity();
-            //     var renderer = new FIRE.SpriteRenderer();
-            //     ent.addComponent(renderer);
+            canvas = document.createElement('canvas');
+            FIRE.Engine.createSceneView( this.$.sceneView.$.view.clientWidth,
+                                         this.$.sceneView.$.view.clientHeight,
+                                         canvas );
+            this.$.sceneView.setCanvas(canvas);
 
-            //     var sprite = new FIRE.Sprite();
-            //     sprite.texture = asset;
-            //     sprite.width = 104;
-            //     sprite.height = 75;
-            //     renderer.sprite = sprite;
-            // });
+            // TEMP TODO:
+            var uuid = AssetDB.urlToUuid("assets://Textures/white-sheep/ip3_a_sheep_down_loop01.png");
+            FIRE.AssetLibrary.loadAssetByUuid(uuid, function ( asset ) {
+                var ent = new FIRE.Entity();
+                var renderer = new FIRE.SpriteRenderer();
+                ent.addComponent(renderer);
+
+                var sprite = new FIRE.Sprite();
+                sprite.texture = asset;
+                sprite.width = 104;
+                sprite.height = 75;
+                renderer.sprite = sprite;
+            });
         },
 
         resizedAction: function () {
             this.$.gameView.resize();
+            this.$.sceneView.resize();
         },
     });
 })();

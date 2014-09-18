@@ -17,8 +17,14 @@
     }
 
     .preview {
+        display: block
         position: relative
         height: 200px
+        border: 1px solid #171717
+
+        &[hidden] {
+            display: none
+        }
 
         .background {
             background-image: url('../img/Checkerboard_64x64.png')
