@@ -5,12 +5,14 @@ var AssetDB;
     var Walk = require('walk');
     var Path = require('path');
     var Uuid = require('node-uuid');
+    var Chokidar = require('chokidar');
 
     var _mounts = {};
     var _uuidToPath = {};
     var _pathToUuid = {};
     var _importers = {};
     var _libraryPath = ""; // the path of library
+    var _watcher = null;
 
     var _newFolderMeta = function ( type ) {
         return {
@@ -157,9 +159,10 @@ var AssetDB;
             }
 
             // NOTE: do not use `!(meta instanceof FIRE_ED.Importer)` here
-            if ( meta.constructor !== importerDef ) {
+            if ( meta && meta.constructor !== importerDef ) {
                 meta = null;
             }
+            
         }
 
         return meta;
@@ -251,7 +254,14 @@ var AssetDB;
                 }
 
                 importer = new importerDef();
-                importer.uuid = Uuid.v4();
+
+                if (_pathToUuid[fspath]) { // reimport asset after remove meta file outside
+                    importer.uuid = _pathToUuid[fspath];
+                }
+                else {
+                    importer.uuid = Uuid.v4();
+                }
+                
                 savemeta = true;
             }
             importer.rawfile = fspath;
@@ -635,4 +645,138 @@ var AssetDB;
         // Walk.walkSync(fspath, options);
     };
 
+    var _fspathToUrl = function ( fspath ) {
+        var assetsDir = _mounts.assets;
+        var relaPath = Path.relative(assetsDir, fspath);
+        return 'assets://' + relaPath;
+    };
+
+    var _metaPathToAssetPath = function ( metaPath ) {
+        return metaPath.substr(0, metaPath.length - '.meta'.length);
+    };
+
+    AssetDB.watch = function () {
+
+        var assetsDir = _mounts.assets;
+        var watcherOptions = {
+            ignored: function(fspath) {
+                if (Path.basename(fspath).indexOf('.') === 0) {
+                    return true;
+                }
+            },
+            ignoreInitial: true,
+            persistent: true
+        };
+        
+        _watcher = Chokidar.watch(assetsDir, watcherOptions);
+
+        _watcher
+        .on('add', function(fspath) {
+
+            var extname = Path.extname(fspath);
+            if (extname === '.meta') {
+        
+                // delete single meta file
+                var assetFsPath = _metaPathToAssetPath(fspath);
+                if (!Fs.existsSync(assetFsPath) && Fs.existsSync(fspath)) {
+                    Fs.unlinkSync(fspath);
+                }
+
+            }
+            else {
+                // import assset
+                if (!_pathToUuid[fspath] && extname !== '')  {
+                    AssetDB.importAsset(fspath);
+
+                    // dispatch event
+                    EditorApp.fire('assetCreated', {url: _fspathToUrl(fspath)});
+                }
+            }
+
+        })
+        .on('addDir', function(fspath) {
+
+            // import assset
+            if (!_pathToUuid[fspath])  {
+                AssetDB.importAsset(fspath);
+
+                // dispatch event
+                EditorApp.fire('folderCreated', {url: _fspathToUrl(fspath)});
+            }
+
+        })
+        .on('change', function(fspath) {
+
+            if (_pathToUuid[fspath]) {
+                AssetDB.importAsset(fspath);
+            }
+
+        })
+        .on('unlink', function(fspath) {
+
+            var extname = Path.extname(fspath);
+
+            if (extname === '.meta') {
+
+                var assetFsPath = _metaPathToAssetPath(fspath);
+                if (Fs.existsSync(assetFsPath)) {
+                    AssetDB.importAsset(assetFsPath);
+                }
+
+            }
+            else {
+                if (_pathToUuid[fspath]) {
+
+                    // clean uuid path info
+                    var uuid = _pathToUuid[fspath];
+                    delete _pathToUuid[fspath];
+                    delete _uuidToPath[uuid];
+
+                    // rm meta file
+                    if (Fs.existsSync(fspath + '.meta')) {
+                        Fs.unlinkSync(fspath + '.meta');
+                    }
+
+                    EditorApp.fire('assetDeleted', {url: _fspathToUrl(fspath)});
+                }
+            }
+
+        })
+        .on('unlinkDir', function(fspath) {
+
+            // rm meta file
+            if (Fs.existsSync(fspath + '.meta')) {
+                Fs.unlinkSync(fspath + '.meta');
+            }
+
+            EditorApp.fire('assetDeleted', {url: _fspathToUrl(fspath)});
+        })
+        .on('error', function(error) {
+            throw error;
+        });
+
+    };
+
+    AssetDB.unwatch = function () {
+        _watcher.close();
+    };
+
+    AssetDB.pathToUuid = function() {
+        return _pathToUuid;
+    };
+
+    AssetDB.uuidToPath = function() {
+        return _uuidToPath;
+    };
+
+    // only for test
+    AssetDB.testInit = function ( projectDir ) {
+        AssetDB.registerImporter( ['unknown'], FIRE_ED.Importer );
+        AssetDB.mount( Path.join(projectDir,'assets'), 'assets');
+    }; 
+
 })(AssetDB || (AssetDB = {}));
+
+if (typeof module !== "undefined" && module) {
+    module.exports = AssetDB;
+}

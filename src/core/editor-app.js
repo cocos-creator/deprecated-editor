@@ -118,6 +118,9 @@ var EditorApp;
                 // F5
                 case 116:
                     nativeMainWin.reload();
+
+                    // close watcher
+                    AssetDB.unwatch();
                 break;
 
                 // F12
@@ -269,6 +272,9 @@ var EditorApp;
         // AssetDB.mount( Path.join(appPath,'shares'), 'shares');
 
         AssetDB.refresh();
+
+        // watch project
+        AssetDB.watch();
     };
 
 })(EditorApp || (EditorApp = {}));
