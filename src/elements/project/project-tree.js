@@ -827,12 +827,15 @@
                 // TODO: EditorApp.fire( 'loadScene', { uuid: uuid } );
                 var url = this.getUrl(event.target);
                 var uuid = AssetDB.urlToUuid(url);
-                FIRE.AssetLibrary.loadAssetByUuid(uuid, function (scene, error) {
+                FIRE.AssetLibrary.loadAssetByUuid(uuid, function (asset, error) {
                     if (error) {
-                        console.error('Failed to load scene: ' + error);
+                        console.error('Failed to load asset: ' + error);
                         return;
                     }
-                    FIRE.Engine._setCurrentScene(scene);
+
+                    if ( asset instanceof FIRE._Scene ) {
+                        FIRE.Engine._setCurrentScene(asset);
+                    }
                 });
 
             }

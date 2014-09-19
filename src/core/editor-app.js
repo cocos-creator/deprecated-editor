@@ -37,7 +37,11 @@ var EditorApp;
 
         // show native main window
         nativeMainWin.show();
-        nativeMainWin.focus();
+
+        if ( EditorApp.options.D || EditorApp.options.showdevtools ) {
+            nativeMainWin.showDevTools();
+            nativeMainWin.focus();
+        }
     };
 
     //
@@ -48,11 +52,6 @@ var EditorApp;
         // parse arguments
         // -D, --showdevtools
         EditorApp.options = Minimist( nwGUI.App.argv );
-
-        // process arguments
-        if ( EditorApp.options.D || EditorApp.options.showdevtools ) {
-            nativeMainWin.showDevTools();
-        }
 
         // TODO: login
         // TODO: choose project

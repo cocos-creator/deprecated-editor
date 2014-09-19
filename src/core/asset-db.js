@@ -318,6 +318,9 @@ var AssetDB;
             return;
 
         if ( uuid && uuid !== "" ) {
+            var fspath = _uuidToPath[uuid];
+            asset.debugName = Path.basename(fspath);
+
             // check and create a folder with the first two character of uuid
             var folder = uuid.substring(0,2);
             var dest = Path.join(_libraryPath,folder);
