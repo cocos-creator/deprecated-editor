@@ -35,7 +35,9 @@
         },
 
         update: function () {
-            FIRE.Engine._scene.render(this.renderContext);
+            if ( this.renderContext ) {
+                FIRE.Engine._scene.render(this.renderContext);
+            }
 
             window.requestAnimationFrame(this.update.bind(this));
         },
