@@ -32,14 +32,16 @@ var paths = {
     elements_html: 'src/elements/**/*.html',
     elements_js:   'src/elements/**/*.js',
     editor_js: [
-        'src/core/utils.js',
-        'src/core/asset-db.js',
-        'src/core/editor-app.js',
         'src/builtin/__intro.js',
         'src/builtin/importer/importer.js',
         'src/builtin/importer/json-importer.js',
         'src/builtin/importer/texture-importer.js',
         'src/builtin/__outro.js',
+    ],
+    editor_core_js: [
+        'src/core/utils.js',
+        'src/core/asset-db.js',
+        'src/core/editor-app.js',
     ],
 };
 
@@ -170,6 +172,26 @@ gulp.task('editor-js-min', ['editor-js-dev'], function() {
     ;
 });
 
+// editor-core-js-dev
+gulp.task('editor-core-js-dev', function() {
+    return gulp.src(paths.editor_core_js)
+    // .pipe(writeVersion('editor-app.js'))
+    .pipe(concat('editor-core.dev.js'))
+    .pipe(gulp.dest('bin'))
+    ;
+});
+
+// editor-core-js-min
+gulp.task('editor-core-js-min', ['editor-core-js-dev'], function() {
+    return gulp.src('bin/editor-core.dev.js')
+    .pipe(jshint())
+    .pipe(jshint.reporter(stylish))
+    .pipe(rename('editor-core.min.js'))
+    .pipe(uglify())
+    .pipe(gulp.dest('bin'))
+    ;
+});
+
 // minify 3rd libraries from their source
 gulp.task('ext-min', ['cp-3rd'], function() {
     // return gulp.src(paths.minify_ext)
@@ -214,6 +236,7 @@ gulp.task('watch', function() {
     gulp.watch(paths.elements_js, ['build-elements-html-dev']).on ( 'error', gutil.log );
     gulp.watch(paths.elements_html, ['build-elements-html-dev']).on ( 'error', gutil.log );
     gulp.watch(paths.editor_js, ['editor-js-dev']).on ( 'error', gutil.log );
+    gulp.watch(paths.editor_core_js, ['editor-core-js-dev']).on ( 'error', gutil.log );
 });
 gulp.task('watch-self', function() {
     gulp.watch(paths.elements_img, ['cp-elements-img']).on ( 'error', gutil.log );
@@ -221,4 +244,5 @@ gulp.task('watch-self', function() {
     gulp.watch(paths.elements_js, ['build-elements-html-dev']).on ( 'error', gutil.log );
     gulp.watch(paths.elements_html, ['build-elements-html-dev']).on ( 'error', gutil.log );
     gulp.watch(paths.editor_js, ['editor-js-dev']).on ( 'error', gutil.log );
+    gulp.watch(paths.editor_core_js, ['editor-core-js-dev']).on ( 'error', gutil.log );
 });
