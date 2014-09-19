@@ -16,7 +16,16 @@
             this.renderContext = renderContext;
 
             if ( this.renderContext !== null ) {
-                this.$.view.appendChild(renderContext.canvas);
+                // create editor camera
+                if ( this.renderContext.camera === null ) {
+                    var cameraEnt = new FIRE.Entity();
+                    cameraEnt._objFlags |= FIRE.ObjectFlags.EditorOnly;
+                    var camera = cameraEnt.addComponent(new FIRE.Camera());
+                    camera.background = new FIRE.Color(0, 0.5, 1.0);
+                    this.renderContext.camera = camera;
+                }
+
+                this.$.view.appendChild(this.renderContext.canvas);
 
                 // start update
                 window.requestAnimationFrame(this.update.bind(this));
