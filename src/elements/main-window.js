@@ -8,15 +8,15 @@
 
             // init engine & game-view
             console.log('fire-engine initializing...');
-            var canvas = FIRE.Engine.init( this.$.gameView.$.view.clientWidth,
-                                           this.$.gameView.$.view.clientHeight );
-            this.$.gameView.setCanvas(canvas);
+            var renderContext = FIRE.Engine.init( this.$.gameView.$.view.clientWidth,
+                                                  this.$.gameView.$.view.clientHeight );
+            this.$.gameView.setRenderContext(renderContext);
 
             canvas = document.createElement('canvas');
-            FIRE.Engine.createSceneView( this.$.sceneView.$.view.clientWidth,
-                                         this.$.sceneView.$.view.clientHeight,
-                                         canvas );
-            this.$.sceneView.setCanvas(canvas);
+            renderContext = FIRE.Engine.createSceneView( this.$.sceneView.$.view.clientWidth,
+                                                         this.$.sceneView.$.view.clientHeight,
+                                                         canvas );
+            this.$.sceneView.setRenderContext(renderContext);
 
             // TEMP TODO:
             var uuid = AssetDB.urlToUuid("assets://Textures/white-sheep/ip3_a_sheep_down_loop01.png");

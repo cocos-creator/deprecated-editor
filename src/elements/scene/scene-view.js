@@ -1,7 +1,7 @@
 (function () {
     Polymer({
         created: function () {
-            this.canvas = null;
+            this.renderContext = null;
             this.frameID = -1;
 
             window.addEventListener('resize', function() {
@@ -9,25 +9,24 @@
             }.bind(this));
         },
 
-        setCanvas: function ( canvas ) {
+        setRenderContext: function ( renderContext ) {
             // cancel update first
             if ( this.frameID !== -1 ) {
                 window.cancelAnimationFrame(this.frameID);
             }
 
-            //
-            if ( this.canvas !== null ) {
-                this.$.view.removeChild(this.canvas);
+            if ( this.renderContext !== null ) {
+                this.$.view.removeChild(this.renderContext.canvas);
             }
 
-            //
-            if ( canvas !== null ) {
-                this.canvas = canvas;
-                this.$.view.appendChild(canvas);
-            }
+            this.renderContext = renderContext;
 
-            // start update
-            this.frameID = window.requestAnimationFrame(this.update);
+            if ( this.renderContext !== null ) {
+                this.$.view.appendChild(renderContext.canvas);
+
+                // start update
+                this.frameID = window.requestAnimationFrame(this.update.bind(this));
+            }
         }, 
 
         showAction: function ( event ) {
@@ -35,10 +34,14 @@
         },
 
         resize: function () {
+            if ( this.renderContext !== null ) {
+                this.renderContext.size = new FIRE.Vec2( this.$.view.clientWidth, 
+                                                         this.$.view.clientHeight );
+            }
         },
 
         update: function () {
-            // TODO: Engine._scene.render(Engine._renderContext);
+            FIRE.Engine._scene.render(this.renderContext);
         },
 
     });

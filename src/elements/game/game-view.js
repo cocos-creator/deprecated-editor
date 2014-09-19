@@ -1,21 +1,22 @@
 (function () {
     Polymer({
         created: function () {
-            this.canvas = null;
+            this.renderContext = null;
 
             window.addEventListener('resize', function() {
                 this.resize();
             }.bind(this));
         },
 
-        setCanvas: function ( canvas ) {
-            if ( this.canvas !== null ) {
-                this.$.view.removeChild(this.canvas);
+        setRenderContext: function ( renderContext ) {
+            if ( this.renderContext !== null ) {
+                this.$.view.removeChild(this.renderContext.canvas);
             }
 
-            if ( canvas !== null ) {
-                this.canvas = canvas;
-                this.$.view.appendChild(canvas);
+            this.renderContext = renderContext;
+
+            if ( renderContext !== null ) {
+                this.$.view.appendChild(renderContext.canvas);
             }
         }, 
 
@@ -24,9 +25,9 @@
         },
 
         resize: function () {
-            if ( this.canvas !== null ) {
-                FIRE.Engine.screenSize = new FIRE.Vec2( this.$.view.clientWidth, 
-                                                        this.$.view.clientHeight );
+            if ( this.renderContext !== null ) {
+                this.renderContext.size = new FIRE.Vec2( this.$.view.clientWidth, 
+                                                         this.$.view.clientHeight );
             }
         },
 
