@@ -9,6 +9,11 @@ var mainWindow = null;
 // Report crashes to our server.
 crashReporter.start();
 
+// Quit when all windows are closed.
+app.on('window-all-closed', function() {
+    app.quit();
+});
+
 //
 app.on('ready', function() {
     mainWindow = new BrowserWindow( { 
@@ -20,9 +25,10 @@ app.on('ready', function() {
         // frame: false,
     } );
     mainWindow.on('closed', function() {
-        app.quit();
+        // TODO: close all window
+        // app.quit();
     });
 
-    mainWindow.loadUrl('file://' + __dirname + '/index.html');
+    // mainWindow.loadUrl('file://' + __dirname + '/index.html');
     mainWindow.show();
 });
