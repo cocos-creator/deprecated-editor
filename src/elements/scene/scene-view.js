@@ -2,7 +2,6 @@
     Polymer({
         created: function () {
             this.renderContext = null;
-            this.frameID = -1;
 
             window.addEventListener('resize', function() {
                 this.resize();
@@ -10,11 +9,6 @@
         },
 
         setRenderContext: function ( renderContext ) {
-            // cancel update first
-            if ( this.frameID !== -1 ) {
-                window.cancelAnimationFrame(this.frameID);
-            }
-
             if ( this.renderContext !== null ) {
                 this.$.view.removeChild(this.renderContext.canvas);
             }
@@ -25,7 +19,7 @@
                 this.$.view.appendChild(renderContext.canvas);
 
                 // start update
-                this.frameID = window.requestAnimationFrame(this.update.bind(this));
+                window.requestAnimationFrame(this.update.bind(this));
             }
         }, 
 
@@ -42,6 +36,8 @@
 
         update: function () {
             FIRE.Engine._scene.render(this.renderContext);
+
+            window.requestAnimationFrame(this.update.bind(this));
         },
 
     });

@@ -16,6 +16,12 @@
             this.renderContext = renderContext;
 
             if ( renderContext !== null ) {
+                // create editor camera
+                if ( renderContext.camera === null ) {
+                    var cameraEnt = new FIRE.Entity();
+                    cameraEnt._objFlags |= FIRE.ObjectFlags.EditorOnly;
+                    renderContext.camera = cameraEnt.addComponent(new FIRE.Camera());
+                }
                 this.$.view.appendChild(renderContext.canvas);
             }
         }, 
