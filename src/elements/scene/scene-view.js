@@ -18,11 +18,13 @@
             if ( this.renderContext !== null ) {
                 // create editor camera
                 if ( this.renderContext.camera === null ) {
+                    // TODO: add this code to EditorUtils
                     var cameraEnt = new FIRE.Entity();
                     cameraEnt._objFlags |= FIRE.ObjectFlags.EditorOnly;
                     var camera = cameraEnt.addComponent(new FIRE.Camera());
-                    camera.background = new FIRE.Color(0, 0.5, 1.0);
                     this.renderContext.camera = camera;
+                    // NOTE: background setup must after camera set to render context
+                    camera.background = new FIRE.Color(0.4, 0.4, 0.4);
                 }
 
                 this.$.view.appendChild(this.renderContext.canvas);
