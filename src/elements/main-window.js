@@ -1,12 +1,45 @@
 (function () {
+    var remote = require('remote');
+    var AssetDB = remote.getGlobal('AssetDB');
+
     Polymer({
         domReady: function () {
-            EditorApp.setMainWindow(this);
+            // init document events
+            document.addEventListener( "drop", function (event) {
+                event.preventDefault(); 
+            } );
+            document.addEventListener( "dragover", function (event) {
+                event.preventDefault(); 
+            } );
+            document.addEventListener( "contextmenu", function (event) {
+                event.preventDefault();
+                event.stopPropagation();
+            } );
+            document.addEventListener( "keydown", function ( event ) {
+                switch ( event.keyCode ) {
+                    // TEST
+                    // F3
+                    case 114:
+                    break;
+
+                    // F5
+                    case 116:
+                        nativeMainWin.reload();
+                    break;
+
+                    // F12
+                    case 123:
+                        nativeMainWin.showDevTools();
+                        event.stopPropagation();
+                    break;
+                }
+            }, true );
 
             // init project-tree
             this.$.projectView.load("assets://");
 
             // init engine & game-view
+            // TODO: FIRE.AssetLibrary.init(_libraryPath);
             console.log('fire-engine initializing...');
             var renderContext = FIRE.Engine.init( this.$.gameView.$.view.clientWidth,
                                                   this.$.gameView.$.view.clientHeight );

@@ -5,11 +5,7 @@
   "homepage": "http://github.com/fireball-x/editor",
   "license": "MIT",
   "licenseUrl": "http://opensource.org/licenses/MIT",
-  "main": "main.js",
   "dependencies": {
-    "minimist": "",
-    "walk": "",
-    "node-uuid": ""
   },
   "devDependencies": {
     "gulp": "",

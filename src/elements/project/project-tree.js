@@ -1,6 +1,31 @@
 (function () {
+    var Shell = require('shell');
     var Path = require('path');
-    var nwGUI = require('nw.gui');
+
+    var remote = require('remote');
+    var Menu = remote.require('menu');
+    var MenuItem = remote.require('menu-item');
+    var FireApp = remote.getGlobal('FireApp');
+    var FireUtils = remote.getGlobal('FireUtils');
+    var AssetDB = remote.getGlobal('AssetDB');
+
+    // pathA = foo/bar,         pathB = foo/bar/foobar, return true
+    // pathA = foo/bar,         pathB = foo/bar,        return true
+    // pathA = foo/bar/foobar,  pathB = foo/bar,        return false
+    // pathA = foo/bar/foobar,  pathB = foobar/bar/foo, return false
+    function _includePath ( pathA, pathB ) {
+        if ( pathA.length < pathB.length &&
+             pathB.indexOf (pathA) === 0 ) 
+        {
+            return true;
+        }
+
+        if ( pathA === pathB ) {
+            return true;
+        }
+
+        return false;
+    }
 
     function _binaryIndexOf ( elements, key ) {
         var lo = 0;
@@ -216,7 +241,7 @@
                 }
             }, true);
 
-            EditorApp.on('assetMoved', function ( event ) {
+            FireApp.on('assetMoved', function ( event ) {
                 var srcEL = this.getElement( event.detail.srcUrl );
                 if ( srcEL === null ) {
                     console.warn( 'Can not find source element: ' + event.detail.srcUrl );
@@ -238,7 +263,7 @@
                 _binaryInsert ( destEL, srcEL );
             }.bind(this) );
 
-            EditorApp.on('assetDeleted', function ( event ) {
+            FireApp.on('assetDeleted', function ( event ) {
                 var el = this.getElement( event.detail.url );
                 if ( el === null ) {
                     console.warn( 'Can not find source element: ' + event.detail.url );
@@ -247,7 +272,7 @@
                 el.parentElement.removeChild(el);
             }.bind(this) );
 
-            EditorApp.on('folderCreated', function ( event ) {
+            FireApp.on('folderCreated', function ( event ) {
                 var parentUrl = Path.dirname(event.detail.url);
                 var parentEL = this.getElement(parentUrl);
                 if ( parentEL === null ) {
@@ -263,7 +288,7 @@
                 _binaryInsert ( parentEL, newEL );
             }.bind(this) );
 
-            EditorApp.on('assetCreated', function ( event ) {
+            FireApp.on('assetCreated', function ( event ) {
                 var parentUrl = Path.dirname(event.detail.url);
                 var parentEL = this.getElement(parentUrl);
                 if ( parentEL === null ) {
@@ -284,9 +309,8 @@
         },
 
         initContextMenu: function () {
-            var menu = new nwGUI.Menu();
-
-            menu.append(new nwGUI.MenuItem({ 
+            var menu = new Menu();
+            menu.append(new MenuItem({ 
                 label: 'New Scene',
                 click: function () {
                     if ( this.contextmenuAt instanceof ProjectItem ) {
@@ -295,7 +319,7 @@
                     }
                 }.bind(this)
             }));
-            menu.append(new nwGUI.MenuItem({ 
+            menu.append(new MenuItem({ 
                 label: 'New Folder',
                 click: function () {
                     if ( this.contextmenuAt instanceof ProjectItem ) {
@@ -305,17 +329,17 @@
                 }.bind(this)
             }));
 
-            menu.append(new nwGUI.MenuItem({ type: 'separator' })); 
-            menu.append(new nwGUI.MenuItem({ 
+            menu.append(new MenuItem({ type: 'separator' })); 
+            menu.append(new MenuItem({ 
                 label: 'Show in finder',
                 click: function () {
                     if ( this.contextmenuAt instanceof ProjectItem ) {
                         var fspath = AssetDB.fspath(this.getUrl(this.contextmenuAt));
-                        nwGUI.Shell.showItemInFolder(fspath);
+                        Shell.showItemInFolder(fspath);
                     }
                 }.bind(this)
             }));
-            menu.append(new nwGUI.MenuItem({ 
+            menu.append(new MenuItem({ 
                 label: 'Rename',
                 click: function () {
                     if ( this.contextmenuAt instanceof ProjectItem ) {
@@ -323,7 +347,7 @@
                     }
                 }.bind(this)
             }));
-            menu.append(new nwGUI.MenuItem({ 
+            menu.append(new MenuItem({ 
                 label: 'Delete',
                 click: function () {
                     if ( this.contextmenuAt instanceof ProjectItem ) {
@@ -333,8 +357,8 @@
                 }.bind(this)
             }));
 
-            menu.append(new nwGUI.MenuItem({ type: 'separator' })); 
-            menu.append(new nwGUI.MenuItem({ 
+            menu.append(new MenuItem({ type: 'separator' })); 
+            menu.append(new MenuItem({ 
                 label: 'Reimport',
                 click: function () {
                     if ( this.contextmenuAt instanceof ProjectItem ) {
@@ -367,11 +391,11 @@
                             AssetDB.walk( 
                                 url, 
 
-                                function ( root, name, stat ) {
+                                function ( root, name, isDirectory ) {
                                     var itemEL = null;
                                     var fspath = Path.join(root, name);
 
-                                    if ( stat.isDirectory() ) {
+                                    if ( isDirectory ) {
                                         itemEL = _newProjectItem( fspath, 'folder' );
                                         folderElements[fspath] = itemEL;
                                     }
@@ -420,10 +444,10 @@
             AssetDB.walk( 
                 url, 
 
-                function ( root, name, stat ) {
+                function ( root, name, isDirectory ) {
                     var itemEL = null;
                     var fspath = Path.join(root,name);
-                    if ( stat.isDirectory() ) {
+                    if ( isDirectory ) {
                         itemEL = _newProjectItem( fspath, 'folder' );
                         folderElements[fspath] = itemEL;
                     }
@@ -496,7 +520,7 @@
                 var uuid = AssetDB.urlToUuid(this.getUrl(this.selection[0]));
 
                 // TEMP TODO 
-                EditorApp.fire( 'selected', { uuid: uuid } );
+                FireApp.fire( 'selected', { uuid: uuid } );
             }
         },
 
@@ -566,14 +590,14 @@
                         resultUrl = this.getUrl(resultEL);
 
                         // url is child of resultUrl
-                        cmp = EditorUtils.includePath( resultUrl, url );
+                        cmp = _includePath( resultUrl, url );
                         if ( cmp ) {
                             addEL = false;
                             break;
                         }
 
                         // url is parent or same of resultUrl
-                        cmp = EditorUtils.includePath( url, resultUrl );
+                        cmp = _includePath( url, resultUrl );
                         if ( cmp ) {
                             resultELs.splice(j,1);
                             --j;
@@ -592,7 +616,7 @@
                         resultUrl = this.getUrl(resultEL);
 
                         // url is child of resultUrl
-                        cmp = EditorUtils.includePath( resultUrl, url );
+                        cmp = _includePath( resultUrl, url );
                         if ( cmp ) {
                             addEL = false;
                             break;
@@ -668,7 +692,7 @@
                     continue;
 
                 var url = this.getUrl(el);
-                if ( EditorUtils.includePath(url,targetUrl) === false ) {
+                if ( _includePath(url,targetUrl) === false ) {
                     var srcUrl = url;
                     var destUrl = Path.join( targetUrl, el.basename + el.extname );
 
@@ -824,7 +848,7 @@
 
         openAction: function (event) {
             if ( event.target instanceof ProjectItem ) {
-                // TODO: EditorApp.fire( 'loadScene', { uuid: uuid } );
+                // TODO: FireApp.fire( 'loadScene', { uuid: uuid } );
                 var url = this.getUrl(event.target);
                 var uuid = AssetDB.urlToUuid(url);
                 FIRE.AssetLibrary.loadAssetByUuid(uuid, function (asset, error) {
@@ -1013,7 +1037,7 @@
             var dstFsDir = AssetDB.fspath(url);
 
             for ( var i = 0; i < files.length; i++ ) {
-                EditorUtils.copySync(files[i].path, dstFsDir);
+                FireUtils.copySync(files[i].path, dstFsDir);
             }
 
             AssetDB.clean(url);
@@ -1030,11 +1054,11 @@
             AssetDB.walk( 
                 url, 
 
-                function ( root, name, stat ) {
+                function ( root, name, isDirectory ) {
                     var itemEL = null;
                     var fspath = Path.join(root, name);
 
-                    if ( stat.isDirectory() ) {
+                    if ( isDirectory ) {
                         itemEL = _newProjectItem( fspath, 'folder' );
                         folderElements[fspath] = itemEL;
                     }

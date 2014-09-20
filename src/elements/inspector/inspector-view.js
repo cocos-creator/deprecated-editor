@@ -1,4 +1,8 @@
 (function () {
+    var remote = require('remote');
+    var FireApp = remote.getGlobal('FireApp');
+    var AssetDB = remote.getGlobal('AssetDB');
+
     Polymer({
         publish: {
             focused: {
@@ -14,7 +18,7 @@
         ready: function () {
             this.tabIndex = EditorUI.getParentTabIndex(this)+1;
 
-            EditorApp.on('selected', function ( event ) {
+            FireApp.on('selected', function ( event ) {
                 if ( event.detail.uuid ) {
                     // var asset = AssetLibrary.loadAssetByUuid(event.detail.uuid);
                     var fspath = AssetDB.uuidToFsysPath(event.detail.uuid);
