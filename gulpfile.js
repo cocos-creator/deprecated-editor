@@ -180,8 +180,8 @@ var build_elements_html = function (strip) {
 gulp.task('build-elements-html', ['cp-elements-html', 'elements-css', 'elements-js'], build_elements_html(true));
 gulp.task('build-elements-html-dev', ['cp-elements-html', 'elements-css', 'elements-js-dev'], build_elements_html(false));
 gulp.task('copy', ['cp-elements-img', 'cp-elements-html', 'cp-3rd'] );
-gulp.task('dev', ['copy', 'build-elements-html-dev', 'editor-js-dev' ] );
-gulp.task('default', ['copy', 'ext-min', 'build-elements-html', 'editor-js-min' ] );
+gulp.task('dev', ['copy', 'build-elements-html-dev' ] );
+gulp.task('default', ['copy', 'ext-min', 'build-elements-html' ] );
 
 // watch
 gulp.task('watch', function() {
