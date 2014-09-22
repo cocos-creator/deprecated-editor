@@ -1,6 +1,7 @@
 (function () {
     var remote = require('remote');
     var AssetDB = remote.getGlobal('AssetDB');
+    var FireConsole = remote.getGlobal('FireConsole');
 
     Polymer({
         domReady: function () {
@@ -39,7 +40,7 @@
             this.$.projectView.load("assets://");
 
             // init engine & game-view
-            // TODO: FIRE.AssetLibrary.init(_libraryPath);
+            FIRE.AssetLibrary.init(AssetDB.getLibraryPath());
             console.log('fire-engine initializing...');
             var renderContext = FIRE.Engine.init( this.$.gameView.$.view.clientWidth,
                                                   this.$.gameView.$.view.clientHeight );
@@ -52,17 +53,23 @@
             this.$.sceneView.setRenderContext(renderContext);
 
             // TEMP TODO:
-            var uuid = AssetDB.urlToUuid("assets://Textures/white-sheep/ip3_a_sheep_down_loop01.png");
-            FIRE.AssetLibrary.loadAssetByUuid(uuid, function ( asset ) {
-                var ent = new FIRE.Entity();
-                var renderer = ent.addComponent(FIRE.SpriteRenderer);
+            var assetPath = 'assets://white-sheep/ip3_a_sheep_down_loop01.png';
+            var uuid = AssetDB.urlToUuid(assetPath);
+            if ( uuid ) {
+                FIRE.AssetLibrary.loadAssetByUuid(uuid, function ( asset ) {
+                    var ent = new FIRE.Entity();
+                    var renderer = ent.addComponent(FIRE.SpriteRenderer);
 
-                var sprite = new FIRE.Sprite();
-                sprite.texture = asset;
-                sprite.width = 104;
-                sprite.height = 75;
-                renderer.sprite = sprite;
-            });
+                    var sprite = new FIRE.Sprite();
+                    sprite.texture = asset;
+                    sprite.width = 104;
+                    sprite.height = 75;
+                    renderer.sprite = sprite;
+                });
+            }
+            else {
+                FireConsole.error('Failed to load ' + assetPath);
+            }
         },
 
         resizedAction: function () {

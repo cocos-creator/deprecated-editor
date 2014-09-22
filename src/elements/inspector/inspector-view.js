@@ -33,13 +33,14 @@
                 return;
             }
 
-            if ( this.$.fields.target instanceof FIRE_ED.Importer &&
-                 obj instanceof FIRE_ED.Importer ) 
-            {
-                if ( this.$.fields.target.uuid === obj.uuid ) {
-                    return;
-                }
-            }
+            // TODO:
+            // if ( this.$.fields.target instanceof FIRE_ED.Importer &&
+            //      obj instanceof FIRE_ED.Importer ) 
+            // {
+            //     if ( this.$.fields.target.uuid === obj.uuid ) {
+            //         return;
+            //     }
+            // }
 
             //
             if ( this.$.preview.firstChild ) {
@@ -48,18 +49,18 @@
 
             this.$.fields.target = obj;
 
-            if ( obj instanceof FIRE_ED.TextureImporter ) {
-                var img = new Image(); 
-                img.src = obj.rawfile;
-                var div = document.createElement('div'); 
-                div.classList.add('background');
-                div.appendChild(img);
-                this.$.preview.appendChild(div);
-                this.$.preview.removeAttribute('hidden');
-            }
-            else {
-                this.$.preview.setAttribute('hidden','');
-            }
+            // if ( obj instanceof FIRE_ED.TextureImporter ) {
+            //     var img = new Image(); 
+            //     img.src = obj.rawfile;
+            //     var div = document.createElement('div'); 
+            //     div.classList.add('background');
+            //     div.appendChild(img);
+            //     this.$.preview.appendChild(div);
+            //     this.$.preview.removeAttribute('hidden');
+            // }
+            // else {
+            //     this.$.preview.setAttribute('hidden','');
+            // }
         },
     });
 })();
