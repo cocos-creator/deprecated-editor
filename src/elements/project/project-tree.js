@@ -1,6 +1,7 @@
 (function () {
     var Shell = require('shell');
     var Path = require('path');
+    var Url = require('url');
 
     var remote = require('remote');
     var Menu = remote.require('menu');
@@ -97,7 +98,13 @@
         case '.png':
         case '.jpg':
             var img = new Image();
-            img.src = fspath; 
+            // TODO: make this possible
+            // img.src = Url.format({
+            //     protocol: 'assets',
+            //     pathname: fspath, 
+            //     slashes: true
+            // });
+            img.src = fspath;
             newEL.setIcon(img);
             break;
 
@@ -241,69 +248,70 @@
                 }
             }, true);
 
-            FireApp.on('assetMoved', function ( event ) {
-                var srcEL = this.getElement( event.detail.srcUrl );
-                if ( srcEL === null ) {
-                    console.warn( 'Can not find source element: ' + event.detail.srcUrl );
-                    return;
-                }
+            // TODO
+            // FireApp.on('assetMoved', function ( event ) {
+            //     var srcEL = this.getElement( event.detail.srcUrl );
+            //     if ( srcEL === null ) {
+            //         console.warn( 'Can not find source element: ' + event.detail.srcUrl );
+            //         return;
+            //     }
 
-                var destEL = this.getElement( Path.dirname(event.detail.destUrl) );
-                if ( destEL === null ) {
-                    console.warn( 'Can not find dest element: ' + event.detail.destUrl );
-                    return;
-                }
+            //     var destEL = this.getElement( Path.dirname(event.detail.destUrl) );
+            //     if ( destEL === null ) {
+            //         console.warn( 'Can not find dest element: ' + event.detail.destUrl );
+            //         return;
+            //     }
 
-                var destExtname = Path.extname(event.detail.destUrl);
-                var destBasename = Path.basename(event.detail.destUrl, destExtname);
-                srcEL.extname = destExtname;
-                srcEL.basename = destBasename;
+            //     var destExtname = Path.extname(event.detail.destUrl);
+            //     var destBasename = Path.basename(event.detail.destUrl, destExtname);
+            //     srcEL.extname = destExtname;
+            //     srcEL.basename = destBasename;
 
-                // binary insert
-                _binaryInsert ( destEL, srcEL );
-            }.bind(this) );
+            //     // binary insert
+            //     _binaryInsert ( destEL, srcEL );
+            // }.bind(this) );
 
-            FireApp.on('assetDeleted', function ( event ) {
-                var el = this.getElement( event.detail.url );
-                if ( el === null ) {
-                    console.warn( 'Can not find source element: ' + event.detail.url );
-                    return;
-                }
-                el.parentElement.removeChild(el);
-            }.bind(this) );
+            // FireApp.on('assetDeleted', function ( event ) {
+            //     var el = this.getElement( event.detail.url );
+            //     if ( el === null ) {
+            //         console.warn( 'Can not find source element: ' + event.detail.url );
+            //         return;
+            //     }
+            //     el.parentElement.removeChild(el);
+            // }.bind(this) );
 
-            FireApp.on('folderCreated', function ( event ) {
-                var parentUrl = Path.dirname(event.detail.url);
-                var parentEL = this.getElement(parentUrl);
-                if ( parentEL === null ) {
-                    console.warn( 'Can not find element at ' + parentUrl );
-                    return;
-                }
+            // FireApp.on('folderCreated', function ( event ) {
+            //     var parentUrl = Path.dirname(event.detail.url);
+            //     var parentEL = this.getElement(parentUrl);
+            //     if ( parentEL === null ) {
+            //         console.warn( 'Can not find element at ' + parentUrl );
+            //         return;
+            //     }
 
-                // create new folder
-                var fspath = AssetDB.fspath(event.detail.url);
-                var newEL = _newProjectItem( fspath, 'folder' );
+            //     // create new folder
+            //     var fspath = AssetDB.fspath(event.detail.url);
+            //     var newEL = _newProjectItem( fspath, 'folder' );
 
-                // binary insert
-                _binaryInsert ( parentEL, newEL );
-            }.bind(this) );
+            //     // binary insert
+            //     _binaryInsert ( parentEL, newEL );
+            // }.bind(this) );
 
-            FireApp.on('assetCreated', function ( event ) {
-                var parentUrl = Path.dirname(event.detail.url);
-                var parentEL = this.getElement(parentUrl);
-                if ( parentEL === null ) {
-                    console.warn( 'Can not find element at ' + parentUrl );
-                    return;
-                }
-                var extname = Path.extname(event.detail.url);
+            // FireApp.on('assetCreated', function ( event ) {
+            //     var parentUrl = Path.dirname(event.detail.url);
+            //     var parentEL = this.getElement(parentUrl);
+            //     if ( parentEL === null ) {
+            //         console.warn( 'Can not find element at ' + parentUrl );
+            //         return;
+            //     }
+            //     var extname = Path.extname(event.detail.url);
 
-                // create new folder
-                var fspath = AssetDB.fspath(event.detail.url);
-                var newEL = _newProjectItem( fspath, extname );
+            //     // create new folder
+            //     var fspath = AssetDB.fspath(event.detail.url);
+            //     var newEL = _newProjectItem( fspath, extname );
 
-                // binary insert
-                _binaryInsert ( parentEL, newEL );
-            }.bind(this) );
+            //     // binary insert
+            //     _binaryInsert ( parentEL, newEL );
+            // }.bind(this) );
 
             this.initContextMenu();
         },
@@ -520,7 +528,7 @@
                 var uuid = AssetDB.urlToUuid(this.getUrl(this.selection[0]));
 
                 // TEMP TODO 
-                FireApp.fire( 'selected', { uuid: uuid } );
+                // FireApp.fire( 'selected', { uuid: uuid } );
             }
         },
 
