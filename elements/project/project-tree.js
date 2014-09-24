@@ -4,9 +4,9 @@
     var Url = require('url');
 
     var remote = require('remote');
+    var Ipc = require('ipc');
     var Menu = remote.require('menu');
     var MenuItem = remote.require('menu-item');
-    var FireApp = remote.getGlobal('FireApp');
     var FireUtils = remote.getGlobal('FireUtils');
     var AssetDB = remote.getGlobal('AssetDB');
 
@@ -444,38 +444,31 @@
 
         load: function ( url ) {
             var folderElements = {};
-            var mountname = AssetDB.mountname(url);
+            var mountname = fireApp.assetDB.mountname(url);
             var rootEL = _newProjectItem( mountname, 'root' );
             rootEL.style.marginLeft="0px";
             this.appendChild(rootEL);
 
-            AssetDB.walk( 
-                url, 
+            fireApp.command( 'asset-db:browse', url );
+            Ipc.on('project-tree:newItem', function ( root, name, isDirectory ) {
+                var itemEL = null;
+                var fspath = Path.join(root,name);
+                if ( isDirectory ) {
+                    itemEL = _newProjectItem( fspath, 'folder' );
+                    folderElements[fspath] = itemEL;
+                }
+                else {
+                    itemEL = _newProjectItem( fspath );
+                }
 
-                function ( root, name, isDirectory ) {
-                    var itemEL = null;
-                    var fspath = Path.join(root,name);
-                    if ( isDirectory ) {
-                        itemEL = _newProjectItem( fspath, 'folder' );
-                        folderElements[fspath] = itemEL;
-                    }
-                    else {
-                        itemEL = _newProjectItem( fspath );
-                    }
-
-                    var parentEL = folderElements[root];
-                    if ( parentEL ) {
-                        parentEL.appendChild(itemEL);
-                    }
-                    else {
-                        rootEL.appendChild(itemEL);
-                    }
-                }.bind(this), 
-
-                function () {
-                    // console.log("finish walk");
-                }.bind(this)
-            );
+                var parentEL = folderElements[root];
+                if ( parentEL ) {
+                    parentEL.appendChild(itemEL);
+                }
+                else {
+                    rootEL.appendChild(itemEL);
+                }
+            }.bind(this));
         },
 
         toggle: function ( items ) {

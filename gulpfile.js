@@ -14,26 +14,14 @@ var es = require('event-stream');
 var stylish = require('jshint-stylish');
 
 var paths = {
-    ext_core: [ 
-        '../core/bin/**/*.js',
-    ],
-    ext_engine: [ 
-        '../engine/bin/**/*.js',
-    ],
-    ext_editor_ui: [ 
-        '../editor-ui/bin/editor-ui.css',
-        '../editor-ui/bin/editor-ui.html',
-        '../editor-ui/bin/img/**/*.png',
-    ],
-    ext_editor_core: [
-        '../editor-core/bin/**/*.js',
-    ],
-    third_party: '3rd/**/*',
-    minify_ext: [],
-    elements_img:  'src/elements/img/**/*.png',
-    elements_css:  'src/elements/**/*.styl',
-    elements_html: 'src/elements/**/*.html',
-    elements_js:   'src/elements/**/*.js',
+    elements_img:  'elements/img/**/*.png',
+    elements_css:  'elements/**/*.styl',
+    elements_html: 'elements/**/*.html',
+    elements_js:   'elements/**/*.js',
+    src: [
+        'src/fire-app.js',
+        'src/bootstrap.js',
+    ]
 };
 
 // clean
@@ -46,53 +34,15 @@ gulp.task('clean', function() {
 // copy
 /////////////////////////////////////////////////////////////////////////////
 
-gulp.task('cp-core', function() {
-    return gulp.src(paths.ext_core)
-    .pipe(gulp.dest('ext/fire-core'))
-    ;
-});
-
-gulp.task('cp-engine', function() {
-    return gulp.src(paths.ext_engine)
-    .pipe(gulp.dest('ext/fire-engine'))
-    ;
-});
-
-gulp.task('cp-editor-core', function() {
-    return gulp.src(paths.ext_editor_core)
-    .pipe(gulp.dest('ext/fire-editor-core'))
-    ;
-});
-
-gulp.task('cp-editor-ui', function() {
-    var deferred = Q.defer();
-
-    // deferred 1 second to prevent copy editor-ui.html while it is in the building phase
-    setTimeout(function () {
-        gulp.src(paths.ext_editor_ui, {base: '../editor-ui/bin/'})
-        .pipe(gulp.dest('ext/fire-editor-ui'))
-        ;
-        deferred.resolve();
-    }, 1000);
-
-    return deferred.promise;
-});
-
 gulp.task('cp-elements-img', function() {
-    return gulp.src(paths.elements_img, {base: 'src/'})
+    return gulp.src(paths.elements_img, {base: 'elements'})
     .pipe(gulp.dest('bin'))
     ;
 });
 
 gulp.task('cp-elements-html', function() {
-    return gulp.src(paths.elements_html, {base: 'src/'})
+    return gulp.src(paths.elements_html, {base: './'})
     .pipe(gulp.dest('bin'))
-    ;
-});
-
-gulp.task('cp-3rd', function() {
-    return gulp.src(paths.third_party, {base: '3rd/'})
-    .pipe(gulp.dest('ext'))
     ;
 });
 
@@ -102,7 +52,7 @@ gulp.task('cp-3rd', function() {
 
 // css
 gulp.task('elements-css', function() {
-    return gulp.src(paths.elements_css, {base: 'src/'})
+    return gulp.src(paths.elements_css, {base: './'})
     .pipe(stylus({
         compress: true,
         include: 'src'
@@ -134,7 +84,7 @@ var writeVersion = function (filename) {
 
 // elements-js
 gulp.task('elements-js', function() {
-    return gulp.src(paths.elements_js, {base: 'src'})
+    return gulp.src(paths.elements_js, {base: './'})
     .pipe(jshint())
     .pipe(jshint.reporter(stylish))
     .pipe(uglify())
@@ -144,23 +94,12 @@ gulp.task('elements-js', function() {
 
 // elements-js-dev
 gulp.task('elements-js-dev', function() {
-    return gulp.src(paths.elements_js, {base: 'src'})
+    return gulp.src(paths.elements_js, {base: './'})
     .pipe(gulp.dest('bin'))
     ;
 });
 
-// minify 3rd libraries from their source
-gulp.task('ext-min', ['cp-3rd'], function() {
-    // return gulp.src(paths.minify_ext)
-    // .pipe(uglify())
-    // .pipe(rename(function (path) {
-    //     //path
-    //     path.extname = ".min" + path.extname;
-    // }))
-    // .pipe(gulp.dest('ext'));
-});
-
-// html
+// element-html
 var build_elements_html = function (strip) {
     return function () {
         return gulp.src('bin/elements/editor.html')
@@ -171,32 +110,62 @@ var build_elements_html = function (strip) {
         }));
     };
 };
+gulp.task('build-elements-html', [
+    'cp-elements-img', 'cp-elements-html', 'elements-css', 'elements-js'
+], build_elements_html(true));
+gulp.task('build-elements-html-dev', [
+    'cp-elements-img', 'cp-elements-html', 'elements-css', 'elements-js-dev'
+], build_elements_html(false));
+
+// js-hint
+gulp.task('src-jshint', function() {
+    return gulp.src(paths.src)
+    .pipe(jshint({
+        forin: false,
+        multistr: true,
+    }))
+    .pipe(jshint.reporter(stylish))
+    ;
+});
+
+// src-dev
+gulp.task('src-dev', ['src-jshint'], function() {
+    return gulp.src(paths.src)
+    .pipe(concat('editor.dev.js'))
+    .pipe(gulp.dest('bin'))
+    ;
+});
+
+// src-min
+gulp.task('src-min', ['src-dev'], function() {
+    return gulp.src('bin/editor.dev.js')
+    .pipe(rename('editor.min.js'))
+    .pipe(uglify())
+    .pipe(gulp.dest('bin'))
+    ;
+});
 
 /////////////////////////////////////////////////////////////////////////////
 // commands
 /////////////////////////////////////////////////////////////////////////////
 
 // short tasks
-gulp.task('build-elements-html', ['cp-elements-html', 'elements-css', 'elements-js'], build_elements_html(true));
-gulp.task('build-elements-html-dev', ['cp-elements-html', 'elements-css', 'elements-js-dev'], build_elements_html(false));
-gulp.task('copy', ['cp-elements-img', 'cp-elements-html', 'cp-3rd'] );
-gulp.task('dev', ['copy', 'build-elements-html-dev' ] );
-gulp.task('default', ['copy', 'ext-min', 'build-elements-html' ] );
+gulp.task('copy', ['cp-elements-img', 'cp-elements-html'] );
+gulp.task('dev', ['copy', 'build-elements-html-dev', 'src-dev' ] );
+gulp.task('default', ['copy', 'build-elements-html', 'src-min' ] );
 
 // watch
 gulp.task('watch', function() {
-    gulp.watch(paths.ext_core, ['cp-core']).on ( 'error', gutil.log );
-    gulp.watch(paths.ext_engine, ['cp-engine']).on ( 'error', gutil.log );
-    gulp.watch(paths.ext_editor_core, ['cp-editor-core']).on ( 'error', gutil.log );
-    gulp.watch(paths.ext_editor_ui, ['cp-editor-ui']).on ( 'error', gutil.log );
     gulp.watch(paths.elements_img, ['cp-elements-img']).on ( 'error', gutil.log );
     gulp.watch(paths.elements_css, ['elements-css', 'build-elements-html-dev']).on ( 'error', gutil.log );
     gulp.watch(paths.elements_js, ['build-elements-html-dev']).on ( 'error', gutil.log );
     gulp.watch(paths.elements_html, ['build-elements-html-dev']).on ( 'error', gutil.log );
+    gulp.watch(paths.src, ['src-dev']).on ( 'error', gutil.log );
 });
 gulp.task('watch-self', function() {
     gulp.watch(paths.elements_img, ['cp-elements-img']).on ( 'error', gutil.log );
     gulp.watch(paths.elements_css, ['elements-css', 'build-elements-html-dev']).on ( 'error', gutil.log );
     gulp.watch(paths.elements_js, ['build-elements-html-dev']).on ( 'error', gutil.log );
     gulp.watch(paths.elements_html, ['build-elements-html-dev']).on ( 'error', gutil.log );
+    gulp.watch(paths.src, ['src-dev']).on ( 'error', gutil.log );
 });

@@ -1,7 +1,5 @@
 (function () {
     var remote = require('remote');
-    var FireApp = remote.getGlobal('FireApp');
-    var AssetDB = remote.getGlobal('AssetDB');
 
     Polymer({
         publish: {

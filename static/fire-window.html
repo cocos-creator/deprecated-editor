@@ -1,26 +1,21 @@
 <html>
     <head>
         <title>Fireball-x Editor</title>
-        <script>
-            // TODO: must be boot.js
-            // skip "?fireID="
-            var fireID = JSON.parse(decodeURIComponent(location.search.substr(8)));
-            console.log("fireID = " + fireID);
-        </script>
 
         <link rel="stylesheet" href="fire://ext/fontawesome/css/font-awesome.css">
-        <link rel="stylesheet" href="fire://src/fire-editor-ui/editor-ui.css">
+        <link rel="stylesheet" href="fire://src/editor-ui/editor-ui.css">
 
         <script type="text/javascript" src="fire://ext/platform/platform.js"></script>
-        <script type="text/javascript" src="fire://ext/pixi/bin/pixi.dev.js"></script>
         <script type="text/javascript" src="fire://ext/web-animations-js/web-animations.js"></script>
+        <script type="text/javascript" src="fire://ext/pixi/bin/pixi.dev.js"></script>
 
-        <script type="text/javascript" src="fire://src/fire-core/core.dev.js"></script>
-        <script type="text/javascript" src="fire://src/fire-engine/engine.dev.js"></script>
+        <script type="text/javascript" src="fire://src/core/core.dev.js"></script>
+        <script type="text/javascript" src="fire://src/engine/engine.dev.js"></script>
+        <script type="text/javascript" src="fire://src/editor/editor.dev.js"></script>
 
         <link rel="import" href="fire://ext/polymer/polymer.html">
-        <link rel="import" href="fire://src/fire-editor-ui/editor-ui.html">
-        <link rel="import" href="fire://src/fire-editor/editor.html">
+        <link rel="import" href="fire://src/editor-ui/editor-ui.html">
+        <link rel="import" href="fire://src/editor/editor.html">
 
         <style>
             body {
