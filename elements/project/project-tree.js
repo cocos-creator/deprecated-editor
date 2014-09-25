@@ -1,7 +1,7 @@
 (function () {
     var Shell = require('shell');
-    var Path = require('path');
-    var Url = require('url');
+    var Path = require('fire-path');
+    var Url = require('fire-url');
 
     var remote = require('remote');
     var Ipc = require('ipc');
@@ -68,9 +68,9 @@
         return null;
     }
 
-    function _newProjectItem ( fspath, type ) {
-        var extname = Path.extname(fspath); 
-        var basename = Path.basename(fspath,extname); 
+    function _newProjectItem ( url, type ) {
+        var extname = Url.extname(url); 
+        var basename = Url.basename(url,extname); 
 
         var newEL = new ProjectItem();
         if ( !type ) {
@@ -102,7 +102,7 @@
             //     pathname: fspath, 
             //     slashes: true
             // });
-            img.src = fspath;
+            img.src = url;
             newEL.setIcon(img);
             break;
 
@@ -172,10 +172,15 @@
             // confliction
             this.isValidForDrop = true;
             this.confliction = [];
+            this._cachedFolderElements = {};
+
+            this._ipc_newItem = this.newItem.bind(this);
         },
 
         ready: function () {
             this.tabIndex = EditorUI.getParentTabIndex(this)+1;
+
+            Ipc.on('project-tree:newItem', this._ipc_newItem );
 
             this.addEventListener('mousemove', function ( event ) {
                 if ( this.startDragging ) {
@@ -314,6 +319,10 @@
             this.initContextMenu();
         },
 
+        detached: function () {
+            Ipc.removeListener('project-tree:newItem', this._ipc_newItem );
+        },
+
         initContextMenu: function () {
             var menu = new Menu();
             menu.append(new MenuItem({ 
@@ -441,32 +450,33 @@
         },
 
         load: function ( url ) {
-            var folderElements = {};
-            var mountname = AssetDB.mountname(url);
-            var rootEL = _newProjectItem( mountname, 'root' );
-            rootEL.style.marginLeft="0px";
+            var rootEL = _newProjectItem( url, 'root' );
+            rootEL.style.marginLeft = "0px";
             this.appendChild(rootEL);
+            this._cachedFolderElements = {};
+            this._cachedFolderElements[url] = rootEL;
 
-            Ipc.on('project-tree:newItem', function ( root, name, isDirectory ) {
-                var itemEL = null;
-                var fspath = Path.join(root,name);
-                if ( isDirectory ) {
-                    itemEL = _newProjectItem( fspath, 'folder' );
-                    folderElements[fspath] = itemEL;
-                }
-                else {
-                    itemEL = _newProjectItem( fspath );
-                }
-
-                var parentEL = folderElements[root];
-                if ( parentEL ) {
-                    parentEL.appendChild(itemEL);
-                }
-                else {
-                    rootEL.appendChild(itemEL);
-                }
-            }.bind(this));
             FireApp.command( 'asset-db:browse', url );
+        },
+
+        newItem: function ( url, isDirectory ) {
+            var itemEL = null;
+            if ( isDirectory ) {
+                itemEL = _newProjectItem( url, 'folder' );
+                this._cachedFolderElements[url] = itemEL;
+            }
+            else {
+                itemEL = _newProjectItem( url );
+            }
+
+            var dirurl = Url.dirname(url);
+            var parentEL = this._cachedFolderElements[dirurl];
+            if ( parentEL ) {
+                parentEL.appendChild(itemEL);
+            }
+            else {
+                FireConsole.error('Can not find element for ' + dirurl);
+            }
         },
 
         toggle: function ( items ) {
