@@ -1,7 +1,4 @@
 (function () {
-    var remote = require('remote');
-    var FireConsole = remote.getGlobal('FireConsole');
-
     Polymer({
         domReady: function () {
             // init document events
@@ -39,8 +36,8 @@
             this.$.projectView.load("assets://");
 
             // init engine & game-view
-            FIRE.AssetLibrary.init(fireApp.assetDB.getLibraryPath());
-            console.log('fire-engine initializing...');
+            FIRE.AssetLibrary.init(AssetDB.getLibraryPath());
+            FireConsole.log('fire-engine initializing...');
             var renderContext = FIRE.Engine.init( this.$.gameView.$.view.clientWidth,
                                                   this.$.gameView.$.view.clientHeight );
             this.$.gameView.setRenderContext(renderContext);
@@ -53,7 +50,7 @@
 
             // TEMP TODO:
             var assetPath = 'assets://white-sheep/ip3_a_sheep_down_loop01.png';
-            var uuid = fireApp.assetDB.urlToUuid(assetPath);
+            var uuid = AssetDB.urlToUuid(assetPath);
             if ( uuid ) {
                 FIRE.AssetLibrary.loadAssetByUuid(uuid, function ( asset ) {
                     var ent = new FIRE.Entity();

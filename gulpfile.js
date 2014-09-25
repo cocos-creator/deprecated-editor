@@ -19,7 +19,7 @@ var paths = {
     elements_html: 'elements/**/*.html',
     elements_js:   'elements/**/*.js',
     src: [
-        'src/fire-app.js',
+        'src/fire-client.js',
         'src/bootstrap.js',
     ]
 };

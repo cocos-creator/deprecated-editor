@@ -7,8 +7,6 @@
     var Ipc = require('ipc');
     var Menu = remote.require('menu');
     var MenuItem = remote.require('menu-item');
-    var FireUtils = remote.getGlobal('FireUtils');
-    var AssetDB = remote.getGlobal('AssetDB');
 
     // pathA = foo/bar,         pathB = foo/bar/foobar, return true
     // pathA = foo/bar,         pathB = foo/bar,        return true
@@ -444,12 +442,11 @@
 
         load: function ( url ) {
             var folderElements = {};
-            var mountname = fireApp.assetDB.mountname(url);
+            var mountname = AssetDB.mountname(url);
             var rootEL = _newProjectItem( mountname, 'root' );
             rootEL.style.marginLeft="0px";
             this.appendChild(rootEL);
 
-            fireApp.command( 'asset-db:browse', url );
             Ipc.on('project-tree:newItem', function ( root, name, isDirectory ) {
                 var itemEL = null;
                 var fspath = Path.join(root,name);
@@ -469,6 +466,7 @@
                     rootEL.appendChild(itemEL);
                 }
             }.bind(this));
+            FireApp.command( 'asset-db:browse', url );
         },
 
         toggle: function ( items ) {
@@ -1033,57 +1031,57 @@
             }
             
             // TODO: we should have better solution { 
-            var url = this.getUrl(targetEl);
-            var files = event.dataTransfer.files;
-            var dstFsDir = AssetDB.fspath(url);
+            // var url = this.getUrl(targetEl);
+            // var files = event.dataTransfer.files;
+            // var dstFsDir = AssetDB.fspath(url);
 
-            for ( var i = 0; i < files.length; i++ ) {
-                FireUtils.copySync(files[i].path, dstFsDir);
-            }
+            // for ( var i = 0; i < files.length; i++ ) {
+            //     Fs.copySync(files[i].path, dstFsDir);
+            // }
 
-            AssetDB.clean(url);
+            // AssetDB.clean(url);
 
-            while (targetEl.firstChild) {
-                targetEl.removeChild(targetEl.firstChild);
-            }
+            // while (targetEl.firstChild) {
+            //     targetEl.removeChild(targetEl.firstChild);
+            // }
 
-            if( !targetEl.isRoot ) {
-                AssetDB.importAsset(dstFsDir);
-            }
+            // if( !targetEl.isRoot ) {
+            //     AssetDB.importAsset(dstFsDir);
+            // }
 
-            var folderElements = {};
-            AssetDB.walk( 
-                url, 
+            // var folderElements = {};
+            // AssetDB.walk( 
+            //     url, 
 
-                function ( root, name, isDirectory ) {
-                    var itemEL = null;
-                    var fspath = Path.join(root, name);
+            //     function ( root, name, isDirectory ) {
+            //         var itemEL = null;
+            //         var fspath = Path.join(root, name);
 
-                    if ( isDirectory ) {
-                        itemEL = _newProjectItem( fspath, 'folder' );
-                        folderElements[fspath] = itemEL;
-                    }
-                    else {
-                        itemEL = _newProjectItem( fspath );
-                    }
+            //         if ( isDirectory ) {
+            //             itemEL = _newProjectItem( fspath, 'folder' );
+            //             folderElements[fspath] = itemEL;
+            //         }
+            //         else {
+            //             itemEL = _newProjectItem( fspath );
+            //         }
 
-                    var parentEL = folderElements[root];
-                    if ( parentEL ) {
-                        parentEL.appendChild(itemEL);
-                    }
-                    else {
-                        targetEl.appendChild(itemEL);
-                    }
+            //         var parentEL = folderElements[root];
+            //         if ( parentEL ) {
+            //             parentEL.appendChild(itemEL);
+            //         }
+            //         else {
+            //             targetEl.appendChild(itemEL);
+            //         }
 
-                    // reimport
-                    AssetDB.importAsset(fspath);
+            //         // reimport
+            //         AssetDB.importAsset(fspath);
 
-                }.bind(targetEl), 
+            //     }.bind(targetEl), 
 
-                function () {
-                    // console.log("finish walk");
-                }.bind(targetEl)
-            );
+            //     function () {
+            //         // console.log("finish walk");
+            //     }.bind(targetEl)
+            // );
             // TODO }: 
 
         },
