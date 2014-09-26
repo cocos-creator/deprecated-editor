@@ -26,10 +26,10 @@
 
         resize: function () {
             if ( this.renderContext !== null ) {
-                this.renderContext.size = new FIRE.Vec2( this.$.view.clientWidth, 
+                this.renderContext.size = new Fire.Vec2( this.$.view.clientWidth, 
                                                          this.$.view.clientHeight );
 
-                FIRE.Engine._scene.render(this.renderContext);
+                Fire.Engine._scene.render(this.renderContext);
             }
         },
 

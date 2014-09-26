@@ -33,8 +33,8 @@
             }
 
             // TODO:
-            // if ( this.$.fields.target instanceof FIRE_ED.Importer &&
-            //      obj instanceof FIRE_ED.Importer ) 
+            // if ( this.$.fields.target instanceof Fire.Importer &&
+            //      obj instanceof Fire.Importer ) 
             // {
             //     if ( this.$.fields.target.uuid === obj.uuid ) {
             //         return;
@@ -48,7 +48,7 @@
 
             this.$.fields.target = obj;
 
-            // if ( obj instanceof FIRE_ED.TextureImporter ) {
+            // if ( obj instanceof Fire.TextureImporter ) {
             //     var img = new Image(); 
             //     img.src = obj.rawfile;
             //     var div = document.createElement('div'); 

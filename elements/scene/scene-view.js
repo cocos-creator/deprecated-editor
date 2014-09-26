@@ -19,12 +19,12 @@
                 // create editor camera
                 if ( this.renderContext.camera === null ) {
                     // TODO: add this code to EditorUtils
-                    var cameraEnt = new FIRE.Entity();
-                    cameraEnt._objFlags |= FIRE.ObjectFlags.EditorOnly;
-                    var camera = cameraEnt.addComponent(FIRE.Camera);
+                    var cameraEnt = new Fire.Entity();
+                    cameraEnt._objFlags |= Fire._ObjectFlags.EditorOnly;
+                    var camera = cameraEnt.addComponent(Fire.Camera);
                     this.renderContext.camera = camera;
                     // NOTE: background setup must after camera set to render context
-                    camera.background = new FIRE.Color(0.4, 0.4, 0.4);
+                    camera.background = new Fire.Color(0.4, 0.4, 0.4);
                 }
 
                 this.$.view.appendChild(this.renderContext.canvas);
@@ -57,14 +57,14 @@
 
         resize: function () {
             if ( this.renderContext !== null ) {
-                this.renderContext.size = new FIRE.Vec2( this.$.view.clientWidth, 
+                this.renderContext.size = new Fire.Vec2( this.$.view.clientWidth, 
                                                          this.$.view.clientHeight );
             }
         },
 
         update: function () {
             if ( this.renderContext ) {
-                FIRE.Engine._scene.render(this.renderContext);
+                Fire.Engine._scene.render(this.renderContext);
             }
 
             window.requestAnimationFrame(this.update.bind(this));

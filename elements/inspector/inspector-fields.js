@@ -29,7 +29,7 @@
             if (klass.__props__) {
                 for (var p = 0; p < klass.__props__.length; p++) {
                     var propName = klass.__props__[p];
-                    var attrs = FIRE.attr(klass, propName);
+                    var attrs = Fire.attr(klass, propName);
 
                     // skip non-serializable
                     if ( attrs.serializable === false ) {

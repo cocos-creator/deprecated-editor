@@ -4,7 +4,7 @@ window.onload = function() {
     var ipc = require('ipc');
     var fireID = JSON.parse(decodeURIComponent(location.search.substr(8)));
 
-    var Fire = {
+    Fire.extend( Fire, {
         // console
         log: function ( text ) { 
             console.log(text); 
@@ -30,7 +30,7 @@ window.onload = function() {
         windowCommand: function ( name, args ) {
             ipc.send( 'window.command@' + fireID, name, args );
         },
-    };
+    });
     Fire.AssetDB = remote.getGlobal( 'AssetDB@' + fireID ); 
 
     window.Fire = Fire;

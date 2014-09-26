@@ -2,27 +2,27 @@
     Polymer({
 
         playAction: function ( event ) {
-            if ( !FIRE.Engine.isPlaying ) {
+            if ( !Fire.Engine.isPlaying ) {
                 this.$.play.setAttribute('active','');
                 this.setAttribute('active','');
-                FIRE.Engine.play();
+                Fire.Engine.play();
             }
             else {
                 this.$.play.removeAttribute('active');
                 this.$.pause.removeAttribute('active');
                 this.removeAttribute('active');
-                FIRE.Engine.stop();
+                Fire.Engine.stop();
             }
         },
 
         pauseAction: function ( event ) {
-            if ( !FIRE.Engine.isPaused ) {
+            if ( !Fire.Engine.isPaused ) {
                 this.$.pause.setAttribute('active','');
-                FIRE.Engine.pause();
+                Fire.Engine.pause();
             }
             else {
                 this.$.pause.removeAttribute('active');
-                FIRE.Engine.play();
+                Fire.Engine.play();
             }
         },
 
@@ -30,7 +30,7 @@
             this.$.pause.setAttribute('active','');
             this.$.play.setAttribute('active','');
             this.setAttribute('active','');
-            FIRE.Engine.step();
+            Fire.Engine.step();
         },
 
     });

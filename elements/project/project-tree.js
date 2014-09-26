@@ -332,7 +332,7 @@
                     click: function () {
                         if ( this.contextmenuAt instanceof ProjectItem ) {
                             var url = this.getUrl(this.contextmenuAt);
-                            Fire.AssetDB.saveAsset( Url.join( url, 'New Scene.fire' ), new FIRE._Scene() );
+                            Fire.AssetDB.saveAsset( Url.join( url, 'New Scene.fire' ), new Fire._Scene() );
                         }
                     }.bind(this)
                 },
@@ -875,14 +875,14 @@
                 // TODO: FireApp.fire( 'loadScene', { uuid: uuid } );
                 var url = this.getUrl(event.target);
                 var uuid = Fire.AssetDB.urlToUuid(url);
-                FIRE.AssetLibrary.loadAssetByUuid(uuid, function (asset, error) {
+                Fire.AssetLibrary.loadAssetByUuid(uuid, function (asset, error) {
                     if (error) {
                         console.error('Failed to load asset: ' + error);
                         return;
                     }
 
-                    if ( asset instanceof FIRE._Scene ) {
-                        FIRE.Engine._setCurrentScene(asset);
+                    if ( asset instanceof Fire._Scene ) {
+                        Fire.Engine._setCurrentScene(asset);
                     }
                 });
 
