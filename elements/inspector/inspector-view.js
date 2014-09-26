@@ -20,8 +20,8 @@
             // FireApp.on('selected', function ( event ) {
             //     if ( event.detail.uuid ) {
             //         // var asset = AssetLibrary.loadAssetByUuid(event.detail.uuid);
-            //         var fspath = AssetDB.uuidToFsysPath(event.detail.uuid);
-            //         var importer = AssetDB.getImporter(fspath);
+            //         var fspath = Fire.AssetDB.uuidToFsysPath(event.detail.uuid);
+            //         var importer = Fire.AssetDB.getImporter(fspath);
             //         this.inspect(importer);
             //     }
             // }.bind(this) );

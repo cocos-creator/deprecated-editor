@@ -1,26 +1,37 @@
 ﻿// skip "?fireID="
 window.onload = function() {
     var remote = require('remote');
+    var ipc = require('ipc');
     var fireID = JSON.parse(decodeURIComponent(location.search.substr(8)));
 
-    window.FireApp = new FireClient(fireID); 
-    window.AssetDB = remote.getGlobal( 'AssetDB@' + fireID ); 
-    window.FireConsole = {
+    var Fire = {
+        // console
         log: function ( text ) { 
             console.log(text); 
-            FireApp.command('console:log', text);
+            Fire.command('console:log', text);
         },
         warn: function ( text ) { 
             console.warn(text); 
-            FireApp.command('console:warn', text);
+            Fire.command('console:warn', text);
         },
         error: function ( text ) { 
             console.error(text); 
-            FireApp.command('console:error', text);
+            Fire.command('console:error', text);
         },
         hint: function ( text ) { 
             console.log('%c' + text, "color: blue"); 
-            FireApp.command('console:hint', text);
+            Fire.command('console:hint', text);
+        },
+
+        // app
+        command: function ( name, args ) {
+            ipc.send( 'command@' + fireID, name, args );
+        },
+        windowCommand: function ( name, args ) {
+            ipc.send( 'window.command@' + fireID, name, args );
         },
     };
+    Fire.AssetDB = remote.getGlobal( 'AssetDB@' + fireID ); 
+
+    window.Fire = Fire;
 };
