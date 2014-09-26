@@ -4,7 +4,7 @@ window.onload = function() {
     var ipc = require('ipc');
     var fireID = JSON.parse(decodeURIComponent(location.search.substr(8)));
 
-    Fire.extend( Fire, {
+    Fire.merge( Fire, {
         // console
         log: function ( text ) { 
             console.log(text); 
