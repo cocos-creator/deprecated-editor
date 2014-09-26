@@ -1,12 +1,11 @@
 (function () {
-    var Shell = require('shell');
     var Path = require('fire-path');
     var Url = require('fire-url');
 
-    var remote = require('remote');
+    var Remote = require('remote');
     var Ipc = require('ipc');
-    var Menu = remote.require('menu');
-    var MenuItem = remote.require('menu-item');
+    var Menu = Remote.require('menu');
+    var MenuItem = Remote.require('menu-item');
 
     // pathA = foo/bar,         pathB = foo/bar/foobar, return true
     // pathA = foo/bar,         pathB = foo/bar,        return true
@@ -172,15 +171,16 @@
             // confliction
             this.isValidForDrop = true;
             this.confliction = [];
-            this._cachedFolderElements = {};
 
             this._ipc_newItem = this.newItem.bind(this);
+            this._ipc_finishLoading = this.finishLoading.bind(this);
         },
 
         ready: function () {
             this.tabIndex = EditorUI.getParentTabIndex(this)+1;
 
             Ipc.on('project-tree:newItem', this._ipc_newItem );
+            Ipc.on('project-tree:finishLoading', this._ipc_finishLoading );
 
             this.addEventListener('mousemove', function ( event ) {
                 if ( this.startDragging ) {
@@ -321,162 +321,177 @@
 
         detached: function () {
             Ipc.removeListener('project-tree:newItem', this._ipc_newItem );
+            Ipc.removeListener('project-tree:finishLoading', this._ipc_finishLoading );
         },
 
         initContextMenu: function () {
-            var menu = new Menu();
-            menu.append(new MenuItem({ 
-                label: 'New Scene',
-                click: function () {
-                    if ( this.contextmenuAt instanceof ProjectItem ) {
-                        var fspath = this.getUrl(this.contextmenuAt);
-                        AssetDB.saveAsset( Path.join( fspath, 'New Scene.fire' ), new FIRE._Scene() );
-                    }
-                }.bind(this)
-            }));
-            menu.append(new MenuItem({ 
-                label: 'New Folder',
-                click: function () {
-                    if ( this.contextmenuAt instanceof ProjectItem ) {
-                        var fspath = this.getUrl(this.contextmenuAt);
-                        AssetDB.makedirs( Path.join( fspath, 'New Folder' ) );
-                    }
-                }.bind(this)
-            }));
-
-            menu.append(new MenuItem({ type: 'separator' })); 
-            menu.append(new MenuItem({ 
-                label: 'Show in finder',
-                click: function () {
-                    if ( this.contextmenuAt instanceof ProjectItem ) {
-                        var fspath = AssetDB.fspath(this.getUrl(this.contextmenuAt));
-                        Shell.showItemInFolder(fspath);
-                    }
-                }.bind(this)
-            }));
-            menu.append(new MenuItem({ 
-                label: 'Rename',
-                click: function () {
-                    if ( this.contextmenuAt instanceof ProjectItem ) {
-                        this.contextmenuAt.rename();
-                    }
-                }.bind(this)
-            }));
-            menu.append(new MenuItem({ 
-                label: 'Delete',
-                click: function () {
-                    if ( this.contextmenuAt instanceof ProjectItem ) {
-                        var url = this.getUrl(this.contextmenuAt);
-                        AssetDB.deleteAsset(url);
-                    }
-                }.bind(this)
-            }));
-
-            menu.append(new MenuItem({ type: 'separator' })); 
-            menu.append(new MenuItem({ 
-                label: 'Reimport',
-                click: function () {
-                    if ( this.contextmenuAt instanceof ProjectItem ) {
-                        var selectedItemEl = this.contextmenuAt;
-                        var url = this.getUrl(selectedItemEl);
-                        
-                        // check url whether exists
-                        if (!AssetDB.exists(url)) {
-                            selectedItemEl.remove();
-                            return;
+            var template = [
+                // New Scene
+                {
+                    label: 'New Scene',
+                    click: function () {
+                        if ( this.contextmenuAt instanceof ProjectItem ) {
+                            var url = this.getUrl(this.contextmenuAt);
+                            AssetDB.saveAsset( Url.join( url, 'New Scene.fire' ), new FIRE._Scene() );
                         }
-                        var fspath = AssetDB.fspath(url);
+                    }.bind(this)
+                },
 
-                        if (selectedItemEl.isFolder) {
+                // New Folder
+                {
+                    label: 'New Folder',
+                    click: function () {
+                        if ( this.contextmenuAt instanceof ProjectItem ) {
+                            var url = this.getUrl(this.contextmenuAt);
+                            AssetDB.makedirs( Url.join( url, 'New Folder' ) );
+                        }
+                    }.bind(this)
+                },
 
-                            // remove assetdb items
-                            AssetDB.clean(url);
+                // =====================
+                { type: 'separator' },
 
-                            // remove childnodes
-                            while (selectedItemEl.firstChild) {
-                                selectedItemEl.removeChild(selectedItemEl.firstChild);
+                // Show in finder
+                {
+                    label: 'Show in finder',
+                    click: function () {
+                        if ( this.contextmenuAt instanceof ProjectItem ) {
+                            FireApp.command( 'asset-db:explore', this.getUrl(this.contextmenuAt) );
+                        }
+                    }.bind(this)
+                },
+
+
+                // Rename
+                {
+                    label: 'Rename',
+                    click: function () {
+                        if ( this.contextmenuAt instanceof ProjectItem ) {
+                            this.contextmenuAt.rename();
+                        }
+                    }.bind(this)
+                },
+
+                // Delete
+                {
+                    label: 'Delete',
+                    click: function () {
+                        if ( this.contextmenuAt instanceof ProjectItem ) {
+                            var url = this.getUrl(this.contextmenuAt);
+                            AssetDB.deleteAsset(url);
+                        }
+                    }.bind(this)
+                },
+                
+                // =====================
+                { type: 'separator' },
+
+                // Reimport
+                { 
+                    label: 'Reimport',
+                    click: function () {
+                        if ( this.contextmenuAt instanceof ProjectItem ) {
+                            var selectedItemEl = this.contextmenuAt;
+                            var url = this.getUrl(selectedItemEl);
+                            
+                            // check url whether exists
+                            if (!AssetDB.exists(url)) {
+                                selectedItemEl.remove();
+                                return;
                             }
+                            var fspath = AssetDB.fspath(url);
 
-                            // reimport self
-                            if( !selectedItemEl.isRoot ) {
+                            if (selectedItemEl.isFolder) {
+
+                                // remove assetdb items
+                                AssetDB.clean(url);
+
+                                // remove childnodes
+                                while (selectedItemEl.firstChild) {
+                                    selectedItemEl.removeChild(selectedItemEl.firstChild);
+                                }
+
+                                // reimport self
+                                if( !selectedItemEl.isRoot ) {
+                                    AssetDB.importAsset(fspath);
+                                }
+
+                                var folderElements = {};
+                                AssetDB.walk( 
+                                    url, 
+
+                                    function ( root, name, isDirectory ) {
+                                        var itemEL = null;
+                                        var fspath = Path.join(root, name);
+
+                                        if ( isDirectory ) {
+                                            itemEL = _newProjectItem( fspath, 'folder' );
+                                            folderElements[fspath] = itemEL;
+                                        }
+                                        else {
+                                            itemEL = _newProjectItem( fspath );
+                                        }
+
+                                        var parentEL = folderElements[root];
+                                        if ( parentEL ) {
+                                            parentEL.appendChild(itemEL);
+                                        }
+                                        else {
+                                            selectedItemEl.appendChild(itemEL);
+                                        }
+
+                                        // reimport
+                                        AssetDB.importAsset(fspath);
+
+                                    }.bind(this), 
+
+                                    function () {
+                                        // console.log("finish walk");
+                                    }.bind(this)
+                                );
+
+                            }
+                            else {
+                                // reimport file
                                 AssetDB.importAsset(fspath);
                             }
-
-                            var folderElements = {};
-                            AssetDB.walk( 
-                                url, 
-
-                                function ( root, name, isDirectory ) {
-                                    var itemEL = null;
-                                    var fspath = Path.join(root, name);
-
-                                    if ( isDirectory ) {
-                                        itemEL = _newProjectItem( fspath, 'folder' );
-                                        folderElements[fspath] = itemEL;
-                                    }
-                                    else {
-                                        itemEL = _newProjectItem( fspath );
-                                    }
-
-                                    var parentEL = folderElements[root];
-                                    if ( parentEL ) {
-                                        parentEL.appendChild(itemEL);
-                                    }
-                                    else {
-                                        selectedItemEl.appendChild(itemEL);
-                                    }
-
-                                    // reimport
-                                    AssetDB.importAsset(fspath);
-
-                                }.bind(this), 
-
-                                function () {
-                                    // console.log("finish walk");
-                                }.bind(this)
-                            );
-
+                            
                         }
-                        else {
-                            // reimport file
-                            AssetDB.importAsset(fspath);
-                        }
-                        
-                    }
-                }.bind(this)
-            }));
-
-            this.contextmenu = menu;
+                    }.bind(this)
+                },
+            ];
+            this.contextmenu = Menu.buildFromTemplate(template);
         },
 
         load: function ( url ) {
+            console.time('project-tree:loading');
+            FireConsole.hint('start loading ' + url);
+
             var rootEL = _newProjectItem( url, 'root' );
             rootEL.style.marginLeft = "0px";
             this.appendChild(rootEL);
-            this._cachedFolderElements = {};
-            this._cachedFolderElements[url] = rootEL;
 
             FireApp.command( 'asset-db:browse', url );
         },
 
+        finishLoading: function ( url ) {
+            FireConsole.hint('finish loading ' + url);
+            console.timeEnd('project-tree:loading');
+        },
+
         newItem: function ( url, isDirectory ) {
-            var itemEL = null;
-            if ( isDirectory ) {
-                itemEL = _newProjectItem( url, 'folder' );
-                this._cachedFolderElements[url] = itemEL;
-            }
-            else {
-                itemEL = _newProjectItem( url );
+            var newEL = _newProjectItem( url, isDirectory ? 'folder' : null );
+
+            //
+            var parentUrl = Url.dirname(url);
+            var parentEL = this.getElement(parentUrl);
+            if ( parentEL === null ) {
+                FireConsole.warn('Can not find element for ' + parentUrl);
+                return;
             }
 
-            var dirurl = Url.dirname(url);
-            var parentEL = this._cachedFolderElements[dirurl];
-            if ( parentEL ) {
-                parentEL.appendChild(itemEL);
-            }
-            else {
-                FireConsole.error('Can not find element for ' + dirurl);
-            }
+            // binary insert
+            _binaryInsert ( parentEL, newEL );
         },
 
         toggle: function ( items ) {
@@ -953,7 +968,7 @@
                 this.select([this.contextmenuAt]);
             }
 
-            this.contextmenu.popup(event.x, event.y);
+            this.contextmenu.popup(Remote.getCurrentWindow());
             event.stopPropagation();
         },
 
