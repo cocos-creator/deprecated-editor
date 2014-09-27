@@ -127,6 +127,11 @@ var EditorApp;
                 break;
             }
         }, true );
+
+        nativeMainWin.on('focus', function() {
+            AssetDB.update();
+        });
+
     };
 
     var _mainWin = null;

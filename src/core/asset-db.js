@@ -12,6 +12,9 @@ var AssetDB;
     var _importers = {};
     var _libraryPath = ""; // the path of library
 
+    var _folders = [];
+    var _files = {};
+
     var _newFolderMeta = function ( type ) {
         return {
             ver: 0,
@@ -157,7 +160,7 @@ var AssetDB;
             }
 
             // NOTE: do not use `!(meta instanceof FIRE_ED.Importer)` here
-            if ( meta.constructor !== importerDef ) {
+            if ( meta && meta.constructor !== importerDef ) {
                 meta = null;
             }
         }
@@ -512,7 +515,14 @@ var AssetDB;
     // import any changes
     AssetDB.refresh = function () {
         var doImportAsset = function ( root, name, stat ) {
-            AssetDB.importAsset( Path.join(root,name) );
+            var fspath = Path.join(root,name);
+            if (stat.isDirectory()) { // folder
+                _folders.push(fspath);
+            }
+            else {
+                _files[fspath] = {mtime: stat.mtime.getTime()};
+            }
+            AssetDB.importAsset(fspath);
         };
 
         var doRefresh = function (root, statsArray, next) {
@@ -553,6 +563,10 @@ var AssetDB;
                 directories: doRefresh,
             },
         };
+
+        _folders = [];
+        _files = {};
+
         for ( var name in _mounts ) {
             // AssetDB.walk ( name + ":/", doImport );
             var fspath = _fspath( name + ":/" );
@@ -635,4 +649,139 @@ var AssetDB;
         // Walk.walkSync(fspath, options);
     };
 
+    var _arrayDiff = function(a1, a2) {
+        return a1.filter(function(i) {return a2.indexOf(i) < 0;});
+    };
+
+    var _filesDiffByPath = function(cur, prev) {
+
+        var res = {};
+        res.added = [];
+        res.removed = [];
+        res.changed = [];
+
+        var fspath;
+        for (fspath in cur) {
+            if (prev[fspath] === undefined) {
+                res.added.push(fspath);
+            }
+            else {
+                if(cur[fspath].mtime !== prev[fspath].mtime || !Fs.existsSync(fspath + '.meta')) {
+                    res.changed.push(fspath);
+                }
+
+                delete prev[fspath];
+            }
+        }
+
+        for (fspath in prev) {
+            res.removed.push(fspath);
+        }
+
+        return res;
+    };
+
+    var _fspathToUrl = function (fspath) {
+        var assetsDir = _mounts.assets;
+        var relaPath = Path.relative(assetsDir, fspath);
+        return 'assets://' + relaPath;
+    };
+
+
+    AssetDB.update = function() {
+        var assetsDir = _mounts.assets;
+
+        var curFolders = [];
+        var curFiles = {};
+
+        var walkFiles = function (root, statsArray, next) {
+            root = Path.resolve(root); // NOTE: bug for windows in Walk
+            for ( var i = 0; i < statsArray.length; ++i ) {
+                var stats = statsArray[i];
+                if ( stats.name[0] !== '.' ) {
+                    var extname = Path.extname(stats.name);
+                    if ( extname !== '.meta' ) {
+                        if ( extname === '.' || (stats.isDirectory() === false && extname === '') ) {
+                            continue;
+                        }
+                        var fspath = Path.join(root, stats.name);
+                        curFiles[fspath] = {mtime: stats.mtime.getTime()};
+                    }
+                    else {
+                        var basename = Path.basename(stats.name,'.meta');
+                        var rawfile = Path.join(root,basename);
+                        if ( Fs.existsSync(rawfile) === false ) {
+                            Fs.unlink( Path.join(root,stats.name) );
+                        }
+                    }
+                }
+
+            }
+            next();
+        };
+
+        var walkFolders = function (root, statsArray, next) {
+            root = Path.resolve(root); // NOTE: bug for windows in Walk
+            for ( var i = 0; i < statsArray.length; ++i ) {
+                var stats = statsArray[i];
+                if ( stats.name[0] !== '.' ) {
+                    var fspath = Path.join(root, stats.name);
+                    curFolders.push(fspath);
+                }
+            }
+            next();
+        };
+
+        var walkOptions = {
+            listeners: {
+                files: walkFiles,
+                directories: walkFolders,
+            },
+        };
+
+        Walk.walkSync(assetsDir, walkOptions);
+
+        var i, fspath;
+
+        var addedFolders = _arrayDiff(curFolders, _folders);
+        var removedFolders = _arrayDiff(_folders, curFolders);
+        var filesDiff = _filesDiffByPath(curFiles, _files);
+
+        // delete project item
+        for (i = 0; i < filesDiff.removed.length; i++) {
+            fspath = filesDiff.removed[i];
+            var uuid = _pathToUuid[fspath];
+            delete _pathToUuid[fspath];
+            delete _uuidToPath[uuid];
+            EditorApp.fire('assetDeleted', {url: _fspathToUrl(fspath)});
+        }
+
+        // delete project item
+        for (i = 0; i < removedFolders.length; i++) {
+            EditorApp.fire('assetDeleted', {url: _fspathToUrl(removedFolders[i])});
+        }
+
+        // import and create project item 
+        for (i = 0; i < addedFolders.length; i++) {
+            fspath = addedFolders[i];
+            AssetDB.importAsset(fspath);
+            EditorApp.fire('folderCreated', {url: _fspathToUrl(fspath)});
+        }
+
+        // import and create project item 
+        for (i = 0; i < filesDiff.added.length; i++) {
+            fspath = filesDiff.added[i];
+            AssetDB.importAsset(fspath);
+            EditorApp.fire('assetCreated', {url: _fspathToUrl(fspath)});
+        }
+
+        // reimport changed files
+        for (i = 0; i < filesDiff.changed.length; i++) {
+            fspath = filesDiff.changed[i];
+            AssetDB.importAsset(fspath);
+        }
+
+        _folders = curFolders;
+        _files = curFiles;
+    };
 })(AssetDB || (AssetDB = {}));
