@@ -19,7 +19,6 @@ var paths = {
     elements_html: 'elements/**/*.html',
     elements_js:   'elements/**/*.js',
     src: [
-        'src/fire-client.js',
         'src/bootstrap.js',
     ]
 };

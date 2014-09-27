@@ -173,16 +173,24 @@
             this.confliction = [];
 
             this._ipc_newItem = this.newItem.bind(this);
+            this._ipc_newFolder = function ( url ) {
+                this.newItem( url, true );
+            }.bind(this);
             this._ipc_deleteItem = this.deleteItem.bind(this);
             this._ipc_finishLoading = this.finishLoading.bind(this);
+            this._ipc_moveItem = this.moveItem.bind(this);
         },
 
         ready: function () {
             this.tabIndex = EditorUI.getParentTabIndex(this)+1;
 
             Ipc.on('project-tree:newItem', this._ipc_newItem );
-            Ipc.on('project-tree:deleteItem', this._ipc_deleteItem );
+            Ipc.on('project-tree:deleteItem', this._ipc_newItem );
             Ipc.on('project-tree:finishLoading', this._ipc_finishLoading );
+
+            Ipc.on('folder:created', this._ipc_newFolder );
+            Ipc.on('asset:moved', this._ipc_moveItem );
+            Ipc.on('asset:deleted', this._ipc_deleteItem );
 
             this.addEventListener('mousemove', function ( event ) {
                 if ( this.startDragging ) {
@@ -255,25 +263,6 @@
 
             // TODO
             // FireApp.on('assetMoved', function ( event ) {
-            //     var srcEL = this.getElement( event.detail.srcUrl );
-            //     if ( srcEL === null ) {
-            //         console.warn( 'Can not find source element: ' + event.detail.srcUrl );
-            //         return;
-            //     }
-
-            //     var destEL = this.getElement( Path.dirname(event.detail.destUrl) );
-            //     if ( destEL === null ) {
-            //         console.warn( 'Can not find dest element: ' + event.detail.destUrl );
-            //         return;
-            //     }
-
-            //     var destExtname = Path.extname(event.detail.destUrl);
-            //     var destBasename = Path.basename(event.detail.destUrl, destExtname);
-            //     srcEL.extname = destExtname;
-            //     srcEL.basename = destBasename;
-
-            //     // binary insert
-            //     _binaryInsert ( destEL, srcEL );
             // }.bind(this) );
 
             // FireApp.on('assetDeleted', function ( event ) {
@@ -325,6 +314,10 @@
             Ipc.removeListener('project-tree:newItem', this._ipc_newItem );
             Ipc.removeListener('project-tree:deleteItem', this._ipc_deleteItem );
             Ipc.removeListener('project-tree:finishLoading', this._ipc_finishLoading );
+
+            Ipc.removeListener('folder:created', this._ipc_newFolder );
+            Ipc.removeListener('asset:moved', this._ipc_moveItem );
+            Ipc.removeListener('asset:deleted', this._ipc_deleteItem );
         },
 
         initContextMenu: function () {
@@ -346,7 +339,7 @@
                     click: function () {
                         if ( this.contextmenuAt instanceof ProjectItem ) {
                             var url = this.getUrl(this.contextmenuAt);
-                            Fire.AssetDB.makedirs( Url.join( url, 'New Folder' ) );
+                            Fire.rpc( 'asset-db:makedirs', Url.join( url, 'New Folder' ) );
                         }
                     }.bind(this)
                 },
@@ -412,8 +405,8 @@
         },
 
         load: function ( url ) {
-            console.time('project-tree:loading');
-            Fire.hint('start loading ' + url);
+            console.time('project-tree:load');
+            Fire.hint('start browsing ' + url);
 
             var rootEL = _newProjectItem( url, 'root' );
             rootEL.style.marginLeft = "0px";
@@ -423,8 +416,8 @@
         },
 
         finishLoading: function ( url ) {
-            Fire.hint('finish loading ' + url);
-            console.timeEnd('project-tree:loading');
+            Fire.hint('finish browsing ' + url);
+            console.timeEnd('project-tree:load');
         },
 
         newItem: function ( url, isDirectory ) {
@@ -449,6 +442,28 @@
                 return;
             }
             el.remove();
+        },
+
+        moveItem: function ( srcUrl, destUrl ) {
+            var srcEL = this.getElement( srcUrl );
+            if ( srcEL === null ) {
+                Fire.warn( 'Can not find source element: ' + srcUrl );
+                return;
+            }
+
+            var destEL = this.getElement( Path.dirname(destUrl) );
+            if ( destEL === null ) {
+                Fire.warn( 'Can not find dest element: ' + destUrl );
+                return;
+            }
+
+            var destExtname = Path.extname(destUrl);
+            var destBasename = Path.basename(destUrl, destExtname);
+            srcEL.extname = destExtname;
+            srcEL.basename = destBasename;
+
+            // binary insert
+            _binaryInsert ( destEL, srcEL );
         },
 
         toggle: function ( items ) {
@@ -820,9 +835,9 @@
         namechangedAction: function (event) {
             if ( event.target instanceof ProjectItem ) {
                 this.focus();
-                var srcPath = this.getUrl(event.target);
-                var destPath = Path.dirname(srcPath) + "/" + event.detail.name + event.target.extname;
-                Fire.AssetDB.moveAsset( srcPath, destPath );
+                var srcUrl = this.getUrl(event.target);
+                var destUrl = Url.join( Url.dirname(srcUrl), event.detail.name + event.target.extname );
+                Fire.command('asset-db:move', srcUrl, destUrl );
             }
             event.stopPropagation();
         },

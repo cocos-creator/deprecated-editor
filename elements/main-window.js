@@ -12,25 +12,12 @@
                 event.preventDefault();
                 event.stopPropagation();
             } );
-            document.addEventListener( "keydown", function ( event ) {
-                switch ( event.keyCode ) {
-                    // TEST
-                    // F3
-                    case 114:
-                    break;
 
-                    // F5
-                    case 116:
-                        nativeMainWin.reload();
-                    break;
-
-                    // F12
-                    case 123:
-                        nativeMainWin.showDevTools();
-                        event.stopPropagation();
-                    break;
-                }
-            }, true );
+            // NOTE: this will prevent mac touchpad scroll the body
+            document.body.onscroll = function ( event ) {
+                document.body.scrollLeft = 0;
+                document.body.scrollTop = 0;
+            };
 
             // init project-tree
             this.$.projectView.load("assets://");
