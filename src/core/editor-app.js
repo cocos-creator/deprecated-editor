@@ -120,6 +120,11 @@ var EditorApp;
                     nativeMainWin.reload();
                 break;
 
+                // F6 for debug AssetDB.update()
+                case 117:
+                    AssetDB.update();
+                break;
+
                 // F12
                 case 123:
                     nativeMainWin.showDevTools();

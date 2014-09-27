@@ -784,4 +784,36 @@ var AssetDB;
         _folders = curFolders;
         _files = curFiles;
     };
+
+    // for test
+    AssetDB.getFiles = function() {
+        return _files;
+    };
+
+    AssetDB.getFolders = function() {
+        return _folders;
+    };
+    
+    AssetDB.pathToUuid = function() {
+        return _pathToUuid;
+    };
+
+    AssetDB.uuidToPath = function() {
+        return _uuidToPath;
+    };
+
+    AssetDB.fspathToUrl = function(fspath) {
+        return _fspathToUrl(fspath);
+    };
+    
+    AssetDB.testInit = function ( projectDir ) {
+        AssetDB.registerImporter( ['unknown'], FIRE_ED.Importer );
+        AssetDB.mount( Path.join(projectDir,'assets'), 'assets');
+    }; 
+
+
 })(AssetDB || (AssetDB = {}));
+
+if (typeof module !== "undefined" && module) {
+    module.exports = AssetDB;
+}

@@ -13,6 +13,9 @@
     "height": 720,
     "show": false
   },
+  "scripts": {
+    "test": "./node_modules/.bin/mocha ./test/test.js --timeout 10000"
+  },
   "dependencies": {
     "minimist": "",
     "walk": "",
@@ -31,6 +34,7 @@
     "jshint-stylish": "",
     "event-stream": "",
     "q": "",
-    "express": ""
+    "express": "",
+    "mocha": ""
   }
 }
