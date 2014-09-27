@@ -95,12 +95,6 @@
         case '.png':
         case '.jpg':
             var img = new Image();
-            // TODO: make this possible
-            // img.src = Url.format({
-            //     protocol: 'assets',
-            //     pathname: fspath, 
-            //     slashes: true
-            // });
             img.src = url;
             newEL.setIcon(img);
             break;
@@ -176,6 +170,9 @@
             this._ipc_newFolder = function ( url ) {
                 this.newItem( url, true );
             }.bind(this);
+            this._ipc_newAsset = function ( url ) {
+                this.newItem( url, false );
+            }.bind(this);
             this._ipc_deleteItem = this.deleteItem.bind(this);
             this._ipc_finishLoading = this.finishLoading.bind(this);
             this._ipc_moveItem = this.moveItem.bind(this);
@@ -183,15 +180,9 @@
 
         ready: function () {
             this.tabIndex = EditorUI.getParentTabIndex(this)+1;
+            this.initContextMenu();
 
-            Ipc.on('project-tree:newItem', this._ipc_newItem );
-            Ipc.on('project-tree:deleteItem', this._ipc_newItem );
-            Ipc.on('project-tree:finishLoading', this._ipc_finishLoading );
-
-            Ipc.on('folder:created', this._ipc_newFolder );
-            Ipc.on('asset:moved', this._ipc_moveItem );
-            Ipc.on('asset:deleted', this._ipc_deleteItem );
-
+            // register events
             this.addEventListener('mousemove', function ( event ) {
                 if ( this.startDragging ) {
                     var dx = event.x - this.startDragAt[0]; 
@@ -261,53 +252,15 @@
                 }
             }, true);
 
-            // TODO
-            // FireApp.on('assetMoved', function ( event ) {
-            // }.bind(this) );
+            // register Ipc
+            Ipc.on('project-tree:newItem', this._ipc_newItem );
+            Ipc.on('project-tree:deleteItem', this._ipc_newItem );
+            Ipc.on('project-tree:finishLoading', this._ipc_finishLoading );
 
-            // FireApp.on('assetDeleted', function ( event ) {
-            //     var el = this.getElement( event.detail.url );
-            //     if ( el === null ) {
-            //         console.warn( 'Can not find source element: ' + event.detail.url );
-            //         return;
-            //     }
-            //     el.parentElement.removeChild(el);
-            // }.bind(this) );
-
-            // FireApp.on('folderCreated', function ( event ) {
-            //     var parentUrl = Path.dirname(event.detail.url);
-            //     var parentEL = this.getElement(parentUrl);
-            //     if ( parentEL === null ) {
-            //         console.warn( 'Can not find element at ' + parentUrl );
-            //         return;
-            //     }
-
-            //     // create new folder
-            //     var fspath = Fire.AssetDB.fspath(event.detail.url);
-            //     var newEL = _newProjectItem( fspath, 'folder' );
-
-            //     // binary insert
-            //     _binaryInsert ( parentEL, newEL );
-            // }.bind(this) );
-
-            // FireApp.on('assetCreated', function ( event ) {
-            //     var parentUrl = Path.dirname(event.detail.url);
-            //     var parentEL = this.getElement(parentUrl);
-            //     if ( parentEL === null ) {
-            //         console.warn( 'Can not find element at ' + parentUrl );
-            //         return;
-            //     }
-            //     var extname = Path.extname(event.detail.url);
-
-            //     // create new folder
-            //     var fspath = Fire.AssetDB.fspath(event.detail.url);
-            //     var newEL = _newProjectItem( fspath, extname );
-
-            //     // binary insert
-            //     _binaryInsert ( parentEL, newEL );
-            // }.bind(this) );
-
-            this.initContextMenu();
+            Ipc.on('folder:created', this._ipc_newFolder );
+            Ipc.on('asset:created', this._ipc_newAsset );
+            Ipc.on('asset:moved', this._ipc_moveItem );
+            Ipc.on('asset:deleted', this._ipc_deleteItem );
         },
 
         detached: function () {
@@ -316,6 +269,7 @@
             Ipc.removeListener('project-tree:finishLoading', this._ipc_finishLoading );
 
             Ipc.removeListener('folder:created', this._ipc_newFolder );
+            Ipc.removeListener('asset:created', this._ipc_newAsset );
             Ipc.removeListener('asset:moved', this._ipc_moveItem );
             Ipc.removeListener('asset:deleted', this._ipc_deleteItem );
         },
@@ -328,7 +282,10 @@
                     click: function () {
                         if ( this.contextmenuAt instanceof ProjectItem ) {
                             var url = this.getUrl(this.contextmenuAt);
-                            Fire.AssetDB.saveAsset( Url.join( url, 'New Scene.fire' ), new Fire._Scene() );
+                            var newScene = new Fire._Scene();
+                            Fire.command( 'asset-db:save', 
+                                          Url.join( url, 'New Scene.fire' ), 
+                                          Fire.serialize(newScene) );
                         }
                     }.bind(this)
                 },
@@ -691,15 +648,7 @@
                 if ( _includePath(url,targetUrl) === false ) {
                     var srcUrl = url;
                     var destUrl = Path.join( targetUrl, el.basename + el.extname );
-
-                    //
-                    try {
-                        Fire.AssetDB.moveAsset( srcUrl, destUrl );
-                    }
-                    catch (err) {
-                        console.error(err);
-                        // TODO: failed
-                    }
+                    Fire.command('asset-db:move', srcUrl, destUrl );
                 }
             }
         },
@@ -844,12 +793,12 @@
 
         openAction: function (event) {
             if ( event.target instanceof ProjectItem ) {
-                // TODO: FireApp.fire( 'loadScene', { uuid: uuid } );
+                // TODO: Fire.broadcast( 'scene:load', uuid );
                 var url = this.getUrl(event.target);
                 var uuid = Fire.AssetDB.urlToUuid(url);
                 Fire.AssetLibrary.loadAssetByUuid(uuid, function (asset, error) {
                     if (error) {
-                        console.error('Failed to load asset: ' + error);
+                        Fire.error('Failed to load asset: ' + error);
                         return;
                     }
 
@@ -981,7 +930,7 @@
                             }
                             this.lastActive = prev;
                             this.select([this.lastActive]);
-                            // this.confirmSelect();
+                            this.confirmSelect();
                         }
                         event.preventDefault();
                         event.stopPropagation();
@@ -997,7 +946,7 @@
                             }
                             this.lastActive = next;
                             this.select([this.lastActive]);
-                            // this.confirmSelect();
+                            this.confirmSelect();
                         }
                         event.preventDefault();
                         event.stopPropagation();

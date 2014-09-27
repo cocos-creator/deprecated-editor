@@ -114,7 +114,8 @@
         },
 
         dblclickAction: function ( event ) {
-            this.fire('open');
+            if ( !this.isFolder )
+                this.fire('open');
             event.stopPropagation();
         },
 
