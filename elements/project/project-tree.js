@@ -796,17 +796,7 @@
                 // TODO: Fire.broadcast( 'scene:load', uuid );
                 var url = this.getUrl(event.target);
                 var uuid = Fire.AssetDB.urlToUuid(url);
-                Fire.AssetLibrary.loadAssetByUuid(uuid, function (asset, error) {
-                    if (error) {
-                        Fire.error('Failed to load asset: ' + error);
-                        return;
-                    }
-
-                    if ( asset instanceof Fire._Scene ) {
-                        Fire.Engine._setCurrentScene(asset);
-                    }
-                });
-
+                Fire.Engine.loadScene(uuid, function (scene) {});
             }
             event.stopPropagation();
         },
