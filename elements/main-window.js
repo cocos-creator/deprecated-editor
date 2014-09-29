@@ -22,15 +22,6 @@
             // init project-tree
             this.$.projectView.load("assets://");
 
-            // register engine callback
-            var editorCallback = Fire.Engine._editorCallback;
-            editorCallback.onTransformCreated = this.onTransformCreated.bind(this);
-            editorCallback.onTransformRemoved = this.onTransformRemoved.bind(this);
-            editorCallback.onTransformParentChanged = this.onTransformParentChanged.bind(this);
-            editorCallback.onTransformIndexChanged = this.onTransformIndexChanged.bind(this);
-            editorCallback.onSceneLaunched = this.onSceneLaunched.bind(this);
-            editorCallback.onSceneLoaded = this.onSceneLoaded.bind(this);
-            
             // init engine & game-view
             Fire.AssetLibrary.init(Fire.AssetDB.getLibraryPath());
             Fire.log('fire-engine initializing...');
@@ -67,20 +58,6 @@
         resizedAction: function () {
             this.$.gameView.resize();
             this.$.sceneView.resize();
-        },
-
-        // TODO: 改成消息
-        onTransformCreated: function () {
-        },
-        onTransformRemoved: function () {
-        },
-        onTransformParentChanged: function () {
-        },
-        onTransformIndexChanged: function () {
-        },
-        onSceneLaunched: function () {
-        },
-        onSceneLoaded: function () {
         },
 
     });

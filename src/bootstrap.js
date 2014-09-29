@@ -34,14 +34,17 @@ window.onload = function() {
 
             // app
             command: function ( name ) {
+                'use strict';
                 var args = arguments.length > 1 ? [].slice.call( arguments, 1 ) : [];
                 ipc.send.apply( ipc, ['command@' + fireID, name].concat(args) );
             },
             broadcast: function ( name ) {
+                'use strict';
                 var args = arguments.length > 1 ? [].slice.call( arguments, 1 ) : [];
                 ipc.send.apply( ipc, ['broadcast@' + fireID, name].concat(args) );
             },
             rpc: function ( name ) {
+                'use strict';
                 var args = arguments.length > 1 ? [].slice.call( arguments, 1 ) : [];
                 ipc.send.apply( ipc, ['rpc@' + fireID, name].concat(args) );
             },

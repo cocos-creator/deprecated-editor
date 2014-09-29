@@ -254,7 +254,7 @@
 
             // register Ipc
             Ipc.on('project-tree:newItem', this._ipc_newItem );
-            Ipc.on('project-tree:deleteItem', this._ipc_newItem );
+            Ipc.on('project-tree:deleteItem', this._ipc_deleteItem );
             Ipc.on('project-tree:finishLoading', this._ipc_finishLoading );
 
             Ipc.on('folder:created', this._ipc_newFolder );
