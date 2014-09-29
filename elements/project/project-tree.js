@@ -471,9 +471,8 @@
         confirmSelect: function () {
             if ( this.selection.length > 0 ) {
                 var uuid = Fire.AssetDB.urlToUuid(this.getUrl(this.selection[0]));
-
-                // TEMP TODO 
-                // FireApp.fire( 'selected', { uuid: uuid } );
+                // TODO: should we change this to selection:changed ?? and use global Selection
+                Fire.broadcast( 'asset:selected', uuid );
             }
         },
 
