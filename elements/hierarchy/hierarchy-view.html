@@ -1,0 +1,17 @@
+<polymer-element 
+    name="hierarchy-view" 
+    constructor="HierarchyView"
+    >
+    <template>
+        <link rel="stylesheet" href="../project/project-view.css">
+
+        <div flex-row flex-stretch style="margin-bottom: 2px;">
+            <fire-ui-button>Create</fire-ui-button>
+            <span class="space"></span>
+            <fire-ui-text-input flex-1></fire-ui-text-input>  
+        </div>
+        <hierarchy-tree id="hierarchyTree" flex-1></hierarchy-tree>
+
+    </template>
+    <script type="text/javascript" src="hierarchy-view.js"></script>
+</polymer-element>
