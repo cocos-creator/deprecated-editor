@@ -1,5 +1,5 @@
 (function () {
-    var remote = require('remote');
+    var Ipc = require('ipc');
 
     Polymer({
         publish: {
@@ -11,20 +11,25 @@
 
         created: function () {
             this.focused = false;
+
+            this._ipc_inspectAsset = this.inspectAsset.bind(this);
         },
 
         ready: function () {
             this.tabIndex = EditorUI.getParentTabIndex(this)+1;
 
-            // TODO
-            // FireApp.on('selected', function ( event ) {
-            //     if ( event.detail.uuid ) {
-            //         // var asset = AssetLibrary.loadAssetByUuid(event.detail.uuid);
-            //         var fspath = Fire.AssetDB.uuidToFsysPath(event.detail.uuid);
-            //         var importer = Fire.AssetDB.getImporter(fspath);
-            //         this.inspect(importer);
-            //     }
-            // }.bind(this) );
+            // register Ipc
+            Ipc.on('asset:selected', this._ipc_inspectAsset );
+        },
+
+        detached: function () {
+            Ipc.removeListener('asset:selected', this._ipc_inspectAsset );
+        },
+
+        inspectAsset: function ( uuid ) {
+            var meta = Fire.AssetDB.loadMeta(uuid);
+            var importer = Fire.deserialize(meta);
+            this.inspect(importer);
         },
 
         inspect: function ( obj ) {
@@ -32,8 +37,9 @@
                 return;
             }
 
-            // TODO:
-            // if ( this.$.fields.target instanceof Fire.Importer &&
+            // 
+            // if ( this.$.fields.target &&
+            //      this.$.fields.target instanceof Fire.Importer &&
             //      obj instanceof Fire.Importer ) 
             // {
             //     if ( this.$.fields.target.uuid === obj.uuid ) {
@@ -48,18 +54,18 @@
 
             this.$.fields.target = obj;
 
-            // if ( obj instanceof Fire.TextureImporter ) {
-            //     var img = new Image(); 
-            //     img.src = obj.rawfile;
-            //     var div = document.createElement('div'); 
-            //     div.classList.add('background');
-            //     div.appendChild(img);
-            //     this.$.preview.appendChild(div);
-            //     this.$.preview.removeAttribute('hidden');
-            // }
-            // else {
-            //     this.$.preview.setAttribute('hidden','');
-            // }
+            if ( obj instanceof Fire.TextureImporter ) {
+                var img = new Image(); 
+                img.src = "uuid://" + obj.uuid;
+                var div = document.createElement('div'); 
+                div.classList.add('background');
+                div.appendChild(img);
+                this.$.preview.appendChild(div);
+                this.$.preview.removeAttribute('hidden');
+            }
+            else {
+                this.$.preview.setAttribute('hidden','');
+            }
         },
     });
 })();
