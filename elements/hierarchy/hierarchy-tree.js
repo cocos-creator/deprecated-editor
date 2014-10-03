@@ -19,17 +19,26 @@
 
             this._idToItem = {};
             this._ipc_newItem = this.newItem.bind(this);
+            // TODO: others
+        },
+
         ready: function () {
             this.tabIndex = EditorUI.getParentTabIndex(this)+1;
+            // Ipc.on('scene:launched', this._ipc_refresh);
             Ipc.on('transform:created', this._ipc_newItem);
+            // Ipc.on('transform:removed', this._ipc_deleteItem);
+            // Ipc.on('transform:parentChanged', this._ipc_setItemParent);
+            // Ipc.on('transform:indexChanged', this._ipc_setItemIndex);
+        },
 
         detached: function () {
-            Ipc.removeListener('scene:launched', this._ipc_refresh);
+            // Ipc.removeListener('scene:launched', this._ipc_refresh);
             Ipc.removeListener('transform:created', this._ipc_newItem);
-            Ipc.removeListener('transform:removed', this._ipc_deleteItem);
-            Ipc.removeListener('transform:parentChanged', this._ipc_setItemParent);
-            Ipc.removeListener('transform:indexChanged', this._ipc_setItemIndex);
+            // Ipc.removeListener('transform:removed', this._ipc_deleteItem);
+            // Ipc.removeListener('transform:parentChanged', this._ipc_setItemParent);
+            // Ipc.removeListener('transform:indexChanged', this._ipc_setItemIndex);
         },
+
         newItem: function ( transform ) {
             var entity = transform.entity;
             var newEL = new HierarchyItem();
