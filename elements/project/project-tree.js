@@ -507,7 +507,7 @@
             if ( relativePath[0] === '/' ) {
                 relativePath = relativePath.slice(1);
             }
-            var names = relativePath.split("/");
+            var names = relativePath.split(Path.sep);
             names.unshift(list[0]);
             var el = this;
 
