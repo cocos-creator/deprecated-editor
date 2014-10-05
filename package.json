@@ -9,7 +9,6 @@
   },
   "devDependencies": {
     "gulp": "",
-    "gulp-clean": "",
     "gulp-concat": "",
     "gulp-jshint": "",
     "gulp-stylus": "",
@@ -20,6 +19,7 @@
     "jshint-stylish": "",
     "event-stream": "",
     "q": "",
-    "express": ""
+    "express": "",
+    "del": ""
   }
 }
