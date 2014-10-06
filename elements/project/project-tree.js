@@ -366,7 +366,6 @@
             Fire.hint('start browsing ' + url);
 
             var rootEL = _newProjectItem( url, 'root' );
-            rootEL.style.marginLeft = "0px";
             this.appendChild(rootEL);
 
             Fire.command( 'asset-db:browse', url );

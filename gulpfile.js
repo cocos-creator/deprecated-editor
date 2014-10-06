@@ -1,12 +1,12 @@
 ﻿var gulp = require('gulp');
 var gutil = require('gulp-util');
-var clean = require('gulp-clean');
 var jshint = require('gulp-jshint');
 var uglify = require('gulp-uglify');
 var concat = require('gulp-concat');
 var stylus = require('gulp-stylus');
 var rename = require('gulp-rename');
 var vulcanize = require('gulp-vulcanize');
+var del = require('del');
 
 var path = require('path');
 var Q = require('q');
@@ -25,8 +25,7 @@ var paths = {
 
 // clean
 gulp.task('clean', function() {
-    return gulp.src('bin/', {read: false})
-    .pipe(clean());
+    del('bin/');
 });
 
 /////////////////////////////////////////////////////////////////////////////
