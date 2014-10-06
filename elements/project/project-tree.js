@@ -469,9 +469,22 @@
 
         confirmSelect: function () {
             if ( this.selection.length > 0 ) {
-                var uuid = Fire.AssetDB.urlToUuid(this.getUrl(this.selection[0]));
-                // TODO: should we change this to selection:changed ?? and use global Selection
-                Fire.broadcast( 'asset:selected', uuid );
+                var promise = new Promise(function(resolve, reject) {
+                    var confirmSelection = this.lastConfirmSelection = this.selection[0];
+                    var url = this.getUrl(confirmSelection);
+                    var uuid = Fire.AssetDB.urlToUuid(url);
+
+                    if ( this.lastConfirmSelection === confirmSelection ) {
+                        resolve(uuid);
+                    }
+                    else {
+                        reject();
+                    }
+                }.bind(this));
+                promise.then ( function ( uuid ) {
+                    // TODO: should we change this to selection:changed ?? and use global Selection
+                    Fire.broadcast( 'asset:selected', uuid );
+                }.bind(this));
             }
         },
 

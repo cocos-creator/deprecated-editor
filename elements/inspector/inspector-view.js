@@ -27,9 +27,21 @@
         },
 
         inspectAsset: function ( uuid ) {
-            var meta = Fire.AssetDB.loadMeta(uuid);
-            var importer = Fire.deserialize(meta);
-            this.inspect(importer);
+            var promise = new Promise(function(resolve, reject) {
+                this.lastUuid = uuid;
+                var meta = Fire.AssetDB.loadMeta(uuid);
+                var importer = Fire.deserialize(meta);
+
+                if ( this.lastUuid === uuid ) {
+                    resolve(importer);
+                }
+                else {
+                    reject();
+                }
+            }.bind(this));
+            promise.then ( function ( importer ) {
+                this.inspect(importer);
+            }.bind(this));
         },
 
         inspect: function ( obj ) {
