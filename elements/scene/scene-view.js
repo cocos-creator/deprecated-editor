@@ -19,8 +19,8 @@
                 // create editor camera
                 if ( this.renderContext.camera === null ) {
                     // TODO: add this code to EditorUtils
-                    var cameraEnt = new Fire.Entity();
-                    cameraEnt._objFlags |= Fire._ObjectFlags.EditorOnly;
+                    var cameraEnt = new Fire.Entity.createWithFlags('Scene View Camera', 
+                                        Fire._ObjectFlags.SceneGizmo | Fire._ObjectFlags.EditorOnly);
                     var camera = cameraEnt.addComponent(Fire.Camera);
                     this.renderContext.camera = camera;
                     // NOTE: background setup must after camera set to render context
