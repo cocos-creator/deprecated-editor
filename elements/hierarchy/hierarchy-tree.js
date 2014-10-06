@@ -54,7 +54,7 @@
             //Ipc.removeListener('hierarchy:endLoad', this._ipc_endLoad);
         },
 
-        newItem: function ( name, flags, id/*, parentID*/ ) {
+        newItem: function ( name, flags, id, parentEL ) {
             if (flags & Fire._ObjectFlags.SceneGizmo) {
                 return;
             }
@@ -62,10 +62,10 @@
             newEL.name = name;
             this._idToItem[id] = newEL;
 
-            //var index = transform.getSiblingIndex();
-            var parentEL = /*parentID ? this._idToItem[parentID] : */this;
+            parentEL = parentEL || this;
             parentEL.appendChild(newEL);
-            //parentEL.insertBefore(newEL, parentEL.children[index]);
+
+            return newEL;
         },
 
         deleteItem: function ( id ) {
@@ -121,23 +121,27 @@
         //    // TODO unlock
         //    console.timeEnd('hierarchy-tree:load');
         //},
+
         refresh: function () {
             // clear
             while (this.firstChild) {
                 this.removeChild(this.firstChild);
             }
+            this._idToItem = {};
+
             // 目前hierarchy和engine处在同一context，直接访问场景就行，
             // 将来如有需要再改成ipc
             if (!Fire.Engine._scene) {
                 return;
             }
-            function createItem(transform) {
+            var self = this;
+            function createItem(transform, parentEL) {
                 var entity = transform.entity;
-                this.newItem(entity.name, entity._objFlags, entity.hashKey);
+                var el = self.newItem(entity.name, entity._objFlags, entity.hashKey, parentEL);
 
                 var children = transform._children;
                 for (var i = 0, len = children.length; i < len; i++) {
-                    createItem(children[i]);
+                    createItem(children[i], el);
                 }
             }
             var entities = Fire.Engine._scene.entities;
