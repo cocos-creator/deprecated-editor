@@ -14,6 +14,5 @@
         ready: function () {
             this.tabIndex = EditorUI.getParentTabIndex(this)+1;
         },
-
     });
 })();
