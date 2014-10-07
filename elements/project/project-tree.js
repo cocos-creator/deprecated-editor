@@ -397,6 +397,7 @@
                 Fire.warn( 'Can not find source element: ' + url );
                 return;
             }
+            this.unselectRecursively(el);
             el.remove();
         },
 
@@ -445,6 +446,17 @@
                     item.selected = true;
                     this.selection.push(item);
                 }
+            }
+        },
+
+        unselectRecursively: function ( item ) {
+            if ( item.selected ) {
+                var idx = this.selection.indexOf(item); 
+                this.selection.splice(idx, 1);
+            }
+            var children = item.children;
+            for ( var i = 0; i < children.length; ++i ) {
+                this.unselectRecursively(children[i]);
             }
         },
 

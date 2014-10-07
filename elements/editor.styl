@@ -22,7 +22,23 @@ html /deep/ {
     project-item>project-item[foldable] {
         margin-left: 14px
     }
+
+    hierarchy-tree[focused] {
+        hierarchy-item[selected]::shadow {
+            .wrapper {
+                .bar {
+                    background: #059
+                }
+            }
+        }
+    }
+    hierarchy-item {
+        margin-left: 10px
+    }
     hierarchy-item>hierarchy-item {
+        margin-left: 24px
+    }
+    hierarchy-item>hierarchy-item[foldable] {
         margin-left: 14px
     }
 
