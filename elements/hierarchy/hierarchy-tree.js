@@ -62,6 +62,64 @@
             //Ipc.removeListener('hierarchy:endLoad', this._ipc_endLoad);
         },
 
+        getContextMenu: function () {
+            var template = [
+                //// Copy
+                //{
+                //    label: 'Copy',
+                //    click: function () {
+                //        if ( this.contextmenuAt instanceof HierarchyItem ) {
+                //            // TODO
+                //        }
+                //    }.bind(this)
+                //},
+
+                //// Paste
+                //{
+                //    label: 'Paste',
+                //    click: function () {
+                //        // TODO
+                //    }.bind(this)
+                //},
+
+                //// Duplicate
+                //{
+                //    label: 'Duplicate',
+                //    click: function () {
+                //        // TODO
+                //    }.bind(this)
+                //},
+
+                //// =====================
+                //{ type: 'separator' },
+                
+                // Rename
+                {
+                    label: 'Rename',
+                    click: function () {
+                        if ( this.contextmenuAt instanceof HierarchyItem ) {
+                            this.contextmenuAt.rename();
+                        }
+                    }.bind(this)
+                },
+
+                // Delete
+                {
+                    label: 'Delete',
+                    click: function () {
+                        this.deleteSelection();
+                    }.bind(this)
+                },
+                
+                // =====================
+                { type: 'separator' },
+            ];
+            // append Create menu
+            template = template.concat(this.parentNode.host.getCreateMenuTemplate(true));
+            //
+            return Menu.buildFromTemplate(template);
+        },
+
         newItem: function ( name, flags, id, parentEL ) {
             if (flags & Fire._ObjectFlags.SceneGizmo) {
                 return;
@@ -85,10 +143,7 @@
                 //Fire.warn( 'Can not find source element: ' + id );
                 return;
             }
-            if (el.parentNode !== this) {
-                el.parentNode.foldable = el.parentNode.hasChildNodes();
-            }
-
+            
             var self = this;
             function deleteRecursively ( item ) {
                 // unselect
@@ -105,19 +160,24 @@
                 }
             }
             deleteRecursively(el);
+
+            var parentEL = el.parentElement;
             el.remove();
+            if (parentEL !== this) {
+                parentEL.foldable = parentEL.hasChildNodes();
+            }
         },
 
-        setItemParent: function ( id, parentID ) {
+        setItemParent: function ( id, parentId ) {
             var el = this._idToItem[id];
             if ( !el ) {
                 //Fire.warn( 'Can not find source element: ' + id );
                 return;
             }
-            if (el.parentNode !== this) {
-                el.parentNode.foldable = el.parentNode.hasChildNodes();
+            if (el.parentElement !== this) {
+                el.parentElement.foldable = el.parentElement.hasChildNodes();
             }
-            var parentEL = parentID ? this._idToItem[parentID] : this;
+            var parentEL = parentId ? this._idToItem[parentId] : this;
             if ( !parentEL ) {
                 //Fire.warn( 'Can not find dest element: ' + destUrl );
                 return;
@@ -140,10 +200,10 @@
                     //Fire.warn( 'Can not find next element: ' + nextIdInGame );
                     return;
                 }
-                el.parentNode.insertBefore(el, next);
+                el.parentElement.insertBefore(el, next);
             }
             else {
-                el.parentNode.appendChild(el);
+                el.parentElement.appendChild(el);
             }
         },
 
@@ -378,6 +438,29 @@
             }
             event.stopPropagation();
         },
+        contextmenuAction: function (event) {
+            this.contextmenuAt = null;
+            if ( event.target instanceof HierarchyItem ) {
+                this.contextmenuAt = event.target;
+                this.lastActive = this.contextmenuAt;
+                if (this.selection.indexOf(this.contextmenuAt) === -1) {
+                    this.clearSelect();
+                }
+                this.select([this.contextmenuAt]);
+            }
+
+            this.getContextMenu().popup(Remote.getCurrentWindow());
+            event.stopPropagation();
+        },
+
+        deleteSelection: function () {
+            var idList = [];
+            for ( var i = 0; i < this.selection.length; ++i ) {
+                idList.push(this.selection[i].id);
+            }
+            Fire.broadcast('engine:deleteEntities', idList);
+        },
+
         keydownAction: function (event) {
             if ( this.dragging ) {
             }
@@ -394,11 +477,7 @@
                     
                     // delete
                     case 46:
-                        var idList = [];
-                        for ( var i = 0; i < this.selection.length; ++i ) {
-                            idList.push(this.selection[i].id);
-                        }
-                        Fire.broadcast('engine:deleteEntities', idList);
+                        this.deleteSelection();
                         event.stopPropagation();
                     break;
                     
