@@ -13,6 +13,7 @@
             this.focused = false;
 
             this._ipc_inspectAsset = this.inspectAsset.bind(this);
+            this._ipc_inspectScene = this.inspectScene.bind(this);
         },
 
         ready: function () {
@@ -20,10 +21,12 @@
 
             // register Ipc
             Ipc.on('asset:selected', this._ipc_inspectAsset );
+            Ipc.on('scene:selected', this._ipc_inspectScene );
         },
 
         detached: function () {
             Ipc.removeListener('asset:selected', this._ipc_inspectAsset );
+            Ipc.removeListener('scene:selected', this._ipc_inspectScene );
         },
 
         inspectAsset: function ( uuid ) {
@@ -42,6 +45,19 @@
             promise.then ( function ( importer ) {
                 this.inspect(importer);
             }.bind(this));
+        },
+
+        inspectScene: function ( entityIdList ) {
+            // only support entity currently
+            var id = entityIdList[0];   // multi-inpector not yet implemented
+            if (!id) {
+                return;
+            }
+            var entity = Fire.Entity._getInstanceById(id);
+            if (!entity) {
+                return;
+            }
+            this.inspect(entity);
         },
 
         inspect: function ( obj ) {

@@ -31,16 +31,12 @@
                     var propName = klass.__props__[p];
                     var attrs = Fire.attr(klass, propName);
 
-                    // skip non-serializable
-                    if ( attrs.serializable === false ) {
-                        continue;
-                    }
-
                     // skip hide-in-inspector
                     if ( attrs.hideInInspector ) {
                         continue;
                     }
 
+                    var type = _getType(this.target, propName, attrs);
                     var propEL = new FireProp();
                     if ( attrs.displayName ) {
                         propEL.name = attrs.displayName;
@@ -50,8 +46,8 @@
                     }
                     propEL.bind( 'value', new PathObserver( this.target, propName ) );
                     propEL.setAttribute( 'value', '{{target.'+propName+'}}' );
-                    propEL.setAttribute( 'type', attrs.type );
-                    if ( attrs.type === 'enum' ) {
+                    propEL.setAttribute( 'type', type );
+                    if ( type === 'enum' ) {
                         propEL.enumList = attrs.enumList;
                     }
                     propEL.id = propName;
@@ -65,4 +61,22 @@
             this.refresh();
         },
     });
+
+    function _getType ( target, propName, attrs ) {
+        var type = attrs.type;
+        if (!type) {
+            if ('default' in attrs) {
+                // declared by prop
+                type = typeof attrs.default;
+            }
+            else {
+                // declared by get
+                type = typeof target[propName];
+            }
+        }
+        if ( type === 'number' ) {
+            type = 'float';
+        }
+        return type;
+    }
 })();

@@ -381,10 +381,8 @@
 
         confirmSelect: function () {
             if ( this.selection.length > 0 ) {
-                var id = this.selection[0].id;
-
-                // TEMP TODO 
-                // FireApp.fire( 'selected', { id: id } );
+                var idList = this.selection.map( function (x) { return x.id; } );
+                Fire.broadcast( 'scene:selected', idList );
             }
         },
 
@@ -410,10 +408,7 @@
 
         moveSelection: function ( targetEL ) {
             // TODO: sort selection
-            var idList = [];
-            for ( var i = 0; i < this.selection.length; ++i ) {
-                idList.push(this.selection[i].id);
-            }
+            var idList = this.selection.map( function (x) { return x.id; } );
             var nextSiblingId;  // Todo: = ? 
             Fire.broadcast('engine:moveEntity', idList, targetEL.id, nextSiblingId);
         },
@@ -600,10 +595,7 @@
         },
 
         deleteSelection: function () {
-            var idList = [];
-            for ( var i = 0; i < this.selection.length; ++i ) {
-                idList.push(this.selection[i].id);
-            }
+            var idList = this.selection.map( function (x) { return x.id; } );
             Fire.broadcast('engine:deleteEntities', idList);
         },
 
