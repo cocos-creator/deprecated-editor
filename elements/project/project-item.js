@@ -36,6 +36,10 @@
             this.renaming = false;
         },
 
+        get expanded() {
+            return this.foldable && !this.folded && this.hasChildNodes();
+        },
+
         domReady: function () {
             // HACK: to make this.$.rename.select() works
             this.$.rename.value = this.basename;

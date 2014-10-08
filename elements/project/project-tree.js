@@ -677,11 +677,7 @@
         },
 
         nextItem: function ( curItem, checkFolded ) {
-            if ( checkFolded &&
-                 curItem.foldable && 
-                 curItem.folded === false && 
-                 curItem.children.length > 0 ) 
-            {
+            if ( checkFolded && curItem.expanded ) {
                 return curItem.firstElementChild;
             }
 
@@ -698,9 +694,7 @@
 
         prevItem: function ( curItem ) {
             if ( curItem.previousElementSibling ) {
-                if ( curItem.previousElementSibling.foldable && 
-                     curItem.previousElementSibling.folded === false && 
-                     curItem.previousElementSibling.children.length > 0 ) 
+                if ( curItem.previousElementSibling.expanded ) 
                 {
                     return this.getLastElementRecursively(curItem.previousElementSibling);
                 }
@@ -717,10 +711,7 @@
         },
 
         getLastElementRecursively: function ( curItem ) {
-            if ( curItem.foldable && 
-                 curItem.folded === false && 
-                 curItem.children.length > 0 ) 
-            {
+            if ( curItem.expanded ) {
                 return this.getLastElementRecursively (curItem.lastElementChild);
             }
 
@@ -831,7 +822,6 @@
                 if ( event.target.foldable === false )
                     target = event.target.parentElement;
 
-                // name collision check
                 if ( target !== this.lastDragoverEL ) {
 
                     this.cancelHighligting();
@@ -841,6 +831,7 @@
                     this.curDragoverEL = target;
                     this.highlight(this.curDragoverEL);
 
+                    // name collision check
                     var names = [];
                     var i = 0;
                     if (event.detail.files) {

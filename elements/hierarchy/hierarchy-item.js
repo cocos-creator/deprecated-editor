@@ -100,12 +100,23 @@
             event.stopPropagation();
         },
 
+        mousemoveAction: function ( event ) {
+            this.fire('draghover');
+
+            event.stopPropagation();
+        },
 
         dblclickAction: function ( event ) {
             this.fire('open');
             event.stopPropagation();
         },
 
+        //dragoverAction: function ( event ) {
+        //    this.fire('draghover', {files : event.dataTransfer.files});
+
+        //    event.preventDefault();
+        //    event.stopPropagation();
+        //},
 
         foldMousedownAction: function ( event ) {
             this.folded = !this.folded;

@@ -1,11 +1,7 @@
 (function () {
-    var Path = require('fire-path');
-    var Url = require('fire-url');
-
-    var Remote = require('remote');
     var Ipc = require('ipc');
+    var Remote = require('remote');
     var Menu = Remote.require('menu');
-    var MenuItem = Remote.require('menu-item');
 
     Polymer({
         publish: {
@@ -24,6 +20,21 @@
             this.selection = [];
             this.lastActive = null;
             this.contextmenuAt = null;
+
+            // dragging
+            this.startDragging = false;
+            this.startDragAt = [-1,-1];
+            this.dragging = false;
+            this.curDragoverEL = null; 
+            this.dragenterCnt = 0;
+            this.lastDragoverEL = null;
+
+            // confliction
+            this.isValidForDrop = true;
+
+            // debug
+            hierarchy = this;
+
             this._ipc_refresh = this.refresh.bind(this);
             this._ipc_newItem = this.newItem.bind(this);
             this._ipc_deleteItem = this.deleteItem.bind(this);
@@ -36,6 +47,71 @@
 
         ready: function () {
             this.tabIndex = EditorUI.getParentTabIndex(this) + 1;
+
+            // register events
+            this.addEventListener('mousemove', function ( event ) {
+                if ( this.startDragging ) {
+                    var dx = event.x - this.startDragAt[0]; 
+                    var dy = event.y - this.startDragAt[1]; 
+                    if ( dx * dx  + dy * dy >= 100.0 ) {
+                        this.dragging = true;
+                        this.startDragging = false;
+                    }
+                    event.stopPropagation();
+                }
+                else if ( this.dragging ) {
+                    // do nothing here
+                }
+                else {
+                    event.stopPropagation();
+                }
+            }, true );
+
+            this.addEventListener('mouseleave', function ( event ) {
+                if ( this.dragging ) {
+                    this.cancelHighligting();
+
+                    this.curDragoverEL = null;
+                    this.lastDragoverEL = null;
+                    this.isValidForDrop = true;
+
+                    event.stopPropagation();
+                }
+            }, true );
+
+            this.addEventListener('mouseup', function ( event ) {
+                this.startDragging = false;
+                if ( this.dragging ) {
+                    if ( this.isValidForDrop && this.curDragoverEL ) {
+                        this.moveSelection( this.curDragoverEL );
+                    }
+
+                    this.cancelHighligting();
+
+                    this.curDragoverEL = null;
+                    this.lastDragoverEL = null;
+                    this.isValidForDrop = true;
+                    this.dragging = false;
+
+                    event.stopPropagation();
+                }
+            }, true );
+
+            this.addEventListener( "dragenter", function (event) {
+                //++this.dragenterCnt;
+            }, true);
+
+            this.addEventListener( "dragleave", function (event) {
+                --this.dragenterCnt;
+                if ( this.dragenterCnt === 0 ) {
+                    this.cancelHighligting();
+
+                    this.curDragoverEL = null;
+                    this.lastDragoverEL = null;
+                    this.isValidForDrop = true;
+                }
+            }, true);
+
             // register Ipc
             Ipc.on('scene:launched', this._ipc_refresh);
             Ipc.on('entity:created', this._ipc_newItem);
@@ -174,9 +250,7 @@
                 //Fire.warn( 'Can not find source element: ' + id );
                 return;
             }
-            if (el.parentElement !== this) {
-                el.parentElement.foldable = el.parentElement.hasChildNodes();
-            }
+            var oldParentEL = el.parentElement;
             var parentEL = parentId ? this._idToItem[parentId] : this;
             if ( !parentEL ) {
                 //Fire.warn( 'Can not find dest element: ' + destUrl );
@@ -185,6 +259,9 @@
             parentEL.appendChild(el);
             if (parentEL !== this) {
                 parentEL.foldable = true;
+            }
+            if (oldParentEL !== this) {
+                oldParentEL.foldable = oldParentEL.hasChildNodes();
             }
         },
 
@@ -294,6 +371,7 @@
                 this.unselectRecursively(children[i]);
             }
         },
+
         clearSelect: function () {
             for ( var i = 0; i < this.selection.length; ++i ) {
                 this.selection[i].selected = false;
@@ -310,6 +388,35 @@
             }
         },
 
+        highlight: function ( item ) {
+            if ( item ) {
+                var style = this.$.highlightMask;
+                style.display = "block";
+                style.left = item.offsetLeft + "px";
+                style.top = item.offsetTop + "px";
+                style.width = item.offsetWidth + "px";
+                style.height = item.offsetHeight + "px";
+
+                item.highlighted = true;
+            }
+        },
+        
+        cancelHighligting: function () {
+            if ( this.curDragoverEL ) {
+                this.curDragoverEL.highlighted = false;
+                this.$.highlightMask.style.display = "none";
+            }
+        },
+
+        moveSelection: function ( targetEL ) {
+            // TODO: sort selection
+            var idList = [];
+            for ( var i = 0; i < this.selection.length; ++i ) {
+                idList.push(this.selection[i].id);
+            }
+            var nextSiblingId;  // Todo: = ? 
+            Fire.broadcast('engine:moveEntity', idList, targetEL.id, nextSiblingId);
+        },
 
         nextItem: function ( curItem, skipChildren ) {
             if ( !skipChildren && curItem.expanded ) {
@@ -373,6 +480,9 @@
             this.focused = false;
         },
 
+        scrollAction: function (event) {
+            this.scrollLeft = 0;
+        },
 
         selectingAction: function (event) {
             this.focus();
@@ -438,7 +548,43 @@
             }
             event.stopPropagation();
         },
+
+        draghoverAction: function (event) {
+            if ( event.target ) {
+                this.lastDragoverEL = this.curDragoverEL;
+                var target = event.target;
+                
+                if ( target !== this.lastDragoverEL ) {
+
+                    this.cancelHighligting();
+
+                    this.isValidForDrop = true;
+                    this.curDragoverEL = target;
+                    this.highlight(this.curDragoverEL);
+                }
+
+            }
+            event.stopPropagation();
+        },
+
+        dragcancelAction: function (event) {
+            this.cancelHighligting();
+
+            this.curDragoverEL = null;
+            this.lastDragoverEL = null;
+            this.isValidForDrop = true;
+        },
+
         contextmenuAction: function (event) {
+            this.cancelHighligting();
+
+            this.curDragoverEL = null;
+            this.lastDragoverEL = null;
+            this.isValidForDrop = true;
+            this.startDragging = false;
+            this.dragging = false;
+
+            //
             this.contextmenuAt = null;
             if ( event.target instanceof HierarchyItem ) {
                 this.contextmenuAt = event.target;
@@ -463,6 +609,18 @@
 
         keydownAction: function (event) {
             if ( this.dragging ) {
+                switch ( event.which ) {
+                    // esc
+                    case 27:
+                        this.cancelHighligting();
+
+                        this.curDragoverEL = null;
+                        this.lastDragoverEL = null;
+                        this.isValidForDrop = true;
+                        this.dragging = false;
+                        event.stopPropagation();
+                    break;
+                }
             }
             else {
                 //console.log(event.which);
@@ -513,5 +671,29 @@
                 }
             }
         },
+
+        dropAction: function ( event ) {
+            event.preventDefault();
+            event.stopPropagation();
+
+            var targetEl = this.curDragoverEL;
+
+            this.cancelHighligting();
+
+            this.curDragoverEL = null;
+            this.lastDragoverEL = null;
+            this.startDragging = false;
+            this.dragging = false;
+            this.dragenterCnt = 0;
+
+            // check
+            if( !this.isValidForDrop ) {
+                this.isValidForDrop = true;
+                return;
+            }
+            
+            // TODO: instantiate
+        },
+
     });
 })();
