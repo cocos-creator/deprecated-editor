@@ -8,6 +8,7 @@
             this.renderContext = null;
             this.svgGrids = null;
             this.svgGizmos = null;
+            this.view = { width: 0, height: 0 };
         },
 
         ready: function () {
@@ -30,9 +31,14 @@
         },
 
         init: function () {
+            this.view = {
+                width: this.clientWidth,
+                height: this.clientHeight,
+            };
+
             // init render context
-            this.renderContext = Fire.Engine.createSceneView( this.clientWidth, 
-                                                              this.clientHeight,
+            this.renderContext = Fire.Engine.createSceneView( this.view.width,
+                                                              this.view.height,
                                                               this.$.canvas );
             if ( this.renderContext !== null ) {
                 // create editor camera
@@ -41,7 +47,7 @@
                     var cameraEnt = new Fire.Entity.createWithFlags('Scene Camera', 
                                         Fire._ObjectFlags.SceneGizmo | Fire._ObjectFlags.EditorOnly);
                     var camera = cameraEnt.addComponent(Fire.Camera);
-                    camera.size = this.clientHeight;
+                    camera.size = this.view.height;
                     this.renderContext.camera = camera;
                 }
             }
@@ -79,17 +85,25 @@
             // this.renderContext.stage.addChild(graphics);
             // } TEMP
 
-            this.updateGrid();
-            this.updateScene();
+            this.repaint();
         }, 
 
         resize: function () {
             if ( this.renderContext !== null ) {
-                this.renderContext.size = new Fire.Vec2( this.clientWidth, this.clientHeight );
+                this.view = {
+                    width: this.clientWidth,
+                    height: this.clientHeight,
+                };
+                this.renderContext.size = new Fire.Vec2( this.view.width, this.view.height );
+                this.svgGrids.size( this.view.width, this.view.height );
 
-                this.updateGrid();
-                this.updateScene();
+                this.repaint();
             }
+        },
+
+        repaint: function () {
+            this.updateGrid();
+            this.updateScene();
         },
 
         updateScene: function () {
@@ -124,7 +138,7 @@
                     x: this.renderContext.camera.transform.position.x, 
                     y: this.renderContext.camera.transform.position.y 
                 },
-                scale: this.renderContext.camera.size/this.clientHeight
+                scale: this.renderContext.camera.size/this.view.height
             };
 
             if ( camera.scale >= 1.0 ) {
@@ -146,9 +160,9 @@
 
             var start = this.renderContext.camera.screenToWorld ( new Fire.Vec2(0, 0) );
             var start_x = Math.ceil(start.x/curTickUnit) * curTickUnit;
-            var end_x = start.x + this.clientWidth / camera.scale;
+            var end_x = start.x + this.view.width / camera.scale;
             var start_y = Math.ceil(start.y/curTickUnit) * curTickUnit;
-            var end_y = start.y + this.clientHeight / camera.scale;
+            var end_y = start.y + this.view.height / camera.scale;
 
             // draw x lines
             var tickIndex = Math.round(start_x/curTickUnit);
@@ -157,7 +171,7 @@
                     line = xlines[cur_idx];
                 }
                 else {
-                    line = this.svgGrids.line( 0, 0, 0, this.clientHeight );
+                    line = this.svgGrids.line( 0, 0, 0, this.view.height );
                     xlines.push(line);
                     xaxis.add(line);
                 }
@@ -173,7 +187,7 @@
 
                 trans = this.renderContext.camera.worldToScreen( new Fire.Vec2(x, 0.0) );
                 trans.y = 0.0;
-                line.plot( 0, 0, 0, this.clientHeight ).stroke("#555").transform(trans);
+                line.plot( 0, 0, 0, this.view.height ).stroke("#555").transform(trans);
             }
             // remove unused x lines
             for ( i = cur_idx; i < xlines.length; ++i ) {
@@ -189,7 +203,7 @@
                     line = ylines[cur_idx];
                 }
                 else {
-                    line = this.svgGrids.line( 0, 0, this.clientWidth, 0 );
+                    line = this.svgGrids.line( 0, 0, this.view.width, 0 );
                     ylines.push(line);
                     yaxis.add(line);
                 }
@@ -205,7 +219,7 @@
 
                 trans = this.renderContext.camera.worldToScreen( new Fire.Vec2(0.0, y) );
                 trans.x = 0.0;
-                line.plot( 0, 0, this.clientWidth, 0 ).stroke("#555").transform(trans);
+                line.plot( 0, 0, this.view.width, 0 ).stroke("#555").transform(trans);
             }
             // remove unused y lines
             for ( i = cur_idx; i < ylines.length; ++i ) {
@@ -225,16 +239,15 @@
                     lastClientY = event.clientY;
 
                     var camera = this.renderContext.camera;
-                    var scale = camera.size/this.clientHeight;
+                    var scale = camera.size/this.view.height;
 
                     camera.transform.position = 
                         new Vec2 ( camera.transform.position.x - dx/scale,
                                    camera.transform.position.y - dy/scale );
 
-                    this.updateGrid();
-                    this.updateScene();
-
                     event.stopPropagation();
+
+                    this.repaint();
                 }.bind(this);
 
                 var mouseUpHandle = function(event) {
@@ -259,16 +272,14 @@
 
         mousewheelAction: function ( event ) {
             var camera = this.renderContext.camera;
-            var scale = camera.size/this.clientHeight;
+            var scale = camera.size/this.view.height;
             scale = Math.pow( 2, event.wheelDelta * 0.002) * scale;
             scale = Math.max( 0.01, Math.min( scale, 1000 ) );
-            camera.size = scale * this.clientHeight;
+            camera.size = scale * this.view.height;
 
-            this.updateGrid();
-            this.updateScene();
-
-            event.preventDefault();
             event.stopPropagation();
+
+            this.repaint();
         },
     });
 })();
