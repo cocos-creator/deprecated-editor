@@ -22,21 +22,17 @@
             // init project-tree
             this.$.projectView.load("assets://");
 
-            // init engine & game-view
+            // init engine & game window
             Fire.AssetLibrary.init(Fire.AssetDB.getLibraryPath());
             Fire.log('fire-engine initializing...');
-            var renderContext = Fire.Engine.init( this.$.gameView.$.view.clientWidth,
-                                                  this.$.gameView.$.view.clientHeight );
-            this.$.gameView.setRenderContext(renderContext);
+            var renderContext = Fire.Engine.init( this.$.game.$.view.clientWidth,
+                                                  this.$.game.$.view.clientHeight );
+            this.$.game.setRenderContext(renderContext);
 
-            canvas = document.createElement('canvas');
-            renderContext = Fire.Engine.createSceneView( this.$.sceneView.$.view.clientWidth,
-                                                         this.$.sceneView.$.view.clientHeight,
-                                                         canvas );
-            this.$.sceneView.setRenderContext(renderContext);
+            this.$.scene.initRenderContext();
 
             // TEMP TODO:
-            var assetPath = 'assets://white-sheep/ip3_a_sheep_down_loop01.png';
+            var assetPath = 'assets://Foobar/004.png';
             var uuid = Fire.AssetDB.urlToUuid(assetPath);
             if ( uuid ) {
                 Fire.AssetLibrary.loadAssetByUuid(uuid, function ( asset ) {
@@ -45,8 +41,8 @@
 
                     var sprite = new Fire.Sprite();
                     sprite.texture = asset;
-                    sprite.width = 104;
-                    sprite.height = 75;
+                    sprite.width = 400;
+                    sprite.height = 300;
                     renderer.sprite = sprite;
                 });
             }
@@ -56,8 +52,8 @@
         },
 
         resizedAction: function () {
-            this.$.gameView.resize();
-            this.$.sceneView.resize();
+            this.$.game.resize();
+            this.$.scene.resize();
         },
 
     });
