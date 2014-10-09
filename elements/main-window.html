@@ -8,30 +8,30 @@
 
 <span class="space"></span>
 
-<div flex-row>
-    <span flex-1></span>
+<div flex-row>           
+    <span flex-1></span> 
     <play-bar></play-bar>
-    <span flex-1></span>
-</div>
+    <span flex-1></span> 
+</div>                   
 
 <span class="space"></span>
 
 <fire-ui-dock flex-1 flex-row flex-stretch
     on-resized="{{resizedAction}}"
     >
-    <fire-ui-dock-panel style="width: 200px;">
+    <fire-ui-dock-panel style="width: 200px;">                              
         <project-view id="projectView" name="Project" flex-1></project-view>
-    </fire-ui-dock-panel>
+    </fire-ui-dock-panel>                                                   
 
-    <fire-ui-dock-panel style="min-width: 240px; width: 240px;">
+    <fire-ui-dock-panel style="min-width: 240px; width: 240px;">                
         <fire-inspector id="inspector" name="Inspector" flex-1></fire-inspector>
-    </fire-ui-dock-panel>
+    </fire-ui-dock-panel>                                                       
 
     <fire-ui-dock flex-1 flex-col flex-stretch>
-        <fire-ui-dock-panel flex-1 style="">
+        <fire-ui-dock-panel flex-1 style="">                        
             <fire-scene id="scene" name="Scene" flex-1></fire-scene>
-            <fire-game id="game" name="Game" flex-1></fire-game>
-        </fire-ui-dock-panel>
+            <fire-game id="game" name="Game" flex-1></fire-game>    
+        </fire-ui-dock-panel>                                       
 
         <fire-ui-dock-panel style="min-height: 200px;">
             <div name="Console" style="margin: 5px; margin-right: 0px; overflow: auto;">
