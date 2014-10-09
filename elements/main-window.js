@@ -29,26 +29,8 @@
                                                   this.$.game.$.view.clientHeight );
             this.$.game.setRenderContext(renderContext);
 
+            // init scene
             this.$.scene.initRenderContext();
-
-            // TEMP TODO:
-            var assetPath = 'assets://Foobar/004.png';
-            var uuid = Fire.AssetDB.urlToUuid(assetPath);
-            if ( uuid ) {
-                Fire.AssetLibrary.loadAssetByUuid(uuid, function ( asset ) {
-                    var ent = new Fire.Entity();
-                    var renderer = ent.addComponent(Fire.SpriteRenderer);
-
-                    var sprite = new Fire.Sprite();
-                    sprite.texture = asset;
-                    sprite.width = 400;
-                    sprite.height = 300;
-                    renderer.sprite = sprite;
-                });
-            }
-            else {
-                Fire.error('Failed to load ' + assetPath);
-            }
         },
 
         resizedAction: function () {
