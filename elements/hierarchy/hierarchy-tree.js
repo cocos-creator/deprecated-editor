@@ -4,13 +4,6 @@
     var Menu = Remote.require('menu');
 
     Polymer({
-        publish: {
-            focused: {
-                value: false,
-                reflect: true
-            },
-        },
-
         created: function () {
             this.focused = false;
 
@@ -37,8 +30,8 @@
 
             this._ipc_refresh = this.refresh.bind(this);
             this._ipc_newItem = this.newItem.bind(this);
-            this._ipc_deleteItem = this.deleteItem.bind(this);
-            this._ipc_setItemParent = this.setItemParent.bind(this);
+            this._ipc_deleteEntity = this.deleteEntity.bind(this);
+            this._ipc_setEntityParent = this.setEntityParent.bind(this);
             this._ipc_setItemIndex = this.setItemIndex.bind(this);
             this._ipc_renameItem = this.renameItem.bind(this);
             //this._ipc_beginLoad = this.beginLoad.bind(this);
@@ -115,8 +108,8 @@
             // register Ipc
             Ipc.on('scene:launched', this._ipc_refresh);
             Ipc.on('entity:created', this._ipc_newItem);
-            Ipc.on('entity:removed', this._ipc_deleteItem);
-            Ipc.on('entity:parentChanged', this._ipc_setItemParent);
+            Ipc.on('entity:removed', this._ipc_deleteEntity);
+            Ipc.on('entity:parentChanged', this._ipc_setEntityParent);
             Ipc.on('entity:indexChanged', this._ipc_setItemIndex);
             Ipc.on('entity:renamed', this._ipc_renameItem);
             //Ipc.on('hierarchy:beginLoad', this._ipc_beginLoad);
@@ -130,8 +123,8 @@
             // unregister Ipc
             Ipc.removeListener('scene:launched', this._ipc_refresh);
             Ipc.removeListener('entity:created', this._ipc_newItem);
-            Ipc.removeListener('entity:removed', this._ipc_deleteItem);
-            Ipc.removeListener('entity:parentChanged', this._ipc_setItemParent);
+            Ipc.removeListener('entity:removed', this._ipc_deleteEntity);
+            Ipc.removeListener('entity:parentChanged', this._ipc_setEntityParent);
             Ipc.removeListener('entity:indexChanged', this._ipc_setItemIndex);
             Ipc.removeListener('entity:renameItem', this._ipc_renameItem);
             //Ipc.removeListener('hierarchy:beginLoad', this._ipc_beginLoad);
@@ -213,38 +206,28 @@
             return newEL;
         },
 
-        deleteItem: function ( id ) {
+        deleteEntity: function ( id ) {
+            // TODO: deal by view ?
             var el = this._idToItem[id];
             if ( !el ) {
                 //Fire.warn( 'Can not find source element: ' + id );
                 return;
             }
-            
-            var self = this;
-            function deleteRecursively ( item ) {
-                // unselect
-                if ( item.selected ) {
-                    var idx = self.selection.indexOf( item ); 
-                    self.selection.splice(idx, 1);
-                }
-                // remove id
-                delete self._idToItem[item.id];
-                // children
-                var children = item.children;
-                for ( var i = 0; i < children.length; ++i ) {
-                    deleteRecursively(children[i]);
-                }
-            }
-            deleteRecursively(el);
-
-            var parentEL = el.parentElement;
-            el.remove();
-            if (parentEL !== this) {
-                parentEL.foldable = parentEL.hasChildNodes();
-            }
+            this.deleteItem(el);
         },
 
-        setItemParent: function ( id, parentId ) {
+        onDeleteItem: function (item) {
+            // TODO: deal by view ?
+            // unselect
+            if (item.selected) {
+                var idx = this.selection.indexOf(item); 
+                this.selection.splice(idx, 1);
+            }
+            // remove id
+            delete this._idToItem[item.id];
+        },
+
+        setEntityParent: function ( id, parentId ) {
             var el = this._idToItem[id];
             if ( !el ) {
                 //Fire.warn( 'Can not find source element: ' + id );
@@ -256,13 +239,7 @@
                 //Fire.warn( 'Can not find dest element: ' + destUrl );
                 return;
             }
-            parentEL.appendChild(el);
-            if (parentEL !== this) {
-                parentEL.foldable = true;
-            }
-            if (oldParentEL !== this) {
-                oldParentEL.foldable = oldParentEL.hasChildNodes();
-            }
+            this.setItemParent(el, parentEL);
         },
 
         setItemIndex: function ( id, nextIdInGame ) {
@@ -413,72 +390,6 @@
             Fire.broadcast('engine:moveEntity', idList, targetEL.id, nextSiblingId);
         },
 
-        nextItem: function ( curItem, skipChildren ) {
-            if ( !skipChildren && curItem.expanded ) {
-                return curItem.firstElementChild;
-            }
-
-            if ( curItem.nextElementSibling )
-                return curItem.nextElementSibling;
-
-            var parentEL = curItem.parentElement;
-            if ( parentEL instanceof HierarchyItem === false ) {
-                return null;
-            }
-
-            return this.nextItem(parentEL, true);
-        },
-
-        prevItem: function ( curItem ) {
-            var prevSb = curItem.previousElementSibling;
-            if ( prevSb ) {
-                if ( prevSb.expanded ) {
-                    function getLastChildRecursively ( curItem ) {
-                        if ( curItem.expanded ) {
-                            return getLastChildRecursively (curItem.lastElementChild);
-                        }
-                        return curItem;
-                    }
-                    return getLastChildRecursively (prevSb);
-                }
-                return prevSb;
-            }
-
-            var parentEL = curItem.parentElement;
-            if ( parentEL instanceof HierarchyItem === false ) {
-                return null;
-            }
-
-            return parentEL;
-        },
-
-        focusinAction: function (event) {
-            this.focused = true;
-        },
-
-        focusoutAction: function (event) {
-            if ( this.focused === false )
-                return;
-
-            if ( event.relatedTarget === null &&
-                 event.target instanceof HierarchyItem ) 
-            {
-                this.focus();
-
-                event.stopPropagation();
-                return;
-            }
-
-            if ( EditorUI.find( this.shadowRoot, event.relatedTarget ) )
-                return;
-
-            this.focused = false;
-        },
-
-        scrollAction: function (event) {
-            this.scrollLeft = 0;
-        },
-
         selectingAction: function (event) {
             this.focus();
 
@@ -527,12 +438,13 @@
 
             event.stopPropagation();
         },
-
+        
         namechangedAction: function (event) {
-            var el = event.target;
-            if ( el instanceof HierarchyItem ) {
+            // TODO: pull up to view ?
+            var item = event.target;
+            if ( item instanceof FireTreeItem ) {
                 this.focus();
-                Fire.broadcast('engine:renameEntity', el.id, event.detail.name);
+                Fire.broadcast('engine:renameEntity', item.id, event.detail.name);
             }
             event.stopPropagation();
         },
@@ -615,16 +527,12 @@
                 }
             }
             else {
+                this.super([event]);
+                if (event.cancelBubble) {
+                    return;
+                }
                 //console.log(event.which);
                 switch ( event.which ) {
-                    // F2
-                    case 113:
-                        if ( this.lastActive ) {
-                            this.lastActive.rename();
-                        }
-                        event.stopPropagation();
-                    break;
-                    
                     // delete
                     case 46:
                         this.deleteSelection();
