@@ -9,6 +9,13 @@
             this.svgGrids = null;
             this.svgGizmos = null;
             this.view = { width: 0, height: 0 };
+            this.sceneCamera = {
+                position: { 
+                    x: 0.0,
+                    y: 0.0,
+                },
+                scale: 1.0,
+            };
         },
 
         ready: function () {
@@ -66,7 +73,7 @@
                     sprite.height = 300;
                     renderer.sprite = sprite;
 
-                    ent.transform.position = { x: -200, y: -150 }; 
+                    ent.transform.position = { x: -200, y: 150 }; 
                 });
             }
             else {
@@ -102,8 +109,18 @@
         },
 
         repaint: function () {
+            this.updateCamera();
             this.updateGrid();
             this.updateScene();
+        },
+
+        updateCamera: function () {
+            if ( this.renderContext ) {
+                this.renderContext.camera.size = this.sceneCamera.scale * this.view.height; 
+                this.renderContext.camera.transform.position = 
+                    new Vec2 ( this.sceneCamera.position.x, 
+                               this.sceneCamera.position.y );
+            }
         },
 
         updateScene: function () {
@@ -132,14 +149,15 @@
             var curTickUnit = tickUnit;
             var ratio = 1.0;
             var trans;
+            var camera = this.sceneCamera;
 
-            var camera = {
-                position: { 
-                    x: this.renderContext.camera.transform.position.x, 
-                    y: this.renderContext.camera.transform.position.y 
-                },
-                scale: this.renderContext.camera.size/this.view.height
-            };
+            // var camera = {
+            //     position: { 
+            //         x: this.renderContext.camera.transform.position.x, 
+            //         y: this.renderContext.camera.transform.position.y 
+            //     },
+            //     scale: this.renderContext.camera.size/this.view.height
+            // };
 
             if ( camera.scale >= 1.0 ) {
                 while ( tickDistance*nextTickCount < tickUnit*camera.scale ) {
@@ -159,10 +177,12 @@
             ratio = (ratio - 1.0/tickCount) / (1.0 - 1.0/tickCount);
 
             var start = this.renderContext.camera.screenToWorld ( new Fire.Vec2(0, 0) );
+            var end = this.renderContext.camera.screenToWorld ( new Fire.Vec2(this.view.width, this.view.height) );
+
             var start_x = Math.ceil(start.x/curTickUnit) * curTickUnit;
-            var end_x = start.x + this.view.width / camera.scale;
-            var start_y = Math.ceil(start.y/curTickUnit) * curTickUnit;
-            var end_y = start.y + this.view.height / camera.scale;
+            var end_x = end.x;
+            var start_y = Math.ceil(end.y/curTickUnit) * curTickUnit;
+            var end_y = start.y;
 
             // draw x lines
             var tickIndex = Math.round(start_x/curTickUnit);
@@ -238,16 +258,12 @@
                     lastClientX = event.clientX;
                     lastClientY = event.clientY;
 
-                    var camera = this.renderContext.camera;
-                    var scale = camera.size/this.view.height;
-
-                    camera.transform.position = 
-                        new Vec2 ( camera.transform.position.x - dx/scale,
-                                   camera.transform.position.y - dy/scale );
-
-                    event.stopPropagation();
+                    this.sceneCamera.position.x = this.sceneCamera.position.x - dx/this.sceneCamera.scale;
+                    this.sceneCamera.position.y = this.sceneCamera.position.y + dy/this.sceneCamera.scale;
 
                     this.repaint();
+
+                    event.stopPropagation();
                 }.bind(this);
 
                 var mouseUpHandle = function(event) {
@@ -271,15 +287,14 @@
         },
 
         mousewheelAction: function ( event ) {
-            var camera = this.renderContext.camera;
-            var scale = camera.size/this.view.height;
+            var scale = this.sceneCamera.scale;
             scale = Math.pow( 2, event.wheelDelta * 0.002) * scale;
             scale = Math.max( 0.01, Math.min( scale, 1000 ) );
-            camera.size = scale * this.view.height;
-
-            event.stopPropagation();
+            this.sceneCamera.scale = scale;
 
             this.repaint();
+
+            event.stopPropagation();
         },
     });
 })();
