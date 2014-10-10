@@ -1,44 +1,16 @@
 <polymer-element 
     name="project-item" 
+    extends="fire-ui-ti"
     constructor="ProjectItem"
-    on-mousedown="{{mousedownAction}}"
-    on-mouseup="{{mouseupAction}}"
     on-mousemove="{{mousemoveAction}}"
-    on-dblclick="{{dblclickAction}}"
     on-dragover="{{dragoverAction}}"
     on-dragenter="{{dragenterAction}}"
     >
 <template>
-<link rel="stylesheet" href="project-item.css">
-
-<div class="wrapper">
-    <div class="bar"></div>
-    <div class="input-wrapper">
-        <div class="item">
-            <div class="item-wrapper">
-                <i id="foldIcon" 
-                   class="fold-icon fa {{folded ? 'fa-caret-right' : 'fa-caret-down'}}"
-                   on-mousedown="{{foldMousedownAction}}"
-                   >
-               </i>
-                <i id="typeIcon" class="type-icon"></i>
-                <span id="name" class="name">{{basename}}</span>
-            </div>
-        </div>
-        <fire-ui-text-input id="rename"
-            style="display: none"
-            on-confirm="{{renameConfirmAction}}"
-        >
-        </fire-ui-text-input>
-    </div>
-</div>
-<div id="content"
-     style="display: {{ folded ? 'none' : '' }}"
-     >
-    <content/>
-</div>
+    <link rel="stylesheet" href="project-item.css">
+    
+    <shadow></shadow>
 
 </template>
-
 <script type="text/javascript" src="project-item.js"></script>
 </polymer-element>

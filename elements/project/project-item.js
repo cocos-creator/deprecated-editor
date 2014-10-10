@@ -1,11 +1,6 @@
 (function () {
     Polymer({
         publish: {
-            folded: false,
-            foldable: {
-                value: false,
-                reflect: true
-            },
             selected: {
                 value: false,
                 reflect: true
@@ -25,47 +20,19 @@
         },
 
         created: function () {
+            this.super();
+
             this._isToggle = false;
             this._isShift = false;
 
-            this.basename = '';
             this.extname = '';
             this.isFolder = false;
             this.isRoot = false;
-
-            this.renaming = false;
-        },
-
-        get expanded() {
-            return this.foldable && !this.folded && this.hasChildNodes();
-        },
-
-        domReady: function () {
-            // HACK: to make this.$.rename.select() works
-            this.$.rename.value = this.basename;
-        },
-
-        rename: function () {
-            this.$.rename.style.display = '';
-            this.$.rename.value = this.basename;
-            this.$.rename.focus();
-            this.$.rename.select();
-
-            this.renaming = true;
-        },
-
-        setIcon: function ( icon ) {
-            if ( icon instanceof Image ) {
-                this.$.typeIcon.appendChild(icon);
-            }
-            else {
-                this.$.typeIcon.className = "type-icon fa " + icon;
-            }
         },
 
         mousedownAction: function ( event ) {
-            if ( this.renaming ) {
-                event.stopPropagation();
+            this.super([event]);
+            if (event.cancelBubble) {
                 return;
             }
 
@@ -94,8 +61,8 @@
         },
 
         mouseupAction: function ( event ) {
-            if ( this.renaming ) {
-                event.stopPropagation();
+            this.super([event]);
+            if (event.cancelBubble) {
                 return;
             }
 
@@ -130,20 +97,5 @@
             event.stopPropagation();
         },
 
-        foldMousedownAction: function ( event ) {
-            this.folded = !this.folded;
-
-            event.stopPropagation();
-        },
-
-        renameConfirmAction: function ( event ) {
-            this.$.rename.style.display = 'none';
-            this.renaming = false;
-
-            if ( this.$.rename.value !== this.basename ) {
-                this.fire('namechanged', { name: this.$.rename.value } );
-            }
-            event.stopPropagation();
-        },
     });
 })();

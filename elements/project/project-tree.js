@@ -34,10 +34,10 @@
             mid = ((lo + hi) >> 1);
             el = elements[mid];
 
-            if (el.basename < key) {
+            if (el.name < key) {
                 lo = mid + 1;
             } 
-            else if (el.basename > key) {
+            else if (el.name > key) {
                 hi = mid - 1;
             } 
             else {
@@ -48,7 +48,7 @@
     }
 
     function _binaryInsert( parentEL, el ) {
-        var idx = _binaryIndexOf( parentEL.children, el.basename );
+        var idx = _binaryIndexOf( parentEL.children, el.name );
         if ( idx === -1 ) {
             parentEL.appendChild(el);
         }
@@ -60,7 +60,7 @@
     function _findElement ( elements, name ) {
         for ( var i = 0; i < elements.length; ++i ) {
             var el = elements[i];
-            var fullname = el.basename + el.extname;
+            var fullname = el.name + el.extname;
             if ( fullname === name )
                 return el;
         }
@@ -79,17 +79,15 @@
         newEL.isFolder = (type === 'folder' || type === 'root');
         newEL.isRoot = type === 'root';
         newEL.extname = extname;
-        newEL.basename = basename;
+        newEL.name = basename;
 
         switch ( type ) {
         case 'root':
             newEL.setIcon('fa-database');
-            newEL.foldable = true;
             break;
 
         case 'folder':
             newEL.setIcon('fa-folder');
-            newEL.foldable = true;
             break;
 
         case '.png':
@@ -128,7 +126,7 @@
             for(j = 0; j < nodesLen; j++) {
                 
                 node = nodes[j];
-                if (node.basename + node.extname === name) {
+                if (node.name + node.extname === name) {
                     collisions.push(node);
                 }
 
@@ -139,19 +137,11 @@
     }
 
     Polymer({
-        publish: {
-            focused: {
-                value: false,
-                reflect: true
-            },
-        },
-
         created: function () {
-            this.focused = false;
+            this.super();
 
             // selection
             this.selection = [];
-            this.lastActive = null;
             this.contextmenuAt = null;
 
             // dragging
@@ -176,10 +166,13 @@
             this._ipc_deleteItem = this.deleteItem.bind(this);
             this._ipc_finishLoading = this.finishLoading.bind(this);
             this._ipc_moveItem = this.moveItem.bind(this);
+
+            // debug
+            project = this;
         },
 
         ready: function () {
-            this.tabIndex = EditorUI.getParentTabIndex(this)+1;
+            this.super();
             this.initContextMenu();
 
             // register events
@@ -352,6 +345,7 @@
                                 while (selectedItemEl.firstChild) {
                                     selectedItemEl.removeChild(selectedItemEl.firstChild);
                                 }
+                                selectedItemEl.foldable = false;
                             }
                             Fire.command( 'asset-db:reimport', url );
                         }
@@ -389,6 +383,7 @@
 
             // binary insert
             _binaryInsert ( parentEL, newEL );
+            parentEL.foldable = true;
         },
 
         deleteItem: function ( url ) {
@@ -397,8 +392,15 @@
                 Fire.warn( 'Can not find source element: ' + url );
                 return;
             }
-            this.unselectRecursively(el);
-            el.remove();
+            this.super([el]);
+        },
+
+        onDeleteItem: function (item) {
+            // unselect
+            if (item.selected) {
+                var idx = this.selection.indexOf(item); 
+                this.selection.splice(idx, 1);
+            }
         },
 
         moveItem: function ( srcUrl, destUrl ) {
@@ -417,10 +419,13 @@
             var destExtname = Path.extname(destUrl);
             var destBasename = Path.basename(destUrl, destExtname);
             srcEL.extname = destExtname;
-            srcEL.basename = destBasename;
+            srcEL.name = destBasename;
 
             // binary insert
+            var oldParent = srcEL.parentElement;
             _binaryInsert ( destEL, srcEL );
+            destEL.foldable = true;
+            oldParent.foldable = oldParent.hasChildNodes();
         },
 
         toggle: function ( items ) {
@@ -502,18 +507,18 @@
 
         getUrl: function ( element ) {
             if ( element.isRoot ) {
-                return element.basename + "://"; 
+                return element.name + "://"; 
             }
 
-            var url = element.basename + element.extname;
+            var url = element.name + element.extname;
             var parentEL = element.parentElement;
             while ( parentEL instanceof ProjectItem ) {
                 if ( parentEL.isRoot ) {
-                    url = parentEL.basename + "://" + url;
+                    url = parentEL.name + "://" + url;
                     break;
                 }
                 else {
-                    url = Path.join( parentEL.basename, url );
+                    url = Path.join( parentEL.name, url );
                     parentEL = parentEL.parentElement;
                 }
             }
@@ -670,81 +675,12 @@
                 var url = this.getUrl(el);
                 if ( _includePath(url,targetUrl) === false ) {
                     var srcUrl = url;
-                    var destUrl = Path.join( targetUrl, el.basename + el.extname );
+                    var destUrl = Path.join( targetUrl, el.name + el.extname );
                     Fire.command('asset-db:move', srcUrl, destUrl );
                 }
             }
         },
-
-        nextItem: function ( curItem, checkFolded ) {
-            if ( checkFolded && curItem.expanded ) {
-                return curItem.firstElementChild;
-            }
-
-            if ( curItem.nextElementSibling )
-                return curItem.nextElementSibling;
-
-            var parentEL = curItem.parentElement;
-            if ( parentEL instanceof ProjectItem === false ) {
-                return null;
-            }
-
-            return this.nextItem(parentEL,false);
-        },
-
-        prevItem: function ( curItem ) {
-            if ( curItem.previousElementSibling ) {
-                if ( curItem.previousElementSibling.expanded ) 
-                {
-                    return this.getLastElementRecursively(curItem.previousElementSibling);
-                }
-
-                return curItem.previousElementSibling;
-            }
-
-            var parentEL = curItem.parentElement;
-            if ( parentEL instanceof ProjectItem === false ) {
-                return null;
-            }
-
-            return parentEL;
-        },
-
-        getLastElementRecursively: function ( curItem ) {
-            if ( curItem.expanded ) {
-                return this.getLastElementRecursively (curItem.lastElementChild);
-            }
-
-            return curItem;
-        },
-
-        focusinAction: function (event) {
-            this.focused = true;
-        },
-
-        focusoutAction: function (event) {
-            if ( this.focused === false )
-                return;
-
-            if ( event.relatedTarget === null &&
-                 event.target instanceof ProjectItem ) 
-            {
-                this.focus();
-
-                event.stopPropagation();
-                return;
-            }
-
-            if ( EditorUI.find( this.shadowRoot, event.relatedTarget ) )
-                return;
-
-            this.focused = false;
-        },
-
-        scrollAction: function (event) {
-            this.scrollLeft = 0;
-        },
-
+        
         selectingAction: function (event) {
             this.focus();
 
@@ -819,7 +755,7 @@
             if ( event.target ) {
                 this.lastDragoverEL = this.curDragoverEL;
                 var target = event.target;
-                if ( event.target.foldable === false )
+                if ( event.target.isFolder === false )
                     target = event.target.parentElement;
 
                 if ( target !== this.lastDragoverEL ) {
@@ -845,7 +781,7 @@
                         for (i = 0; i < srcELs.length; i++) {
                             var srcEL = srcELs[i];
                             if (target != srcEL.parentElement) {
-                                names.push(srcEL.basename + srcEL.extname);
+                                names.push(srcEL.name + srcEL.extname);
                             }
                         }
                     }
@@ -914,16 +850,11 @@
                 }
             }
             else {
+                this.super([event]);
+                if (event.cancelBubble) {
+                    return;
+                }
                 switch ( event.which ) {
-                    // enter or F2
-                    case 13:
-                    case 113:
-                        if ( this.lastActive ) {
-                            this.lastActive.rename();
-                        }
-                        event.stopPropagation();
-                    break;
-
                     // key-up
                     case 38:
                         if ( this.lastActive ) {
@@ -944,7 +875,7 @@
                     case 40:
                         if ( this.lastActive ) {
                             this.clearSelect();
-                            var next = this.nextItem(this.lastActive,true);
+                            var next = this.nextItem(this.lastActive, false);
                             if ( next === null ) {
                                 next = this.lastActive;
                             }
@@ -994,6 +925,7 @@
             // while (targetEl.firstChild) {
             //     targetEl.removeChild(targetEl.firstChild);
             // }
+            // targetEl.foldable = false;
 
             // if( !targetEl.isRoot ) {
             //     Fire.AssetDB.importAsset(dstFsDir);

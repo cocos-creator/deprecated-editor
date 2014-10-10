@@ -1,26 +1,20 @@
 <polymer-element 
     name="project-tree" 
+    extends="fire-ui-tree"
     constructor="ProjectTree"
-    on-focusin="{{focusinAction}}"
-    on-focusout="{{focusoutAction}}"
-    on-scroll="{{scrollAction}}"
     on-selecting="{{selectingAction}}"
     on-select="{{selectAction}}"
     on-namechanged="{{namechangedAction}}"
     on-open="{{openAction}}"
     on-draghover="{{draghoverAction}}"
     on-dragcancel="{{dragcancelAction}}"
-    on-keydown="{{keydownAction}}"
     on-contextmenu="{{contextmenuAction}}"
     on-drop="{{dropAction}}"
     >
 <template>
 <link rel="stylesheet" href="project-tree.css">
 
-<div id="content" class="content">
-    <content></content>
-    <div id="highlightMask" class="highlight"></div>
-</div>
+<shadow></shadow>
 
 </template>
 
