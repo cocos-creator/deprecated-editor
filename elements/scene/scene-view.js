@@ -7,7 +7,7 @@
         created: function () {
             this.renderContext = null;
             this.svgGrids = null;
-            this.svgGizmos = null;
+            this.gizmosMng = null;
             this.view = { width: 0, height: 0 };
             this.sceneCamera = {
                 position: { 
@@ -19,6 +19,8 @@
         },
 
         ready: function () {
+            this.tabIndex = EditorUI.getParentTabIndex(this)+1;
+
             // init svg grids
             this.svgGrids = SVG( this.$.grids );
 
@@ -34,13 +36,16 @@
             this.svgGrids.ylines = [];
 
             // init gizmos
-            this.svgGizmos = SVG( this.$.gizmos );
+            this.gizmosMng = new GizmosMng( this.$.gizmos );
         },
 
         init: function () {
+            var clientRect = this.getBoundingClientRect();
             this.view = {
-                width: this.clientWidth,
-                height: this.clientHeight,
+                left: clientRect.left,
+                top: clientRect.top,
+                width: clientRect.width,
+                height: clientRect.height,
             };
 
             // init render context
@@ -58,6 +63,7 @@
                     this.renderContext.camera = camera;
                 }
             }
+            this.repaint();
 
             // TEMP {
             var assetPath = 'assets://Foobar/004.png';
@@ -74,7 +80,9 @@
                     renderer.sprite = sprite;
 
                     ent.transform.position = { x: -200, y: 150 }; 
-                });
+
+                    this.repaint();
+                }.bind(this) );
             }
             else {
                 Fire.error('Failed to load ' + assetPath);
@@ -91,18 +99,20 @@
             // // add it the stage so we see it on our screens..
             // this.renderContext.stage.addChild(graphics);
             // } TEMP
-
-            this.repaint();
         }, 
 
         resize: function () {
             if ( this.renderContext !== null ) {
+                var clientRect = this.getBoundingClientRect();
                 this.view = {
-                    width: this.clientWidth,
-                    height: this.clientHeight,
+                    left: clientRect.left,
+                    top: clientRect.top,
+                    width: clientRect.width,
+                    height: clientRect.height,
                 };
                 this.renderContext.size = new Fire.Vec2( this.view.width, this.view.height );
                 this.svgGrids.size( this.view.width, this.view.height );
+                this.gizmosMng.resize( this.view.width, this.view.height );
 
                 this.repaint();
             }
@@ -112,6 +122,7 @@
             this.updateCamera();
             this.updateGrid();
             this.updateScene();
+            this.updateGizmos();
         },
 
         updateCamera: function () {
@@ -127,6 +138,10 @@
             if ( this.renderContext ) {
                 Fire.Engine._scene.render(this.renderContext);
             }
+        },
+
+        updateGizmos: function () {
+            this.gizmosMng.update();
         },
 
         updateGrid: function () {
@@ -150,14 +165,6 @@
             var ratio = 1.0;
             var trans;
             var camera = this.sceneCamera;
-
-            // var camera = {
-            //     position: { 
-            //         x: this.renderContext.camera.transform.position.x, 
-            //         y: this.renderContext.camera.transform.position.y 
-            //     },
-            //     scale: this.renderContext.camera.size/this.view.height
-            // };
 
             if ( camera.scale >= 1.0 ) {
                 while ( tickDistance*nextTickCount < tickUnit*camera.scale ) {
@@ -249,40 +256,96 @@
         },
 
         mousedownAction: function ( event ) {
-
-            if ( event.which === 1 ) {
-                var mouseMoveHandle = function(event) {
-                    var dx = event.clientX - lastClientX;
-                    var dy = event.clientY - lastClientY;
-
-                    lastClientX = event.clientX;
-                    lastClientY = event.clientY;
+            // process camera panning
+            if ( event.which === 1 && event.shiftKey ) {
+                var mousemoveHandle = function(event) {
+                    var dx = event.clientX - this._lastClientX;
+                    var dy = event.clientY - this._lastClientY;
 
                     this.sceneCamera.position.x = this.sceneCamera.position.x - dx/this.sceneCamera.scale;
                     this.sceneCamera.position.y = this.sceneCamera.position.y + dy/this.sceneCamera.scale;
+
+                    this._lastClientX = event.clientX;
+                    this._lastClientY = event.clientY;
 
                     this.repaint();
 
                     event.stopPropagation();
                 }.bind(this);
 
-                var mouseUpHandle = function(event) {
-                    document.removeEventListener('mousemove', mouseMoveHandle);
-                    document.removeEventListener('mouseup', mouseUpHandle);
+                var mouseupHandle = function(event) {
+                    document.removeEventListener('mousemove', mousemoveHandle);
+                    document.removeEventListener('mouseup', mouseupHandle);
+                    document.removeEventListener('keyup', keyupHandle);
 
                     EditorUI.removeDragGhost();
                     event.stopPropagation();
                 }.bind(this);
 
-                //
-                lastClientX = event.clientX;
-                lastClientY = event.clientY;
+                var keyupHandle = function(event) {
+                    // shift key
+                    if ( event.keyCode === 16 ) {
+                        document.removeEventListener('mousemove', mousemoveHandle);
+                        document.removeEventListener('mouseup', mouseupHandle);
+                        document.removeEventListener('keyup', keyupHandle);
 
-                EditorUI.addDragGhost("default");
-                document.addEventListener ( 'mousemove', mouseMoveHandle );
-                document.addEventListener ( 'mouseup', mouseUpHandle );
+                        EditorUI.removeDragGhost();
+                        event.stopPropagation();
+                    }
+                }.bind(this);
+
+                //
+                this._lastClientX = event.clientX;
+                this._lastClientY = event.clientY;
+                EditorUI.addDragGhost("cell");
+                document.addEventListener ( 'mousemove', mousemoveHandle );
+                document.addEventListener ( 'mouseup', mouseupHandle );
+                document.addEventListener ( 'keyup', keyupHandle );
 
                 event.stopPropagation();
+                return;
+            }
+
+            // process rect-selection
+            if ( event.which === 1 ) {
+                var selectmoveHandle = function(event) {
+                    // this._rectSelectStartX;
+                    // this._rectSelectStartY;
+                    var x = this._rectSelectStartX - this.view.left; 
+                    var y = this._rectSelectStartY - this.view.top; 
+                    var w = event.clientX - this._rectSelectStartX;
+                    var h = event.clientY - this._rectSelectStartY;
+                    if ( w < 0.0 ) {
+                        x += w;
+                        w = -w;
+                    }
+                    if ( h < 0.0 ) {
+                        y += h;
+                        h = -h;
+                    }
+                    this.gizmosMng.updateSelection( x, y, w, h);
+
+                    event.stopPropagation();
+                }.bind(this);
+
+                var selectexitHandle = function(event) {
+                    document.removeEventListener('mousemove', selectmoveHandle);
+                    document.removeEventListener('mouseup', selectexitHandle);
+
+                    this.gizmosMng.fadeoutSelection();
+                    EditorUI.removeDragGhost();
+                    event.stopPropagation();
+                }.bind(this);
+
+                //
+                this._rectSelectStartX = event.clientX;
+                this._rectSelectStartY = event.clientY;
+                EditorUI.addDragGhost("default");
+                document.addEventListener ( 'mousemove', selectmoveHandle );
+                document.addEventListener ( 'mouseup', selectexitHandle );
+
+                event.stopPropagation();
+                return;
             }
         },
 
