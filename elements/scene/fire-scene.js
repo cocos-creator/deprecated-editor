@@ -1,4 +1,6 @@
 (function () {
+    var Ipc = require('ipc');
+
     Polymer({
         created: function () {
             window.addEventListener('resize', function() {
