@@ -71,6 +71,7 @@
             if ( uuid ) {
                 Fire.AssetLibrary.loadAssetByUuid(uuid, function ( asset ) {
                     var ent = new Fire.Entity();
+                    ent.name = "Foobar";
                     var renderer = ent.addComponent(Fire.SpriteRenderer);
 
                     var sprite = new Fire.Sprite();

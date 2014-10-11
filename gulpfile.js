@@ -9,7 +9,6 @@ var vulcanize = require('gulp-vulcanize');
 var del = require('del');
 
 var path = require('path');
-var Q = require('q');
 var es = require('event-stream');
 var stylish = require('jshint-stylish');
 

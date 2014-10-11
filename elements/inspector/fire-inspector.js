@@ -61,27 +61,30 @@
         },
 
         inspect: function ( obj ) {
+            //
             if ( this.$.fields.target === obj ) {
                 return;
             }
-
-            // 
-            // if ( this.$.fields.target &&
-            //      this.$.fields.target instanceof Fire.Importer &&
-            //      obj instanceof Fire.Importer ) 
-            // {
-            //     if ( this.$.fields.target.uuid === obj.uuid ) {
-            //         return;
-            //     }
-            // }
+            
+            //
+            if ( this.$.fields.target instanceof Fire.Importer &&
+                 obj instanceof Fire.Importer ) 
+            {
+                if ( this.$.fields.target.uuid === obj.uuid ) {
+                    return;
+                }
+            }
 
             //
             if ( this.$.preview.firstChild ) {
                 this.$.preview.removeChild(this.$.preview.firstChild);
             }
+            this.$.preview.setAttribute('hidden','');
 
+            //
             this.$.fields.target = obj;
 
+            //
             if ( obj instanceof Fire.TextureImporter ) {
                 var img = new Image(); 
                 img.src = "uuid://" + obj.uuid;
@@ -90,9 +93,6 @@
                 div.appendChild(img);
                 this.$.preview.appendChild(div);
                 this.$.preview.removeAttribute('hidden');
-            }
-            else {
-                this.$.preview.setAttribute('hidden','');
             }
         },
     });
