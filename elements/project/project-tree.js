@@ -858,14 +858,19 @@
                     // key-up
                     case 38:
                         if ( this.lastActive ) {
-                            this.clearSelect();
                             var prev = this.prevItem(this.lastActive);
                             if ( prev === null ) {
                                 prev = this.lastActive;
                             }
-                            this.lastActive = prev;
-                            this.select([this.lastActive]);
-                            this.confirmSelect();
+                            if ( prev !== this.lastActive ) {
+                                if ( prev.offsetTop <= this.scrollTop ) {
+                                    this.scrollTop = prev.offsetTop;
+                                }
+                                this.clearSelect();
+                                this.lastActive = prev;
+                                this.select([this.lastActive]);
+                                this.confirmSelect();
+                            }
                         }
                         event.preventDefault();
                         event.stopPropagation();
@@ -874,14 +879,19 @@
                     // key-down
                     case 40:
                         if ( this.lastActive ) {
-                            this.clearSelect();
                             var next = this.nextItem(this.lastActive, false);
                             if ( next === null ) {
                                 next = this.lastActive;
                             }
-                            this.lastActive = next;
-                            this.select([this.lastActive]);
-                            this.confirmSelect();
+                            if ( next !== this.lastActive ) {
+                                if ( next.offsetTop + 16 >= this.scrollTop + this.offsetHeight ) {
+                                    this.scrollTop = next.offsetTop + 16 - this.offsetHeight;
+                                }
+                                this.clearSelect();
+                                this.lastActive = next;
+                                this.select([this.lastActive]);
+                                this.confirmSelect();
+                            }
                         }
                         event.preventDefault();
                         event.stopPropagation();

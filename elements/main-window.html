@@ -22,27 +22,26 @@
     on-resized="{{resizedAction}}"
     >
     <fire-ui-dock-panel style="width: 200px;">                              
-        <fire-project id="projectView" name="Project" flex-1></fire-project>
+        <fire-project id="projectView" name="Project" fit></fire-project>
     </fire-ui-dock-panel>                                                   
 
     <fire-ui-dock-panel style="min-width: 240px; width: 240px;">                
-        <fire-inspector id="inspector" name="Inspector" flex-1></fire-inspector>
+        <fire-inspector id="inspector" name="Inspector" fit></fire-inspector>
     </fire-ui-dock-panel>                                                       
 
     <fire-ui-dock flex-1 flex-col flex-stretch>
         <fire-ui-dock-panel flex-1 style="">                        
-            <fire-scene id="scene" name="Scene" flex-1></fire-scene>
-            <fire-game id="game" name="Game" flex-1></fire-game>    
+            <fire-scene id="scene" name="Scene" fit></fire-scene>
+            <fire-game id="game" name="Game" fit></fire-game>    
         </fire-ui-dock-panel>                                       
 
         <fire-ui-dock-panel style="min-height: 200px;">
-            <div name="Console" style="margin: 5px; margin-right: 0px; overflow: auto;">
-            </div>
+            <fire-console id="console" name="Console" fit></fire-console>
         </fire-ui-dock-panel>
     </fire-ui-dock>
 
     <fire-ui-dock-panel style="min-width: 200px; width: 200px;">
-        <fire-hierarchy id="hierarchyView" name="Hierarchy" flex-1></fire-hierarchy>
+        <fire-hierarchy id="hierarchyView" name="Hierarchy" fit></fire-hierarchy>
     </fire-ui-dock-panel>
 </fire-ui-dock>
 
