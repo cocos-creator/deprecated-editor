@@ -1,0 +1,6 @@
+(function () {
+    Polymer({
+        created: function () {
+        },
+    });
+})();
