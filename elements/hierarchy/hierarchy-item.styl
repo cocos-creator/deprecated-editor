@@ -1,0 +1,38 @@
+:host {
+    
+	// It will create a new shadow-root instead of import the base element's shadow-root,
+    // so we must use the selector '::shadow' to customize the style of base element
+    // https://groups.google.com/forum/?fromgroups=#!topic/polymer-dev/8MOOwcjZVpw
+    // https://www.polymer-project.org/articles/styling-elements.html
+
+    &([selected])::shadow {
+        .wrapper {
+            .bar {
+                visibility: visible
+                background: #555
+            }
+        }
+    }
+
+    &([conflicted])::shadow {
+        .wrapper {
+            .bar {
+                visibility: visible
+                background: #900
+            }
+        }
+    }
+
+    &([highlighted])::shadow {
+        // border: 2px solid #c7722c
+        .wrapper {
+            background: #c7722c
+        }
+    }
+
+    &([invalid])::shadow {
+        .wrapper {
+            background: #f00
+        }
+    }
+}
