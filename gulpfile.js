@@ -82,7 +82,11 @@ var writeVersion = function (filename) {
 // elements-js
 gulp.task('elements-js', function() {
     return gulp.src(paths.elements_js, {base: './'})
-    .pipe(jshint())
+    .pipe(jshint({
+        multistr: true,
+        smarttabs: false,
+        loopfunc: true,
+    }))
     .pipe(jshint.reporter(stylish))
     .pipe(uglify())
     .pipe(gulp.dest('bin'))
