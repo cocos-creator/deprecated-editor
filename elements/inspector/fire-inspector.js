@@ -1,5 +1,7 @@
 (function () {
     var Ipc = require('ipc');
+    var Remote = require('remote');
+    var Menu = Remote.require('menu');
 
     Polymer({
         publish: {
@@ -82,6 +84,10 @@
             this.$.preview.setAttribute('hidden','');
 
             //
+            var isEntity = obj instanceof Fire.Entity;
+            this.$.addComponent.style.display = isEntity ? '' : 'none';
+
+            //
             this.$.fields.target = obj;
 
             //
@@ -94,6 +100,88 @@
                 this.$.preview.appendChild(div);
                 this.$.preview.removeAttribute('hidden');
             }
+        },
+
+        addComponent: function (component) {
+            var entity = this.$.fields.target;
+            if (entity instanceof Fire.Entity === false) {
+                return;
+            }
+            entity.addComponent(component);
+        },
+
+        addComponentAction: function () {
+            var entity = this.$.fields.target;
+            if (entity instanceof Fire.Entity === false) {
+                return;
+            }
+            var template = this.getAddCompMenuTemplate();
+            var menu = Menu.buildFromTemplate(template);
+            menu.popup(Remote.getCurrentWindow());
+        },
+
+        getAddCompMenuTemplate: function () {
+            function findMenu (menuArray, label) {
+                for (var i = 0; i < menuArray.length; i++) {
+                    if (menuArray[i].label === label) {
+                        return menuArray[i];
+                    }
+                }
+                return null;
+            }
+
+            var template = [];
+            var items = Fire._componentMenuItems;
+            // enumerate components
+            for (var i = 0; i < items.length; i++) {
+                var item = items[i];
+                var subPathes = item.menuPath.split('/');
+                // enumerate menu path
+                var newMenu = null;
+                for (var p = 0, parent = template; p < subPathes.length; p++) {
+                    var label = subPathes[p];
+                    if (!label) {
+                        continue;
+                    }
+                    var parentMenuArray = parent === template ? template : parent.submenu;
+                    if (parentMenuArray) {
+                        var menu = findMenu(parentMenuArray, label);
+                        if (menu) {
+                            if (menu.submenu) {
+                                parent = menu;
+                                continue;
+                            }
+                            else {
+                                Fire.error('Component menu path %s conflict', item.menuPath);
+                                break;
+                            }
+                        }
+                    }
+                    // create
+                    newMenu = {
+                        label: label,
+                    };
+                    if ( !parentMenuArray ) {
+                        parent.submenu = [newMenu];
+                    }
+                    else {
+                        // TODO: sort by items.order;
+                        parentMenuArray.push(newMenu);
+                    }
+                    parent = newMenu;
+                }
+                //
+                if (newMenu && !newMenu.submenu) {
+                    // click callback
+                    newMenu.click = function () {
+                        this.addComponent(item.component);
+                    }.bind(this);
+                }
+                else {
+                    Fire.error('Invalid component menu path: ' + item.menuPath);
+                }
+            }
+            return template;
         },
     });
 })();

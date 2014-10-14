@@ -1,5 +1,7 @@
 (function () {
-    
+    var Remote = require('remote');
+    var Menu = Remote.require('menu');
+
     Polymer({
         publish: {
             focused: {
@@ -17,8 +19,6 @@
         },
 
         getCreateMenuTemplate: function (isContextMenu) {
-            //var Remote = require('remote');
-            //var Menu = Remote.require('menu');
             return [
                 {
                     label: 'Create Empty',
@@ -36,10 +36,17 @@
                 {
                     label: 'Create Empty Child',
                     click: function () {
-                        Fire.broadcast('engine:createEntity', this.contextmenuAt && this.contextmenuAt.id);
+                        var selected = isContextMenu ? this.contextmenuAt : this.lastActive;
+                        Fire.broadcast('engine:createEntity', selected && selected.id);
                     }.bind(this.$.hierarchyTree)
                 },
             ];
+        },
+
+        createAction: function () {
+            var template = this.getCreateMenuTemplate(false);
+            var menu = Menu.buildFromTemplate(template);
+            menu.popup(Remote.getCurrentWindow());
         },
     });
 
