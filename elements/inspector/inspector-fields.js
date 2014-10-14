@@ -92,6 +92,27 @@
         return fireSectionEL;
     }
 
+    function _entitySection ( target ) {
+        var sectionEL = document.createElement('div'); 
+        sectionEL.classList.add('entity-section');
+        sectionEL.setAttribute('flex-row','');
+
+        var el = new FireField();
+        el.bind( 'value', new PathObserver(target,'active') );
+        sectionEL.appendChild( el );
+
+        el = document.createElement('span'); 
+        el.classList.add('space');
+        sectionEL.appendChild( el );
+
+        el = new FireField();
+        el.bind( 'value', new PathObserver(target,'name') );
+        el.setAttribute('flex-1','');
+        sectionEL.appendChild( el );
+
+        return sectionEL;
+    }
+
     Polymer({
         created: function () {
             this.target = null;
@@ -117,7 +138,7 @@
                 this.appendChild( el );
             }
             else if ( this.target instanceof Fire.Entity ) {
-                el = _fieldSection( "Entity", this.target );
+                el = _entitySection( this.target );
                 this.appendChild( el );
 
                 for ( var i = 0; i < this.target._components.length; ++i ) {
