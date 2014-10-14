@@ -88,7 +88,14 @@
             this.$.addComponent.style.display = isEntity ? '' : 'none';
 
             //
+            if ( this.$.fields.target ) {
+                Fire.observe(this.$.fields.target,false);
+            }
+            if ( obj ) {
+                Fire.observe(obj,true);
+            }
             this.$.fields.target = obj;
+            this.$.fields.refresh();
 
             //
             if ( obj instanceof Fire.TextureImporter ) {

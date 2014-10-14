@@ -50,6 +50,15 @@ window.onload = function() {
             },
         });
         Fire.AssetDB = remote.getGlobal( 'AssetDB@' + fireID ); 
+        Fire.observe = function ( target, enabled ) {
+            target._observing = enabled;
+            if ( target instanceof Fire.Entity ) {
+                for ( var i = 0; i < target._components.length; ++i ) {
+                    var comp = target._components[i];
+                    comp._observing = enabled;
+                }
+            }
+        };
     }
     catch ( error ) {
         var currentWindow = remote.getCurrentWindow();
