@@ -33,21 +33,12 @@
     };
 
     
-    function _getType ( target, propName, attrs ) {
+    function _getTypeName ( target, propName, attrs ) {
         var type = attrs.type;
-        if (!type) {
-            if ('default' in attrs) {
-                // declared by prop
-                type = typeof attrs.default;
-            }
-            else {
-                // declared by get
-                type = typeof target[propName];
-            }
+        if ( type === 'object' ) {
+            type = Fire.getClassName( attrs.objectType );
         }
-        if ( type === 'number' ) {
-            type = 'float';
-        }
+        type = type || '';
         return type;
     }
 
@@ -67,7 +58,7 @@
                     continue;
                 }
 
-                var type = _getType(target, propName, attrs);
+                var type = _getTypeName(target, propName, attrs);
                 var propEL = new FireProp();
                 if ( attrs.displayName ) {
                     propEL.name = attrs.displayName;

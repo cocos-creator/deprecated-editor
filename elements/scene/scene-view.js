@@ -75,6 +75,7 @@
                     var renderer = ent.addComponent(Fire.SpriteRenderer);
 
                     var sprite = new Fire.Sprite();
+                    sprite.name = "Temp";
                     sprite.texture = asset;
                     sprite.width = 400;
                     sprite.height = 300;
