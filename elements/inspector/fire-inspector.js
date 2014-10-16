@@ -170,9 +170,9 @@
                 //
                 if (newMenu && !newMenu.submenu) {
                     // click callback
-                    newMenu.click = function () {
-                        this.addComponent(item.component);
-                    }.bind(this);
+                    newMenu.click = (function (component) {
+                        this.addComponent(component);
+                    }).bind(this, item.component);
                 }
                 else {
                     Fire.error('Invalid component menu path: ' + item.menuPath);

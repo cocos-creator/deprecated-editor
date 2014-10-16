@@ -70,18 +70,49 @@
             var uuid = Fire.AssetDB.urlToUuid(assetPath);
             if ( uuid ) {
                 Fire.AssetLibrary.loadAssetByUuid(uuid, function ( asset ) {
-                    var ent = new Fire.Entity();
-                    ent.name = "Foobar";
-                    var renderer = ent.addComponent(Fire.SpriteRenderer);
-
-                    var sprite = new Fire.Sprite();
+                    var sprite;
+                    var ent = new Fire.Entity('Foobar');
+                    sprite = new Fire.Sprite();
                     sprite.name = "Temp";
                     sprite.texture = asset;
+                    sprite.x = 0;
+                    sprite.y = 0;
                     sprite.width = 400;
                     sprite.height = 300;
-                    renderer.sprite = sprite;
+                    ent.addComponent(Fire.SpriteRenderer).sprite = sprite;
+                    ent.transform.position = new Fire.Vec2(-200, 150);
 
-                    ent.transform.position = { x: -200, y: 150 }; 
+                    var pivot = new Fire.Entity('老子在原点');
+                    sprite = new Fire.Sprite();
+                    sprite.texture = asset;
+                    sprite.x = 20;
+                    sprite.y = 40;
+                    sprite.width = 20;
+                    sprite.height = 20;
+                    pivot.addComponent(Fire.SpriteRenderer).sprite = sprite;
+                    //pivot.addComponent(Fire.Camera);
+
+                    // global variable： wei
+                    wei = new Fire.Entity('喂~~ 你还好吗？');
+                    wei.transform.scale = new Fire.Vec2(3, 1);
+                    wei.transform.rotation = 90;
+                    wei.transform.position = new Fire.Vec2(-100, -30);
+
+                    // global variable: hao
+                    hao = new Fire.Entity('很~好~啊~~');
+                    hao.transform.parent = wei.transform;
+                    sprite = new Fire.Sprite();
+                    sprite.texture = asset;
+                    sprite.x = 20;
+                    sprite.y = 40;
+                    sprite.width = 40;
+                    sprite.height = 10;
+                    hao.addComponent(Fire.SpriteRenderer).sprite = sprite;
+                    // local bounds: (-8, -9, 20, 40)
+                    // world bounds: (-109, -66, 40, 60)
+                    hao.transform.scale = new Fire.Vec2(1, 2);
+                    hao.transform.rotation = 90;
+                    hao.transform.position = new Fire.Vec2(12, 31);
 
                     this.repaint();
                 }.bind(this) );
