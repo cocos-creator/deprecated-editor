@@ -9,17 +9,20 @@
 
             this._ipc_clearselect = this.clearselect.bind(this);
             this._ipc_select = this.select.bind(this);
+            this._ipc_repaint = this.repaintScene.bind(this);
         },
 
         ready: function () {
             // register Ipc
             Ipc.on('asset:selected', this._ipc_clearselect );
             Ipc.on('scene:selected', this._ipc_select );
+            Ipc.on('scene:dirty', this._ipc_repaint );
         },
 
         detached: function () {
             Ipc.removeListener('asset:selected', this._ipc_clearselect );
             Ipc.removeListener('scene:selected', this._ipc_select );
+            Ipc.removeListener('scene:dirty', this._ipc_repaint );
         },
 
         initRenderContext: function () {
@@ -56,5 +59,8 @@
             // this.$.view.select(entity);
         },
 
+        repaintScene: function () {
+            this.$.view.repaint();
+        },
     });
 })();

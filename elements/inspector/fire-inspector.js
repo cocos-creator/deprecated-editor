@@ -117,16 +117,6 @@
             entity.addComponent(component);
         },
 
-        addComponentAction: function () {
-            var entity = this.$.fields.target;
-            if (entity instanceof Fire.Entity === false) {
-                return;
-            }
-            var template = this.getAddCompMenuTemplate();
-            var menu = Menu.buildFromTemplate(template);
-            menu.popup(Remote.getCurrentWindow());
-        },
-
         getAddCompMenuTemplate: function () {
             function findMenu (menuArray, label) {
                 for (var i = 0; i < menuArray.length; i++) {
@@ -189,6 +179,27 @@
                 }
             }
             return template;
+        },
+
+        addComponentAction: function () {
+            var entity = this.$.fields.target;
+            if (entity instanceof Fire.Entity === false) {
+                return;
+            }
+            var template = this.getAddCompMenuTemplate();
+            var menu = Menu.buildFromTemplate(template);
+            menu.popup(Remote.getCurrentWindow());
+        },
+
+        fieldsChangedAction: function ( event ) {
+            if ( this.collectingChanges )
+                return;
+
+            this.collectingChanges = true;
+            setTimeout ( function () {
+                this.collectingChanges = false;
+                Fire.broadcast( 'scene:dirty' );
+            }.bind(this), 100 );
         },
     });
 })();

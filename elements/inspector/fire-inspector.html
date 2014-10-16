@@ -8,7 +8,11 @@
 <link rel="stylesheet" href="fire-inspector.css">
 
 <div class="fields" flex-1>
-    <inspector-fields id="fields" fit></inspector-fields>
+    <inspector-fields id="fields" 
+    on-changed="{{fieldsChangedAction}}"
+        fit
+    >
+    </inspector-fields>
 </div>
 
 <fire-ui-button id="addComponent"
