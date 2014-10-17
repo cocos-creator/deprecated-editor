@@ -9,20 +9,30 @@
 
             this._ipc_clearselect = this.clearselect.bind(this);
             this._ipc_select = this.select.bind(this);
-            this._ipc_repaint = this.repaintScene.bind(this);
+            this._ipc_hover = this.hover.bind(this);
+            this._ipc_hoverout = this.hoverout.bind(this);
+            this._ipc_repaint = this.delayRepaintScene.bind(this);
         },
 
         ready: function () {
             // register Ipc
             Ipc.on('asset:selected', this._ipc_clearselect );
             Ipc.on('scene:selected', this._ipc_select );
+            Ipc.on('scene:hover', this._ipc_hover );
+            Ipc.on('scene:hoverout', this._ipc_hoverout );
             Ipc.on('scene:dirty', this._ipc_repaint );
+
+            this._repaintID = setInterval ( this.repaintScene.bind(this), 500 );
         },
 
         detached: function () {
             Ipc.removeListener('asset:selected', this._ipc_clearselect );
             Ipc.removeListener('scene:selected', this._ipc_select );
+            Ipc.removeListener('scene:hover', this._ipc_hover );
+            Ipc.removeListener('scene:hoverout', this._ipc_hoverout );
             Ipc.removeListener('scene:dirty', this._ipc_repaint );
+
+            clearInterval (this._repaintID);
         },
 
         initRenderContext: function () {
@@ -55,8 +65,34 @@
                 return;
             }
 
-            // TODO
-            // this.$.view.select(entity);
+            this.$.view.select(entity);
+        },
+
+        hover: function ( entityID ) {
+            if ( !entityID )
+                return;
+
+            var entity = Fire.Entity._getInstanceById(entityID);
+            if (!entity) {
+                return;
+            }
+
+            this.$.view.hover(entity);
+        },
+
+        hoverout: function ( entityID ) {
+            this.$.view.hoverout();
+        },
+
+        delayRepaintScene: function () {
+            if ( this._repainting )
+                return;
+
+            this._repainting = true;
+            setTimeout( function () {
+                this.repaintScene();
+                this._repainting = false;
+            }.bind(this), 100 );
         },
 
         repaintScene: function () {

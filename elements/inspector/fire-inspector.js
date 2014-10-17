@@ -115,6 +115,8 @@
                 return;
             }
             entity.addComponent(component);
+
+            this.$.fields.refresh();
         },
 
         getAddCompMenuTemplate: function () {
@@ -192,14 +194,7 @@
         },
 
         fieldsChangedAction: function ( event ) {
-            if ( this.collectingChanges )
-                return;
-
-            this.collectingChanges = true;
-            setTimeout ( function () {
-                this.collectingChanges = false;
-                Fire.broadcast( 'scene:dirty' );
-            }.bind(this), 100 );
+            Fire.broadcast( 'scene:dirty' );
         },
     });
 })();

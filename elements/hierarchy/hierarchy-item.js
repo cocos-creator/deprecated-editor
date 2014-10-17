@@ -78,6 +78,16 @@
             event.stopPropagation();
         },
 
+        mouseenterAction: function ( event ) {
+            Fire.broadcast('scene:hover', this.id);
+            event.stopPropagation();
+        },
+
+        mouseleaveAction: function ( event ) {
+            Fire.broadcast('scene:hoverout', this.id);
+            event.stopPropagation();
+        },
+
         //dragoverAction: function ( event ) {
         //    this.fire('draghover', {files : event.dataTransfer.files});
 

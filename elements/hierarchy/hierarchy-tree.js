@@ -365,7 +365,7 @@
 
         highlight: function ( item ) {
             if ( item ) {
-                var style = this.$.highlightMask;
+                var style = this.$.highlightMask.style;
                 style.display = "block";
                 style.left = item.offsetLeft + "px";
                 style.top = item.offsetTop + "px";

@@ -36,7 +36,7 @@
             this.svgGrids.ylines = [];
 
             // init gizmos
-            this.gizmosMng = new GizmosMng( this.$.gizmos );
+            this.gizmosMng = new Fire.GizmosMng( this.$.gizmos );
         },
 
         init: function () {
@@ -61,9 +61,9 @@
                     var camera = cameraEnt.addComponent(Fire.Camera);
                     camera.size = this.view.height;
                     this.renderContext.camera = camera;
+                    this.gizmosMng.camera = camera;
                 }
             }
-            this.repaint();
 
             // TEMP {
             var assetPath = 'assets://Foobar/004.png';
@@ -87,8 +87,8 @@
                     sprite.texture = asset;
                     sprite.x = 20;
                     sprite.y = 40;
-                    sprite.width = 20;
-                    sprite.height = 20;
+                    sprite.width = 200;
+                    sprite.height = 150;
                     pivot.addComponent(Fire.SpriteRenderer).sprite = sprite;
                     //pivot.addComponent(Fire.Camera);
 
@@ -113,8 +113,6 @@
                     hao.transform.scale = new Fire.Vec2(1, 2);
                     hao.transform.rotation = 90;
                     hao.transform.position = new Fire.Vec2(12, 31);
-
-                    this.repaint();
                 }.bind(this) );
             }
             else {
@@ -286,6 +284,18 @@
                 ylines[i].remove();
             }
             ylines.splice(cur_idx);
+        },
+
+        hover: function ( entity ) {
+            this.gizmosMng.hover(entity);
+        },
+
+        hoverout: function () {
+            this.gizmosMng.hoverout();
+        },
+
+        select: function ( entity ) {
+            this.gizmosMng.select(entity);
         },
 
         mousedownAction: function ( event ) {
