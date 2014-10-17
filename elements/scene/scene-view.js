@@ -82,7 +82,8 @@
                     ent.addComponent(Fire.SpriteRenderer).sprite = sprite;
                     ent.transform.position = new Fire.Vec2(-200, 150);
 
-                    var pivot = new Fire.Entity('老子在原点');
+                    // global variable： pivot
+                    pivot = new Fire.Entity('pivot');
                     sprite = new Fire.Sprite();
                     sprite.texture = asset;
                     sprite.x = 20;
@@ -90,12 +91,12 @@
                     sprite.width = 200;
                     sprite.height = 150;
                     pivot.addComponent(Fire.SpriteRenderer).sprite = sprite;
-                    //pivot.addComponent(Fire.Camera);
+                    pivot.addComponent(Fire.Camera);
 
                     // global variable： wei
                     wei = new Fire.Entity('喂~~ 你还好吗？');
                     wei.transform.scale = new Fire.Vec2(3, 1);
-                    wei.transform.rotation = 90;
+                    wei.transform.rotation = -90;
                     wei.transform.position = new Fire.Vec2(-100, -30);
 
                     // global variable: hao
@@ -111,7 +112,7 @@
                     // local bounds: (-8, -9, 20, 40)
                     // world bounds: (-109, -66, 40, 60)
                     hao.transform.scale = new Fire.Vec2(1, 2);
-                    hao.transform.rotation = 90;
+                    hao.transform.rotation = -90;
                     hao.transform.position = new Fire.Vec2(12, 31);
                 }.bind(this) );
             }
