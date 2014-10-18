@@ -2,7 +2,7 @@
     Polymer({
         created: function () {
             this.renderContext = null;
-            this.svgGrids = null;
+            this.pixiGrids = null;
             this.svgGizmos = null;
             this.view = { width: 0, height: 0 };
             this.sceneCamera = {
@@ -17,8 +17,8 @@
         ready: function () {
             this.tabIndex = EditorUI.getParentTabIndex(this)+1;
 
-            // init svg grids
-            this.svgGrids = new Fire.SvgGrids( this.$.grids );
+            // init pixi grids
+            this.pixiGrids = new Fire.PixiGrids();
 
             // init gizmos
             this.svgGizmos = new Fire.SvgGizmos( this.$.gizmos );
@@ -46,8 +46,12 @@
                     var camera = cameraEnt.addComponent(Fire.Camera);
                     camera.size = this.view.height;
                     this.renderContext.camera = camera;
-                    this.svgGrids.setCamera(camera);
                     this.svgGizmos.setCamera(camera);
+
+                    var graphics = new PIXI.Graphics();
+                    this.renderContext.stage.addChild(graphics);
+                    this.pixiGrids.setGraphics(graphics);
+                    this.pixiGrids.setCamera(camera);
                 }
             }
 
@@ -107,17 +111,6 @@
             else {
                 Fire.error('Failed to load ' + assetPath);
             }
-            // // create a new graphics object
-            // var graphics = new PIXI.Graphics();
-            // // begin a green fill..
-            // graphics.beginFill(0x00aaff, 0.5);
-            // graphics.lineStyle(1, 0x00aaff);
-            // // draw a rectangle
-            // graphics.drawRect(0, 0, 400, 400);
-            // // end the fill
-            // graphics.endFill();
-            // // add it the stage so we see it on our screens..
-            // this.renderContext.stage.addChild(graphics);
             // } TEMP
         }, 
 
@@ -131,7 +124,7 @@
                     height: clientRect.height,
                 };
                 this.renderContext.size = new Fire.Vec2( this.view.width, this.view.height );
-                this.svgGrids.resize( this.view.width, this.view.height );
+                this.pixiGrids.resize( this.view.width, this.view.height );
                 this.svgGizmos.resize( this.view.width, this.view.height );
 
                 this.repaint();
@@ -165,7 +158,7 @@
         },
 
         updateGrid: function () {
-            this.svgGrids.update();
+            this.pixiGrids.update();
         },
 
         hover: function ( entity ) {
