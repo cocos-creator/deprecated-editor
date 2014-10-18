@@ -18,6 +18,8 @@ var paths = {
     elements_html: 'elements/**/*.html',
     elements_js:   'elements/**/*.js',
     src: [
+        'src/svg-gizmos.js',
+        'src/svg-grids.js',
         'src/bootstrap.js',
     ]
 };

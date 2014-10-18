@@ -1,23 +1,27 @@
-Fire.GizmosMng = (function () {
+Fire.SvgGizmos = (function () {
     function _snapPixel (p) {
         return Math.floor(p) + 0.5; 
     }
 
-    function GizmosMng ( svgElement ) {
-        this.svg = SVG(svgElement);
+    function SvgGizmos ( svgEL ) {
+        this.svg = SVG(svgEL);
         this.hoverRect = this.svg.polyline();
         this.hoverRect.hide();
     }
 
-    GizmosMng.prototype.resize = function ( width, height ) {
+    SvgGizmos.prototype.setCamera = function ( camera ) {
+        this.camera = camera;
+    };
+
+    SvgGizmos.prototype.resize = function ( width, height ) {
         this.svg.size( width, height );
     };
 
-    GizmosMng.prototype.update = function () {
+    SvgGizmos.prototype.update = function () {
         this.select( this.currentSelect );
     };
 
-    GizmosMng.prototype.updateSelection = function ( x, y, w, h ) {
+    SvgGizmos.prototype.updateSelection = function ( x, y, w, h ) {
         if ( !this.selectRect ) {
             this.selectRect = this.svg.rect();
         }
@@ -29,7 +33,7 @@ Fire.GizmosMng = (function () {
                        ;
     };
 
-    GizmosMng.prototype.fadeoutSelection = function () {
+    SvgGizmos.prototype.fadeoutSelection = function () {
         if ( !this.selectRect ) {
             return;
         }
@@ -41,7 +45,7 @@ Fire.GizmosMng = (function () {
         this.selectRect = null;
     };
 
-    GizmosMng.prototype.hover = function ( entity ) {
+    SvgGizmos.prototype.hover = function ( entity ) {
         var renderer = entity.getComponent( Fire.Renderer );
         if ( renderer ) {
             var bounds = renderer.getWorldOrientedBounds();
@@ -67,11 +71,11 @@ Fire.GizmosMng = (function () {
         }
     };
 
-    GizmosMng.prototype.hoverout = function () {
+    SvgGizmos.prototype.hoverout = function () {
         this.hoverRect.hide();
     };
 
-    GizmosMng.prototype.select = function ( entity ) {
+    SvgGizmos.prototype.select = function ( entity ) {
         if ( !entity ) {
             return;
         }
@@ -94,5 +98,5 @@ Fire.GizmosMng = (function () {
                            ;
     };
 
-    return GizmosMng;
+    return SvgGizmos;
 })();

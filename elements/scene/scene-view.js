@@ -1,13 +1,9 @@
 (function () {
-    function _smooth (t) {
-        return ( t === 1.0 ) ? 1.0 : 1.001 * ( 1.0 - Math.pow( 2, -10 * t ) );
-    }
-
     Polymer({
         created: function () {
             this.renderContext = null;
             this.svgGrids = null;
-            this.gizmosMng = null;
+            this.svgGizmos = null;
             this.view = { width: 0, height: 0 };
             this.sceneCamera = {
                 position: { 
@@ -22,21 +18,10 @@
             this.tabIndex = EditorUI.getParentTabIndex(this)+1;
 
             // init svg grids
-            this.svgGrids = SVG( this.$.grids );
-
-            var xaxis = this.svgGrids.group();
-            xaxis.addClass("x-axis");
-            this.svgGrids.xaxis = xaxis;
-
-            var yaxis = this.svgGrids.group();
-            yaxis.addClass("y-axis");
-            this.svgGrids.yaxis = yaxis;
-
-            this.svgGrids.xlines = [];
-            this.svgGrids.ylines = [];
+            this.svgGrids = new Fire.SvgGrids( this.$.grids );
 
             // init gizmos
-            this.gizmosMng = new Fire.GizmosMng( this.$.gizmos );
+            this.svgGizmos = new Fire.SvgGizmos( this.$.gizmos );
         },
 
         init: function () {
@@ -61,7 +46,8 @@
                     var camera = cameraEnt.addComponent(Fire.Camera);
                     camera.size = this.view.height;
                     this.renderContext.camera = camera;
-                    this.gizmosMng.camera = camera;
+                    this.svgGrids.setCamera(camera);
+                    this.svgGizmos.setCamera(camera);
                 }
             }
 
@@ -143,8 +129,8 @@
                     height: clientRect.height,
                 };
                 this.renderContext.size = new Fire.Vec2( this.view.width, this.view.height );
-                this.svgGrids.size( this.view.width, this.view.height );
-                this.gizmosMng.resize( this.view.width, this.view.height );
+                this.svgGrids.resize( this.view.width, this.view.height );
+                this.svgGizmos.resize( this.view.width, this.view.height );
 
                 this.repaint();
             }
@@ -173,130 +159,23 @@
         },
 
         updateGizmos: function () {
-            this.gizmosMng.update();
+            this.svgGizmos.update();
         },
 
         updateGrid: function () {
-            var i = 0;
-            var cur_idx = 0;
-            var line = null; 
-            var xlines = this.svgGrids.xlines;
-            var ylines = this.svgGrids.ylines;
-            var xaxis = this.svgGrids.xaxis;
-            var yaxis = this.svgGrids.yaxis;
-
-            // var center = this.renderContext.camera.worldToScreen( 0.0, 0.0 );
-            // origin.center( center.x, center.y ); 
-
-            var tickUnit = 100;
-            var tickCount = 10;
-            var tickDistance = 50;
-
-            var nextTickCount = 1;
-            var curTickUnit = tickUnit;
-            var ratio = 1.0;
-            var trans;
-            var camera = this.sceneCamera;
-
-            if ( camera.scale >= 1.0 ) {
-                while ( tickDistance*nextTickCount < tickUnit*camera.scale ) {
-                    nextTickCount = nextTickCount * tickCount;
-                }
-                curTickUnit = tickUnit/nextTickCount * tickCount;
-                ratio = (tickUnit*camera.scale) / (tickDistance*nextTickCount);
-            }
-            else if ( camera.scale < 1.0 ) {
-                while ( tickDistance/nextTickCount > tickUnit*camera.scale ) {
-                    nextTickCount = nextTickCount * tickCount;
-                }
-                curTickUnit = tickUnit*nextTickCount;
-                ratio = (tickUnit*camera.scale) / (tickDistance/nextTickCount);
-                ratio /= 10.0;
-            }
-            ratio = (ratio - 1.0/tickCount) / (1.0 - 1.0/tickCount);
-
-            var start = this.renderContext.camera.screenToWorld ( new Fire.Vec2(0, 0) );
-            var end = this.renderContext.camera.screenToWorld ( new Fire.Vec2(this.view.width, this.view.height) );
-
-            var start_x = Math.ceil(start.x/curTickUnit) * curTickUnit;
-            var end_x = end.x;
-            var start_y = Math.ceil(end.y/curTickUnit) * curTickUnit;
-            var end_y = start.y;
-
-            // draw x lines
-            var tickIndex = Math.round(start_x/curTickUnit);
-            for ( var x = start_x; x < end_x; x += curTickUnit ) {
-                if ( cur_idx < xlines.length ) {
-                    line = xlines[cur_idx];
-                }
-                else {
-                    line = this.svgGrids.line( 0, 0, 0, this.view.height );
-                    xlines.push(line);
-                    xaxis.add(line);
-                }
-                ++cur_idx;
-
-                if ( tickIndex % tickCount === 0 ) {
-                    line.opacity(1.0);
-                }
-                else {
-                    line.opacity(_smooth(ratio));
-                }
-                ++tickIndex;
-
-                trans = this.renderContext.camera.worldToScreen( new Fire.Vec2(x, 0.0) );
-                trans.y = 0.0;
-                line.plot( 0, 0, 0, this.view.height ).stroke("#555").transform(trans);
-            }
-            // remove unused x lines
-            for ( i = cur_idx; i < xlines.length; ++i ) {
-                xlines[i].remove();
-            }
-            xlines.splice(cur_idx);
-
-            // draw y lines
-            cur_idx = 0;
-            tickIndex = Math.round(start_y/curTickUnit);
-            for ( var y = start_y; y < end_y; y += curTickUnit ) {
-                if ( cur_idx < ylines.length ) {
-                    line = ylines[cur_idx];
-                }
-                else {
-                    line = this.svgGrids.line( 0, 0, this.view.width, 0 );
-                    ylines.push(line);
-                    yaxis.add(line);
-                }
-                ++cur_idx;
-
-                if ( tickIndex % tickCount === 0 ) {
-                    line.opacity(1.0);
-                }
-                else {
-                    line.opacity(_smooth(ratio));
-                }
-                ++tickIndex;
-
-                trans = this.renderContext.camera.worldToScreen( new Fire.Vec2(0.0, y) );
-                trans.x = 0.0;
-                line.plot( 0, 0, this.view.width, 0 ).stroke("#555").transform(trans);
-            }
-            // remove unused y lines
-            for ( i = cur_idx; i < ylines.length; ++i ) {
-                ylines[i].remove();
-            }
-            ylines.splice(cur_idx);
+            this.svgGrids.update();
         },
 
         hover: function ( entity ) {
-            this.gizmosMng.hover(entity);
+            this.svgGizmos.hover(entity);
         },
 
         hoverout: function () {
-            this.gizmosMng.hoverout();
+            this.svgGizmos.hoverout();
         },
 
         select: function ( entity ) {
-            this.gizmosMng.select(entity);
+            this.svgGizmos.select(entity);
         },
 
         mousedownAction: function ( event ) {
@@ -367,7 +246,7 @@
                         y += h;
                         h = -h;
                     }
-                    this.gizmosMng.updateSelection( x, y, w, h);
+                    this.svgGizmos.updateSelection( x, y, w, h);
 
                     event.stopPropagation();
                 }.bind(this);
@@ -376,7 +255,7 @@
                     document.removeEventListener('mousemove', selectmoveHandle);
                     document.removeEventListener('mouseup', selectexitHandle);
 
-                    this.gizmosMng.fadeoutSelection();
+                    this.svgGizmos.fadeoutSelection();
                     EditorUI.removeDragGhost();
                     event.stopPropagation();
                 }.bind(this);
