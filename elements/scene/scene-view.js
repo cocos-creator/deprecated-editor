@@ -51,6 +51,8 @@
                 }
             }
 
+            this.resize(); // make sure we apply the size to all canvas
+
             // TEMP {
             var assetPath = 'assets://Foobar/004.png';
             var uuid = Fire.AssetDB.urlToUuid(assetPath);

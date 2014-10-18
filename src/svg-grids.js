@@ -19,8 +19,8 @@ Fire.SvgGrids = (function () {
         this.ylines = [];
 
         this.view = {
-            width: 1,
-            height: 1
+            width: 0,
+            height: 0,
         };
     }
 

@@ -81,7 +81,7 @@ Fire.SvgGizmos = (function () {
         }
 
         if ( !this.translateGizmo ) {
-            this.translateGizmo = this.svg.rect();
+            this.translateGizmo = this.positionTool();
         }
         this.currentSelect = entity;
 
@@ -90,12 +90,45 @@ Fire.SvgGizmos = (function () {
         pos = this.camera.worldToScreen(pos);
         var rotation = localToWorld.getRotation() * 180.0 / Math.PI;
 
-        this.translateGizmo.move( _snapPixel(pos.x), _snapPixel(pos.y-20) ) 
-                           .size( 20, 20 )
+        this.translateGizmo.translate( _snapPixel(pos.x), _snapPixel(pos.y) ) 
                            .rotate( -rotation, _snapPixel(pos.x), _snapPixel(pos.y)  )
-                           .fill( { color: "#05f", opacity: 0.4 } )
-                           .stroke( { width: 1, color: "#05f", opacity: 1.0 } )
                            ;
+    };
+
+    // SvgGizmos.prototype.arrow = function ( x, y, angle, size ) {
+    //     this.svg.polyline
+    // };
+    
+    SvgGizmos.prototype.positionTool = function () {
+        var group = this.svg.group();
+
+        // x-arrow
+        group.line( 0, 0, 100, 0 )
+             .stroke( { width: 1, color: "#f00" } )
+             .marker( 'end', 10, 10, function (add) {
+                 add.path( 10, 10 )
+                    .fill( { color: "#f00" } )
+                 ;
+             });
+
+        // y-arrow
+        group.line( 0, 0, 0, -100 )
+             .stroke( { width: 1, color: "#5c5" } )
+             .marker( 'end', 10, 10, function (add) {
+                 add.rect( 10, 10 )
+                    .fill( { color: "#5c5" } )
+                 ;
+             });
+
+        // move rect
+        group.rect( 20, 20 )
+             .move( 0, -20 )
+             .fill( { color: "#05f", opacity: 0.4 } )
+             .stroke( { width: 1, color: "#05f" } )
+             ;
+
+
+        return group;
     };
 
     return SvgGizmos;
