@@ -5,7 +5,7 @@ Fire.SvgGizmos = (function () {
 
     function SvgGizmos ( svgEL ) {
         this.svg = SVG(svgEL);
-        this.hoverRect = this.svg.polyline();
+        this.hoverRect = this.svg.polygon();
         this.hoverRect.hide();
     }
 
@@ -60,7 +60,6 @@ Fire.SvgGizmos = (function () {
                 [_snapPixel(v2.x), _snapPixel(v2.y)],
                 [_snapPixel(v3.x), _snapPixel(v3.y)],
                 [_snapPixel(v4.x), _snapPixel(v4.y)],
-                [_snapPixel(v1.x), _snapPixel(v1.y)]
             ])
             .fill( "none" )
             .stroke( { color: "#999", width: 1 } )
@@ -88,37 +87,46 @@ Fire.SvgGizmos = (function () {
         var localToWorld = entity.transform.getLocalToWorldMatrix();
         var pos = new Fire.Vec2(localToWorld.tx, localToWorld.ty);
         pos = this.camera.worldToScreen(pos);
+        pos.x = _snapPixel(pos.x);
+        pos.y = _snapPixel(pos.y);
+
         var rotation = localToWorld.getRotation() * 180.0 / Math.PI;
 
-        this.translateGizmo.translate( _snapPixel(pos.x), _snapPixel(pos.y) ) 
-                           .rotate( -rotation, _snapPixel(pos.x), _snapPixel(pos.y)  )
+        this.translateGizmo.translate( pos.x, pos.y ) 
+                           .rotate( -rotation, pos.x, pos.y )
                            ;
     };
 
-    // SvgGizmos.prototype.arrow = function ( x, y, angle, size ) {
-    //     this.svg.polyline
-    // };
+    SvgGizmos.prototype.arrow = function ( size, color ) {
+        var arrow = this.svg.line( 0, 0, size, 0 )
+                            .stroke( { width: 1, color: color } )
+                            .marker( 'end', 13, 10, function (add) {
+                                add.polygon([ [1,1], [1,9], [12,5] ])
+                                   .fill( { color: color } )
+                                   ;
+                            });
+        arrow.on( 'mouseover', function ( event ) {
+            this.scale( 1.5, 1.5 );
+        } );
+        arrow.on( 'mouseout', function ( event ) {
+            this.scale( 1, 1 );
+        } );
+        // arrow.style( 'pointer-events', 'bounding-box' );
+
+        return arrow;
+    };
     
     SvgGizmos.prototype.positionTool = function () {
         var group = this.svg.group();
 
         // x-arrow
-        group.line( 0, 0, 100, 0 )
-             .stroke( { width: 1, color: "#f00" } )
-             .marker( 'end', 10, 10, function (add) {
-                 add.path( 10, 10 )
-                    .fill( { color: "#f00" } )
-                 ;
-             });
+        var xarrow = this.arrow( 100, "#f00" );
+        group.add(xarrow);
 
         // y-arrow
-        group.line( 0, 0, 0, -100 )
-             .stroke( { width: 1, color: "#5c5" } )
-             .marker( 'end', 10, 10, function (add) {
-                 add.rect( 10, 10 )
-                    .fill( { color: "#5c5" } )
-                 ;
-             });
+        var yarrow = this.arrow( 100, "#5c5" );
+        yarrow.rotate(-90, 0, 0 );
+        group.add(yarrow);
 
         // move rect
         group.rect( 20, 20 )
@@ -126,7 +134,6 @@ Fire.SvgGizmos = (function () {
              .fill( { color: "#05f", opacity: 0.4 } )
              .stroke( { width: 1, color: "#05f" } )
              ;
-
 
         return group;
     };
