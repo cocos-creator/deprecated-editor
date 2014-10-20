@@ -90,7 +90,7 @@ Fire.PixiGrids = (function () {
             ++tickIndex;
 
             trans = camera.worldToScreen( new Fire.Vec2(x, 0.0) );
-            this.graphics.moveTo( _snapPixel(trans.x), 0.0 );
+            this.graphics.moveTo( _snapPixel(trans.x), -1.0 );
             this.graphics.lineTo( _snapPixel(trans.x), this.view.height );
         }
 

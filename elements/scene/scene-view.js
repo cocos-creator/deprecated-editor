@@ -170,7 +170,30 @@
         },
 
         select: function ( entity ) {
-            this.svgGizmos.select(entity);
+            if ( this._moveTool ) {
+                this.svgGizmos.remove(this._moveTool);
+                this._moveTool = null;
+            }
+
+            var worldPos;
+            this._moveTool = this.svgGizmos.positionTool ( {
+                start: function () {
+                    var localToWorld = entity.transform.getLocalToWorldMatrix();
+                    worldPos = new Fire.Vec2( localToWorld.tx, localToWorld.ty );
+                }.bind(this),
+
+                update: function ( dx, dy ) {
+                    // var localToWorld = entity.transform.getLocalToWorldMatrix();
+                    // var worldToLocal = entity.transform.getWorldToLocalMatrix();
+                    // entity.transform.position = worldToLocal.transformPoint(position);
+                    var delta = new Fire.Vec2( dx/this.sceneCamera.scale, 
+                                              -dy/this.sceneCamera.scale );
+                    entity.transform.position = worldPos.add(delta);
+
+                    this.repaint();
+                }.bind(this),
+            } ); 
+            this.svgGizmos.add( this._moveTool, entity );
         },
 
         mousedownAction: function ( event ) {

@@ -3,10 +3,72 @@ Fire.SvgGizmos = (function () {
         return Math.floor(p) + 0.5; 
     }
 
+    function _updateGizmo ( gizmo, camera ) {
+        if ( gizmo.entity ) {
+            var localToWorld = gizmo.entity.transform.getLocalToWorldMatrix();
+            var worldPos = new Fire.Vec2(localToWorld.tx, localToWorld.ty);
+
+            var screenPos = camera.worldToScreen(worldPos);
+            screenPos.x = _snapPixel(screenPos.x);
+            screenPos.y = _snapPixel(screenPos.y);
+
+            var rotation = localToWorld.getRotation() * 180.0 / Math.PI;
+
+            gizmo.translate( screenPos.x, screenPos.y ) 
+                 .rotate( -rotation, screenPos.x, screenPos.y )
+                 ;
+        }
+    }
+
+    function _addMoveHandles ( gizmo, callbacks ) {
+        var pressx, pressy;
+
+        //
+        var mousemoveHandle = function(event) {
+            var dx = event.clientX - pressx;
+            var dy = event.clientY - pressy;
+
+            if ( callbacks.update ) {
+                callbacks.update.call( gizmo, dx, dy );
+            }
+
+            event.stopPropagation();
+        }.bind(gizmo);
+
+        var mouseupHandle = function(event) {
+            document.removeEventListener('mousemove', mousemoveHandle);
+            document.removeEventListener('mouseup', mouseupHandle);
+            EditorUI.removeDragGhost();
+
+            if ( callbacks.end ) {
+                callbacks.end.call( gizmo );
+            }
+
+            event.stopPropagation();
+        }.bind(gizmo);
+
+        gizmo.on( 'mousedown', function ( event ) {
+            if ( event.which === 1 ) {
+                pressx = event.clientX;
+                pressy = event.clientY;
+
+                EditorUI.addDragGhost("default");
+                document.addEventListener ( 'mousemove', mousemoveHandle );
+                document.addEventListener ( 'mouseup', mouseupHandle );
+
+                if ( callbacks.start ) {
+                    callbacks.start.call ( gizmo );
+                }
+            }
+            event.stopPropagation();
+        } );
+    } 
+
     function SvgGizmos ( svgEL ) {
         this.svg = SVG(svgEL);
         this.hoverRect = this.svg.polygon();
         this.hoverRect.hide();
+        this.gizmos = [];
     }
 
     SvgGizmos.prototype.setCamera = function ( camera ) {
@@ -18,7 +80,10 @@ Fire.SvgGizmos = (function () {
     };
 
     SvgGizmos.prototype.update = function () {
-        this.select( this.currentSelect );
+        for ( var i = 0; i < this.gizmos.length; ++i ) {
+            var gizmo = this.gizmos[i];
+            _updateGizmo( gizmo, this.camera );
+        }
     };
 
     SvgGizmos.prototype.updateSelection = function ( x, y, w, h ) {
@@ -74,66 +139,142 @@ Fire.SvgGizmos = (function () {
         this.hoverRect.hide();
     };
 
-    SvgGizmos.prototype.select = function ( entity ) {
-        if ( !entity ) {
-            return;
-        }
-
-        if ( !this.translateGizmo ) {
-            this.translateGizmo = this.positionTool();
-        }
-        this.currentSelect = entity;
-
-        var localToWorld = entity.transform.getLocalToWorldMatrix();
-        var pos = new Fire.Vec2(localToWorld.tx, localToWorld.ty);
-        pos = this.camera.worldToScreen(pos);
-        pos.x = _snapPixel(pos.x);
-        pos.y = _snapPixel(pos.y);
-
-        var rotation = localToWorld.getRotation() * 180.0 / Math.PI;
-
-        this.translateGizmo.translate( pos.x, pos.y ) 
-                           .rotate( -rotation, pos.x, pos.y )
-                           ;
+    SvgGizmos.prototype.add = function ( gizmo, entity ) {
+        gizmo.entity = entity;
+        _updateGizmo( gizmo, this.camera );
+        this.gizmos.push(gizmo);
     };
 
-    SvgGizmos.prototype.arrow = function ( size, color ) {
-        var arrow = this.svg.line( 0, 0, size, 0 )
-                            .stroke( { width: 1, color: color } )
-                            .marker( 'end', 13, 10, function (add) {
-                                add.polygon([ [1,1], [1,9], [12,5] ])
-                                   .fill( { color: color } )
-                                   ;
-                            });
-        arrow.on( 'mouseover', function ( event ) {
-            this.scale( 1.5, 1.5 );
-        } );
-        arrow.on( 'mouseout', function ( event ) {
-            this.scale( 1, 1 );
-        } );
-        // arrow.style( 'pointer-events', 'bounding-box' );
+    SvgGizmos.prototype.remove = function ( gizmo ) {
+        for ( var i = this.gizmos.length-1; i >= 0; --i ) {
+            var g = this.gizmos[i];
+            if ( g === gizmo ) {
+                g.remove();
+                this.gizmos.splice( i, 1 );
+                break;
+            }
+        }
+    };
 
-        return arrow;
+    SvgGizmos.prototype.arrowTool = function ( size, color, callback ) {
+        var group = this.svg.group();
+        var line = group.line( 0, 0, size, 0 )
+                        .stroke( { width: 1, color: color } )
+                        ;
+        var arrow = group.polygon ([ [size, 5], [size, -5], [size+15, 0] ])
+                         .fill( { color: color } )
+                         ;
+        var dragging = false;
+
+        group.style( 'pointer-events', 'bounding-box' );
+
+        group.on( 'mouseover', function ( event ) {
+            var lightColor = chroma(color).brighter().hex();
+            line.stroke( { color: lightColor } );
+            arrow.fill( { color: lightColor } );
+
+            event.stopPropagation();
+        } );
+
+        group.on( 'mouseout', function ( event ) {
+            if ( !dragging ) {
+                line.stroke( { color: color } );
+                arrow.fill( { color: color } );
+            }
+
+            event.stopPropagation();
+        } );
+
+        _addMoveHandles( group, {
+            start: function () {
+                dragging = true;
+                line.stroke( { color: "#ff0" } );
+                arrow.fill( { color: "#ff0" } );
+            },
+
+            update: function ( dx, dy ) {
+                callback ( dx, dy );
+            },
+
+            end: function () {
+                dragging = false;
+                line.stroke( { color: color } );
+                arrow.fill( { color: color } );
+            }
+        }  );
+
+        return group;
     };
     
-    SvgGizmos.prototype.positionTool = function () {
+    SvgGizmos.prototype.positionTool = function ( callbacks ) {
         var group = this.svg.group();
+        var xarrow, yarrow, moveRect;
 
         // x-arrow
-        var xarrow = this.arrow( 100, "#f00" );
+        xarrow = this.arrowTool( 80, "#f00", function ( dx, dy ) {
+            // TODO
+        } );
+        xarrow.translate( 20, 0 );
         group.add(xarrow);
 
         // y-arrow
-        var yarrow = this.arrow( 100, "#5c5" );
+        yarrow = this.arrowTool( 80, "#5c5", function ( dx, dy ) {
+            // TODO
+        } );
+        yarrow.translate( 20, 0 );
         yarrow.rotate(-90, 0, 0 );
         group.add(yarrow);
 
         // move rect
-        group.rect( 20, 20 )
-             .move( 0, -20 )
-             .fill( { color: "#05f", opacity: 0.4 } )
-             .stroke( { width: 1, color: "#05f" } )
-             ;
+        var color = "#05f";
+        var dragging = false;
+        moveRect = group.rect( 20, 20 )
+                            .move( 0, -20 )
+                            .fill( { color: color, opacity: 0.4 } )
+                            .stroke( { width: 1, color: color } )
+                            ;
+        moveRect.on( 'mouseover', function ( event ) {
+            var lightColor = chroma(color).brighter().hex();
+            this.fill( { color: lightColor } )
+                .stroke( { color: lightColor } )
+                ;
+            event.stopPropagation();
+        } );
+        moveRect.on( 'mouseout', function ( event ) {
+            if ( !dragging ) {
+                var lightColor = chroma(color).brighter().hex();
+                this.fill( { color: color } )
+                    .stroke( { color: color } )
+                    ;
+            }
+            event.stopPropagation();
+        } );
+        _addMoveHandles( moveRect, {
+            start: function () {
+                dragging = true;
+                this.fill( { color: "#cc5" } )
+                    .stroke( { color: "#cc5" } )
+                    ;
+
+                if ( callbacks.start )
+                    callbacks.start();
+            },
+
+            update: function ( dx, dy ) {
+                if ( callbacks.update )
+                    callbacks.update( dx, dy );
+            },
+
+            end: function () {
+                dragging = false;
+                this.fill( { color: color } )
+                    .stroke( { color: color } )
+                    ;
+
+                if ( callbacks.end )
+                    callbacks.end();
+            }
+        }  );
 
         return group;
     };
