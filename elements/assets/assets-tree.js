@@ -243,9 +243,9 @@
             }, true);
 
             // register Ipc
-            Ipc.on('assets-tree:newItem', this._ipc_newItem );
-            Ipc.on('assets-tree:deleteItem', this._ipc_deleteItem );
-            Ipc.on('assets-tree:finishLoading', this._ipc_finishLoading );
+            Ipc.on('fire-assets:newItem', this._ipc_newItem );
+            Ipc.on('fire-assets:deleteItem', this._ipc_deleteItem );
+            Ipc.on('fire-assets:finishLoading', this._ipc_finishLoading );
 
             Ipc.on('folder:created', this._ipc_newFolder );
             Ipc.on('asset:created', this._ipc_newAsset );
@@ -254,9 +254,9 @@
         },
 
         detached: function () {
-            Ipc.removeListener('assets-tree:newItem', this._ipc_newItem );
-            Ipc.removeListener('assets-tree:deleteItem', this._ipc_deleteItem );
-            Ipc.removeListener('assets-tree:finishLoading', this._ipc_finishLoading );
+            Ipc.removeListener('fire-assets:newItem', this._ipc_newItem );
+            Ipc.removeListener('fire-assets:deleteItem', this._ipc_deleteItem );
+            Ipc.removeListener('fire-assets:finishLoading', this._ipc_finishLoading );
 
             Ipc.removeListener('folder:created', this._ipc_newFolder );
             Ipc.removeListener('asset:created', this._ipc_newAsset );
@@ -353,7 +353,7 @@
         },
 
         load: function ( url ) {
-            console.time('assets-tree:load');
+            console.time('fire-assets:load');
             Fire.hint('start browsing ' + url);
 
             var rootEL = _newAssetsItem( url, 'root' );
@@ -364,7 +364,7 @@
 
         finishLoading: function ( url ) {
             Fire.hint('finish browsing ' + url);
-            console.timeEnd('assets-tree:load');
+            console.timeEnd('fire-assets:load');
         },
 
         newItem: function ( url, isDirectory ) {
