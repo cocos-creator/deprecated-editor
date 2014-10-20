@@ -23,12 +23,12 @@
 
             // register Ipc
             Ipc.on('asset:selected', this._ipc_inspectAsset );
-            Ipc.on('scene:selected', this._ipc_inspectScene );
+            Ipc.on('entity:selected', this._ipc_inspectScene );
         },
 
         detached: function () {
             Ipc.removeListener('asset:selected', this._ipc_inspectAsset );
-            Ipc.removeListener('scene:selected', this._ipc_inspectScene );
+            Ipc.removeListener('entity:selected', this._ipc_inspectScene );
         },
 
         inspectAsset: function ( uuid ) {

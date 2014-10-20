@@ -359,7 +359,7 @@
         confirmSelect: function () {
             if ( this.selection.length > 0 ) {
                 var idList = this.selection.map( function (x) { return x.id; } );
-                Fire.broadcast( 'scene:selected', idList );
+                Fire.broadcast( 'entity:selected', idList );
             }
         },
 
