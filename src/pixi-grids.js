@@ -1,4 +1,8 @@
 Fire.PixiGrids = (function () {
+    function _snapPixel (p) {
+        return Math.floor(p);
+    }
+
     function _smooth (t) {
         return ( t === 1.0 ) ? 1.0 : 1.001 * ( 1.0 - Math.pow( 2, -10 * t ) );
     }
@@ -86,8 +90,8 @@ Fire.PixiGrids = (function () {
             ++tickIndex;
 
             trans = camera.worldToScreen( new Fire.Vec2(x, 0.0) );
-            this.graphics.moveTo( trans.x, 0.0 );
-            this.graphics.lineTo( trans.x, this.view.height );
+            this.graphics.moveTo( _snapPixel(trans.x), 0.0 );
+            this.graphics.lineTo( _snapPixel(trans.x), this.view.height );
         }
 
         // draw y lines
@@ -102,8 +106,8 @@ Fire.PixiGrids = (function () {
             ++tickIndex;
 
             trans = camera.worldToScreen( new Fire.Vec2(0.0, y) );
-            this.graphics.moveTo( 0.0, trans.y );
-            this.graphics.lineTo( this.view.width, trans.y );
+            this.graphics.moveTo( 0.0, _snapPixel(trans.y) );
+            this.graphics.lineTo( this.view.width, _snapPixel(trans.y) );
         }
         this.graphics.endFill();
     };
