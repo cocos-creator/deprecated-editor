@@ -1,6 +1,6 @@
 html /deep/ {
-    project-tree[focused] {
-        project-item[selected]::shadow {
+    assets-tree[focused] {
+        assets-item[selected]::shadow {
             .wrapper {
                 .bar {
                     background: #059
@@ -8,7 +8,7 @@ html /deep/ {
             }
         }
 
-        project-item[conflicted]::shadow {
+        assets-item[conflicted]::shadow {
             .wrapper {
                 .bar {
                     background: #900
@@ -16,10 +16,10 @@ html /deep/ {
             }
         }
     }
-    project-item>project-item {
+    assets-item>assets-item{
         margin-left: 24px
     }
-    project-item>project-item[foldable] {
+    assets-item>assets-item[foldable] {
         margin-left: 14px
     }
 

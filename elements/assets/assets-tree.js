@@ -67,11 +67,11 @@
         return null;
     }
 
-    function _newProjectItem ( url, type ) {
+    function _newAssetsItem ( url, type ) {
         var extname = Url.extname(url); 
         var basename = Url.basename(url,extname); 
 
-        var newEL = new ProjectItem();
+        var newEL = new AssetsItem();
         if ( !type ) {
             type = extname;
         }
@@ -166,9 +166,6 @@
             this._ipc_deleteItem = this.deleteItem.bind(this);
             this._ipc_finishLoading = this.finishLoading.bind(this);
             this._ipc_moveItem = this.moveItem.bind(this);
-
-            // debug
-            project = this;
         },
 
         ready: function () {
@@ -246,9 +243,9 @@
             }, true);
 
             // register Ipc
-            Ipc.on('project-tree:newItem', this._ipc_newItem );
-            Ipc.on('project-tree:deleteItem', this._ipc_deleteItem );
-            Ipc.on('project-tree:finishLoading', this._ipc_finishLoading );
+            Ipc.on('assets-tree:newItem', this._ipc_newItem );
+            Ipc.on('assets-tree:deleteItem', this._ipc_deleteItem );
+            Ipc.on('assets-tree:finishLoading', this._ipc_finishLoading );
 
             Ipc.on('folder:created', this._ipc_newFolder );
             Ipc.on('asset:created', this._ipc_newAsset );
@@ -257,9 +254,9 @@
         },
 
         detached: function () {
-            Ipc.removeListener('project-tree:newItem', this._ipc_newItem );
-            Ipc.removeListener('project-tree:deleteItem', this._ipc_deleteItem );
-            Ipc.removeListener('project-tree:finishLoading', this._ipc_finishLoading );
+            Ipc.removeListener('assets-tree:newItem', this._ipc_newItem );
+            Ipc.removeListener('assets-tree:deleteItem', this._ipc_deleteItem );
+            Ipc.removeListener('assets-tree:finishLoading', this._ipc_finishLoading );
 
             Ipc.removeListener('folder:created', this._ipc_newFolder );
             Ipc.removeListener('asset:created', this._ipc_newAsset );
@@ -273,7 +270,7 @@
                 {
                     label: 'New Scene',
                     click: function () {
-                        if ( this.contextmenuAt instanceof ProjectItem ) {
+                        if ( this.contextmenuAt instanceof AssetsItem ) {
                             var url = this.getUrl(this.contextmenuAt);
                             var newScene = new Fire._Scene();
                             Fire.command( 'asset-db:save', 
@@ -287,7 +284,7 @@
                 {
                     label: 'New Folder',
                     click: function () {
-                        if ( this.contextmenuAt instanceof ProjectItem ) {
+                        if ( this.contextmenuAt instanceof AssetsItem ) {
                             var url = this.getUrl(this.contextmenuAt);
                             Fire.rpc( 'asset-db:makedirs', Url.join( url, 'New Folder' ) );
                         }
@@ -301,7 +298,7 @@
                 {
                     label: 'Show in finder',
                     click: function () {
-                        if ( this.contextmenuAt instanceof ProjectItem ) {
+                        if ( this.contextmenuAt instanceof AssetsItem ) {
                             Fire.command( 'asset-db:explore', this.getUrl(this.contextmenuAt) );
                         }
                     }.bind(this)
@@ -312,7 +309,7 @@
                 {
                     label: 'Rename',
                     click: function () {
-                        if ( this.contextmenuAt instanceof ProjectItem ) {
+                        if ( this.contextmenuAt instanceof AssetsItem ) {
                             this.contextmenuAt.rename();
                         }
                     }.bind(this)
@@ -322,7 +319,7 @@
                 {
                     label: 'Delete',
                     click: function () {
-                        if ( this.contextmenuAt instanceof ProjectItem ) {
+                        if ( this.contextmenuAt instanceof AssetsItem ) {
                             var url = this.getUrl(this.contextmenuAt);
                             Fire.command( 'asset-db:delete', url );
                         }
@@ -336,7 +333,7 @@
                 { 
                     label: 'Reimport',
                     click: function () {
-                        if ( this.contextmenuAt instanceof ProjectItem ) {
+                        if ( this.contextmenuAt instanceof AssetsItem ) {
                             var selectedItemEl = this.contextmenuAt;
                             var url = this.getUrl(selectedItemEl);
 
@@ -356,10 +353,10 @@
         },
 
         load: function ( url ) {
-            console.time('project-tree:load');
+            console.time('assets-tree:load');
             Fire.hint('start browsing ' + url);
 
-            var rootEL = _newProjectItem( url, 'root' );
+            var rootEL = _newAssetsItem( url, 'root' );
             this.appendChild(rootEL);
 
             Fire.command( 'asset-db:browse', url );
@@ -367,11 +364,11 @@
 
         finishLoading: function ( url ) {
             Fire.hint('finish browsing ' + url);
-            console.timeEnd('project-tree:load');
+            console.timeEnd('assets-tree:load');
         },
 
         newItem: function ( url, isDirectory ) {
-            var newEL = _newProjectItem( url, isDirectory ? 'folder' : null );
+            var newEL = _newAssetsItem( url, isDirectory ? 'folder' : null );
 
             //
             var parentUrl = Url.dirname(url);
@@ -512,7 +509,7 @@
 
             var url = element.name + element.extname;
             var parentEL = element.parentElement;
-            while ( parentEL instanceof ProjectItem ) {
+            while ( parentEL instanceof AssetsItem ) {
                 if ( parentEL.isRoot ) {
                     url = parentEL.name + "://" + url;
                     break;
@@ -684,7 +681,7 @@
         selectingAction: function (event) {
             this.focus();
 
-            if ( event.target instanceof ProjectItem ) {
+            if ( event.target instanceof AssetsItem ) {
                 if ( event.detail.shift ) {
                     if ( !this.lastActive ) {
                         this.lastActive = event.target;
@@ -711,7 +708,7 @@
         },
 
         selectAction: function (event) {
-            if ( event.target instanceof ProjectItem ) {
+            if ( event.target instanceof AssetsItem ) {
                 if ( event.detail.shift ) {
                     // TODO:
                 }
@@ -732,7 +729,7 @@
         },
 
         namechangedAction: function (event) {
-            if ( event.target instanceof ProjectItem ) {
+            if ( event.target instanceof AssetsItem ) {
                 this.focus();
                 var srcUrl = this.getUrl(event.target);
                 var destUrl = Url.join( Url.dirname(srcUrl), event.detail.name + event.target.extname );
@@ -742,7 +739,7 @@
         },
 
         openAction: function (event) {
-            if ( event.target instanceof ProjectItem ) {
+            if ( event.target instanceof AssetsItem ) {
                 // TODO: Fire.broadcast( 'scene:load', uuid );
                 var url = this.getUrl(event.target);
                 var uuid = Fire.AssetDB.urlToUuid(url);
@@ -822,7 +819,7 @@
 
             //
             this.contextmenuAt = null;
-            if ( event.target instanceof ProjectItem ) {
+            if ( event.target instanceof AssetsItem ) {
                 this.contextmenuAt = event.target;
                 this.lastActive = this.contextmenuAt;
                 this.clearSelect();
@@ -950,11 +947,11 @@
             //         var fspath = Path.join(root, name);
 
             //         if ( isDirectory ) {
-            //             itemEL = _newProjectItem( fspath, 'folder' );
+            //             itemEL = _newAssetsItem( fspath, 'folder' );
             //             folderElements[fspath] = itemEL;
             //         }
             //         else {
-            //             itemEL = _newProjectItem( fspath );
+            //             itemEL = _newAssetsItem( fspath );
             //         }
 
             //         var parentEL = folderElements[root];

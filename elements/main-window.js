@@ -19,8 +19,8 @@
                 document.body.scrollTop = 0;
             };
 
-            // init project-tree
-            this.$.projectView.load("assets://");
+            // init assets-tree
+            this.$.assetsView.load("assets://");
 
             // init engine & game window
             Fire.AssetLibrary.init(Fire.AssetDB.getLibraryPath());

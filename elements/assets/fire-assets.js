@@ -16,7 +16,7 @@
         },
 
         load: function ( url ) {
-            this.$.projectTree.load(url);
+            this.$.assetsTree.load(url);
         },
 
     });
