@@ -15,6 +15,11 @@
             this.tabIndex = EditorUI.getParentTabIndex(this)+1;
         },
 
+        domReady: function () {
+            // init assets-tree
+            this.load("assets://");
+        },
+
         load: function ( url ) {
             this.$.assetsTree.load(url);
         },

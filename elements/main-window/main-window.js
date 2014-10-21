@@ -19,17 +19,16 @@
                 document.body.scrollTop = 0;
             };
 
-            // init assets-tree
-            this.$.assetsView.load("assets://");
-
-            // init engine & game window
-            Fire.AssetLibrary.init(Fire.AssetDB.getLibraryPath());
+            // init engine
             Fire.log('fire-engine initializing...');
+            Fire.AssetLibrary.init(Fire.AssetDB.getLibraryPath());
             var renderContext = Fire.Engine.init( this.$.game.$.view.clientWidth,
                                                   this.$.game.$.view.clientHeight );
+
+            // init game view
             this.$.game.setRenderContext(renderContext);
 
-            // init scene
+            // init scene view
             this.$.scene.initRenderContext();
         },
 
