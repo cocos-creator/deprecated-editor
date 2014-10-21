@@ -16,7 +16,6 @@
         },
 
         domReady: function () {
-            // init assets-tree
             this.load("assets://");
         },
 

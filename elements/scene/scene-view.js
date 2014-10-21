@@ -12,6 +12,8 @@
                 },
                 scale: 1.0,
             };
+
+            this._layoutTool = null;
         },
 
         ready: function () {
@@ -49,7 +51,7 @@
                     this.svgGizmos.setCamera(camera);
 
                     var graphics = new PIXI.Graphics();
-                    this.renderContext.stage.addChild(graphics);
+                    this.renderContext.getBackgroundNode().addChild(graphics);
                     this.pixiGrids.setGraphics(graphics);
                     this.pixiGrids.setCamera(camera);
                 }
@@ -133,7 +135,6 @@
 
         repaint: function () {
             this.updateCamera();
-            this.updateGrid();
             this.updateScene();
             this.updateGizmos();
         },
@@ -149,6 +150,7 @@
 
         updateScene: function () {
             if ( this.renderContext ) {
+                this.pixiGrids.update();
                 Fire.Engine._scene.render(this.renderContext);
             }
         },
@@ -157,8 +159,20 @@
             this.svgGizmos.update();
         },
 
-        updateGrid: function () {
-            this.pixiGrids.update();
+        rebuildGizmos: function () {
+            for ( var i = 0; i < this.svgGizmos.gizmos.length; ++i ) {
+                var gizmo = this.svgGizmos.gizmos[i];
+                if ( gizmo.entity ) {
+                    var newGizmo = this.newLayoutTools(gizmo.entity);
+                    this.svgGizmos.gizmos[i] = newGizmo;
+
+                    if ( this._layoutTool === gizmo ) {
+                        this._layoutTool = newGizmo;
+                    }
+                    gizmo.remove();
+                }
+            }
+            this.updateGizmos();
         },
 
         hover: function ( entity ) {
@@ -170,30 +184,38 @@
         },
 
         select: function ( entity ) {
-            if ( this._moveTool ) {
-                this.svgGizmos.remove(this._moveTool);
-                this._moveTool = null;
+            if ( this._layoutTool ) {
+                this.svgGizmos.remove(this._layoutTool);
+                this._layoutTool = null;
             }
 
+            this._layoutTool = this.newLayoutTools(entity);
+            this.svgGizmos.add( this._layoutTool );
+        },
+
+        newLayoutTools: function ( entity ) {
+            var sceneView = this;
             var worldPos;
-            this._moveTool = this.svgGizmos.positionTool ( {
+
+            var tool = this.svgGizmos.positionTool ( {
                 start: function () {
-                    var localToWorld = entity.transform.getLocalToWorldMatrix();
-                    worldPos = new Fire.Vec2( localToWorld.tx, localToWorld.ty );
-                }.bind(this),
+                    worldPos = this.entity.transform.worldPosition;
+                },
 
                 update: function ( dx, dy ) {
-                    // var localToWorld = entity.transform.getLocalToWorldMatrix();
-                    // var worldToLocal = entity.transform.getWorldToLocalMatrix();
-                    // entity.transform.position = worldToLocal.transformPoint(position);
-                    var delta = new Fire.Vec2( dx/this.sceneCamera.scale, 
-                                              -dy/this.sceneCamera.scale );
-                    entity.transform.position = worldPos.add(delta);
+                    var delta = new Fire.Vec2( dx/sceneView.sceneCamera.scale, 
+                                              -dy/sceneView.sceneCamera.scale );
+                    this.entity.transform.worldPosition = worldPos.add(delta);
 
-                    this.repaint();
-                }.bind(this),
+                    sceneView.repaint();
+                },
             } ); 
-            this.svgGizmos.add( this._moveTool, entity );
+            tool.entity = entity;
+            tool.handle = Fire.mainWindow.settings.handle;
+            tool.pivot = Fire.mainWindow.settings.pivot;
+            tool.coordinate = Fire.mainWindow.settings.coordinate;
+
+            return tool;
         },
 
         mousedownAction: function ( event ) {

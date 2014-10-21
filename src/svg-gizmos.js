@@ -6,16 +6,23 @@ Fire.SvgGizmos = (function () {
     function _updateGizmo ( gizmo, camera ) {
         if ( gizmo.entity ) {
             var localToWorld = gizmo.entity.transform.getLocalToWorldMatrix();
-            var worldPos = new Fire.Vec2(localToWorld.tx, localToWorld.ty);
 
+            var worldPos = new Fire.Vec2(localToWorld.tx, localToWorld.ty);
             var screenPos = camera.worldToScreen(worldPos);
             screenPos.x = _snapPixel(screenPos.x);
             screenPos.y = _snapPixel(screenPos.y);
 
-            var rotation = localToWorld.getRotation() * 180.0 / Math.PI;
+            var rotation = 0.0;
+            if ( gizmo.handle === "move" && gizmo.coordinate === "global" ) {
+                rotation = 0.0;
+            }
+            else {
+                rotation = localToWorld.getRotation() * 180.0 / Math.PI;
+                rotation = -rotation;
+            }
 
             gizmo.translate( screenPos.x, screenPos.y ) 
-                 .rotate( -rotation, screenPos.x, screenPos.y )
+                 .rotate( rotation, screenPos.x, screenPos.y )
                  ;
         }
     }
@@ -139,8 +146,7 @@ Fire.SvgGizmos = (function () {
         this.hoverRect.hide();
     };
 
-    SvgGizmos.prototype.add = function ( gizmo, entity ) {
-        gizmo.entity = entity;
+    SvgGizmos.prototype.add = function ( gizmo ) {
         _updateGizmo( gizmo, this.camera );
         this.gizmos.push(gizmo);
     };
@@ -156,7 +162,7 @@ Fire.SvgGizmos = (function () {
         }
     };
 
-    SvgGizmos.prototype.arrowTool = function ( size, color, callback ) {
+    SvgGizmos.prototype.arrowTool = function ( size, color, callbacks ) {
         var group = this.svg.group();
         var line = group.line( 0, 0, size, 0 )
                         .stroke( { width: 1, color: color } )
@@ -190,16 +196,23 @@ Fire.SvgGizmos = (function () {
                 dragging = true;
                 line.stroke( { color: "#ff0" } );
                 arrow.fill( { color: "#ff0" } );
+
+                if ( callbacks.start )
+                    callbacks.start ();
             },
 
             update: function ( dx, dy ) {
-                callback ( dx, dy );
+                if ( callbacks.update )
+                    callbacks.update ( dx, dy );
             },
 
             end: function () {
                 dragging = false;
                 line.stroke( { color: color } );
                 arrow.fill( { color: color } );
+
+                if ( callbacks.end )
+                    callbacks.end ();
             }
         }  );
 
@@ -211,15 +224,37 @@ Fire.SvgGizmos = (function () {
         var xarrow, yarrow, moveRect;
 
         // x-arrow
-        xarrow = this.arrowTool( 80, "#f00", function ( dx, dy ) {
-            // TODO
+        xarrow = this.arrowTool( 80, "#f00", {
+            start: function () {
+                if ( callbacks.start )
+                    callbacks.start.call(group);
+            },
+            update: function ( dx, dy ) {
+                if ( callbacks.update )
+                    callbacks.update.call(group, dx, 0 );
+            },
+            end: function () {
+                if ( callbacks.end )
+                    callbacks.end.call(group);
+            },
         } );
         xarrow.translate( 20, 0 );
         group.add(xarrow);
 
         // y-arrow
-        yarrow = this.arrowTool( 80, "#5c5", function ( dx, dy ) {
-            // TODO
+        yarrow = this.arrowTool( 80, "#5c5", {
+            start: function () {
+                if ( callbacks.start )
+                    callbacks.start.call(group);
+            },
+            update: function ( dx, dy ) {
+                if ( callbacks.update )
+                    callbacks.update.call(group, 0, dy );
+            },
+            end: function () {
+                if ( callbacks.end )
+                    callbacks.end.call(group);
+            },
         } );
         yarrow.translate( 20, 0 );
         yarrow.rotate(-90, 0, 0 );
@@ -242,7 +277,6 @@ Fire.SvgGizmos = (function () {
         } );
         moveRect.on( 'mouseout', function ( event ) {
             if ( !dragging ) {
-                var lightColor = chroma(color).brighter().hex();
                 this.fill( { color: color } )
                     .stroke( { color: color } )
                     ;
@@ -257,12 +291,12 @@ Fire.SvgGizmos = (function () {
                     ;
 
                 if ( callbacks.start )
-                    callbacks.start();
+                    callbacks.start.call(group);
             },
 
             update: function ( dx, dy ) {
                 if ( callbacks.update )
-                    callbacks.update( dx, dy );
+                    callbacks.update.call(group, dx, dy );
             },
 
             end: function () {
@@ -272,7 +306,7 @@ Fire.SvgGizmos = (function () {
                     ;
 
                 if ( callbacks.end )
-                    callbacks.end();
+                    callbacks.end.call(group);
             }
         }  );
 

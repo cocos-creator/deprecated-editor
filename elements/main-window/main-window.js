@@ -1,5 +1,15 @@
 (function () {
     Polymer({
+        created: function () {
+            Fire.mainWindow = this;
+
+            this.settings = {
+                handle: "move", // move, rotate, scale
+                coordinate: "local", // local, global
+                pivot: "pivot", // pivot, center
+            };
+        },
+
         domReady: function () {
             // init document events
             document.addEventListener( "drop", function (event) {
@@ -32,9 +42,17 @@
             this.$.scene.initRenderContext();
         },
 
-        resizedAction: function () {
+        resizedAction: function ( event ) {
             this.$.game.resize();
             this.$.scene.resize();
+        },
+
+        layoutToolsAction: function ( event ) {
+            var layoutToolsSettings = this.$.toolbar.$.layoutTools.settings();
+            Fire.merge( this.settings, layoutToolsSettings );
+
+            this.$.scene.fire('layout-tools-changed');
+            event.stopPropagation();
         },
 
     });

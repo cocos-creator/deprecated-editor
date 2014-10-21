@@ -13,7 +13,10 @@ var es = require('event-stream');
 var stylish = require('jshint-stylish');
 
 var paths = {
-    elements_img:  'elements/img/**/*.png',
+    elements_img:  [ 
+        'elements/img/**/*.png',
+        'elements/img/**/*.jpg'
+    ],
     elements_css:  'elements/**/*.styl',
     elements_html: 'elements/**/*.html',
     elements_js:   'elements/**/*.js',

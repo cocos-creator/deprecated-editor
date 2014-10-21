@@ -1,0 +1,102 @@
+:host {
+    display: flex
+    flex-direction: row
+    flex-wrap: nowrap     
+    align-items: flex-end
+
+    position: relative
+    box-sizing: border-box
+
+    span.space {
+        width: 10px
+    }
+
+    .left {
+        border-top-left-radius: 2px
+        border-bottom-left-radius: 2px
+    }
+
+    .right {
+        border-top-right-radius: 2px
+        border-bottom-right-radius: 2px
+    }
+
+    .transform {
+        .btn {
+            display: inline-block
+            box-sizing: border-box
+            font-size: 14px
+            padding: 6px 15px
+
+            color: #aaa
+            background-color: #444
+
+            &:hover {
+                background-color: #555
+            }
+
+            &[active] {
+                color: #00aa00
+                background-color: #222
+            }
+
+            &:active {
+                background-color: #171717
+            }
+        }
+    }
+
+    .coordinate {
+        .btn {
+            display: inline-block
+            box-sizing: border-box
+            font-size: 12px
+            padding: 3px 0px
+            text-align: center
+            width: 60px
+
+            color: #aaa
+            background-color: #444
+
+            &:hover {
+                background-color: #555
+            }
+
+            &[active] {
+                color: #aa0
+                background-color: #222
+            }
+
+            &:active {
+                background-color: #171717
+            }
+        }
+    }
+
+    .pivot {
+        .btn {
+            display: inline-block
+            box-sizing: border-box
+            font-size: 12px
+            padding: 3px 0px
+            text-align: center
+            width: 50px
+
+            color: #aaa
+            background-color: #444
+
+            &:hover {
+                background-color: #555
+            }
+
+            &[active] {
+                color: #a00
+                background-color: #222
+            }
+
+            &:active {
+                background-color: #171717
+            }
+        }
+    }
+}

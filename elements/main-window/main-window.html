@@ -1,4 +1,4 @@
-<link rel="import" href="play-bar.html">
+<link rel="import" href="top-bar.html">
 <link rel="import" href="status-bar.html">
 
 <polymer-element 
@@ -11,13 +11,9 @@
 
 <span class="space"></span>
 
-<div flex-row>           
-    <span flex-1></span> 
-    <play-bar></play-bar>
-    <span flex-1></span> 
-</div>                   
-
-<span class="space"></span>
+<top-bar id="toolbar"
+    on-layout-tools-changed="{{layoutToolsAction}}"
+></top-bar>
 
 <fire-ui-dock flex-1 flex-row flex-stretch
     on-resized="{{resizedAction}}"
@@ -45,8 +41,6 @@
         <fire-hierarchy id="hierarchy" name="Hierarchy" fit></fire-hierarchy>
     </fire-ui-dock-panel>
 </fire-ui-dock>
-
-<span class="space"></span>
 
 <status-bar id="status"></status-bar>
 

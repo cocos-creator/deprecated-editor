@@ -6,18 +6,14 @@
 <template>
 <link rel="stylesheet" href="play-bar.css">
 
-<div flex-row id="border">
-    <div id="play" class="btn" on-click="{{playAction}}">
-        <i class="fa fa-play"></i>
-    </div>
-    <span class="space"></span>
-    <div id="pause" class="btn" on-click="{{pauseAction}}">
-        <i class="fa fa-pause"></i>
-    </div>
-    <span class="space"></span>
-    <div id="step" class="btn" on-click="{{stepAction}}">
-        <i class="fa fa-step-forward"></i>
-    </div>
+<div id="play" class="btn left" on-click="{{playAction}}">
+    <i class="fa fa-play"></i>
+</div>
+<div id="pause" class="btn" on-click="{{pauseAction}}">
+    <i class="fa fa-pause"></i>
+</div>
+<div id="step" class="btn right" on-click="{{stepAction}}">
+    <i class="fa fa-step-forward"></i>
 </div>
 
 </template>

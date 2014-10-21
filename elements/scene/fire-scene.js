@@ -39,10 +39,6 @@
             this.$.view.init();
         },
 
-        showAction: function ( event ) {
-            this.resize();
-        },
-
         resize: function () {
             this.$.view.resize();
         },
@@ -97,6 +93,15 @@
 
         repaintScene: function () {
             this.$.view.repaint();
+        },
+
+        showAction: function ( event ) {
+            this.resize();
+        },
+
+        layoutToolsAction: function ( event ) {
+            this.$.view.rebuildGizmos();
+            event.stopPropagation();
         },
     });
 })();

@@ -1,0 +1,46 @@
+<polymer-element 
+    name="layout-tools" 
+    constructor="LayoutTools"
+    
+    >
+<template>
+<link rel="stylesheet" href="layout-tools.css">
+
+<div flex-row class="transform">
+    <div class="btn left" on-click="{{selectMove}}" active?="{{handleID|isActive(0)}}">
+        <i class="fa fa-arrows"></i>
+    </div>
+    <div class="btn" on-click="{{selectRotate}}" active?="{{handleID|isActive(1)}}">
+        <i class="fa fa-rotate-left"></i>
+    </div>
+    <div class="btn right" on-click="{{selectScale}}" active?="{{handleID|isActive(2)}}">
+        <i class="fa fa-expand"></i>
+    </div>
+</div>
+
+<span class="space"></span>
+
+<div flex-row class="coordinate">
+    <div class="btn left" on-click="{{selectLocal}}" active?="{{coordinateID|isActive(0)}}">
+        Local
+    </div>
+    <div class="btn right" on-click="{{selectGlobal}}" active?="{{coordinateID|isActive(1)}}">
+        Global
+    </div>
+</div>
+
+<span class="space"></span>
+
+<div flex-row class="pivot">
+    <div class="btn left" on-click="{{selectPivot}}" active?="{{pivotID|isActive(0)}}">
+        Pivot
+    </div>
+    <div class="btn right" on-click="{{selectCenter}}" active?="{{pivotID|isActive(1)}}">
+        Center
+    </div>
+</div>
+
+</template>
+
+<script type="text/javascript" src="layout-tools.js"></script>
+</polymer-element>
