@@ -195,20 +195,26 @@
 
         newLayoutTools: function ( entity ) {
             var sceneView = this;
-            var worldPos;
 
-            var tool = this.svgGizmos.positionTool ( {
+            var localToWorld = entity.transform.getLocalToWorldMatrix();
+            var worldpos = new Fire.Vec2(localToWorld.tx, localToWorld.ty);
+            var screenpos = this.renderContext.camera.worldToScreen(worldpos);
+            screenpos.x = Math.floor(screenpos.x) + 0.5;
+            screenpos.y = Math.floor(screenpos.y) + 0.5;
+            var rotation = -localToWorld.getRotation() * 180.0 / Math.PI;
+
+            var tool = this.svgGizmos.positionTool ( screenpos, rotation, {
                 start: function () {
-                    worldPos = this.entity.transform.worldPosition;
+                    worldpos = this.entity.transform.worldPosition;
                 },
 
                 update: function ( dx, dy ) {
                     var delta = new Fire.Vec2( dx/sceneView.sceneCamera.scale, 
                                               -dy/sceneView.sceneCamera.scale );
-                    this.entity.transform.worldPosition = worldPos.add(delta);
+                    this.entity.transform.worldPosition = worldpos.add(delta);
 
                     sceneView.repaint();
-                },
+                }, 
             } ); 
             tool.entity = entity;
             tool.handle = Fire.mainWindow.settings.handle;

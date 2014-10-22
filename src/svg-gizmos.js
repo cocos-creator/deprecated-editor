@@ -2,29 +2,31 @@ Fire.SvgGizmos = (function () {
     function _snapPixel (p) {
         return Math.floor(p) + 0.5; 
     }
+    function _biasPixel (p) {
+        return p + 0.5; 
+    }
 
     function _updateGizmo ( gizmo, camera ) {
         if ( gizmo.entity ) {
             var localToWorld = gizmo.entity.transform.getLocalToWorldMatrix();
+            var worldpos = new Fire.Vec2(localToWorld.tx, localToWorld.ty);
+            var screenpos = camera.worldToScreen(worldpos);
+            screenpos.x = _biasPixel(screenpos.x);
+            screenpos.y = _biasPixel(screenpos.y);
+            gizmo.position = screenpos;
 
-            var worldPos = new Fire.Vec2(localToWorld.tx, localToWorld.ty);
-            var screenPos = camera.worldToScreen(worldPos);
-            screenPos.x = _snapPixel(screenPos.x);
-            screenPos.y = _snapPixel(screenPos.y);
-
-            var rotation = 0.0;
+            gizmo.rotation = 0.0; 
             if ( gizmo.handle === "move" && gizmo.coordinate === "global" ) {
-                rotation = 0.0;
+                gizmo.rotation = 0.0;
             }
             else {
-                rotation = localToWorld.getRotation() * 180.0 / Math.PI;
-                rotation = -rotation;
+                gizmo.rotation = -localToWorld.getRotation() * 180.0 / Math.PI;
             }
-
-            gizmo.translate( screenPos.x, screenPos.y ) 
-                 .rotate( rotation, screenPos.x, screenPos.y )
-                 ;
         }
+
+        gizmo.translate( gizmo.position.x, gizmo.position.y ) 
+             .rotate( gizmo.rotation, gizmo.position.x, gizmo.position.y )
+             ;
     }
 
     function _addMoveHandles ( gizmo, callbacks ) {
@@ -219,9 +221,12 @@ Fire.SvgGizmos = (function () {
         return group;
     };
     
-    SvgGizmos.prototype.positionTool = function ( callbacks ) {
+    SvgGizmos.prototype.positionTool = function ( position, rotation, callbacks ) {
         var group = this.svg.group();
         var xarrow, yarrow, moveRect;
+
+        group.position = position;
+        group.rotation = rotation;
 
         // x-arrow
         xarrow = this.arrowTool( 80, "#f00", {
@@ -230,8 +235,17 @@ Fire.SvgGizmos = (function () {
                     callbacks.start.call(group);
             },
             update: function ( dx, dy ) {
-                if ( callbacks.update )
-                    callbacks.update.call(group, dx, 0 );
+                var radius = group.rotation * Math.PI / 180.0;
+                var dirx = Math.cos(radius);
+                var diry = Math.sin(radius);
+
+                var length = Math.sqrt(dx * dx + dy * dy);
+                var theta = Math.atan2( diry, dirx ) - Math.atan2( dy, dx );
+                length = length * Math.cos(theta);
+
+                if ( callbacks.update ) {
+                    callbacks.update.call(group, dirx * length, diry * length );
+                }
             },
             end: function () {
                 if ( callbacks.end )
@@ -248,8 +262,17 @@ Fire.SvgGizmos = (function () {
                     callbacks.start.call(group);
             },
             update: function ( dx, dy ) {
-                if ( callbacks.update )
-                    callbacks.update.call(group, 0, dy );
+                var radius = (group.rotation + 90.0) * Math.PI / 180.0;
+                var dirx = Math.cos(radius);
+                var diry = Math.sin(radius);
+
+                var length = Math.sqrt(dx * dx + dy * dy);
+                var theta = Math.atan2( diry, dirx ) - Math.atan2( dy, dx );
+                length = length * Math.cos(theta);
+
+                if ( callbacks.update ) {
+                    callbacks.update.call(group, dirx * length, diry * length );
+                }
             },
             end: function () {
                 if ( callbacks.end )
@@ -308,7 +331,7 @@ Fire.SvgGizmos = (function () {
                 if ( callbacks.end )
                     callbacks.end.call(group);
             }
-        }  );
+        } );
 
         return group;
     };
