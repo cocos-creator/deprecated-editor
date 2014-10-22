@@ -195,6 +195,7 @@
 
         newLayoutTools: function ( entity ) {
             var sceneView = this;
+            var tool;
 
             var localToWorld = entity.transform.getLocalToWorldMatrix();
             var worldpos = new Fire.Vec2(localToWorld.tx, localToWorld.ty);
@@ -203,19 +204,57 @@
             screenpos.y = Math.floor(screenpos.y) + 0.5;
             var rotation = -localToWorld.getRotation() * 180.0 / Math.PI;
 
-            var tool = this.svgGizmos.positionTool ( screenpos, rotation, {
-                start: function () {
-                    worldpos = this.entity.transform.worldPosition;
-                },
+            switch ( Fire.mainWindow.settings.handle ) {
+                case "move":
+                    tool = this.svgGizmos.positionTool ( screenpos, rotation, {
+                        start: function () {
+                            worldpos = this.entity.transform.worldPosition;
+                        },
 
-                update: function ( dx, dy ) {
-                    var delta = new Fire.Vec2( dx/sceneView.sceneCamera.scale, 
-                                              -dy/sceneView.sceneCamera.scale );
-                    this.entity.transform.worldPosition = worldpos.add(delta);
+                        update: function ( dx, dy ) {
+                            var delta = new Fire.Vec2( dx/sceneView.sceneCamera.scale, 
+                                                      -dy/sceneView.sceneCamera.scale );
+                            this.entity.transform.worldPosition = worldpos.add(delta);
+                            sceneView.repaint();
+                        }, 
+                    } ); 
+                    break;
 
-                    sceneView.repaint();
-                }, 
-            } ); 
+                case "rotate":
+                    // var localscale = entity.transform.scale;
+                    tool = this.svgGizmos.rotationTool ( screenpos, rotation, {
+                        start: function () {
+                            // localscale = this.entity.transform.scale;
+                        },
+
+                        update: function ( dx, dy ) {
+                            // this.entity.transform.scale = new Fire.Vec2 ( 
+                            //     localscale.x * (1.0 + dx),
+                            //     localscale.y * (1.0 - dy)
+                            // ); 
+                            sceneView.repaint();
+                        }, 
+                    } ); 
+                    break;
+
+                case "scale":
+                    var localscale = entity.transform.scale;
+                    tool = this.svgGizmos.scaleTool ( screenpos, rotation, {
+                        start: function () {
+                            localscale = this.entity.transform.scale;
+                        },
+
+                        update: function ( dx, dy ) {
+                            this.entity.transform.scale = new Fire.Vec2 ( 
+                                localscale.x * (1.0 + dx),
+                                localscale.y * (1.0 - dy)
+                            ); 
+                            sceneView.repaint();
+                        }, 
+                    } ); 
+                    break;
+            }
+
             tool.entity = entity;
             tool.handle = Fire.mainWindow.settings.handle;
             tool.pivot = Fire.mainWindow.settings.pivot;

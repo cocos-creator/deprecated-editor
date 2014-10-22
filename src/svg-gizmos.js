@@ -2,17 +2,14 @@ Fire.SvgGizmos = (function () {
     function _snapPixel (p) {
         return Math.floor(p) + 0.5; 
     }
-    function _biasPixel (p) {
-        return p + 0.5; 
-    }
 
     function _updateGizmo ( gizmo, camera ) {
         if ( gizmo.entity ) {
             var localToWorld = gizmo.entity.transform.getLocalToWorldMatrix();
             var worldpos = new Fire.Vec2(localToWorld.tx, localToWorld.ty);
             var screenpos = camera.worldToScreen(worldpos);
-            screenpos.x = _biasPixel(screenpos.x);
-            screenpos.y = _biasPixel(screenpos.y);
+            screenpos.x = _snapPixel(screenpos.x);
+            screenpos.y = _snapPixel(screenpos.y);
             gizmo.position = screenpos;
 
             gizmo.rotation = 0.0; 
@@ -20,7 +17,8 @@ Fire.SvgGizmos = (function () {
                 gizmo.rotation = 0.0;
             }
             else {
-                gizmo.rotation = -localToWorld.getRotation() * 180.0 / Math.PI;
+                var worldrot = gizmo.entity.transform.worldRotation;
+                gizmo.rotation = -worldrot;
             }
         }
 
@@ -162,6 +160,68 @@ Fire.SvgGizmos = (function () {
                 break;
             }
         }
+    };
+
+    SvgGizmos.prototype.scaleSlider = function ( size, color, callbacks ) {
+        var group = this.svg.group();
+        var line = group.line( 0, 0, size, 0 )
+                        .stroke( { width: 1, color: color } )
+                        ;
+        var rect = group.polygon ([ [size, 5], [size, -5], [size+10, -5], [size+10, 5] ])
+                        .fill( { color: color } )
+                        ;
+        var dragging = false;
+
+        group.style( 'pointer-events', 'bounding-box' );
+
+        group.resize = function ( size ) {
+            line.plot( 0, 0, size, 0 );
+            rect.plot([ [size, 5], [size, -5], [size+10, -5], [size+10, 5] ]);
+        };
+
+        group.on( 'mouseover', function ( event ) {
+            var lightColor = chroma(color).brighter().hex();
+            line.stroke( { color: lightColor } );
+            rect.fill( { color: lightColor } );
+
+            event.stopPropagation();
+        } );
+
+        group.on( 'mouseout', function ( event ) {
+            if ( !dragging ) {
+                line.stroke( { color: color } );
+                rect.fill( { color: color } );
+            }
+
+            event.stopPropagation();
+        } );
+
+        _addMoveHandles( group, {
+            start: function () {
+                dragging = true;
+                line.stroke( { color: "#ff0" } );
+                rect.fill( { color: "#ff0" } );
+
+                if ( callbacks.start )
+                    callbacks.start ();
+            },
+
+            update: function ( dx, dy ) {
+                if ( callbacks.update )
+                    callbacks.update ( dx, dy );
+            },
+
+            end: function () {
+                dragging = false;
+                line.stroke( { color: color } );
+                rect.fill( { color: color } );
+
+                if ( callbacks.end )
+                    callbacks.end ();
+            }
+        }  );
+
+        return group;
     };
 
     SvgGizmos.prototype.arrowTool = function ( size, color, callbacks ) {
@@ -327,6 +387,184 @@ Fire.SvgGizmos = (function () {
                 this.fill( { color: color } )
                     .stroke( { color: color } )
                     ;
+
+                if ( callbacks.end )
+                    callbacks.end.call(group);
+            }
+        } );
+
+        return group;
+    };
+
+    SvgGizmos.prototype.rotationTool = function ( position, rotation, callbacks ) {
+        var group = this.svg.group();
+        var circle;
+
+        group.position = position;
+        group.rotation = rotation;
+
+        var color = "#f00";
+        var dragging = false;
+        circle = group.path('M50,-10 A50,50, 0 1,0 50,10')
+                      .fill( "none" )
+                      .stroke( { width: 2, color: color } )
+                      ;
+
+        // x-arrow
+        xarrow = this.arrowTool( 50, "#f00", {
+            start: function () {
+                if ( callbacks.start )
+                    callbacks.start.call(group);
+            },
+            update: function ( dx, dy ) {
+                var radius = group.rotation * Math.PI / 180.0;
+                var dirx = Math.cos(radius);
+                var diry = Math.sin(radius);
+
+                var length = Math.sqrt(dx * dx + dy * dy);
+                var theta = Math.atan2( diry, dirx ) - Math.atan2( dy, dx );
+                length = length * Math.cos(theta);
+
+                if ( callbacks.update ) {
+                    callbacks.update.call(group, dirx * length, diry * length );
+                }
+            },
+            end: function () {
+                if ( callbacks.end )
+                    callbacks.end.call(group);
+            },
+        } );
+        group.add(xarrow);
+
+        return group;
+    };
+
+    SvgGizmos.prototype.scaleTool = function ( position, rotation, callbacks ) {
+        var group = this.svg.group();
+        var xarrow, yarrow, scaleRect;
+
+        group.position = position;
+        group.rotation = rotation;
+
+        // x-slider
+        xarrow = this.scaleSlider( 100, "#f00", {
+            start: function () {
+                if ( callbacks.start )
+                    callbacks.start.call(group);
+            },
+            update: function ( dx, dy ) {
+                var radius = group.rotation * Math.PI / 180.0;
+                var dirx = Math.cos(radius);
+                var diry = Math.sin(radius);
+
+                var length = Math.sqrt(dx * dx + dy * dy);
+                var theta = Math.atan2( diry, dirx ) - Math.atan2( dy, dx );
+                length = length * Math.cos(theta);
+
+                xarrow.resize( length + 100 );
+
+                if ( callbacks.update ) {
+                    callbacks.update.call(group, length/100.0, 0.0 );
+                }
+            },
+            end: function () {
+                xarrow.resize( 100 );
+
+                if ( callbacks.end )
+                    callbacks.end.call(group);
+            },
+        } );
+        group.add(xarrow);
+
+        // y-slider
+        yarrow = this.scaleSlider( 100, "#5c5", {
+            start: function () {
+                if ( callbacks.start )
+                    callbacks.start.call(group);
+            },
+            update: function ( dx, dy ) {
+                var radius = (group.rotation + 90.0) * Math.PI / 180.0;
+                var dirx = Math.cos(radius);
+                var diry = Math.sin(radius);
+
+                var length = Math.sqrt(dx * dx + dy * dy);
+                var theta = Math.atan2( diry, dirx ) - Math.atan2( dy, dx );
+                length = length * Math.cos(theta);
+
+                yarrow.resize( -1.0 * length + 100 );
+
+                if ( callbacks.update ) {
+                    callbacks.update.call(group, 0.0, length/100.0 );
+                }
+            },
+            end: function () {
+                yarrow.resize( 100 );
+
+                if ( callbacks.end )
+                    callbacks.end.call(group);
+            },
+        } );
+        yarrow.rotate(-90, 0, 0 );
+        group.add(yarrow);
+
+
+        // scaleRect
+        var color = "#fff";
+        var dragging = false;
+        scaleRect = group.rect( 20, 20 )
+                            .move( -10, -10 )
+                            .fill( { color: color, opacity: 0.4 } )
+                            .stroke( { width: 1, color: color } )
+                            ;
+        scaleRect.on( 'mouseover', function ( event ) {
+            var lightColor = chroma(color).brighter().hex();
+            this.fill( { color: lightColor } )
+                .stroke( { color: lightColor } )
+                ;
+            event.stopPropagation();
+        } );
+        scaleRect.on( 'mouseout', function ( event ) {
+            if ( !dragging ) {
+                this.fill( { color: color } )
+                    .stroke( { color: color } )
+                    ;
+            }
+            event.stopPropagation();
+        } );
+        _addMoveHandles( scaleRect, {
+            start: function () {
+                dragging = true;
+                this.fill( { color: "#cc5" } )
+                    .stroke( { color: "#cc5" } )
+                    ;
+
+                if ( callbacks.start )
+                    callbacks.start.call(group);
+            },
+
+            update: function ( dx, dy ) {
+                var dirx = 1.0;
+                var diry = -1.0;
+
+                var length = Math.sqrt(dx * dx + dy * dy);
+                var theta = Math.atan2( diry, dirx ) - Math.atan2( dy, dx );
+                length = length * Math.cos(theta);
+
+                xarrow.resize( length + 100 );
+                yarrow.resize( length + 100 );
+
+                if ( callbacks.update )
+                    callbacks.update.call(group, dirx * length/100.0, diry * length/100.0 );
+            },
+
+            end: function () {
+                dragging = false;
+                this.fill( { color: color } )
+                    .stroke( { color: color } )
+                    ;
+
+                xarrow.resize( 100 );
+                yarrow.resize( 100 );
 
                 if ( callbacks.end )
                     callbacks.end.call(group);
