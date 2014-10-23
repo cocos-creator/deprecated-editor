@@ -221,17 +221,19 @@
                     break;
 
                 case "rotate":
-                    // var localscale = entity.transform.scale;
+                    var worldrot;
                     tool = this.svgGizmos.rotationTool ( screenpos, rotation, {
                         start: function () {
-                            // localscale = this.entity.transform.scale;
+                            worldrot = this.entity.transform.worldRotation;
                         },
 
-                        update: function ( dx, dy ) {
-                            // this.entity.transform.scale = new Fire.Vec2 ( 
-                            //     localscale.x * (1.0 + dx),
-                            //     localscale.y * (1.0 - dy)
-                            // ); 
+                        update: function ( delta ) {
+                            var rot = worldrot + delta;
+                            if ( rot > 180.0 || rot < -180.0 ) {
+                                rot = (rot + 360.0) % 360.0;
+                            }
+                            rot = Math.floor(rot);
+                            this.entity.transform.worldRotation = rot;
                             sceneView.repaint();
                         }, 
                     } ); 

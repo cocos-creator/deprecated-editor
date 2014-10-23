@@ -64,7 +64,7 @@ Fire.SvgGizmos = (function () {
                 document.addEventListener ( 'mouseup', mouseupHandle );
 
                 if ( callbacks.start ) {
-                    callbacks.start.call ( gizmo );
+                    callbacks.start.call ( gizmo, event.offsetX, event.offsetY );
                 }
             }
             event.stopPropagation();
@@ -398,43 +398,133 @@ Fire.SvgGizmos = (function () {
 
     SvgGizmos.prototype.rotationTool = function ( position, rotation, callbacks ) {
         var group = this.svg.group();
-        var circle;
+        var circle, line, arrow, arc, txtDegree;
+        var dragging = false;
+        var color = "#f00";
 
         group.position = position;
         group.rotation = rotation;
 
-        var color = "#f00";
-        var dragging = false;
+        // circle
         circle = group.path('M50,-10 A50,50, 0 1,0 50,10')
                       .fill( "none" )
                       .stroke( { width: 2, color: color } )
                       ;
 
-        // x-arrow
-        xarrow = this.arrowTool( 50, "#f00", {
-            start: function () {
+        arc = group.path()
+                   .fill( {color: color, opacity: 0.4} )
+                   .stroke( { width: 1, color: color } )
+                   ;
+        arc.hide();
+
+        // arrow
+        var size = 50;
+        line = group.line( 0, 0, size, 0 )
+                    .stroke( { width: 1, color: color } )
+                    ;
+        arrow = group.polygon ([ [size, 5], [size, -5], [size+15, 0] ])
+                     .fill( { color: color } )
+                     ;
+
+        //
+        txtDegree = group.text("0")
+                         .plain("")
+                         .fill( { color: "white" } )
+                         .font( {
+                             anchor: 'middle',
+                         })
+                         .hide()
+                         .translate( 30, 0 )
+                         ;
+
+        group.style( 'pointer-events', 'visibleFill' );
+        group.on( 'mouseover', function ( event ) {
+            var lightColor = chroma(color).brighter().hex();
+            circle.stroke( { color: lightColor } );
+            line.stroke( { color: lightColor } );
+            arrow.fill( { color: lightColor } );
+
+            event.stopPropagation();
+        } );
+        group.on( 'mouseout', function ( event ) {
+            if ( !dragging ) {
+                circle.stroke( { color: color } );
+                line.stroke( { color: color } );
+                arrow.fill( { color: color } );
+            }
+            event.stopPropagation();
+        } );
+
+        var x1, y1;
+        _addMoveHandles( group, {
+            start: function ( x, y ) {
+                dragging = true;
+                circle.stroke( { color: "#cc5" } );
+                line.stroke( { color: "#cc5" } );
+                arrow.fill( { color: "#cc5" } );
+
+                arc.show();
+                arc.plot( 'M40,0 A40,40, 0 0,1 40,0 L0,0 Z' );
+
+                txtDegree.plain("0\xB0");
+                txtDegree.rotate(0, 0, 0);
+                txtDegree.show();
+
+                x1 = x - group.position.x;
+                y1 = y - group.position.y;
+
                 if ( callbacks.start )
                     callbacks.start.call(group);
             },
+
             update: function ( dx, dy ) {
-                var radius = group.rotation * Math.PI / 180.0;
-                var dirx = Math.cos(radius);
-                var diry = Math.sin(radius);
+                var x2 = x1 + dx;
+                var y2 = y1 + dy;
+                var len1 = Math.sqrt(x1 * x1 + y1 * y1);
+                var len2 = Math.sqrt(x2 * x2 + y2 * y2);
 
-                var length = Math.sqrt(dx * dx + dy * dy);
-                var theta = Math.atan2( diry, dirx ) - Math.atan2( dy, dx );
-                length = length * Math.cos(theta);
+                //
+                if ( len1 > 0 && len2 > 0 ) {
+                    var dot = x1 * x2 + y1 * y2;
+                    var cross = y1 * x2 - x1 * y2;
 
-                if ( callbacks.update ) {
-                    callbacks.update.call(group, dirx * length, diry * length );
+                    var alpha = Math.acos( dot / (len1 * len2) );
+                    alpha = Math.sign(cross) * alpha;
+
+                    var dirx = Math.cos(alpha);
+                    var diry = Math.sin(alpha);
+                    var angle = alpha * 180.0 / Math.PI;
+
+                    txtDegree.rotate(alpha * 180.0 / Math.PI, 0, 0);
+                    if ( alpha > 0.0 ) {
+                        arc.plot( 'M40,0 A40,40, 0 0,1 ' + dirx*40 + ',' + diry*40 + ' L0,0 Z' );
+                        txtDegree.plain( "+" + angle.toFixed(0) + "\xB0" );
+                    }
+                    else {
+                        arc.plot( 'M40,0 A40,40, 0 0,0 ' + dirx*40 + ',' + diry*40 + ' L0,0 Z' );
+                        txtDegree.plain( angle.toFixed(0) + "\xB0" );
+                    }
                 }
+
+                //
+                var theta = Math.atan2( y1, x1 ) - Math.atan2( y2, x2 );
+                if ( callbacks.update )
+                    callbacks.update.call(group, theta * 180.0 / Math.PI );
             },
+
             end: function () {
+                dragging = false;
+                circle.stroke( { color: color } );
+                line.stroke( { color: color } );
+                arrow.fill( { color: color } );
+
+                arc.hide();
+                txtDegree.hide();
+
                 if ( callbacks.end )
                     callbacks.end.call(group);
-            },
+            }
         } );
-        group.add(xarrow);
 
         return group;
     };
