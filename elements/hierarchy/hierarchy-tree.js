@@ -7,12 +7,8 @@
         created: function () {
             this.focused = false;
 
-            this._idToItem = {};
-
-            // selection
-            this.selection = [];
-            this.lastActive = null;
             this.contextmenuAt = null;
+            this._idToItem = {};
 
             // dragging
             this.startDragging = false;
@@ -218,11 +214,6 @@
 
         onDeleteItem: function (item) {
             // TODO: deal by view ?
-            // unselect
-            if (item.selected) {
-                var idx = this.selection.indexOf(item); 
-                this.selection.splice(idx, 1);
-            }
             // remove id
             delete this._idToItem[item.id];
         },
@@ -233,7 +224,7 @@
                 //Fire.warn( 'Can not find source element: ' + id );
                 return;
             }
-            var oldParentEL = el.parentElement;
+            //var oldParentEL = el.parentElement;
             var parentEL = parentId ? this._idToItem[parentId] : this;
             if ( !parentEL ) {
                 //Fire.warn( 'Can not find dest element: ' + destUrl );
@@ -287,7 +278,7 @@
                 this.removeChild(this.firstChild);
             }
             this._idToItem = {};
-            this.selection.length = 0;
+            
             //
             // 目前hierarchy和engine处在同一context，直接访问场景就行。
             // 将来如有需要再改成ipc。
@@ -296,6 +287,7 @@
             if (!Fire.Engine._scene) {
                 return;
             }
+            var selection = Fire.Selection.entities;
             var self = this;
             function createItem(transform, parentEL) {
                 var entity = transform.entity;
@@ -306,60 +298,12 @@
                         createItem(children[i], el);
                     }
                     el.foldable = el.hasChildNodes();
+                    el.selected = selection.indexOf(el.id) !== -1;
                 }
             }
             var entities = Fire.Engine._scene.entities;
             for (var i = 0, len = entities.length; i < len; i++) {
                 createItem(entities[i].transform);
-            }
-        },
-
-        toggle: function ( items ) {
-            for ( var i = 0; i < items.length; ++i ) {
-                var item = items[i];
-                item.selected = !item.selected;
-                if ( item.selected ) {
-                    this.selection.push(item);
-                }
-                else {
-                    var idx = this.selection.indexOf(item); 
-                    this.selection.splice(idx,1);
-                }
-            }
-        },
-
-        select: function ( items ) {
-            for ( var i = 0; i < items.length; ++i ) {
-                var item = items[i];
-                if ( item.selected === false ) {
-                    item.selected = true;
-                    this.selection.push(item);
-                }
-            }
-        },
-
-        unselectRecursively: function ( item ) {
-            if ( item.selected ) {
-                var idx = this.selection.indexOf(item); 
-                this.selection.splice(idx, 1);
-            }
-            var children = item.children;
-            for ( var i = 0; i < children.length; ++i ) {
-                this.unselectRecursively(children[i]);
-            }
-        },
-
-        clearSelect: function () {
-            for ( var i = 0; i < this.selection.length; ++i ) {
-                this.selection[i].selected = false;
-            }
-            this.selection = [];
-        },
-
-        confirmSelect: function () {
-            if ( this.selection.length > 0 ) {
-                var idList = this.selection.map( function (x) { return x.id; } );
-                Fire.broadcast( 'entity:selected', idList );
             }
         },
 
@@ -385,57 +329,46 @@
 
         moveSelection: function ( targetEL ) {
             // TODO: sort selection
-            var idList = this.selection.map( function (x) { return x.id; } );
             var nextSiblingId;  // Todo: = ? 
-            Fire.broadcast('engine:moveEntity', idList, targetEL.id, nextSiblingId);
+            Fire.broadcast('engine:moveEntity', Fire.Selection.entities, targetEL.id, nextSiblingId);
         },
 
         selectingAction: function (event) {
+            // mouse down
             this.focus();
-
             if ( event.target instanceof HierarchyItem ) {
                 if ( event.detail.shift ) {
-                    if ( !this.lastActive ) {
-                        this.select( [event.target] );
-                    }
-                    else {
-                        // TODO:
-                    }
+                    //if ( !this.lastActive ) {
+                    //    Fire.broadcast('select:entity', event.target.id);
+                    //}
+                    //else {
+                    //    // TODO:
+                    //}
                 }
                 else if ( event.detail.toggle ) {
-                    this.toggle( [event.target] );
+                    if ( event.target.selected ) {
+                        Fire.Selection.unselectEntity(event.target.id);
+                    }
+                    else {
+                        Fire.Selection.selectEntity(event.target.id, false);
+                    }
                 }
                 else {
                     this.startDragging = true;
                     this.startDragAt = [event.detail.x, event.detail.y];
-                    if ( this.selection.indexOf(event.target) === -1 ) {
-                        this.clearSelect();
-                        this.select( [event.target] );
-                    }
-                } 
-                this.lastActive = event.target;
+                    //Fire.log('select ' + event.target.id);
+                    Fire.Selection.selectEntity(event.target.id);
+                    //Fire.log('active becomes ' + Fire.Selection.activeEntityId);
+                }
             }
             event.stopPropagation();
         },
 
         selectAction: function (event) {
-            if ( event.target instanceof HierarchyItem ) {
-                if ( event.detail.shift ) {
-                    // TODO:
-                }
-                else if ( event.detail.toggle ) {
-                    // TODO:
-                }
-                else {
-                    if ( this.selection.indexOf(event.target) !== -1 ) {
-                        this.clearSelect();
-                        this.select( [event.target] );
-                    }
-                } 
-
-                this.confirmSelect();
+            // mouse up
+            if ( event.target instanceof HierarchyItem === false ) {
+                Fire.Selection.clearEntity(event.target.id);
             }
-
             event.stopPropagation();
         },
         
@@ -495,11 +428,10 @@
             this.contextmenuAt = null;
             if ( event.target instanceof HierarchyItem ) {
                 this.contextmenuAt = event.target;
-                this.lastActive = this.contextmenuAt;
-                if (this.selection.indexOf(this.contextmenuAt) === -1) {
-                    this.clearSelect();
+                if (Fire.Selection.entities.indexOf(event.target.id) === -1) {
+                    Fire.Selection.clearEntity();
                 }
-                this.select([this.contextmenuAt]);
+                Fire.Selection.selectEntity(event.target.id);
             }
 
             this.getContextMenu().popup(Remote.getCurrentWindow());
@@ -507,8 +439,7 @@
         },
 
         deleteSelection: function () {
-            var idList = this.selection.map( function (x) { return x.id; } );
-            Fire.broadcast('engine:deleteEntities', idList);
+            Fire.broadcast('engine:deleteEntities', Fire.Selection.entities);
         },
 
         keydownAction: function (event) {
@@ -527,7 +458,10 @@
                 }
             }
             else {
-                this.super([event]);
+                var activeId = Fire.Selection.activeEntityId;
+                var activeEL = activeId && this._idToItem[activeId];
+
+                this.super([event, activeEL]);
                 if (event.cancelBubble) {
                     return;
                 }
@@ -541,13 +475,10 @@
                     
                     // key-up
                     case 38:
-                        if ( this.lastActive ) {
-                            var prev = this.prevItem(this.lastActive);
+                        if ( activeEL ) {
+                            var prev = this.prevItem(activeEL);
                             if ( prev ) {
-                                this.clearSelect();
-                                this.lastActive = prev;
-                                this.select([this.lastActive]);
-                                this.confirmSelect();
+                                Fire.Selection.selectEntity(prev.id);
                             }
                         }
                         event.preventDefault();
@@ -556,13 +487,10 @@
 
                     // key-down
                     case 40:
-                        if ( this.lastActive ) {
-                            var next = this.nextItem(this.lastActive, false);
+                        if ( activeEL ) {
+                            var next = this.nextItem(activeEL.id, false);
                             if ( next ) {
-                                this.clearSelect();
-                                this.lastActive = next;
-                                this.select([this.lastActive]);
-                                this.confirmSelect();
+                                Fire.Selection.selectEntity(next.id);
                             }
                         }
                         event.preventDefault();

@@ -7,8 +7,8 @@
                 this.resize();
             }.bind(this));
 
-            this._ipc_clearselect = this.clearselect.bind(this);
-            this._ipc_select = this.select.bind(this);
+            this._ipc_select = this.select.bind(this, true);
+            this._ipc_unselect = this.select.bind(this, false);
             this._ipc_hover = this.hover.bind(this);
             this._ipc_hoverout = this.hoverout.bind(this);
             this._ipc_repaint = this.delayRepaintScene.bind(this);
@@ -16,8 +16,8 @@
 
         ready: function () {
             // register Ipc
-            Ipc.on('asset:selected', this._ipc_clearselect );
-            Ipc.on('entity:selected', this._ipc_select );
+            Ipc.on('selection:activated:entity', this._ipc_select );
+            Ipc.on('selection:deactivated:entity', this._ipc_unselect );
             Ipc.on('scene:hover', this._ipc_hover );
             Ipc.on('scene:hoverout', this._ipc_hoverout );
             Ipc.on('scene:dirty', this._ipc_repaint );
@@ -26,8 +26,8 @@
         },
 
         detached: function () {
-            Ipc.removeListener('asset:selected', this._ipc_clearselect );
-            Ipc.removeListener('entity:selected', this._ipc_select );
+            Ipc.removeListener('selection:activated:entity', this._ipc_select );
+            Ipc.removeListener('selection:deactivated:entity', this._ipc_unselect );
             Ipc.removeListener('scene:hover', this._ipc_hover );
             Ipc.removeListener('scene:hoverout', this._ipc_hoverout );
             Ipc.removeListener('scene:dirty', this._ipc_repaint );
@@ -43,25 +43,22 @@
             this.$.view.resize();
         },
 
-        clearselect: function () {
-            // this.$.view.clearselect();
-        },
+        select: function ( selected, entityID ) {
+            if (selected) {
+                if (!entityID) {
+                    return;
+                }
 
-        select: function ( entityIDs ) {
-            this.clearselect();
+                var entity = Fire.Entity._getInstanceById(entityID);
+                if (!entity) {
+                    return;
+                }
 
-            // only support entity currently
-            var id = entityIDs[0];   // multi-inpector not yet implemented
-            if (!id) {
-                return;
+                this.$.view.select(entity);
             }
-
-            var entity = Fire.Entity._getInstanceById(id);
-            if (!entity) {
-                return;
+            else {
+                //TODO: this.$.view.clearselect();
             }
-
-            this.$.view.select(entity);
         },
 
         hover: function ( entityID ) {

@@ -14,52 +14,64 @@
         created: function () {
             this.focused = false;
 
-            this._ipc_inspectAsset = this.inspectAsset.bind(this);
-            this._ipc_inspectScene = this.inspectScene.bind(this);
+            this._ipc_inspectAsset = this.inspectAsset.bind(this, true);
+            this._ipc_inspectEntity = this.inspectEntity.bind(this, true);
+            this._ipc_uninspectAsset = this.inspectAsset.bind(this, false);
+            this._ipc_uninspectEntity = this.inspectEntity.bind(this, false);
         },
 
         ready: function () {
             this.tabIndex = EditorUI.getParentTabIndex(this)+1;
 
             // register Ipc
-            Ipc.on('asset:selected', this._ipc_inspectAsset );
-            Ipc.on('entity:selected', this._ipc_inspectScene );
+            Ipc.on('selection:activated:asset', this._ipc_inspectAsset );
+            Ipc.on('selection:activated:entity', this._ipc_inspectEntity );
+            Ipc.on('selection:deactivated:asset', this._ipc_uninspectAsset );
+            Ipc.on('selection:deactivated:entity', this._ipc_uninspectEntity );
         },
 
         detached: function () {
-            Ipc.removeListener('asset:selected', this._ipc_inspectAsset );
-            Ipc.removeListener('entity:selected', this._ipc_inspectScene );
+            Ipc.removeListener('selection:activated:asset', this._ipc_inspectAsset );
+            Ipc.removeListener('selection:activated:entity', this._ipc_inspectEntity );
+            Ipc.removeListener('selection:deactivated:asset', this._ipc_uninspectAsset );
+            Ipc.removeListener('selection:deactivated:entity', this._ipc_uninspectEntity );
         },
 
-        inspectAsset: function ( uuid ) {
-            var promise = new Promise(function(resolve, reject) {
-                this.lastUuid = uuid;
-                var meta = Fire.AssetDB.loadMeta(uuid);
-                var importer = Fire.deserialize(meta);
+        inspectAsset: function ( inspect, uuid ) {
+            if (inspect) {
+                var promise = new Promise(function(resolve, reject) {
+                    this.lastUuid = uuid;
+                    var meta = Fire.AssetDB.loadMeta(uuid);
+                    var importer = Fire.deserialize(meta);
 
-                if ( this.lastUuid === uuid ) {
-                    resolve(importer);
-                }
-                else {
-                    reject();
-                }
-            }.bind(this));
-            promise.then ( function ( importer ) {
-                this.inspect(importer);
-            }.bind(this));
+                    if ( this.lastUuid === uuid ) {
+                        resolve(importer);
+                    }
+                    else {
+                        reject();
+                    }
+                }.bind(this));
+                promise.then ( function ( importer ) {
+                    this.inspect(importer);
+                }.bind(this));
+            }
+            else if (this.$.fields.target instanceof Fire.Asset) {
+                // uninspect
+            }
         },
 
-        inspectScene: function ( entityIdList ) {
-            // only support entity currently
-            var id = entityIdList[0];   // multi-inpector not yet implemented
-            if (!id) {
-                return;
+        inspectEntity: function ( inspect, id ) {
+            if (inspect) {
+                // only support entity currently
+                var entity = Fire.Entity._getInstanceById(id);
+                if (!entity) {
+                    return;
+                }
+                this.inspect(entity);
             }
-            var entity = Fire.Entity._getInstanceById(id);
-            if (!entity) {
-                return;
+            else if (this.$.fields.target instanceof Fire.Entity) {
+                // uninspect
             }
-            this.inspect(entity);
         },
 
         inspect: function ( obj ) {
