@@ -5,10 +5,9 @@
 
     Polymer({
         created: function () {
-            this.focused = false;
+            this.super();
 
             this.contextmenuAt = null;
-            this._idToItem = {};
 
             // dragging
             this.startDragging = false;
@@ -26,10 +25,10 @@
 
             this._ipc_refresh = this.refresh.bind(this);
             this._ipc_newItem = this.newItem.bind(this);
-            this._ipc_deleteEntity = this.deleteEntity.bind(this);
-            this._ipc_setEntityParent = this.setEntityParent.bind(this);
+            this._ipc_deleteEntity = this.deleteItemById.bind(this);
+            this._ipc_setEntityParent = this.setItemParentById.bind(this);
             this._ipc_setItemIndex = this.setItemIndex.bind(this);
-            this._ipc_renameItem = this.renameItem.bind(this);
+            this._ipc_renameItem = this.renameItemById.bind(this);
             //this._ipc_beginLoad = this.beginLoad.bind(this);
             //this._ipc_endLoad = this.endLoad.bind(this);
         },
@@ -190,57 +189,18 @@
                 return;
             }
             var newEL = new HierarchyItem();
-            newEL.name = name;
-            newEL.foldable = false;
-            newEL.id = id;
-
-            this._idToItem[id] = newEL;
-
-            parentEL = parentEL || this;
-            parentEL.appendChild(newEL);
-
+            this.initItem(newEL, name, id, parentEL);
             return newEL;
         },
 
-        deleteEntity: function ( id ) {
-            // TODO: deal by view ?
-            var el = this._idToItem[id];
-            if ( !el ) {
-                //Fire.warn( 'Can not find source element: ' + id );
-                return;
-            }
-            this.deleteItem(el);
-        },
-
-        onDeleteItem: function (item) {
-            // TODO: deal by view ?
-            // remove id
-            delete this._idToItem[item.id];
-        },
-
-        setEntityParent: function ( id, parentId ) {
-            var el = this._idToItem[id];
-            if ( !el ) {
-                //Fire.warn( 'Can not find source element: ' + id );
-                return;
-            }
-            //var oldParentEL = el.parentElement;
-            var parentEL = parentId ? this._idToItem[parentId] : this;
-            if ( !parentEL ) {
-                //Fire.warn( 'Can not find dest element: ' + destUrl );
-                return;
-            }
-            this.setItemParent(el, parentEL);
-        },
-
         setItemIndex: function ( id, nextIdInGame ) {
-            var el = this._idToItem[id];
+            var el = this.idToItem[id];
             if ( !el ) {
                 //Fire.warn( 'Can not find source element: ' + id );
                 return;
             }
             if ( nextIdInGame ) {
-                var next = this._idToItem[nextIdInGame];
+                var next = this.idToItem[nextIdInGame];
                 if ( !next ) {
                     //Fire.warn( 'Can not find next element: ' + nextIdInGame );
                     return;
@@ -250,15 +210,6 @@
             else {
                 el.parentElement.appendChild(el);
             }
-        },
-
-        renameItem: function ( id, newName ) {
-            var el = this._idToItem[id];
-            if ( !el ) {
-                //Fire.warn( 'Can not find source element: ' + id );
-                return;
-            }
-            el.name = newName;
         },
 
         //beginLoad: function () {
@@ -273,11 +224,7 @@
         //},
 
         refresh: function () {
-            // clear
-            while (this.firstChild) {
-                this.removeChild(this.firstChild);
-            }
-            this._idToItem = {};
+            this.clear();
             
             //
             // 目前hierarchy和engine处在同一context，直接访问场景就行。
@@ -459,7 +406,7 @@
             }
             else {
                 var activeId = Fire.Selection.activeEntityId;
-                var activeEL = activeId && this._idToItem[activeId];
+                var activeEL = activeId && this.idToItem[activeId];
 
                 this.super([event, activeEL]);
                 if (event.cancelBubble) {

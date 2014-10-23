@@ -36,7 +36,7 @@
         select: function (selected, entityIds) {
             for (var i = 0; i < entityIds.length; ++i) {
                 var id = entityIds[i];
-                var el = this.$.hierarchyTree._idToItem[id];
+                var el = this.$.hierarchyTree.idToItem[id];
                 if (el) {
                     el.selected = selected;
                 }
