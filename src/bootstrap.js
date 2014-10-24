@@ -59,6 +59,7 @@ window.onload = function() {
                 }
             }
         };
+        Fire.Selection = remote.getGlobal( 'Selection' );
     }
     catch ( error ) {
         var currentWindow = remote.getCurrentWindow();

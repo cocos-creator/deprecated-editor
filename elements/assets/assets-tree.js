@@ -7,24 +7,6 @@
     var Menu = Remote.require('menu');
     var MenuItem = Remote.require('menu-item');
 
-    // pathA = foo/bar,         pathB = foo/bar/foobar, return true
-    // pathA = foo/bar,         pathB = foo/bar,        return true
-    // pathA = foo/bar/foobar,  pathB = foo/bar,        return false
-    // pathA = foo/bar/foobar,  pathB = foobar/bar/foo, return false
-    function _includePath ( pathA, pathB ) {
-        if ( pathA.length < pathB.length &&
-             pathB.indexOf (pathA) === 0 ) 
-        {
-            return true;
-        }
-
-        if ( pathA === pathB ) {
-            return true;
-        }
-
-        return false;
-    }
-
     function _binaryIndexOf ( elements, key ) {
         var lo = 0;
         var hi = elements.length - 1;
@@ -53,7 +35,7 @@
             parentEL.appendChild(el);
         }
         else {
-            parentEL.insertBefore(el,parentEL.children[idx]);
+            parentEL.insertBefore(el, parentEL.children[idx]);
         }
     }
 
@@ -551,61 +533,35 @@
         },
 
         getMostIncludeElements: function ( elements ) {
-            var i,j;
+            var i, j;
             var resultELs = [];
 
             for ( i = 0; i < elements.length; ++i ) {
                 var el = elements[i];
-                var url = this.getUrl(el);
                 var addEL = true;
                 var resultEL = null;
-                var resultUrl = null;
-                var cmp = null;
 
-                if ( el.isFolder ) {
-                    for ( j = 0; j < resultELs.length; ++j ) {
-                        resultEL = resultELs[j];
-                        resultUrl = this.getUrl(resultEL);
-
+                for ( j = 0; j < resultELs.length; ++j ) {
+                    resultEL = resultELs[j];
+                    if ( resultEL === el ) {
+                        addEL = false;
+                        break;
+                    }
+                    else if ( resultEL.contains(el) ) {
                         // url is child of resultUrl
-                        cmp = _includePath( resultUrl, url );
-                        if ( cmp ) {
-                            addEL = false;
-                            break;
-                        }
-
+                        addEL = false;
+                        break;
+                    }
+                    else if ( el.contains(resultEL) ) {
                         // url is parent or same of resultUrl
-                        cmp = _includePath( url, resultUrl );
-                        if ( cmp ) {
-                            resultELs.splice(j,1);
-                            --j;
-                        }
-
-                        // url is not relative with resultUrl
+                        resultELs.splice(j, 1);
+                        --j;
                     }
-
-                    if ( addEL ) {
-                        resultELs.push(el);
-                    }
+                    // url is not relative with resultUrl
                 }
-                else {
-                    for ( j = 0; j < resultELs.length; ++j ) {
-                        resultEL = resultELs[j];
-                        resultUrl = this.getUrl(resultEL);
 
-                        // url is child of resultUrl
-                        cmp = _includePath( resultUrl, url );
-                        if ( cmp ) {
-                            addEL = false;
-                            break;
-                        }
-
-                        // url is not relative with resultUrl
-                    }
-
-                    if ( addEL ) {
-                        resultELs.push(el);
-                    }
+                if ( addEL ) {
+                    resultELs.push(el);
                 }
             }
 
@@ -666,12 +622,11 @@
                 var el = elements[i];
 
                 // do nothing if we already here
-                if ( el.parentElement === targetEL )
+                if ( el === targetEL || el.parentElement === targetEL )
                     continue;
 
-                var url = this.getUrl(el);
-                if ( _includePath(url,targetUrl) === false ) {
-                    var srcUrl = url;
+                if ( el.contains(targetEL) === false ) {
+                    var srcUrl = this.getUrl(el);
                     var destUrl = Path.join( targetUrl, el.name + el.extname );
                     Fire.command('asset-db:move', srcUrl, destUrl );
                 }
@@ -777,7 +732,7 @@
                         var srcELs = this.getMostIncludeElements(this.selection);
                         for (i = 0; i < srcELs.length; i++) {
                             var srcEL = srcELs[i];
-                            if (target != srcEL.parentElement) {
+                            if (target !== srcEL.parentElement) {
                                 names.push(srcEL.name + srcEL.extname);
                             }
                         }
