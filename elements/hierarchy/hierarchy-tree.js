@@ -293,17 +293,17 @@
                 }
                 else if ( event.detail.toggle ) {
                     if ( event.target.selected ) {
-                        Fire.Selection.unselectEntity(event.target.id);
+                        Fire.Selection.unselectEntity(event.target.id, false);
                     }
                     else {
-                        Fire.Selection.selectEntity(event.target.id, false);
+                        Fire.Selection.selectEntity(event.target.id, false, false);
                     }
                 }
                 else {
                     this.startDragging = true;
                     this.startDragAt = [event.detail.x, event.detail.y];
                     //Fire.log('select ' + event.target.id);
-                    Fire.Selection.selectEntity(event.target.id);
+                    Fire.Selection.selectEntity(event.target.id, true, false);
                     //Fire.log('active becomes ' + Fire.Selection.activeEntityId);
                 }
             }
@@ -312,8 +312,19 @@
 
         selectAction: function (event) {
             // mouse up
-            if ( event.target instanceof HierarchyItem === false ) {
-                Fire.Selection.clearEntity(event.target.id);
+            if ( event.target instanceof HierarchyItem ) {
+                if ( event.detail.shift ) {
+                    // TODO:
+                }
+                else if ( event.detail.toggle ) {
+                    // TODO:
+                }
+                else {
+                    if (Fire.Selection.entities.indexOf(event.target.id) !== -1) {
+                        Fire.Selection.selectEntity(event.target.id, true);
+                    }
+                }
+                Fire.Selection.confirm();
             }
             event.stopPropagation();
         },
@@ -374,10 +385,8 @@
             this.contextmenuAt = null;
             if ( event.target instanceof HierarchyItem ) {
                 this.contextmenuAt = event.target;
-                if (Fire.Selection.entities.indexOf(event.target.id) === -1) {
-                    Fire.Selection.clearEntity();
-                }
-                Fire.Selection.selectEntity(event.target.id);
+                var unselectOther = (Fire.Selection.entities.indexOf(event.target.id) === -1);
+                Fire.Selection.selectEntity(event.target.id, unselectOther, true);
             }
 
             this.getContextMenu().popup(Remote.getCurrentWindow());
@@ -424,7 +433,8 @@
                         if ( activeEL ) {
                             var prev = this.prevItem(activeEL);
                             if ( prev ) {
-                                Fire.Selection.selectEntity(prev.id);
+                                // Todo toggle?
+                                Fire.Selection.selectEntity(prev.id, true, true);
                             }
                         }
                         event.preventDefault();
@@ -436,7 +446,8 @@
                         if ( activeEL ) {
                             var next = this.nextItem(activeEL.id, false);
                             if ( next ) {
-                                Fire.Selection.selectEntity(next.id);
+                                // Todo toggle?
+                                Fire.Selection.selectEntity(next.id, true, true);
                             }
                         }
                         event.preventDefault();
