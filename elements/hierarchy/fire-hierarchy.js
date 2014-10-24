@@ -22,15 +22,15 @@
         ready: function () {
             this.tabIndex = EditorUI.getParentTabIndex(this) + 1;
 
-            Ipc.on('selection:selected:entity', this._ipc_selected);
-            Ipc.on('selection:unselected:entity', this._ipc_unselected);
-            //Ipc.on('selection:activated:entity', this._ipc_activated);
-            //Ipc.on('selection:deactivated:entity', this._ipc_deactivated);
+            Ipc.on('selection:entity:selected', this._ipc_selected);
+            Ipc.on('selection:entity:unselected', this._ipc_unselected);
+            //Ipc.on('selection:entity:activated', this._ipc_activated);
+            //Ipc.on('selection:entity:deactivated', this._ipc_deactivated);
         },
 
         detached: function () {
-            Ipc.removeListener('selection:selected:entity', this._ipc_selected);
-            Ipc.removeListener('selection:unselected:entity', this._ipc_unselected);
+            Ipc.removeListener('selection:entity:selected', this._ipc_selected);
+            Ipc.removeListener('selection:entity:unselected', this._ipc_unselected);
         },
 
         select: function (selected, entityIds) {

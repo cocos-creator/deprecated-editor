@@ -244,7 +244,6 @@
                     for (var i = 0, len = children.length; i < len; i++) {
                         createItem(children[i], el);
                     }
-                    el.foldable = el.hasChildNodes();
                     el.selected = selection.indexOf(el.id) !== -1;
                 }
             }

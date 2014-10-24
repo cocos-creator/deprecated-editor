@@ -16,8 +16,8 @@
 
         ready: function () {
             // register Ipc
-            Ipc.on('selection:activated:entity', this._ipc_select );
-            Ipc.on('selection:deactivated:entity', this._ipc_unselect );
+            Ipc.on('selection:entity:activated', this._ipc_select );
+            Ipc.on('selection:entity:deactivated', this._ipc_unselect );
             Ipc.on('scene:hover', this._ipc_hover );
             Ipc.on('scene:hoverout', this._ipc_hoverout );
             Ipc.on('scene:dirty', this._ipc_repaint );
@@ -26,8 +26,8 @@
         },
 
         detached: function () {
-            Ipc.removeListener('selection:activated:entity', this._ipc_select );
-            Ipc.removeListener('selection:deactivated:entity', this._ipc_unselect );
+            Ipc.removeListener('selection:entity:activated', this._ipc_select );
+            Ipc.removeListener('selection:entity:deactivated', this._ipc_unselect );
             Ipc.removeListener('scene:hover', this._ipc_hover );
             Ipc.removeListener('scene:hoverout', this._ipc_hoverout );
             Ipc.removeListener('scene:dirty', this._ipc_repaint );

@@ -24,17 +24,17 @@
             this.tabIndex = EditorUI.getParentTabIndex(this)+1;
 
             // register Ipc
-            Ipc.on('selection:activated:asset', this._ipc_inspectAsset );
-            Ipc.on('selection:activated:entity', this._ipc_inspectEntity );
-            Ipc.on('selection:deactivated:asset', this._ipc_uninspectAsset );
-            Ipc.on('selection:deactivated:entity', this._ipc_uninspectEntity );
+            Ipc.on('selection:asset:activated', this._ipc_inspectAsset );
+            Ipc.on('selection:entity:activated', this._ipc_inspectEntity );
+            Ipc.on('selection:asset:deactivated', this._ipc_uninspectAsset );
+            Ipc.on('selection:entity:deactivated', this._ipc_uninspectEntity );
         },
 
         detached: function () {
-            Ipc.removeListener('selection:activated:asset', this._ipc_inspectAsset );
-            Ipc.removeListener('selection:activated:entity', this._ipc_inspectEntity );
-            Ipc.removeListener('selection:deactivated:asset', this._ipc_uninspectAsset );
-            Ipc.removeListener('selection:deactivated:entity', this._ipc_uninspectEntity );
+            Ipc.removeListener('selection:asset:activated', this._ipc_inspectAsset );
+            Ipc.removeListener('selection:entity:activated', this._ipc_inspectEntity );
+            Ipc.removeListener('selection:asset:deactivated', this._ipc_uninspectAsset );
+            Ipc.removeListener('selection:entity:deactivated', this._ipc_uninspectEntity );
         },
 
         inspectAsset: function ( inspect, uuid ) {
