@@ -497,11 +497,11 @@ Fire.SvgGizmos = (function () {
 
                     txtDegree.rotate(alpha * 180.0 / Math.PI, 0, 0);
                     if ( alpha > 0.0 ) {
-                        arc.plot( 'M40,0 A40,40, 0 0,1 ' + dirx*40 + ',' + diry*40 + ' L0,0 Z' );
+                        arc.plot( 'M40,0 A40,40, 0 0,1 ' + dirx*40 + ',' + diry*40 + ' L0,0' );
                         txtDegree.plain( "+" + angle.toFixed(0) + "\xB0" );
                     }
                     else {
-                        arc.plot( 'M40,0 A40,40, 0 0,0 ' + dirx*40 + ',' + diry*40 + ' L0,0 Z' );
+                        arc.plot( 'M40,0 A40,40, 0 0,0 ' + dirx*40 + ',' + diry*40 + ' L0,0' );
                         txtDegree.plain( angle.toFixed(0) + "\xB0" );
                     }
                 }
