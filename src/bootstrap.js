@@ -49,7 +49,7 @@ window.onload = function() {
                 ipc.send.apply( ipc, ['rpc@' + fireID, name].concat(args) );
             },
         });
-        Fire.AssetDB = remote.getGlobal( 'AssetDB@' + fireID ); 
+
         Fire.observe = function ( target, enabled ) {
             target._observing = enabled;
             if ( target instanceof Fire.Entity ) {
@@ -59,7 +59,10 @@ window.onload = function() {
                 }
             }
         };
-        Fire.Selection = remote.getGlobal( 'Selection' );
+
+        // get remote globals
+        Fire.AssetDB = remote.getGlobal( 'AssetDB@' + fireID ); 
+        Fire.Selection = remote.getGlobal( 'Selection@' + fireID );
     }
     catch ( error ) {
         var currentWindow = remote.getCurrentWindow();
