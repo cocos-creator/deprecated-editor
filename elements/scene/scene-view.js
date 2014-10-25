@@ -60,7 +60,7 @@
             this.resize(); // make sure we apply the size to all canvas
 
             // TEMP {
-            var assetPath = 'assets://Foobar/004.png';
+            var assetPath = 'assets://white-sheep/ip3_a_sheep_down_loop01.png';
             var uuid = Fire.AssetDB.urlToUuid(assetPath);
             if ( uuid ) {
                 Fire.AssetLibrary.loadAssetByUuid(uuid, function ( asset ) {

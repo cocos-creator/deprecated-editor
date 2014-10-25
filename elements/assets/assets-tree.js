@@ -7,62 +7,16 @@
     var Menu = Remote.require('menu');
     var MenuItem = Remote.require('menu-item');
 
-    function _binaryIndexOf ( elements, key ) {
-        var lo = 0;
-        var hi = elements.length - 1;
-        var mid, el;
-
-        while (lo <= hi) {
-            mid = ((lo + hi) >> 1);
-            el = elements[mid];
-
-            if (el.name < key) {
-                lo = mid + 1;
-            } 
-            else if (el.name > key) {
-                hi = mid - 1;
-            } 
-            else {
-                return mid;
-            }
-        }
-        return lo;
-    }
-
-    function _binaryInsert( parentEL, el ) {
-        var idx = _binaryIndexOf( parentEL.children, el.name );
-        if ( idx === -1 ) {
-            parentEL.appendChild(el);
-        }
-        else {
-            parentEL.insertBefore(el, parentEL.children[idx]);
-        }
-    }
-
-    function _findElement ( elements, name ) {
-        for ( var i = 0; i < elements.length; ++i ) {
-            var el = elements[i];
-            var fullname = el.name + el.extname;
-            if ( fullname === name )
-                return el;
-        }
-        return null;
-    }
-
-    function _newAssetsItem ( url, type ) {
+    function _newAssetsItem ( url, type, id, parent ) {
         var extname = Url.extname(url); 
-        var basename = Url.basename(url,extname); 
+        var basename = Url.basename(url, extname); 
 
         var newEL = new AssetsItem();
-        if ( !type ) {
-            type = extname;
-        }
-
-        newEL.isFolder = (type === 'folder' || type === 'root');
         newEL.isRoot = type === 'root';
+        newEL.isFolder = (type === 'folder' || newEL.isRoot);
         newEL.extname = extname;
-        newEL.name = basename;
 
+        type = type || extname;
         switch ( type ) {
         case 'root':
             newEL.setIcon('fa-database');
@@ -88,6 +42,7 @@
             break;
         }
 
+        this.initItem(newEL, basename, id, parent);
         return newEL;
     }
 
@@ -122,8 +77,6 @@
         created: function () {
             this.super();
 
-            // selection
-            this.selection = [];
             this.contextmenuAt = null;
 
             // dragging
@@ -139,13 +92,13 @@
             this.confliction = [];
 
             this._ipc_newItem = this.newItem.bind(this);
-            this._ipc_newFolder = function ( url ) {
-                this.newItem( url, true );
+            this._ipc_newFolder = function ( url, id, parentId ) {
+                this.newItem( url, id, parentId, true );
             }.bind(this);
-            this._ipc_newAsset = function ( url ) {
-                this.newItem( url, false );
+            this._ipc_newAsset = function ( url, id, parentId ) {
+                this.newItem( url, id, parentId, false );
             }.bind(this);
-            this._ipc_deleteItem = this.deleteItem.bind(this);
+            this._ipc_deleteItem = this.deleteItemById.bind(this);
             this._ipc_finishLoading = this.finishLoading.bind(this);
             this._ipc_moveItem = this.moveItem.bind(this);
         },
@@ -294,18 +247,15 @@
                         if ( this.contextmenuAt instanceof AssetsItem ) {
                             this.contextmenuAt.rename();
                         }
-                    }.bind(this)
+                    }.bind(this),
+                    //enable: this.contextmenuAt && this.contextmenuAt.isRoot === false && Fire.Selection.assets.length === 1,
                 },
 
                 // Delete
                 {
                     label: 'Delete',
-                    click: function () {
-                        if ( this.contextmenuAt instanceof AssetsItem ) {
-                            var url = this.getUrl(this.contextmenuAt);
-                            Fire.command( 'asset-db:delete', url );
-                        }
-                    }.bind(this)
+                    click: this.deleteSelection.bind(this),
+                    //enable: this.contextmenuAt && this.contextmenuAt.isRoot === false,
                 },
                 
                 // =====================
@@ -338,10 +288,9 @@
             console.time('fire-assets:load');
             Fire.hint('start browsing ' + url);
 
-            var rootEL = _newAssetsItem( url, 'root' );
-            this.appendChild(rootEL);
+            _newAssetsItem.call(this, url, 'root', Fire.UUID.AssetsRoot, this);
 
-            Fire.command( 'asset-db:browse', url );
+            Fire.command('asset-db:browse', url);
         },
 
         finishLoading: function ( url ) {
@@ -349,138 +298,35 @@
             console.timeEnd('fire-assets:load');
         },
 
-        newItem: function ( url, isDirectory ) {
-            var newEL = _newAssetsItem( url, isDirectory ? 'folder' : null );
-
-            //
-            var parentUrl = Url.dirname(url);
-            var parentEL = this.getElement(parentUrl);
-            if ( parentEL === null ) {
-                Fire.warn('Can not find element for ' + parentUrl);
+        newItem: function ( url, id, parentId, isDirectory ) {
+            var parentEL = this.idToItem[parentId];
+            if ( !parentEL ) {
+                Fire.warn('Can not find element for ' + parentId);
                 return;
             }
-
-            // binary insert
-            _binaryInsert ( parentEL, newEL );
-            parentEL.foldable = true;
+            var type = isDirectory ? 'folder' : '';
+            _newAssetsItem.call(this, url, type, id, parentEL);
         },
-
-        deleteItem: function ( url ) {
-            var el = this.getElement(url);
-            if ( el === null ) {
-                Fire.warn( 'Can not find source element: ' + url );
+        
+        moveItem: function ( id, destUrl, destDirId ) {
+            var srcEL = this.idToItem[id];
+            if ( !srcEL ) {
+                Fire.warn( 'Can not find source element: ' + id );
                 return;
             }
-            this.super([el]);
-        },
-
-        onDeleteItem: function (item) {
-            // unselect
-            if (item.selected) {
-                var idx = this.selection.indexOf(item); 
-                this.selection.splice(idx, 1);
-            }
-        },
-
-        moveItem: function ( srcUrl, destUrl ) {
-            var srcEL = this.getElement( srcUrl );
-            if ( srcEL === null ) {
-                Fire.warn( 'Can not find source element: ' + srcUrl );
-                return;
-            }
-
-            var destEL = this.getElement( Path.dirname(destUrl) );
-            if ( destEL === null ) {
-                Fire.warn( 'Can not find dest element: ' + destUrl );
-                return;
-            }
-
+            
+            this.setItemParentById(id, destDirId);
+            
             var destExtname = Path.extname(destUrl);
             var destBasename = Path.basename(destUrl, destExtname);
             srcEL.extname = destExtname;
             srcEL.name = destBasename;
-
-            // binary insert
-            var oldParent = srcEL.parentElement;
-            _binaryInsert ( destEL, srcEL );
-            destEL.foldable = true;
-            oldParent.foldable = oldParent.hasChildNodes();
         },
 
-        toggle: function ( items ) {
-            for ( var i = 0; i < items.length; ++i ) {
-                var item = items[i];
-                if ( item.selected === false ) {
-                    item.selected = true;
-                    this.selection.push(item);
-                }
-                else {
-                    item.selected = false;
-
-                    var idx = this.selection.indexOf(item); 
-                    this.selection.splice(idx,1);
-                }
-            }
-        },
-
-        select: function ( items ) {
-            for ( var i = 0; i < items.length; ++i ) {
-                var item = items[i];
-                if ( item.selected === false ) {
-                    item.selected = true;
-                    this.selection.push(item);
-                }
-            }
-        },
-
-        unselectRecursively: function ( item ) {
-            if ( item.selected ) {
-                var idx = this.selection.indexOf(item); 
-                this.selection.splice(idx, 1);
-            }
-            var children = item.children;
-            for ( var i = 0; i < children.length; ++i ) {
-                this.unselectRecursively(children[i]);
-            }
-        },
-
-        unselect: function ( items ) {
-            for ( var i = 0; i < items.length; ++i ) {
-                var item = items[i];
-                if ( item.selected ) {
-                    item.selected = false;
-
-                    var idx = this.selection.indexOf(item); 
-                    this.selection.splice(idx,1);
-                }
-            }
-        },
-
-        clearSelect: function () {
-            for ( var i = 0; i < this.selection.length; ++i ) {
-                this.selection[i].selected = false;
-            }
-            this.selection = [];
-        },
-
-        confirmSelect: function () {
-            if ( this.selection.length > 0 ) {
-                var promise = new Promise(function(resolve, reject) {
-                    var confirmSelection = this.lastConfirmSelection = this.selection[0];
-                    var url = this.getUrl(confirmSelection);
-                    var uuid = Fire.AssetDB.urlToUuid(url);
-
-                    if ( this.lastConfirmSelection === confirmSelection ) {
-                        resolve(uuid);
-                    }
-                    else {
-                        reject();
-                    }
-                }.bind(this));
-                promise.then ( function ( uuid ) {
-                    // TODO: should we change this to selection:changed ?? and use global Selection
-                    Fire.broadcast( 'asset:selected', uuid );
-                }.bind(this));
+        deleteSelection: function () {
+            var elements = this.getMostIncludeElements(Fire.Selection.assets);
+            for (var i = 0; i < elements.length; i++) {
+                Fire.command( 'asset-db:delete', elements[i].id );
             }
         },
 
@@ -497,47 +343,19 @@
                     break;
                 }
                 else {
-                    url = Path.join( parentEL.name, url );
+                    url = Url.join( parentEL.name, url );
                     parentEL = parentEL.parentElement;
                 }
             }
             return url;
         },
 
-        getElement: function ( url ) {
-            var list = url.split(":");
-            if ( list.length !== 2 ) {
-                console.warn("Invalid url " + url);
-                return null;
-            }
-            var relativePath = Path.normalize(list[1]);
-            if ( relativePath[0] === '/' ) {
-                relativePath = relativePath.slice(1);
-            }
-            var names = relativePath.split(Path.sep);
-            names.unshift(list[0]);
-            var el = this;
-
-            for ( var i = 0; i < names.length; ++i ) {
-                var name = names[i];
-
-                if ( name === '' || name === '.' )
-                    continue;
-
-                el = _findElement ( el.children, name );
-                if ( !el )
-                    return null;
-            }
-
-            return el;
-        },
-
-        getMostIncludeElements: function ( elements ) {
+        getMostIncludeElements: function ( uuids ) {
             var i, j;
             var resultELs = [];
 
-            for ( i = 0; i < elements.length; ++i ) {
-                var el = elements[i];
+            for ( i = 0; i < uuids.length; ++i ) {
+                var el = this.idToItem[uuids[i]];
                 var addEL = true;
                 var resultEL = null;
 
@@ -615,7 +433,7 @@
         },
 
         moveSelection: function ( targetEL ) {
-            var elements = this.getMostIncludeElements(this.selection);
+            var elements = this.getMostIncludeElements(Fire.Selection.assets);
             var targetUrl = this.getUrl(targetEL);
 
             for ( var i = 0; i < elements.length; ++i ) {
@@ -627,7 +445,7 @@
 
                 if ( el.contains(targetEL) === false ) {
                     var srcUrl = this.getUrl(el);
-                    var destUrl = Path.join( targetUrl, el.name + el.extname );
+                    var destUrl = Url.join( targetUrl, el.name + el.extname );
                     Fire.command('asset-db:move', srcUrl, destUrl );
                 }
             }
@@ -638,26 +456,24 @@
 
             if ( event.target instanceof AssetsItem ) {
                 if ( event.detail.shift ) {
-                    if ( !this.lastActive ) {
-                        this.lastActive = event.target;
-                        this.select( [event.target] );
-                    }
-                    else {
-                        // TODO:
-                    }
+                    //if ( !this.lastActive ) {
+                    //}
+                    //else {
+                    //}
                 }
                 else if ( event.detail.toggle ) {
-                    this.toggle( [event.target] );
+                    if ( event.target.selected ) {
+                        Fire.Selection.unselectAsset(event.target.id, false);
+                    }
+                    else {
+                        Fire.Selection.selectAsset(event.target.id, false, false);
+                    }
                 }
                 else {
                     this.startDragging = true;
                     this.startDragAt = [event.detail.x, event.detail.y];
-                    if ( this.selection.indexOf(event.target) === -1 ) {
-                        this.clearSelect();
-                        this.select( [event.target] );
-                    }
-                } 
-                this.lastActive = event.target;
+                    Fire.Selection.selectAsset(event.target.id, true, false);
+                }
             }
             event.stopPropagation();
         },
@@ -671,15 +487,12 @@
                     // TODO:
                 }
                 else {
-                    if ( this.selection.indexOf(event.target) !== -1 ) {
-                        this.clearSelect();
-                        this.select( [event.target] );
+                    if (Fire.Selection.assets.indexOf(event.target.id) !== -1) {
+                        Fire.Selection.selectAsset(event.target.id, true);
                     }
-                } 
-
-                this.confirmSelect();
+                }
+                Fire.Selection.confirm();
             }
-
             event.stopPropagation();
         },
 
@@ -729,7 +542,7 @@
                         }
                     }
                     else {
-                        var srcELs = this.getMostIncludeElements(this.selection);
+                        var srcELs = this.getMostIncludeElements(Fire.Selection.assets);
                         for (i = 0; i < srcELs.length; i++) {
                             var srcEL = srcELs[i];
                             if (target !== srcEL.parentElement) {
@@ -776,9 +589,8 @@
             this.contextmenuAt = null;
             if ( event.target instanceof AssetsItem ) {
                 this.contextmenuAt = event.target;
-                this.lastActive = this.contextmenuAt;
-                this.clearSelect();
-                this.select([this.contextmenuAt]);
+                var unselectOther = (Fire.Selection.assets.indexOf(event.target.id) === -1);
+                Fire.Selection.selectAsset(event.target.id, unselectOther, true);
             }
 
             this.contextmenu.popup(Remote.getCurrentWindow());
@@ -798,30 +610,39 @@
                         this.isValidForDrop = true;
                         this.dragging = false;
                         event.stopPropagation();
+
+                        Fire.Selection.cancel();
                     break;
                 }
             }
             else {
-                this.super([event]);
+                var activeId = Fire.Selection.activeAssetUuid;
+                var activeEL = activeId && this.idToItem[activeId];
+                
+                this.super([event, activeEL]);
                 if (event.cancelBubble) {
                     return;
                 }
                 switch ( event.which ) {
+                    // delete
+                    case 46:
+                        this.deleteSelection();
+                        event.stopPropagation();
+                    break;
+
                     // key-up
                     case 38:
-                        if ( this.lastActive ) {
-                            var prev = this.prevItem(this.lastActive);
-                            if ( prev === null ) {
-                                prev = this.lastActive;
-                            }
-                            if ( prev !== this.lastActive ) {
-                                if ( prev.offsetTop <= this.scrollTop ) {
-                                    this.scrollTop = prev.offsetTop;
+                        if ( activeEL ) {
+                            var prev = this.prevItem(activeEL);
+                            if ( prev ) {
+                                // Todo toggle?
+                                Fire.Selection.selectAsset(prev.id, true, true);
+                                
+                                if (prev !== activeEL) {
+                                    if ( prev.offsetTop <= this.scrollTop ) {
+                                        this.scrollTop = prev.offsetTop;
+                                    }
                                 }
-                                this.clearSelect();
-                                this.lastActive = prev;
-                                this.select([this.lastActive]);
-                                this.confirmSelect();
                             }
                         }
                         event.preventDefault();
@@ -830,19 +651,17 @@
 
                     // key-down
                     case 40:
-                        if ( this.lastActive ) {
-                            var next = this.nextItem(this.lastActive, false);
-                            if ( next === null ) {
-                                next = this.lastActive;
-                            }
-                            if ( next !== this.lastActive ) {
-                                if ( next.offsetTop + 16 >= this.scrollTop + this.offsetHeight ) {
-                                    this.scrollTop = next.offsetTop + 16 - this.offsetHeight;
+                        if ( activeEL ) {
+                            var next = this.nextItem(activeEL, false);
+                            if ( next ) {
+                                // Todo toggle?
+                                Fire.Selection.selectAsset(next.id, true, true);
+                                
+                                if ( next !== activeEL ) {
+                                    if ( next.offsetTop + 16 >= this.scrollTop + this.offsetHeight ) {
+                                        this.scrollTop = next.offsetTop + 16 - this.offsetHeight;
+                                    }
                                 }
-                                this.clearSelect();
-                                this.lastActive = next;
-                                this.select([this.lastActive]);
-                                this.confirmSelect();
                             }
                         }
                         event.preventDefault();
@@ -901,20 +720,14 @@
             //         var itemEL = null;
             //         var fspath = Path.join(root, name);
 
+            //         var parentEL = folderElements[root];
+            //         parentEL = parentEL || targetEl;
             //         if ( isDirectory ) {
-            //             itemEL = _newAssetsItem( fspath, 'folder' );
+            //             itemEL = _newAssetsItem.call( this, fspath, 'folder', id, parentEL );
             //             folderElements[fspath] = itemEL;
             //         }
             //         else {
-            //             itemEL = _newAssetsItem( fspath );
-            //         }
-
-            //         var parentEL = folderElements[root];
-            //         if ( parentEL ) {
-            //             parentEL.appendChild(itemEL);
-            //         }
-            //         else {
-            //             targetEl.appendChild(itemEL);
+            //             itemEL = _newAssetsItem.call( this, fspath, null, id, parentEL );
             //         }
 
             //         // reimport

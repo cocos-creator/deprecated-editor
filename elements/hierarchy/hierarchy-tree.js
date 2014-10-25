@@ -170,9 +170,7 @@
                 // Delete
                 {
                     label: 'Delete',
-                    click: function () {
-                        this.deleteSelection();
-                    }.bind(this)
+                    click: this.deleteSelection.bind(this)
                 },
                 
                 // =====================
@@ -285,10 +283,8 @@
             if ( event.target instanceof HierarchyItem ) {
                 if ( event.detail.shift ) {
                     //if ( !this.lastActive ) {
-                    //    Fire.broadcast('select:entity', event.target.id);
                     //}
                     //else {
-                    //    // TODO:
                     //}
                 }
                 else if ( event.detail.toggle ) {
@@ -302,9 +298,7 @@
                 else {
                     this.startDragging = true;
                     this.startDragAt = [event.detail.x, event.detail.y];
-                    //Fire.log('select ' + event.target.id);
                     Fire.Selection.selectEntity(event.target.id, true, false);
-                    //Fire.log('active becomes ' + Fire.Selection.activeEntityId);
                 }
             }
             event.stopPropagation();
@@ -403,12 +397,13 @@
                     // esc
                     case 27:
                         this.cancelHighligting();
-
                         this.curDragoverEL = null;
                         this.lastDragoverEL = null;
                         this.isValidForDrop = true;
                         this.dragging = false;
                         event.stopPropagation();
+
+                        Fire.Selection.cancel();
                     break;
                 }
             }
@@ -437,6 +432,11 @@
                             if ( prev ) {
                                 // Todo toggle?
                                 Fire.Selection.selectEntity(prev.id, true, true);
+                                if (prev !== activeEL) {
+                                    if ( prev.offsetTop <= this.scrollTop ) {
+                                        this.scrollTop = prev.offsetTop;
+                                    }
+                                }
                             }
                         }
                         event.preventDefault();

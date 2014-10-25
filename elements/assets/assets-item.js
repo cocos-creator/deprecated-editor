@@ -1,4 +1,37 @@
 (function () {
+
+    function _binaryIndexOf ( elements, key ) {
+        var lo = 0;
+        var hi = elements.length - 1;
+        var mid, el;
+
+        while (lo <= hi) {
+            mid = ((lo + hi) >> 1);
+            name = elements[mid].name;
+
+            if (name < key) {
+                lo = mid + 1;
+            } 
+            else if (name > key) {
+                hi = mid - 1;
+            }
+            else {
+                return mid;
+            }
+        }
+        return lo;
+    }
+
+    function _binaryInsert( parentEL, el ) {
+        var idx = _binaryIndexOf( parentEL.children, el.name );
+        if ( idx === -1 ) {
+            parentEL.appendChild(el);
+        }
+        else {
+            parentEL.insertBefore(el, parentEL.children[idx]);
+        }
+    }
+
     Polymer({
         publish: {
             selected: {
@@ -28,6 +61,12 @@
             this.extname = '';
             this.isFolder = false;
             this.isRoot = false;
+        },
+
+        addChild: function (child) {
+            _binaryInsert ( this, child );
+
+            this.foldable = true;
         },
 
         mousedownAction: function ( event ) {
