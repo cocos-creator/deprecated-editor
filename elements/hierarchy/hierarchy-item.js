@@ -79,12 +79,12 @@
         },
 
         mouseenterAction: function ( event ) {
-            Fire.broadcast('scene:hover', this.id);
+            Fire.broadcast('scene:hover', this.userId);
             event.stopPropagation();
         },
 
         mouseleaveAction: function ( event ) {
-            Fire.broadcast('scene:hoverout', this.id);
+            Fire.broadcast('scene:hoverout', this.userId);
             event.stopPropagation();
         },
 

@@ -51,7 +51,7 @@
                         if (isContextMenu) {
                             var parentEL = this.contextmenuAt && this.contextmenuAt.parentElement;
                             if (parentEL instanceof HierarchyItem) {
-                                Fire.broadcast('engine:createEntity', parentEL.id);
+                                Fire.broadcast('engine:createEntity', parentEL.userId);
                                 return;
                             }
                         }
@@ -62,7 +62,7 @@
                     label: 'Create Empty Child',
                     click: function () {
                         if (isContextMenu && this.contextmenuAt) {
-                            Fire.broadcast('engine:createEntity', this.contextmenuAt.id);
+                            Fire.broadcast('engine:createEntity', this.contextmenuAt.userId);
                         }
                         else {
                             var activeId = Fire.Selection.activeEntityId;

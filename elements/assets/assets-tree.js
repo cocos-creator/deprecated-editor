@@ -326,7 +326,7 @@
         deleteSelection: function () {
             var elements = this.getMostIncludeElements(Fire.Selection.assets);
             for (var i = 0; i < elements.length; i++) {
-                Fire.command( 'asset-db:delete', elements[i].id );
+                Fire.command( 'asset-db:delete', elements[i].userId );
             }
         },
 
@@ -463,16 +463,16 @@
                 }
                 else if ( event.detail.toggle ) {
                     if ( event.target.selected ) {
-                        Fire.Selection.unselectAsset(event.target.id, false);
+                        Fire.Selection.unselectAsset(event.target.userId, false);
                     }
                     else {
-                        Fire.Selection.selectAsset(event.target.id, false, false);
+                        Fire.Selection.selectAsset(event.target.userId, false, false);
                     }
                 }
                 else {
                     this.startDragging = true;
                     this.startDragAt = [event.detail.x, event.detail.y];
-                    Fire.Selection.selectAsset(event.target.id, true, false);
+                    Fire.Selection.selectAsset(event.target.userId, true, false);
                 }
             }
             event.stopPropagation();
@@ -487,8 +487,8 @@
                     // TODO:
                 }
                 else {
-                    if (Fire.Selection.assets.indexOf(event.target.id) !== -1) {
-                        Fire.Selection.selectAsset(event.target.id, true);
+                    if (Fire.Selection.assets.indexOf(event.target.userId) !== -1) {
+                        Fire.Selection.selectAsset(event.target.userId, true);
                     }
                 }
                 Fire.Selection.confirm();
@@ -589,8 +589,8 @@
             this.contextmenuAt = null;
             if ( event.target instanceof AssetsItem ) {
                 this.contextmenuAt = event.target;
-                var unselectOther = (Fire.Selection.assets.indexOf(event.target.id) === -1);
-                Fire.Selection.selectAsset(event.target.id, unselectOther, true);
+                var unselectOther = (Fire.Selection.assets.indexOf(event.target.userId) === -1);
+                Fire.Selection.selectAsset(event.target.userId, unselectOther, true);
             }
 
             this.contextmenu.popup(Remote.getCurrentWindow());
@@ -636,7 +636,7 @@
                             var prev = this.prevItem(activeEL);
                             if ( prev ) {
                                 // Todo toggle?
-                                Fire.Selection.selectAsset(prev.id, true, true);
+                                Fire.Selection.selectAsset(prev.userId, true, true);
                                 
                                 if (prev !== activeEL) {
                                     if ( prev.offsetTop <= this.scrollTop ) {
@@ -655,7 +655,7 @@
                             var next = this.nextItem(activeEL, false);
                             if ( next ) {
                                 // Todo toggle?
-                                Fire.Selection.selectAsset(next.id, true, true);
+                                Fire.Selection.selectAsset(next.userId, true, true);
                                 
                                 if ( next !== activeEL ) {
                                     if ( next.offsetTop + 16 >= this.scrollTop + this.offsetHeight ) {

@@ -242,7 +242,7 @@
                     for (var i = 0, len = children.length; i < len; i++) {
                         createItem(children[i], el);
                     }
-                    el.selected = selection.indexOf(el.id) !== -1;
+                    el.selected = selection.indexOf(el.userId) !== -1;
                 }
             }
             var entities = Fire.Engine._scene.entities;
@@ -274,7 +274,7 @@
         moveSelection: function ( targetEL ) {
             // TODO: sort selection
             var nextSiblingId;  // Todo: = ? 
-            Fire.broadcast('engine:moveEntity', Fire.Selection.entities, targetEL.id, nextSiblingId);
+            Fire.broadcast('engine:moveEntity', Fire.Selection.entities, targetEL.userId, nextSiblingId);
         },
 
         selectingAction: function (event) {
@@ -289,16 +289,16 @@
                 }
                 else if ( event.detail.toggle ) {
                     if ( event.target.selected ) {
-                        Fire.Selection.unselectEntity(event.target.id, false);
+                        Fire.Selection.unselectEntity(event.target.userId, false);
                     }
                     else {
-                        Fire.Selection.selectEntity(event.target.id, false, false);
+                        Fire.Selection.selectEntity(event.target.userId, false, false);
                     }
                 }
                 else {
                     this.startDragging = true;
                     this.startDragAt = [event.detail.x, event.detail.y];
-                    Fire.Selection.selectEntity(event.target.id, true, false);
+                    Fire.Selection.selectEntity(event.target.userId, true, false);
                 }
             }
             event.stopPropagation();
@@ -314,8 +314,8 @@
                     // TODO:
                 }
                 else {
-                    if (Fire.Selection.entities.indexOf(event.target.id) !== -1) {
-                        Fire.Selection.selectEntity(event.target.id, true);
+                    if (Fire.Selection.entities.indexOf(event.target.userId) !== -1) {
+                        Fire.Selection.selectEntity(event.target.userId, true);
                     }
                 }
                 Fire.Selection.confirm();
@@ -328,7 +328,7 @@
             var item = event.target;
             if ( item instanceof FireTreeItem ) {
                 this.focus();
-                Fire.broadcast('engine:renameEntity', item.id, event.detail.name);
+                Fire.broadcast('engine:renameEntity', item.userId, event.detail.name);
             }
             event.stopPropagation();
         },
@@ -379,8 +379,8 @@
             this.contextmenuAt = null;
             if ( event.target instanceof HierarchyItem ) {
                 this.contextmenuAt = event.target;
-                var unselectOther = (Fire.Selection.entities.indexOf(event.target.id) === -1);
-                Fire.Selection.selectEntity(event.target.id, unselectOther, true);
+                var unselectOther = (Fire.Selection.entities.indexOf(event.target.userId) === -1);
+                Fire.Selection.selectEntity(event.target.userId, unselectOther, true);
             }
 
             this.getContextMenu().popup(Remote.getCurrentWindow());
@@ -431,7 +431,7 @@
                             var prev = this.prevItem(activeEL);
                             if ( prev ) {
                                 // Todo toggle?
-                                Fire.Selection.selectEntity(prev.id, true, true);
+                                Fire.Selection.selectEntity(prev.userId, true, true);
                                 if (prev !== activeEL) {
                                     if ( prev.offsetTop <= this.scrollTop ) {
                                         this.scrollTop = prev.offsetTop;
@@ -449,7 +449,7 @@
                             var next = this.nextItem(activeEL, false);
                             if ( next ) {
                                 // Todo toggle?
-                                Fire.Selection.selectEntity(next.id, true, true);
+                                Fire.Selection.selectEntity(next.userId, true, true);
                             }
                         }
                         event.preventDefault();
