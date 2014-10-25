@@ -202,7 +202,7 @@
             var screenpos = this.renderContext.camera.worldToScreen(worldpos);
             screenpos.x = Math.floor(screenpos.x) + 0.5;
             screenpos.y = Math.floor(screenpos.y) + 0.5;
-            var rotation = -localToWorld.getRotation() * 180.0 / Math.PI;
+            var rotation = Math.rad2deg(-localToWorld.getRotation());
 
             switch ( Fire.mainWindow.settings.handle ) {
                 case "move":
@@ -228,10 +228,7 @@
                         },
 
                         update: function ( delta ) {
-                            var rot = worldrot + delta;
-                            if ( rot > 180.0 || rot < -180.0 ) {
-                                rot = (rot + 360.0) % 360.0;
-                            }
+                            var rot = Math.deg180(worldrot + delta);
                             rot = Math.floor(rot);
                             this.entity.transform.worldRotation = rot;
                             sceneView.repaint();

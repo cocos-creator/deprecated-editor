@@ -295,7 +295,7 @@ Fire.SvgGizmos = (function () {
                     callbacks.start.call(group);
             },
             update: function ( dx, dy ) {
-                var radius = group.rotation * Math.PI / 180.0;
+                var radius = Math.deg2rad(group.rotation);
                 var dirx = Math.cos(radius);
                 var diry = Math.sin(radius);
 
@@ -322,7 +322,7 @@ Fire.SvgGizmos = (function () {
                     callbacks.start.call(group);
             },
             update: function ( dx, dy ) {
-                var radius = (group.rotation + 90.0) * Math.PI / 180.0;
+                var radius = Math.deg2rad(group.rotation + 90.0);
                 var dirx = Math.cos(radius);
                 var diry = Math.sin(radius);
 
@@ -478,24 +478,23 @@ Fire.SvgGizmos = (function () {
             },
 
             update: function ( dx, dy ) {
-                var x2 = x1 + dx;
-                var y2 = y1 + dy;
-                var len1 = Math.sqrt(x1 * x1 + y1 * y1);
-                var len2 = Math.sqrt(x2 * x2 + y2 * y2);
+                var v1 = new Fire.Vec2( x1,    y1    );
+                var v2 = new Fire.Vec2( x1+dx, y1+dy );
+
+                var magSqr1 = v1.magSqr();
+                var magSqr2 = v2.magSqr();
 
                 //
-                if ( len1 > 0 && len2 > 0 ) {
-                    var dot = x1 * x2 + y1 * y2;
-                    var cross = y1 * x2 - x1 * y2;
-
-                    var alpha = Math.acos( dot / (len1 * len2) );
-                    alpha = Math.sign(cross) * alpha;
+                if ( magSqr1 > 0 && magSqr2 > 0 ) {
+                    var dot = v1.dot(v2);
+                    var cross = v1.cross(v2);
+                    var alpha = Math.sign(cross) * Math.acos( dot / Math.sqrt(magSqr1 * magSqr2) );
 
                     var dirx = Math.cos(alpha);
                     var diry = Math.sin(alpha);
-                    var angle = alpha * 180.0 / Math.PI;
+                    var angle = Math.rad2deg(alpha);
 
-                    txtDegree.rotate(alpha * 180.0 / Math.PI, 0, 0);
+                    txtDegree.rotate(angle, 0, 0);
                     if ( alpha > 0.0 ) {
                         arc.plot( 'M40,0 A40,40, 0 0,1 ' + dirx*40 + ',' + diry*40 + ' L0,0' );
                         txtDegree.plain( "+" + angle.toFixed(0) + "\xB0" );
@@ -507,9 +506,9 @@ Fire.SvgGizmos = (function () {
                 }
 
                 //
-                var theta = Math.atan2( y1, x1 ) - Math.atan2( y2, x2 );
+                var theta = Math.atan2( v1.y, v1.x ) - Math.atan2( v2.y, v2.x );
                 if ( callbacks.update )
-                    callbacks.update.call(group, theta * 180.0 / Math.PI );
+                    callbacks.update.call(group, Math.rad2deg(theta) );
             },
 
             end: function () {

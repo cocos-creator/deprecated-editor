@@ -413,6 +413,7 @@
                 }
             }
             else {
+                // FIXME: Johnny Said: I found this will swallow some keyaction such as Command+R to refresh the page
                 var activeId = Fire.Selection.activeEntityId;
                 var activeEL = activeId && this.idToItem[activeId];
 
@@ -420,7 +421,8 @@
                 if (event.cancelBubble) {
                     return;
                 }
-                //console.log(event.which);
+
+                // console.log(event.which);
                 switch ( event.which ) {
                     // delete
                     case 46:
@@ -444,7 +446,7 @@
                     // key-down
                     case 40:
                         if ( activeEL ) {
-                            var next = this.nextItem(activeEL.id, false);
+                            var next = this.nextItem(activeEL, false);
                             if ( next ) {
                                 // Todo toggle?
                                 Fire.Selection.selectEntity(next.id, true, true);
