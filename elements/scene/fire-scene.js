@@ -18,8 +18,8 @@
             // register Ipc
             Ipc.on('selection:entity:activated', this._ipc_select );
             Ipc.on('selection:entity:deactivated', this._ipc_unselect );
-            Ipc.on('scene:hover', this._ipc_hover );
-            Ipc.on('scene:hoverout', this._ipc_hoverout );
+            Ipc.on('selection:entity:hover', this._ipc_hover );
+            Ipc.on('selection:entity:hoverout', this._ipc_hoverout );
             Ipc.on('scene:dirty', this._ipc_repaint );
 
             this._repaintID = setInterval ( this.repaintScene.bind(this), 500 );
@@ -28,8 +28,8 @@
         detached: function () {
             Ipc.removeListener('selection:entity:activated', this._ipc_select );
             Ipc.removeListener('selection:entity:deactivated', this._ipc_unselect );
-            Ipc.removeListener('scene:hover', this._ipc_hover );
-            Ipc.removeListener('scene:hoverout', this._ipc_hoverout );
+            Ipc.removeListener('selection:entity:hover', this._ipc_hover );
+            Ipc.removeListener('selection:entity:hoverout', this._ipc_hoverout );
             Ipc.removeListener('scene:dirty', this._ipc_repaint );
 
             clearInterval (this._repaintID);
@@ -73,7 +73,7 @@
             this.$.view.hover(entity);
         },
 
-        hoverout: function ( entityID ) {
+        hoverout: function () {
             this.$.view.hoverout();
         },
 

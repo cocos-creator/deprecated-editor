@@ -17,6 +17,10 @@
             this._ipc_unselected = this.select.bind(this, false);
             //this._ipc_activated = this.activate.bind(this, true);
             //this._ipc_deactivated = this.activate.bind(this, false);
+            this._ipc_hover = this.hover.bind(this);
+            this._ipc_hoverout = this.hoverout.bind(this);
+
+            this._lasthover = null;
         },
 
         ready: function () {
@@ -26,11 +30,15 @@
             Ipc.on('selection:entity:unselected', this._ipc_unselected);
             //Ipc.on('selection:entity:activated', this._ipc_activated);
             //Ipc.on('selection:entity:deactivated', this._ipc_deactivated);
+            Ipc.on('selection:entity:hover', this._ipc_hover );
+            Ipc.on('selection:entity:hoverout', this._ipc_hoverout );
         },
 
         detached: function () {
             Ipc.removeListener('selection:entity:selected', this._ipc_selected);
             Ipc.removeListener('selection:entity:unselected', this._ipc_unselected);
+            Ipc.removeListener('selection:entity:hover', this._ipc_hover );
+            Ipc.removeListener('selection:entity:hoverout', this._ipc_hoverout );
         },
 
         select: function (selected, entityIds) {
@@ -40,6 +48,25 @@
                 if (el) {
                     el.selected = selected;
                 }
+            }
+        },
+
+        hover: function ( entityID ) {
+            var el = this.$.hierarchyTree.idToItem[entityID];
+            if (el) {
+                el.hover = true;
+            }
+
+            if ( this._lasthover && this._lasthover !== el ) {
+                this._lasthover.hover = false;
+            }
+            this._lasthover = el;
+        },
+
+        hoverout: function () {
+            if ( this._lasthover ) {
+                this._lasthover.hover = false;
+                this._lasthover = null;
             }
         },
 

@@ -14,6 +14,15 @@
         }
     }
 
+    &([hover])::shadow {
+        .wrapper {
+            .bar {
+                visibility: visible
+                background: #333
+            }
+        }
+    }
+
     &([conflicted])::shadow {
         .wrapper {
             .bar {
@@ -33,15 +42,6 @@
     &([invalid])::shadow {
         .wrapper {
             background: #f00
-        }
-    }
-
-    &::shadow {
-        .wrapper:hover {
-            .bar {
-                visibility: visible
-                background: #333
-            }
         }
     }
 }

@@ -14,6 +14,7 @@
             };
 
             this._layoutTool = null;
+            this._lasthover = null;
         },
 
         ready: function () {
@@ -180,10 +181,12 @@
         },
 
         hover: function ( entity ) {
+            this._lasthover = entity;
             this.svgGizmos.hover(entity);
         },
 
         hoverout: function () {
+            this._lasthover = null;
             this.svgGizmos.hoverout();
         },
 
@@ -282,7 +285,7 @@
 
             //
             var minDist = null;
-            var selectedEntity = null;
+            var hoverEntity = null;
             for ( i = 0; i < entities.length; ++i ) {
                 var entity = entities[i];
                 var renderer = entity.getComponent( Fire.Renderer );
@@ -295,7 +298,7 @@
                         var dist = worldMousePos.sub(polygon.center).magSqr();
                         if ( minDist === null || dist < minDist ) {
                             minDist = dist;
-                            selectedEntity = entity;
+                            hoverEntity = entity;
                         }
                         
                     }
@@ -303,11 +306,13 @@
             }
 
             //
-            if ( selectedEntity ) {
-                this.hover(selectedEntity);
+            if ( hoverEntity ) {
+                if ( this._lasthover === null || this._lasthover !== hoverEntity ) {
+                    Fire.Selection.hoverEntity(hoverEntity.hashKey);
+                }
             }
             else {
-                this.hoverout();
+                Fire.Selection.hoverEntity(null);
             }
 
             event.stopPropagation();
@@ -419,7 +424,7 @@
         },
 
         hovergizmosAction: function ( event ) {
-            this.hoverout();
+            Fire.Selection.hoverEntity(null);
 
             event.stopPropagation();
         },

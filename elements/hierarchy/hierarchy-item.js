@@ -17,6 +17,10 @@
                 value: false,
                 reflect: true
             },
+            hover: {
+                value: false,
+                reflect: true
+            },
         },
 
         created: function () {
@@ -79,12 +83,12 @@
         },
 
         mouseenterAction: function ( event ) {
-            Fire.broadcast('scene:hover', this.userId);
+            Fire.Selection.hoverEntity(this.userId);
             event.stopPropagation();
         },
 
         mouseleaveAction: function ( event ) {
-            Fire.broadcast('scene:hoverout', this.userId);
+            Fire.Selection.hoverEntity(null);
             event.stopPropagation();
         },
 
