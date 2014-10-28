@@ -75,6 +75,7 @@ Fire.SvgGizmos = (function () {
         this.svg = SVG(svgEL);
         this.hoverRect = this.svg.polygon();
         this.hoverRect.hide();
+        this.hoverEntity = null;
         this.gizmos = [];
     }
 
@@ -91,6 +92,8 @@ Fire.SvgGizmos = (function () {
             var gizmo = this.gizmos[i];
             _updateGizmo( gizmo, this.camera );
         }
+
+        this.hover(this.hoverEntity);
     };
 
     SvgGizmos.prototype.updateSelection = function ( x, y, w, h ) {
@@ -118,7 +121,13 @@ Fire.SvgGizmos = (function () {
     };
 
     SvgGizmos.prototype.hover = function ( entity ) {
-        var renderer = entity.getComponent( Fire.Renderer );
+        this.hoverEntity = entity;
+
+        var renderer = null;
+        if ( entity ) {
+            renderer = entity.getComponent( Fire.Renderer );
+        }
+
         if ( renderer ) {
             var bounds = renderer.getWorldOrientedBounds();
             var v1  = this.camera.worldToScreen(bounds[0]);
@@ -143,6 +152,7 @@ Fire.SvgGizmos = (function () {
     };
 
     SvgGizmos.prototype.hoverout = function () {
+        this.hoverEntity = null;
         this.hoverRect.hide();
     };
 
@@ -179,12 +189,16 @@ Fire.SvgGizmos = (function () {
             rect.plot([ [size, 5], [size, -5], [size+10, -5], [size+10, 5] ]);
         };
 
+        group.on( 'mousemove', function ( event ) {
+            event.stopPropagation();
+        } );
         group.on( 'mouseover', function ( event ) {
             var lightColor = chroma(color).brighter().hex();
             line.stroke( { color: lightColor } );
             rect.fill( { color: lightColor } );
 
             event.stopPropagation();
+            this.node.dispatchEvent( new CustomEvent('hovergizmos') );
         } );
 
         group.on( 'mouseout', function ( event ) {
@@ -236,12 +250,16 @@ Fire.SvgGizmos = (function () {
 
         group.style( 'pointer-events', 'bounding-box' );
 
+        group.on( 'mousemove', function ( event ) {
+            event.stopPropagation();
+        } );
         group.on( 'mouseover', function ( event ) {
             var lightColor = chroma(color).brighter().hex();
             line.stroke( { color: lightColor } );
             arrow.fill( { color: lightColor } );
 
             event.stopPropagation();
+            this.node.dispatchEvent( new CustomEvent('hovergizmos') );
         } );
 
         group.on( 'mouseout', function ( event ) {
@@ -351,12 +369,17 @@ Fire.SvgGizmos = (function () {
                             .fill( { color: color, opacity: 0.4 } )
                             .stroke( { width: 1, color: color } )
                             ;
+        // swallow mousemove event to prevent scene-view mousemove
+        moveRect.on( 'mousemove', function ( event ) {
+            event.stopPropagation();
+        } );
         moveRect.on( 'mouseover', function ( event ) {
             var lightColor = chroma(color).brighter().hex();
             this.fill( { color: lightColor } )
                 .stroke( { color: lightColor } )
                 ;
             event.stopPropagation();
+            this.node.dispatchEvent( new CustomEvent('hovergizmos') );
         } );
         moveRect.on( 'mouseout', function ( event ) {
             if ( !dragging ) {
@@ -438,6 +461,9 @@ Fire.SvgGizmos = (function () {
                          ;
 
         group.style( 'pointer-events', 'visibleFill' );
+        group.on( 'mousemove', function ( event ) {
+            event.stopPropagation();
+        } );
         group.on( 'mouseover', function ( event ) {
             var lightColor = chroma(color).brighter().hex();
             circle.stroke( { color: lightColor } );
@@ -445,6 +471,7 @@ Fire.SvgGizmos = (function () {
             arrow.fill( { color: lightColor } );
 
             event.stopPropagation();
+            this.node.dispatchEvent( new CustomEvent('hovergizmos') );
         } );
         group.on( 'mouseout', function ( event ) {
             if ( !dragging ) {
@@ -598,19 +625,23 @@ Fire.SvgGizmos = (function () {
 
 
         // scaleRect
-        var color = "#fff";
+        var color = "#aaa";
         var dragging = false;
         scaleRect = group.rect( 20, 20 )
                             .move( -10, -10 )
                             .fill( { color: color, opacity: 0.4 } )
                             .stroke( { width: 1, color: color } )
                             ;
+        scaleRect.on( 'mousemove', function ( event ) {
+            event.stopPropagation();
+        } );
         scaleRect.on( 'mouseover', function ( event ) {
             var lightColor = chroma(color).brighter().hex();
             this.fill( { color: lightColor } )
                 .stroke( { color: lightColor } )
                 ;
             event.stopPropagation();
+            this.node.dispatchEvent( new CustomEvent('hovergizmos') );
         } );
         scaleRect.on( 'mouseout', function ( event ) {
             if ( !dragging ) {

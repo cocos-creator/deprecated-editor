@@ -35,6 +35,9 @@
                 height: clientRect.height,
             };
 
+            // init interaction context
+            this.interactionContext = Fire.Engine.createInteractionContext();
+
             // init render context
             this.renderContext = Fire.Engine.createSceneView( this.view.width,
                                                               this.view.height,
@@ -60,7 +63,7 @@
             this.resize(); // make sure we apply the size to all canvas
 
             // TEMP {
-            var assetPath = 'assets://white-sheep/ip3_a_sheep_down_loop01.png';
+            var assetPath = 'assets://Foobar/004.png';
             var uuid = Fire.AssetDB.urlToUuid(assetPath);
             if ( uuid ) {
                 Fire.AssetLibrary.loadAssetByUuid(uuid, function ( asset ) {
@@ -152,6 +155,7 @@
             if ( this.renderContext ) {
                 this.pixiGrids.update();
                 Fire.Engine._scene.render(this.renderContext);
+                Fire.Engine._scene.updateInteractionContext(this.interactionContext);
             }
         },
 
@@ -262,6 +266,53 @@
             return tool;
         },
 
+        mousemoveAction: function ( event ) {
+            var mousePos = new Fire.Vec2(event.offsetX, event.offsetY); 
+            var worldMousePos = this.renderContext.camera.screenToWorld(mousePos);
+
+            var entities = []; 
+            var i, bounding;
+
+            for ( i = 0; i < this.interactionContext.boundings.length; ++i ) {
+                bounding = this.interactionContext.boundings[i];
+                if ( bounding.aabb.contains(worldMousePos) ) {
+                    entities.push(bounding.entity);
+                }
+            }
+
+            //
+            var minDist = null;
+            var selectedEntity = null;
+            for ( i = 0; i < entities.length; ++i ) {
+                var entity = entities[i];
+                var renderer = entity.getComponent( Fire.Renderer );
+                if ( renderer ) {
+                    var bounds = renderer.getWorldOrientedBounds();
+                    var polygon = new Fire.Polygon(bounds);
+
+                    //
+                    if ( polygon.contains( worldMousePos ) ) {
+                        var dist = worldMousePos.sub(polygon.center).magSqr();
+                        if ( minDist === null || dist < minDist ) {
+                            minDist = dist;
+                            selectedEntity = entity;
+                        }
+                        
+                    }
+                }
+            }
+
+            //
+            if ( selectedEntity ) {
+                this.hover(selectedEntity);
+            }
+            else {
+                this.hoverout();
+            }
+
+            event.stopPropagation();
+        },
+
         mousedownAction: function ( event ) {
             // process camera panning
             if ( event.which === 1 && event.shiftKey ) {
@@ -363,6 +414,12 @@
             this.sceneCamera.scale = scale;
 
             this.repaint();
+
+            event.stopPropagation();
+        },
+
+        hovergizmosAction: function ( event ) {
+            this.hoverout();
 
             event.stopPropagation();
         },
