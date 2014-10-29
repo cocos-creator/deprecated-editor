@@ -1,6 +1,4 @@
 (function () {
-    var Ipc = require('ipc');
-
     Polymer({
         publish: {
             focused: {
@@ -11,20 +9,18 @@
 
         created: function () {
             this.focused = false;
-            this._ipc_selected = this.select.bind(this, true);
-            this._ipc_unselected = this.select.bind(this, false);
+            this.ipc = new Fire.IpcListener();
         },
 
         ready: function () {
             this.tabIndex = EditorUI.getParentTabIndex(this) + 1;
 
-            Ipc.on('selection:asset:selected', this._ipc_selected);
-            Ipc.on('selection:asset:unselected', this._ipc_unselected);
+            this.ipc.on('selection:asset:selected', this.select.bind(this, true));
+            this.ipc.on('selection:asset:unselected', this.select.bind(this, false));
         },
 
         detached: function () {
-            Ipc.removeListener('selection:asset:selected', this._ipc_selected);
-            Ipc.removeListener('selection:asset:unselected', this._ipc_unselected);
+            this.ipc.clear();
         },
 
         select: function (selected, ids) {

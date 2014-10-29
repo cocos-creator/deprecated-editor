@@ -1,36 +1,26 @@
 (function () {
-    var Ipc = require('ipc');
-
     Polymer({
         created: function () {
             window.addEventListener('resize', function() {
                 this.resize();
             }.bind(this));
 
-            this._ipc_select = this.select.bind(this, true);
-            this._ipc_unselect = this.select.bind(this, false);
-            this._ipc_hover = this.hover.bind(this);
-            this._ipc_hoverout = this.hoverout.bind(this);
-            this._ipc_repaint = this.delayRepaintScene.bind(this);
+            this.ipc = new Fire.IpcListener();
         },
 
         ready: function () {
-            // register Ipc
-            Ipc.on('selection:entity:selected', this._ipc_select );
-            Ipc.on('selection:entity:unselected', this._ipc_unselect );
-            Ipc.on('selection:entity:hover', this._ipc_hover );
-            Ipc.on('selection:entity:hoverout', this._ipc_hoverout );
-            Ipc.on('scene:dirty', this._ipc_repaint );
+            // register ipc
+            this.ipc.on('selection:entity:selected', this.select.bind(this, true) );
+            this.ipc.on('selection:entity:unselected', this.select.bind(this, false) );
+            this.ipc.on('selection:entity:hover', this.hover.bind(this) );
+            this.ipc.on('selection:entity:hoverout', this.hoverout.bind(this) );
+            this.ipc.on('scene:dirty', this.delayRepaintScene.bind(this) );
 
             this._repaintID = setInterval ( this.repaintScene.bind(this), 500 );
         },
 
         detached: function () {
-            Ipc.removeListener('selection:entity:selected', this._ipc_select );
-            Ipc.removeListener('selection:entity:unselected', this._ipc_unselect );
-            Ipc.removeListener('selection:entity:hover', this._ipc_hover );
-            Ipc.removeListener('selection:entity:hoverout', this._ipc_hoverout );
-            Ipc.removeListener('scene:dirty', this._ipc_repaint );
+            this.ipc.clear();
 
             clearInterval (this._repaintID);
         },

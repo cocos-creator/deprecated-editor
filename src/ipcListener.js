@@ -1,11 +1,10 @@
-﻿(function () {
+﻿Fire.IpcListener = (function () {
 
     var Ipc = require('ipc');
 
     function IpcListener () {
         this.listeningIpcs = [];
     }
-    Fire.IpcListener = IpcListener;
 
     IpcListener.prototype.on = function (message, callback) {
         Ipc.on( message, callback );
@@ -20,4 +19,5 @@
         this.listeningIpcs.length = 0;
     };
 
+    return IpcListener;
 })();

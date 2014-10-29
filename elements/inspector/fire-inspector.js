@@ -1,5 +1,4 @@
 (function () {
-    var Ipc = require('ipc');
     var Remote = require('remote');
     var Menu = Remote.require('menu');
 
@@ -14,27 +13,21 @@
         created: function () {
             this.focused = false;
 
-            this._ipc_inspectAsset = this.inspectAsset.bind(this, true);
-            this._ipc_inspectEntity = this.inspectEntity.bind(this, true);
-            this._ipc_uninspectAsset = this.inspectAsset.bind(this, false);
-            this._ipc_uninspectEntity = this.inspectEntity.bind(this, false);
+            this.ipc = new Fire.IpcListener();
         },
 
         ready: function () {
             this.tabIndex = EditorUI.getParentTabIndex(this)+1;
 
             // register Ipc
-            Ipc.on('selection:asset:activated', this._ipc_inspectAsset );
-            Ipc.on('selection:entity:activated', this._ipc_inspectEntity );
-            Ipc.on('selection:asset:deactivated', this._ipc_uninspectAsset );
-            Ipc.on('selection:entity:deactivated', this._ipc_uninspectEntity );
+            this.ipc.on('selection:asset:activated', this.inspectAsset.bind(this, true) );
+            this.ipc.on('selection:entity:activated', this.inspectEntity.bind(this, true) );
+            this.ipc.on('selection:asset:deactivated', this.inspectAsset.bind(this, false) );
+            this.ipc.on('selection:entity:deactivated', this.inspectEntity.bind(this, false) );
         },
 
         detached: function () {
-            Ipc.removeListener('selection:asset:activated', this._ipc_inspectAsset );
-            Ipc.removeListener('selection:entity:activated', this._ipc_inspectEntity );
-            Ipc.removeListener('selection:asset:deactivated', this._ipc_uninspectAsset );
-            Ipc.removeListener('selection:entity:deactivated', this._ipc_uninspectEntity );
+            this.ipc.clear();
         },
 
         inspectAsset: function ( inspect, uuid ) {
