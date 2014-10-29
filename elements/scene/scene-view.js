@@ -15,6 +15,7 @@
 
             this._layoutTool = null;
             this._lasthover = null;
+            this._editingEdities = [];
         },
 
         ready: function () {
@@ -80,6 +81,21 @@
                     ent.addComponent(Fire.SpriteRenderer).sprite = sprite;
                     ent.transform.position = new Fire.Vec2(-200, 150);
 
+                    for ( var x = -5; x < 5; ++x ) {
+                        for ( var y = -5; y < 5; ++y ) {
+                            // global variable： pivot
+                            pivot = new Fire.Entity('test ' + x + "," + y );
+                            pivot.transform.position = new Fire.Vec2( x * 400, y * 400 );
+                            sprite = new Fire.Sprite();
+                            sprite.texture = asset;
+                            sprite.x = 0;
+                            sprite.y = 0;
+                            sprite.width = 400;
+                            sprite.height = 300;
+                            pivot.addComponent(Fire.SpriteRenderer).sprite = sprite;
+                            pivot.addComponent(Fire.Camera);
+                        }
+                    }
                     // global variable： pivot
                     pivot = new Fire.Entity('pivot');
                     sprite = new Fire.Sprite();
@@ -190,14 +206,41 @@
             this.svgGizmos.hoverout();
         },
 
-        select: function ( entity ) {
+        select: function ( entities ) {
             if ( this._layoutTool ) {
                 this.svgGizmos.remove(this._layoutTool);
                 this._layoutTool = null;
             }
 
-            this._layoutTool = this.newLayoutTools(entity);
-            this.svgGizmos.add( this._layoutTool );
+            this._editingEdities = entities;
+
+            if ( entities.length > 0 ) {
+                this._layoutTool = this.newLayoutTools(entities[0]);
+                this.svgGizmos.add( this._layoutTool );
+            }
+        },
+
+        unselect: function ( entities ) {
+            for ( var i = 0; i < entities.length; ++i ) {
+                var ent = entities[i];
+
+                for ( var j = 0; j < this._editingEdities.length; ++j ) {
+                    if ( this._editingEdities[j] === ent ) {
+                        this._editingEdities.splice(j,1);
+                        break;
+                    }
+                }
+            }
+
+            if ( this._layoutTool ) {
+                this.svgGizmos.remove(this._layoutTool);
+                this._layoutTool = null;
+            }
+
+            if ( this._editingEdities.length > 0 ) {
+                this._layoutTool = this.newLayoutTools(this._editingEdities[0]);
+                this.svgGizmos.add( this._layoutTool );
+            }
         },
 
         newLayoutTools: function ( entity ) {
@@ -270,7 +313,10 @@
         },
 
         hitTest: function ( x, y ) {
-            var mousePos = new Fire.Vec2(x,y ); 
+            if ( !this.renderContext )
+                return null;
+
+            var mousePos = new Fire.Vec2(x,y); 
             var worldMousePos = this.renderContext.camera.screenToWorld(mousePos);
 
             var entities = []; 
@@ -300,12 +346,45 @@
                             minDist = dist;
                             resultEntity = entity;
                         }
-                        
                     }
                 }
             }
 
             return resultEntity;
+        },
+
+        rectHitTest: function ( rect ) {
+            var v1 = this.renderContext.camera.screenToWorld(new Fire.Vec2(rect.x,rect.y));
+            var v2 = this.renderContext.camera.screenToWorld(new Fire.Vec2(rect.xMax,rect.yMax));
+            var worldRect = Fire.Rect.fromVec2(v1,v2); 
+
+            var entities = []; 
+            var i, bounding;
+
+            for ( i = 0; i < this.interactionContext.boundings.length; ++i ) {
+                bounding = this.interactionContext.boundings[i];
+                if ( bounding.aabb.intersects(worldRect) ) {
+                    entities.push(bounding.entity);
+                }
+            }
+
+            //
+            for ( i = 0; i < entities.length; ++i ) {
+                var entity = entities[i];
+                var renderer = entity.getComponent( Fire.Renderer );
+                if ( renderer ) {
+                    var bounds = renderer.getWorldOrientedBounds();
+                    var polygon = new Fire.Polygon(bounds);
+
+                    //
+                    if ( Fire.Intersection.rectPolygon(worldRect,polygon) === false ) {
+                        entities.splice( i, 1 );
+                        --i;
+                    }
+                }
+            }
+
+            return entities;
         },
 
         mousemoveAction: function ( event ) {
@@ -379,8 +458,6 @@
             // process rect-selection
             if ( event.which === 1 ) {
                 var selectmoveHandle = function(event) {
-                    // this._rectSelectStartX;
-                    // this._rectSelectStartY;
                     var x = this._rectSelectStartX - this.view.left; 
                     var y = this._rectSelectStartY - this.view.top; 
                     var w = event.clientX - this._rectSelectStartX;
@@ -393,8 +470,23 @@
                         y += h;
                         h = -h;
                     }
+
                     this.svgGizmos.updateSelection( x, y, w, h);
 
+                    //
+                    var entities = this.rectHitTest( new Fire.Rect( x, y, w, h ) );
+                    if ( entities.length > 0 ) {
+                        var ids = [];
+                        for ( var i = 0; i < entities.length; ++i ) {
+                            ids.push( entities[i].hashKey );
+                        }
+                        Fire.Selection.selectEntity ( ids, true, false );
+                    }
+                    else {
+                        Fire.Selection.clearEntity ();
+                    }
+
+                    //
                     event.stopPropagation();
                 }.bind(this);
 
@@ -402,14 +494,28 @@
                     document.removeEventListener('mousemove', selectmoveHandle);
                     document.removeEventListener('mouseup', selectexitHandle);
 
+                    var x = this._rectSelectStartX - this.view.left; 
+                    var y = this._rectSelectStartY - this.view.top; 
+                    var w = event.clientX - this._rectSelectStartX;
+                    var h = event.clientY - this._rectSelectStartY;
+
                     this.svgGizmos.fadeoutSelection();
                     EditorUI.removeDragGhost();
                     event.stopPropagation();
 
-                    // TODO:
-                    // if ( this._lasthover ) {
-                    //     Fire.Selection.selectEntity(this._lasthover.hashKey, true);
-                    // }
+                    var magSqr = w*w + h*h;
+                    if ( magSqr >= 2.0 * 2.0 ) {
+                        Fire.Selection.confirm ();
+                    }
+                    else {
+                        var entity = this.hitTest( x, y );
+                        if ( entity ) {
+                            Fire.Selection.selectEntity ( entity.hashKey, true );
+                        }
+                        else {
+                            Fire.Selection.clearEntity ();
+                        }
+                    }
                 }.bind(this);
 
                 //

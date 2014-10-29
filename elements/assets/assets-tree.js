@@ -20,7 +20,7 @@
         type = type || extname;
         switch ( type ) {
         case 'root':
-            newEL.setIcon('fa fa-database');
+            newEL.setIcon('database');
             break;
 
         case 'folder':

@@ -1,4 +1,5 @@
 Fire.SvgGizmos = (function () {
+
     function _snapPixel (p) {
         return Math.floor(p) + 0.5; 
     }

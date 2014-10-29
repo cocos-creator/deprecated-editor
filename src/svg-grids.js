@@ -1,8 +1,8 @@
 Fire.SvgGrids = (function () {
+
     function _smooth (t) {
         return ( t === 1.0 ) ? 1.0 : 1.001 * ( 1.0 - Math.pow( 2, -10 * t ) );
     }
-
 
     function SvgGrids ( svgEL ) {
         this.svg = SVG(svgEL);
