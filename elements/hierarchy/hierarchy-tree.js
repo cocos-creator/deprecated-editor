@@ -23,14 +23,7 @@
             // debug
             hierarchy = this;
 
-            this._ipc_refresh = this.refresh.bind(this);
-            this._ipc_newItem = this.newItem.bind(this);
-            this._ipc_deleteEntity = this.deleteItemById.bind(this);
-            this._ipc_setEntityParent = this.setItemParentById.bind(this);
-            this._ipc_setItemIndex = this.setItemIndex.bind(this);
-            this._ipc_renameItem = this.renameItemById.bind(this);
-            //this._ipc_beginLoad = this.beginLoad.bind(this);
-            //this._ipc_endLoad = this.endLoad.bind(this);
+            this.ipc = new Fire.IpcListener();
         },
 
         ready: function () {
@@ -101,32 +94,32 @@
             }, true);
 
             // register Ipc
-            Ipc.on('scene:launched', this._ipc_refresh);
-            Ipc.on('entity:created', this._ipc_newItem);
-            Ipc.on('entity:removed', this._ipc_deleteEntity);
-            Ipc.on('entity:parentChanged', this._ipc_setEntityParent);
-            Ipc.on('entity:indexChanged', this._ipc_setItemIndex);
-            Ipc.on('entity:renamed', this._ipc_renameItem);
-            //Ipc.on('hierarchy:beginLoad', this._ipc_beginLoad);
-            //Ipc.on('hierarchy:endLoad', this._ipc_endLoad);
+            this.ipc.on('scene:launched', this.refresh.bind(this));
+
+            this.ipc.on('entity:created', this.newItem.bind(this));
+            this.ipc.on('entity:removed', this.deleteItemById.bind(this));
+            this.ipc.on('entity:parentChanged', this.setItemParentById.bind(this));
+            this.ipc.on('entity:indexChanged', this.setItemIndex.bind(this));
+            this.ipc.on('entity:renamed', this.renameItemById.bind(this));
+
+            this.ipc.on('hierarchy:createEntity', this.createEntity.bind(this));
+            this.ipc.on('hierarchy:createChildEntity', this.createChildEntity.bind(this));
+            this.ipc.on('hierarchy:rename', function () {
+                if ( this.contextmenuAt instanceof HierarchyItem ) {
+                    this.contextmenuAt.rename();
+                }
+            }.bind(this));
+            this.ipc.on('hierarchy:delete', this.deleteSelection.bind(this));
 
             //
             this.refresh();
         },
 
         detached: function () {
-            // unregister Ipc
-            Ipc.removeListener('scene:launched', this._ipc_refresh);
-            Ipc.removeListener('entity:created', this._ipc_newItem);
-            Ipc.removeListener('entity:removed', this._ipc_deleteEntity);
-            Ipc.removeListener('entity:parentChanged', this._ipc_setEntityParent);
-            Ipc.removeListener('entity:indexChanged', this._ipc_setItemIndex);
-            Ipc.removeListener('entity:renameItem', this._ipc_renameItem);
-            //Ipc.removeListener('hierarchy:beginLoad', this._ipc_beginLoad);
-            //Ipc.removeListener('hierarchy:endLoad', this._ipc_endLoad);
+            this.ipc.clear();
         },
 
-        getContextMenu: function () {
+        getContextMenuTemplate: function () {
             var template = [
                 //// Copy
                 //{
@@ -160,26 +153,23 @@
                 // Rename
                 {
                     label: 'Rename',
-                    click: function () {
-                        if ( this.contextmenuAt instanceof HierarchyItem ) {
-                            this.contextmenuAt.rename();
-                        }
-                    }.bind(this)
+                    message: 'hierarchy:rename',
                 },
 
                 // Delete
                 {
                     label: 'Delete',
-                    click: this.deleteSelection.bind(this)
+                    message: 'hierarchy:delete',
                 },
                 
                 // =====================
                 { type: 'separator' },
             ];
             // append Create menu
-            template = template.concat(this.parentNode.host.getCreateMenuTemplate(true));
+            var createMenu = Fire.plugins.hierarchy.getCreateMenuTemplate('hierarchy');
+            template = template.concat(createMenu);
             //
-            return Menu.buildFromTemplate(template);
+            return template;
         },
 
         newItem: function ( name, flags, id, parentEL ) {
@@ -366,6 +356,26 @@
             this.isValidForDrop = true;
         },
 
+        createEntity: function () {
+            var parentEL = this.contextmenuAt && this.contextmenuAt.parentElement;
+            if (parentEL instanceof HierarchyItem) {
+                Fire.broadcast('engine:createEntity', parentEL.userId);
+            }
+            else {
+                Fire.broadcast('engine:createEntity');
+            }
+        },
+
+        createChildEntity: function () {
+            if (this.contextmenuAt) {
+                Fire.broadcast('engine:createEntity', this.contextmenuAt.userId);
+            }
+            else {
+                var activeId = Fire.Selection.activeEntityId;
+                Fire.broadcast('engine:createEntity', activeId);
+            }
+        },
+
         contextmenuAction: function (event) {
             this.cancelHighligting();
 
@@ -383,7 +393,7 @@
                 Fire.Selection.selectEntity(event.target.userId, unselectOther, true);
             }
 
-            this.getContextMenu().popup(Remote.getCurrentWindow());
+            Fire.popupMenu(this.getContextMenuTemplate());
             event.stopPropagation();
         },
 

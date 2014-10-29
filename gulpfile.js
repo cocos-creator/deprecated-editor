@@ -21,10 +21,13 @@ var paths = {
     elements_html: 'elements/**/*.html',
     elements_js:   'elements/**/*.js',
     src: [
+        'src/ipcListener.js',
         'src/pixi-grids.js',
         'src/svg-grids.js',
         'src/svg-gizmos.js',
         'src/bootstrap.js',
+        'src/menu.js',
+        'src/hierarchy.js',
     ]
 };
 
