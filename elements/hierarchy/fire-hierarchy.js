@@ -14,6 +14,8 @@
             this.focused = false;
 
             this.ipc = new Fire.IpcListener();
+
+            this._lasthover = null;
         },
 
         ready: function () {
@@ -21,10 +23,13 @@
 
             this.ipc.on('selection:entity:selected', this.select.bind(this, true));
             this.ipc.on('selection:entity:unselected', this.select.bind(this, false));
+            this.ipc.on('selection:entity:hover', this.hover.bind(this) );
+            this.ipc.on('selection:entity:hoverout', this.hoverout.bind(this) );
         },
 
         detached: function () {
             this.ipc.clear();
+
         },
 
         select: function (selected, entityIds) {
@@ -34,6 +39,25 @@
                 if (el) {
                     el.selected = selected;
                 }
+            }
+        },
+
+        hover: function ( entityID ) {
+            var el = this.$.hierarchyTree.idToItem[entityID];
+            if (el) {
+                el.hover = true;
+            }
+
+            if ( this._lasthover && this._lasthover !== el ) {
+                this._lasthover.hover = false;
+            }
+            this._lasthover = el;
+        },
+
+        hoverout: function () {
+            if ( this._lasthover ) {
+                this._lasthover.hover = false;
+                this._lasthover = null;
             }
         },
 

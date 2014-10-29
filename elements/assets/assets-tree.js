@@ -10,6 +10,7 @@
     function _newAssetsItem ( url, type, id, parent ) {
         var extname = Url.extname(url); 
         var basename = Url.basename(url, extname); 
+        var img;
 
         var newEL = new AssetsItem();
         newEL.isRoot = type === 'root';
@@ -19,26 +20,26 @@
         type = type || extname;
         switch ( type ) {
         case 'root':
-            newEL.setIcon('fa-database');
+            newEL.setIcon('fa fa-database');
             break;
 
         case 'folder':
-            newEL.setIcon('fa-folder');
+            newEL.setIcon('folder');
             break;
 
         case '.png':
         case '.jpg':
-            var img = new Image();
+            img = new Image();
             img.src = url;
             newEL.setIcon(img);
             break;
 
         case '.fire':
-            newEL.setIcon('fa-fire');
+            newEL.setIcon('fa fa-fire');
             break;
                 
         default:
-            newEL.setIcon('fa-cube');
+            newEL.setIcon('fa fa-cube');
             break;
         }
 
