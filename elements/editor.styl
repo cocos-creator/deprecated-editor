@@ -16,11 +16,14 @@ html /deep/ {
             }
         }
     }
+
+    // calculate by .fold-icon.(width+marginRight) + .type-icon.(width+marginRight)
     assets-item>assets-item{
-        margin-left: 24px
+        margin-left: 30px
     }
+    // calculate by .type-icon.(width+marginRight)
     assets-item>assets-item[foldable] {
-        margin-left: 14px
+        margin-left: 18px
     }
 
     hierarchy-tree[focused] {
@@ -32,14 +35,17 @@ html /deep/ {
             }
         }
     }
-    hierarchy-item {
-        margin-left: 10px
-    }
+    // calculate by .fold-icon.(width+marginRight) + .type-icon.(width+marginRight)
     hierarchy-item>hierarchy-item {
-        margin-left: 24px
+        margin-left: 30px
     }
+    // calculate by .fold-icon.(width+marginRight)
+    hierarchy-item {
+        margin-left: 12px
+    }
+    // calculate by .type-icon.(width+marginRight)
     hierarchy-item>hierarchy-item[foldable] {
-        margin-left: 14px
+        margin-left: 18px
     }
 
     ::-webkit-scrollbar {

@@ -269,8 +269,8 @@
             return tool;
         },
 
-        mousemoveAction: function ( event ) {
-            var mousePos = new Fire.Vec2(event.offsetX, event.offsetY); 
+        hitTest: function ( x, y ) {
+            var mousePos = new Fire.Vec2(x,y ); 
             var worldMousePos = this.renderContext.camera.screenToWorld(mousePos);
 
             var entities = []; 
@@ -285,7 +285,7 @@
 
             //
             var minDist = null;
-            var hoverEntity = null;
+            var resultEntity = null;
             for ( i = 0; i < entities.length; ++i ) {
                 var entity = entities[i];
                 var renderer = entity.getComponent( Fire.Renderer );
@@ -298,12 +298,19 @@
                         var dist = worldMousePos.sub(polygon.center).magSqr();
                         if ( minDist === null || dist < minDist ) {
                             minDist = dist;
-                            hoverEntity = entity;
+                            resultEntity = entity;
                         }
                         
                     }
                 }
             }
+
+            return resultEntity;
+        },
+
+        mousemoveAction: function ( event ) {
+            //
+            var hoverEntity = this.hitTest(event.offsetX, event.offsetY);
 
             //
             if ( hoverEntity ) {
@@ -398,6 +405,11 @@
                     this.svgGizmos.fadeoutSelection();
                     EditorUI.removeDragGhost();
                     event.stopPropagation();
+
+                    // TODO:
+                    // if ( this._lasthover ) {
+                    //     Fire.Selection.selectEntity(this._lasthover.hashKey, true);
+                    // }
                 }.bind(this);
 
                 //
