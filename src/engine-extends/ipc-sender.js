@@ -22,7 +22,7 @@
                         entity._name,
                         entity._objFlags,
                         entity.hashKey//,
-                        //entity.transform.parent && entity.transform.parent.entity.hashKey
+                        //entity.parent && entity.parent.hashKey
                       );
     };
 
@@ -36,7 +36,7 @@
     editorCallback.onEntityParentChanged = function (entity) {
         Fire.broadcast( onEntityParentChanged,
                         entity.hashKey,
-                        entity.transform.parent && entity.transform.parent.entity.hashKey
+                        entity.parent && entity.parent.hashKey
                       );
         Fire.broadcast('scene:dirty');
     };
@@ -48,8 +48,7 @@
         var i = newIndex;
         do {
             ++i;
-            var nextTrans = entity.transform.getSibling(i);
-            next = nextTrans && nextTrans.entity;
+            next = entity.getSibling(i);
         } while (next && (next._objFlags & SceneGizmo));
         //
         Fire.broadcast( onEntityIndexChanged,

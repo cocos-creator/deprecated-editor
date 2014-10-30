@@ -224,11 +224,10 @@
             }
             var selection = Fire.Selection.entities;
             var self = this;
-            function createItem(transform, parentEL) {
-                var entity = transform.entity;
+            function createItem(entity, parentEL) {
                 var el = self.newItem(entity.name, entity._objFlags, entity.hashKey, parentEL);
                 if (el) {
-                    var children = transform._children;
+                    var children = entity._children;
                     for (var i = 0, len = children.length; i < len; i++) {
                         createItem(children[i], el);
                     }
@@ -237,7 +236,7 @@
             }
             var entities = Fire.Engine._scene.entities;
             for (var i = 0, len = entities.length; i < len; i++) {
-                createItem(entities[i].transform);
+                createItem(entities[i]);
             }
         },
 

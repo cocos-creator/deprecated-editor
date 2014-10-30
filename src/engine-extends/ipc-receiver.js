@@ -33,33 +33,30 @@
         if (parentId) {
             var parent = Entity._getInstanceById(parentId);
             if (parent) {
-                ent.transform.parent = parent.transform;
+                ent.parent = parent;
             }
         }
     });
 
     Ipc.on('engine:moveEntity', function (idList, parentId, nextSiblingId) {
-        var parentT = null;
-        if (parentId) {
-            var parentE = Entity._getInstanceById(parentId);
-            parentT = parentE && parentE.transform;
-        }
+        var parentT = parentId && Entity._getInstanceById(parentId);
+        
         var index = -1;
         if (nextSiblingId) {
             var next = Entity._getInstanceById(nextSiblingId);
             if (next) {
-                index = next.transform.getSiblingIndex();
+                index = next.getSiblingIndex();
             }
         }
         for (var i = 0; i < idList.length; i++) {
             var id = idList[i];
             var entity = Entity._getInstanceById(id);
             if (entity) {
-                if (parentT.isChildOf(entity.transform) === false) {
-                    entity.transform.parent = parentT;
+                if (parentT.isChildOf(entity) === false) {
+                    entity.parent = parentT;
                 }
                 if (index !== -1) {
-                    entity.transform.setSiblingIndex(index + i);
+                    entity.setSiblingIndex(index + i);
                 }
             }
         }
