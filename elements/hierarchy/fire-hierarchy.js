@@ -62,8 +62,8 @@
         },
 
         createAction: function () {
-            var type = 'main-menu'; // the same as main menu
-            Fire.popupMenu(Fire.plugins.hierarchy.getCreateMenuTemplate(type));
+            var type = 'create';
+            Fire.popupMenu(Fire.plugins.hierarchy.getMenuTemplate(type));
         },
     });
 })();

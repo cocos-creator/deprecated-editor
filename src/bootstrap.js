@@ -67,14 +67,23 @@ try {
     Fire.AssetDB = remote.getGlobal( 'AssetDB@' + fireID );
     Fire.MainMenu = remote.getGlobal( 'MainMenu@' + fireID );
 
-    // register menus
+
     window.onload = function () {
+        var key, plugin;
+        // init plugins
+        for (key in Fire.plugins) {
+            plugin = Fire.plugins[key];
+            if (plugin.init) {
+                plugin.init();
+            }
+        }
+        // register menus
         var isMainWebContext = true;
         if (isMainWebContext) {
-            for (var key in Fire.plugins) {
-                var plugin = Fire.plugins[key];
-                if (plugin.onEnable) {
-                    plugin.onEnable();
+            for (key in Fire.plugins) {
+                plugin = Fire.plugins[key];
+                if (plugin.mainMenu) {
+                    Fire.MainMenu.addTemplate(plugin.mainMenu.path, plugin.mainMenu.template);
                 }
             }
         }

@@ -1,7 +1,5 @@
 ﻿(function () {
 
-    var Ipc = require('ipc');
-
     function createEntity() {
         Fire.broadcast('engine:createEntity');
     }
@@ -10,27 +8,30 @@
         var activeId = Fire.Selection.activeEntityId;
         Fire.broadcast('engine:createEntity', activeId);
     }
+
+    var ipc = new Fire.IpcListener();
     
     var hierarchy = {
 
-        // built-in callbacks
+        // built-in properties
 
-        onEnable: function () {
-            // register main menu
-            Fire.MainMenu.addTemplate('Entity', this.getCreateMenuTemplate('main-menu'));
-
-            Ipc.on('main-menu:createEntity', createEntity);
-            Ipc.on('main-menu:createChildEntity', createChildEntity);
+        init: function () {
+            ipc.on('create:createEntity', createEntity);
+            ipc.on('create:createChildEntity', createChildEntity);
         },
 
-        onDisable: function () {
-            Ipc.removeListener('main-menu:createEntity', createEntity);
-            Ipc.removeListener('main-menu:createChildEntity', createChildEntity);
+        destroy: function () {
+            ipc.clear();
+        },
+
+        mainMenu: {
+            path: 'Entity',
+            template: null,
         },
 
         // custom properties
 
-        getCreateMenuTemplate: function (type) {
+        getMenuTemplate: function (type) {
             return [
                 {
                     label: 'Create Empty',
@@ -44,6 +45,7 @@
         },
     };
 
-    Fire.plugins.hierarchy = hierarchy;
+    hierarchy.mainMenu.template = hierarchy.getMenuTemplate('create');
 
+    Fire.plugins.hierarchy = hierarchy;
 })();

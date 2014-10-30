@@ -166,7 +166,7 @@
                 { type: 'separator' },
             ];
             // append Create menu
-            var createMenu = Fire.plugins.hierarchy.getCreateMenuTemplate('hierarchy');
+            var createMenu = Fire.plugins.hierarchy.getMenuTemplate('hierarchy');
             template = template.concat(createMenu);
             //
             return template;
