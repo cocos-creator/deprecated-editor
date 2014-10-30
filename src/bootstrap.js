@@ -65,7 +65,6 @@ try {
 
     // get remote globals
     Fire.AssetDB = remote.getGlobal( 'AssetDB@' + fireID );
-    Fire.Selection = remote.getGlobal( 'Selection@' + fireID );
     Fire.MainMenu = remote.getGlobal( 'MainMenu@' + fireID );
 
     // register menus

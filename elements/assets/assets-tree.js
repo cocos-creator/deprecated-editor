@@ -325,7 +325,7 @@
         },
 
         deleteSelection: function () {
-            var elements = this.getMostIncludeElements(Fire.Selection.assets);
+            var elements = this.getToplevelElements(Fire.Selection.assets);
             for (var i = 0; i < elements.length; i++) {
                 Fire.command( 'asset-db:delete', elements[i].userId );
             }
@@ -351,37 +351,24 @@
             return url;
         },
 
-        getMostIncludeElements: function ( uuids ) {
-            var i, j;
+        getToplevelElements: function ( uuids ) {
+            var resultIDs = Fire.Selection.filter( uuids, 'top-level', function ( idA, idB ) {
+                var elA = this.idToItem[idA];
+                var elB = this.idToItem[idA];
+
+                if ( elA.contains(elB) ) {
+                    return 1;
+                }
+                if ( elB.contains(elA) ) {
+                    return -1;
+                }
+                return 0;
+            } );
+
             var resultELs = [];
-
-            for ( i = 0; i < uuids.length; ++i ) {
-                var el = this.idToItem[uuids[i]];
-                var addEL = true;
-                var resultEL = null;
-
-                for ( j = 0; j < resultELs.length; ++j ) {
-                    resultEL = resultELs[j];
-                    if ( resultEL === el ) {
-                        addEL = false;
-                        break;
-                    }
-                    else if ( resultEL.contains(el) ) {
-                        // url is child of resultUrl
-                        addEL = false;
-                        break;
-                    }
-                    else if ( el.contains(resultEL) ) {
-                        // url is parent or same of resultUrl
-                        resultELs.splice(j, 1);
-                        --j;
-                    }
-                    // url is not relative with resultUrl
-                }
-
-                if ( addEL ) {
-                    resultELs.push(el);
-                }
+            for ( var i = 0; i < resultIDs.length; ++i ) {
+                var el = this.idToItem[resultIDs[i]];
+                resultELs.push(el);
             }
 
             return resultELs;
@@ -434,7 +421,7 @@
         },
 
         moveSelection: function ( targetEL ) {
-            var elements = this.getMostIncludeElements(Fire.Selection.assets);
+            var elements = this.getToplevelElements(Fire.Selection.assets);
             var targetUrl = this.getUrl(targetEL);
 
             for ( var i = 0; i < elements.length; ++i ) {
@@ -543,7 +530,7 @@
                         }
                     }
                     else {
-                        var srcELs = this.getMostIncludeElements(Fire.Selection.assets);
+                        var srcELs = this.getToplevelElements(Fire.Selection.assets);
                         for (i = 0; i < srcELs.length; i++) {
                             var srcEL = srcELs[i];
                             if (target !== srcEL.parentElement) {
@@ -554,7 +541,7 @@
 
                     // check if we have conflicts names
                     if ( names.length > 0 ) {
-                        var collisions = _getNameCollisions( target, names);
+                        var collisions = _getNameCollisions( target, names );
                         if ( collisions.length > 0 ) {
                             this.highlightConflicts(collisions);
                             this.isValidForDrop = false;
