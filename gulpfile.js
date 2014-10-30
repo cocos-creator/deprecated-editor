@@ -28,7 +28,8 @@ var paths = {
         'src/bootstrap.js',
         'src/menu.js',
 
-        'src/builtin/hierarchy.js',
+        'src/plugins/hierarchy.js',
+        'src/gizmos/camera.js',
     ]
 };
 
