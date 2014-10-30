@@ -2,17 +2,10 @@
 
 (function () {
     
-    var Entity = Fire.Entity;
-
-    Entity.createWithFlags = function (name, flags) {
-        Entity._defaultFlags = flags;
-        var ent = new Entity(name);
-        Entity._defaultFlags = 0;
-        return ent;
-    };
+    var Component = Fire.Component;
 
     // register id
-    Object.defineProperty ( Entity.prototype, 'hashKey', {
+    Object.defineProperty ( Component.prototype, 'hashKey', {
         get: function () {
             var retval = this._hashKey;
             if (retval) {
@@ -26,8 +19,8 @@
     });
 
     // unregister id
-    var doOnPreDestroy = Entity.prototype._onPreDestroy;
-    Entity.prototype._onPreDestroy = function () {
+    var doOnPreDestroy = Component.prototype._onPreDestroy;
+    Component.prototype._onPreDestroy = function () {
         doOnPreDestroy.call(this);
         delete Fire._idToObject[this._hashKey];
     };

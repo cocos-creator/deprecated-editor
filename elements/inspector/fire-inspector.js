@@ -56,7 +56,7 @@
         inspectEntity: function ( inspect, id ) {
             if (inspect) {
                 // only support entity currently
-                var entity = Fire.Entity._getInstanceById(id);
+                var entity = Fire._getInstanceById(id);
                 if (!entity) {
                     return;
                 }

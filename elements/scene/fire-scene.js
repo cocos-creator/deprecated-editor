@@ -36,7 +36,7 @@
         select: function ( selected, entityIDs ) {
             var entities = [];
             for ( var i = 0; i < entityIDs.length; ++i ) {
-                var entity = Fire.Entity._getInstanceById(entityIDs[i]);
+                var entity = Fire._getInstanceById(entityIDs[i]);
                 if (entity) {
                     entities.push( entity );
                 }
@@ -52,7 +52,7 @@
             if ( !entityID )
                 return;
 
-            var entity = Fire.Entity._getInstanceById(entityID);
+            var entity = Fire._getInstanceById(entityID);
             if (!entity) {
                 return;
             }

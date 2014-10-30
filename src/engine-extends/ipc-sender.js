@@ -65,4 +65,12 @@
                       );
     };
 
+    editorCallback.onComponentEnabled = function (component) {
+        Fire.broadcast('component:enabled', component.hashKey);
+    };
+
+    editorCallback.onComponentDisabled = function (component) {
+        Fire.broadcast('component:disabled', component.hashKey);
+    };
+
 })();

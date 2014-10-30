@@ -17,6 +17,8 @@ var paths = {
     elements_html: 'elements/**/*.html',
     elements_js:   'elements/**/*.js',
     src: [
+        'src/engine-extends/misc.js',
+        'src/engine-extends/component.js',
         'src/engine-extends/entity.js',
         'src/engine-extends/scene.js',
         'src/engine-extends/engine.js',
