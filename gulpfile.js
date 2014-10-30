@@ -16,6 +16,10 @@ var paths = {
     elements_css:  'elements/**/*.styl',
     elements_html: 'elements/**/*.html',
     elements_js:   'elements/**/*.js',
+    elements_img: [ 
+        'elements/img/**/*.png',
+        'elements/img/**/*.jpg'
+    ],
     src: [
         'src/engine-extends/misc.js',
         'src/engine-extends/component.js',
@@ -39,10 +43,6 @@ var paths = {
         'src/plugins/hierarchy.js',
         'src/gizmos/camera.js',
     ],
-    img: [ 
-        'img/**/*.png',
-        'img/**/*.jpg'
-    ],
 };
 
 // clean
@@ -54,8 +54,8 @@ gulp.task('clean', function() {
 // copy
 /////////////////////////////////////////////////////////////////////////////
 
-gulp.task('cp-img', function() {
-    return gulp.src(paths.img, {base: './'})
+gulp.task('cp-elements-img', function() {
+    return gulp.src(paths.elements_img, {base: 'elements/'})
     .pipe(gulp.dest('bin'))
     ;
 });
@@ -135,10 +135,10 @@ var build_elements_html = function (strip) {
     };
 };
 gulp.task('build-elements-html', [
-    'cp-img', 'cp-elements-html', 'elements-css', 'elements-js'
+    'cp-elements-img', 'cp-elements-html', 'elements-css', 'elements-js'
 ], build_elements_html(true));
 gulp.task('build-elements-html-dev', [
-    'cp-img', 'cp-elements-html', 'elements-css', 'elements-js-dev'
+    'cp-elements-img', 'cp-elements-html', 'elements-css', 'elements-js-dev'
 ], build_elements_html(false));
 
 // js-hint
@@ -174,7 +174,7 @@ gulp.task('src-min', ['src-dev'], function() {
 /////////////////////////////////////////////////////////////////////////////
 
 // short tasks
-gulp.task('copy', ['cp-img', 'cp-elements-html'] );
+gulp.task('copy', ['cp-elements-img', 'cp-elements-html'] );
 gulp.task('dev', ['copy', 'build-elements-html-dev', 'src-dev' ] );
 gulp.task('default', ['copy', 'build-elements-html', 'src-min' ] );
 
@@ -183,13 +183,13 @@ gulp.task('watch', function() {
     gulp.watch(paths.elements_css, ['elements-css', 'build-elements-html-dev']).on ( 'error', gutil.log );
     gulp.watch(paths.elements_js, ['build-elements-html-dev']).on ( 'error', gutil.log );
     gulp.watch(paths.elements_html, ['build-elements-html-dev']).on ( 'error', gutil.log );
+    gulp.watch(paths.elements_img, ['cp-elements-img']).on ( 'error', gutil.log );
     gulp.watch(paths.src, ['src-dev']).on ( 'error', gutil.log );
-    gulp.watch(paths.img, ['cp-img']).on ( 'error', gutil.log );
 });
 gulp.task('watch-self', function() {
     gulp.watch(paths.elements_css, ['elements-css', 'build-elements-html-dev']).on ( 'error', gutil.log );
     gulp.watch(paths.elements_js, ['build-elements-html-dev']).on ( 'error', gutil.log );
     gulp.watch(paths.elements_html, ['build-elements-html-dev']).on ( 'error', gutil.log );
+    gulp.watch(paths.elements_img, ['cp-elements-img']).on ( 'error', gutil.log );
     gulp.watch(paths.src, ['src-dev']).on ( 'error', gutil.log );
-    gulp.watch(paths.img, ['cp-img']).on ( 'error', gutil.log );
 });

@@ -13,6 +13,7 @@
 
         itemAddedAction: function ( event ) {
             this.scrollTop = this.scrollHeight;
+            event.stopPropagation();
         },
     });
 })();

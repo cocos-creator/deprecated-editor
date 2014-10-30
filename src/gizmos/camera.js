@@ -1,8 +1,12 @@
 ﻿(function () {
 
     var gizmos = {
-        icon: "img/gizmos-camera.png",
+        icon: {
+            url: "fire://static/img/gizmos-camera.png",
+            width: 40,
+            height: 40,
+        },
     };
 
-    Fire.Camera.gizmos = gizmos;
+    Fire.gizmos['Fire.Camera'] = gizmos;
 })();

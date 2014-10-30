@@ -13,6 +13,8 @@
                 scale: 1.0,
             };
 
+            this.ipc = new Fire.IpcListener();
+
             this._layoutTool = null;
             this._lasthover = null;
             this._editingEdities = [];
@@ -26,6 +28,13 @@
 
             // init gizmos
             this.svgGizmos = new Fire.SvgGizmos( this.$.gizmos );
+
+            this.ipc.on('component:enabled', this.updateComponent.bind(this,true) );
+            this.ipc.on('component:disabled', this.updateComponent.bind(this,false) );
+        },
+
+        detached: function () {
+            this.ipc.clear();
         },
 
         init: function () {
@@ -97,7 +106,6 @@
                             sprite.width = 400;
                             sprite.height = 300;
                             testEnt.addComponent(Fire.SpriteRenderer).sprite = sprite;
-                            testEnt.addComponent(Fire.Camera);
                         }
                     }
                 }.bind(this) );
@@ -155,7 +163,7 @@
         rebuildGizmos: function () {
             for ( var i = 0; i < this.svgGizmos.gizmos.length; ++i ) {
                 var gizmo = this.svgGizmos.gizmos[i];
-                if ( gizmo.entity ) {
+                if ( gizmo.entity && gizmo.type === "handle" ) {
                     var newGizmo = this.newLayoutTools(gizmo.entity);
                     this.svgGizmos.gizmos[i] = newGizmo;
 
@@ -166,6 +174,28 @@
                 }
             }
             this.updateGizmos();
+        },
+
+        updateComponent: function ( enabled, id ) {
+            if ( enabled ) {
+
+                var comp = Fire._getInstanceById(id);
+                if ( comp.entity._objFlags & Fire._ObjectFlags.SceneGizmo ) {
+                    return;
+                }
+
+                var classname = Fire.getClassName(comp);
+                var gizmos = Fire.gizmos[classname];
+                if ( gizmos && gizmos.icon ) {
+                    var iconGizmo = this.svgGizmos.icon( gizmos.icon.url, 
+                                                         gizmos.icon.width, 
+                                                         gizmos.icon.height );
+                    iconGizmo.entity = comp.entity;
+                    iconGizmo.type = "icon";
+
+                    this.svgGizmos.add (iconGizmo);
+                }
+            }
         },
 
         hover: function ( entity ) {
@@ -277,6 +307,7 @@
             }
 
             tool.entity = entity;
+            tool.type = "handle";
             tool.handle = Fire.mainWindow.settings.handle;
             tool.pivot = Fire.mainWindow.settings.pivot;
             tool.coordinate = Fire.mainWindow.settings.coordinate;
@@ -292,7 +323,7 @@
             var worldMousePos = this.renderContext.camera.screenToWorld(mousePos);
 
             var entities = []; 
-            var i, bounding;
+            var i, c, bounding;
 
             for ( i = 0; i < this.interactionContext.boundings.length; ++i ) {
                 bounding = this.interactionContext.boundings[i];
@@ -306,18 +337,23 @@
             var resultEntity = null;
             for ( i = 0; i < entities.length; ++i ) {
                 var entity = entities[i];
-                var renderer = entity.getComponent( Fire.Renderer );
-                if ( renderer ) {
-                    var bounds = renderer.getWorldOrientedBounds();
-                    var polygon = new Fire.Polygon(bounds);
+                for ( c = 0; c < entity._components.length; ++c ) {
+                    var component = entity._components[c];
 
-                    //
-                    if ( polygon.contains( worldMousePos ) ) {
-                        var dist = worldMousePos.sub(polygon.center).magSqr();
-                        if ( minDist === null || dist < minDist ) {
-                            minDist = dist;
-                            resultEntity = entity;
+                    if ( component instanceof Fire.Renderer ) { 
+                        var bounds = component.getWorldOrientedBounds();
+                        var polygon = new Fire.Polygon(bounds);
+
+                        //
+                        if ( polygon.contains( worldMousePos ) ) {
+                            var dist = worldMousePos.sub(polygon.center).magSqr();
+                            if ( minDist === null || dist < minDist ) {
+                                minDist = dist;
+                                resultEntity = entity;
+                            }
                         }
+
+                        break;
                     }
                 }
             }
@@ -331,7 +367,7 @@
             var worldRect = Fire.Rect.fromVec2(v1,v2); 
 
             var entities = []; 
-            var i, bounding;
+            var i, c, bounding;
 
             for ( i = 0; i < this.interactionContext.boundings.length; ++i ) {
                 bounding = this.interactionContext.boundings[i];
@@ -343,15 +379,20 @@
             //
             for ( i = 0; i < entities.length; ++i ) {
                 var entity = entities[i];
-                var renderer = entity.getComponent( Fire.Renderer );
-                if ( renderer ) {
-                    var bounds = renderer.getWorldOrientedBounds();
-                    var polygon = new Fire.Polygon(bounds);
+                for ( c = 0; c < entity._components.length; ++c ) {
+                    var component = entity._components[c];
 
-                    //
-                    if ( Fire.Intersection.rectPolygon(worldRect,polygon) === false ) {
-                        entities.splice( i, 1 );
-                        --i;
+                    if ( component instanceof Fire.Renderer ) { 
+                        var bounds = component.getWorldOrientedBounds();
+                        var polygon = new Fire.Polygon(bounds);
+
+                        //
+                        if ( Fire.Intersection.rectPolygon(worldRect,polygon) === false ) {
+                            entities.splice( i, 1 );
+                            --i;
+                        }
+
+                        break;
                     }
                 }
             }

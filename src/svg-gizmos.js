@@ -12,14 +12,16 @@ Fire.SvgGizmos = (function () {
             screenpos.x = _snapPixel(screenpos.x);
             screenpos.y = _snapPixel(screenpos.y);
             gizmo.position = screenpos;
-
             gizmo.rotation = 0.0; 
-            if ( gizmo.handle === "move" && gizmo.coordinate === "global" ) {
-                gizmo.rotation = 0.0;
-            }
-            else {
-                var worldrot = gizmo.entity.transform.worldRotation;
-                gizmo.rotation = -worldrot;
+
+            if ( gizmo.type === "handle" ) {
+                if ( gizmo.handle === "move" && gizmo.coordinate === "global" ) {
+                    gizmo.rotation = 0.0;
+                }
+                else {
+                    var worldrot = gizmo.entity.transform.worldRotation;
+                    gizmo.rotation = -worldrot;
+                }
             }
         }
 
@@ -97,6 +99,22 @@ Fire.SvgGizmos = (function () {
         this.hover(this.hoverEntity);
     };
 
+    SvgGizmos.prototype.add = function ( gizmo ) {
+        _updateGizmo( gizmo, this.camera );
+        this.gizmos.push(gizmo);
+    };
+
+    SvgGizmos.prototype.remove = function ( gizmo ) {
+        for ( var i = this.gizmos.length-1; i >= 0; --i ) {
+            var g = this.gizmos[i];
+            if ( g === gizmo ) {
+                g.remove();
+                this.gizmos.splice( i, 1 );
+                break;
+            }
+        }
+    };
+
     SvgGizmos.prototype.updateSelection = function ( x, y, w, h ) {
         if ( !this.selectRect ) {
             this.selectRect = this.svg.rect();
@@ -157,20 +175,12 @@ Fire.SvgGizmos = (function () {
         this.hoverRect.hide();
     };
 
-    SvgGizmos.prototype.add = function ( gizmo ) {
-        _updateGizmo( gizmo, this.camera );
-        this.gizmos.push(gizmo);
-    };
-
-    SvgGizmos.prototype.remove = function ( gizmo ) {
-        for ( var i = this.gizmos.length-1; i >= 0; --i ) {
-            var g = this.gizmos[i];
-            if ( g === gizmo ) {
-                g.remove();
-                this.gizmos.splice( i, 1 );
-                break;
-            }
-        }
+    SvgGizmos.prototype.icon = function ( url, w, h ) {
+        var icon = this.svg.image(url)
+                           .move( -w * 0.5, -h * 0.5 )
+                           .size( w, h )
+                           ;
+        return icon;
     };
 
     SvgGizmos.prototype.scaleSlider = function ( size, color, callbacks ) {

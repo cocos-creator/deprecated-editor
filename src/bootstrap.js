@@ -3,6 +3,7 @@ var remote = require('remote');
 var ipc = require('ipc');
 
 Fire.plugins = {};  // TODO: 做成Remote Object，确保全局只有一份?
+Fire.gizmos = {};
 
 try {
     // skip "?fireID="
@@ -67,7 +68,7 @@ try {
     Fire.AssetDB = remote.getGlobal( 'AssetDB@' + fireID );
     Fire.MainMenu = remote.getGlobal( 'MainMenu@' + fireID );
 
-
+    //
     window.onload = function () {
         var key, plugin;
         // init plugins
