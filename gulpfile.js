@@ -20,10 +20,19 @@ var paths = {
         'src/bootstrap.js',
         'src/ipc-listener.js',
         'src/selection.js',
+
+        'engine-extends/entity.js',
+        'engine-extends/scene.js',
+        'engine-extends/engine.js',
+        'engine-extends/render-context.js',
+        'engine-extends/ipc-sender.js',
+        'engine-extends/ipc-listener.js',
+        
         'src/pixi-grids.js',
         'src/svg-grids.js',
         'src/svg-gizmos.js',
         'src/menu.js',
+
         //'src/main-menu.js',
         'src/plugins/hierarchy.js',
         'src/gizmos/camera.js',
