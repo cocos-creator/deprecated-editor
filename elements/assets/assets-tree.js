@@ -30,7 +30,7 @@
         case '.png':
         case '.jpg':
             img = new Image();
-            img.src = url;
+            img.src = 'uuid://' + id;
             newEL.setIcon(img);
             break;
 
