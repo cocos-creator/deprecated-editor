@@ -17,17 +17,17 @@ var paths = {
     elements_html: 'elements/**/*.html',
     elements_js:   'elements/**/*.js',
     src: [
+        'src/engine-extends/entity.js',
+        'src/engine-extends/scene.js',
+        'src/engine-extends/engine.js',
+        'src/engine-extends/render-context.js',
+        'src/engine-extends/ipc-sender.js',
+        'src/engine-extends/ipc-receiver.js',
+
         'src/bootstrap.js',
         'src/ipc-listener.js',
         'src/selection.js',
 
-        'engine-extends/entity.js',
-        'engine-extends/scene.js',
-        'engine-extends/engine.js',
-        'engine-extends/render-context.js',
-        'engine-extends/ipc-sender.js',
-        'engine-extends/ipc-listener.js',
-        
         'src/pixi-grids.js',
         'src/svg-grids.js',
         'src/svg-gizmos.js',
