@@ -21,6 +21,13 @@ var paths = {
     elements_html: 'elements/**/*.html',
     elements_js:   'elements/**/*.js',
     src: [
+        'engine-extends/entity.js',
+        'engine-extends/scene.js',
+        'engine-extends/engine.js',
+        'engine-extends/render-context.js',
+        'engine-extends/ipc-sender.js',
+        'engine-extends/ipc-listener.js',
+        
         'src/ipcListener.js',
         'src/pixi-grids.js',
         'src/svg-grids.js',
