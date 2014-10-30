@@ -27,7 +27,7 @@ var paths = {
         'src/svg-gizmos.js',
         'src/bootstrap.js',
         'src/menu.js',
-
+        //'src/main-menu.js',
         'src/plugins/hierarchy.js',
         'src/gizmos/camera.js',
     ]
