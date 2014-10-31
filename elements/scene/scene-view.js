@@ -16,6 +16,7 @@
             this.ipc = new Fire.IpcListener();
 
             this._layoutTool = null;
+            this._editTool = null;
             this._lasthover = null;
             this._editingEdities = [];
         },
@@ -164,7 +165,7 @@
             for ( var i = 0; i < this.svgGizmos.gizmos.length; ++i ) {
                 var gizmo = this.svgGizmos.gizmos[i];
                 if ( gizmo.entity && gizmo.type === "handle" ) {
-                    var newGizmo = this.newLayoutTools(gizmo.entity);
+                    var newGizmo = this.newLayoutTool(gizmo.entity);
                     this.svgGizmos.gizmos[i] = newGizmo;
 
                     if ( this._layoutTool === gizmo ) {
@@ -187,10 +188,10 @@
                 var classname = Fire.getClassName(comp);
                 var gizmos = Fire.gizmos[classname];
                 if ( gizmos && gizmos.icon ) {
-                    var tool = this.newIconTools( comp.entity, 
-                                                  gizmos.icon.url, 
-                                                  gizmos.icon.width, 
-                                                  gizmos.icon.height );
+                    var tool = this.newIconTool( comp.entity, 
+                                                 gizmos.icon.url, 
+                                                 gizmos.icon.width, 
+                                                 gizmos.icon.height );
                     this.svgGizmos.add (tool);
                 }
             }
@@ -211,12 +212,23 @@
                 this.svgGizmos.remove(this._layoutTool);
                 this._layoutTool = null;
             }
+            if ( this._editTool ) {
+                this.svgGizmos.remove(this._editTool);
+                this._editTool = null;
+            }
 
             this._editingEdities = entities;
 
             if ( entities.length > 0 ) {
-                this._layoutTool = this.newLayoutTools(entities[0]);
+                this._layoutTool = this.newLayoutTool(entities[0]);
                 this.svgGizmos.add( this._layoutTool );
+            }
+
+            if ( entities.length === 1 ) {
+                this._editTool = this.newCustomTool(entities[0]);
+                if ( this._editTool ) {
+                    this.svgGizmos.add( this._editTool );
+                }
             }
         },
 
@@ -237,13 +249,18 @@
                 this._layoutTool = null;
             }
 
+            if ( this._editTool ) {
+                this.svgGizmos.remove(this._editTool);
+                this._editTool = null;
+            }
+
             if ( this._editingEdities.length > 0 ) {
-                this._layoutTool = this.newLayoutTools(this._editingEdities[0]);
+                this._layoutTool = this.newLayoutTool(this._editingEdities[0]);
                 this.svgGizmos.add( this._layoutTool );
             }
         },
 
-        newIconTools: function ( entity, url, w, h ) {
+        newIconTool: function ( entity, url, w, h ) {
             var tool = this.svgGizmos.icon( url, w, h ); 
             tool.entity = entity;
             tool.type = "icon";
@@ -252,7 +269,31 @@
             return tool;
         },
 
-        newLayoutTools: function ( entity ) {
+        newCustomTool: function ( entity ) {
+            var tool = null;
+
+            for ( c = 0; c < entity._components.length; ++c ) {
+                var comp = entity._components[c];
+
+                var classname = Fire.getClassName(comp);
+                var gizmos = Fire.gizmos[classname];
+
+                if ( gizmos && gizmos.create ) {
+                    tool = gizmos.create( this.svgGizmos.scene, comp );
+                    break;
+                }
+            }
+
+            if ( tool ) {
+                tool.entity = entity;
+                tool.type = "custom";
+                tool.hitTest = false;
+            }
+
+            return tool;
+        },
+
+        newLayoutTool: function ( entity ) {
             var sceneView = this;
             var tool;
 

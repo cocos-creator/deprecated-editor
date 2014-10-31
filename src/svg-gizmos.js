@@ -5,36 +5,52 @@ Fire.SvgGizmos = (function () {
     }
 
     function _updateGizmo ( gizmo, camera, view ) {
-        if ( gizmo.entity ) {
-            var localToWorld = gizmo.entity.transform.getLocalToWorldMatrix();
-            var worldpos = new Fire.Vec2(localToWorld.tx, localToWorld.ty);
-            var screenpos = camera.worldToScreen(worldpos);
+        var localToWorld, worldpos, screenpos, rotation, zoom;
+
+        if ( gizmo.type === "custom" ) {
+            gizmo.update( camera, view );
+        }
+        else if ( gizmo.type === "handle" ) {
+            localToWorld = gizmo.entity.transform.getLocalToWorldMatrix();
+            worldpos = new Fire.Vec2(localToWorld.tx, localToWorld.ty);
+            screenpos = camera.worldToScreen(worldpos);
+            rotation = -gizmo.entity.transform.worldRotation;
+
             screenpos.x = _snapPixel(screenpos.x);
             screenpos.y = _snapPixel(screenpos.y);
             gizmo.position = screenpos;
             gizmo.rotation = 0.0; 
 
-            if ( gizmo.type === "handle" ) {
-                if ( gizmo.handle === "move" && gizmo.coordinate === "global" ) {
-                    gizmo.rotation = 0.0;
-                }
-                else {
-                    var worldrot = gizmo.entity.transform.worldRotation;
-                    gizmo.rotation = -worldrot;
-                }
+            if ( gizmo.handle === "move" && gizmo.coordinate === "global" ) {
+                gizmo.rotation = 0.0;
             }
-            else if ( gizmo.type === "icon" ) {
-                var scale = camera.size/view.height;
-                // scale = Math.max( scale, 0.5 );
-                gizmo.move( -20 * scale, -20 * scale )
-                     .size( 40 * scale, 40 * scale )
-                     ;
+            else {
+                gizmo.rotation = rotation;
             }
-        }
 
-        gizmo.translate( gizmo.position.x, gizmo.position.y ) 
-             .rotate( gizmo.rotation, gizmo.position.x, gizmo.position.y )
-             ;
+            gizmo.translate( gizmo.position.x, gizmo.position.y ) 
+                 .rotate( gizmo.rotation, gizmo.position.x, gizmo.position.y )
+                 ;
+        }
+        else if ( gizmo.type === "icon" ) {
+            localToWorld = gizmo.entity.transform.getLocalToWorldMatrix();
+            worldpos = new Fire.Vec2(localToWorld.tx, localToWorld.ty);
+            screenpos = camera.worldToScreen(worldpos);
+
+            screenpos.x = _snapPixel(screenpos.x);
+            screenpos.y = _snapPixel(screenpos.y);
+            gizmo.position = screenpos;
+            gizmo.rotation = -gizmo.entity.transform.worldRotation;
+
+            zoom = camera.size/view.height;
+
+            var s = Math.max( zoom, 0.5 );
+            gizmo.scale(s,s);
+
+            gizmo.translate( gizmo.position.x, gizmo.position.y ) 
+                 .rotate( gizmo.rotation, gizmo.position.x, gizmo.position.y )
+                 ;
+        }
     }
 
     function _addMoveHandles ( gizmo, callbacks ) {
@@ -81,13 +97,19 @@ Fire.SvgGizmos = (function () {
         } );
     } 
 
+    SvgGizmos.snapPixel = _snapPixel;
+
     function SvgGizmos ( svgEL ) {
         this.svg = SVG(svgEL);
         this.view = { width: 0, height : 0 };
-        this.hoverRect = this.svg.polygon();
-        this.hoverRect.hide();
         this.hoverEntity = null;
         this.gizmos = [];
+
+        this.scene = this.svg.group();  
+        this.foreground = this.svg.group();  
+
+        this.hoverRect = this.scene.polygon();
+        this.hoverRect.hide();
     }
 
     SvgGizmos.prototype.setCamera = function ( camera ) {
@@ -150,7 +172,7 @@ Fire.SvgGizmos = (function () {
 
     SvgGizmos.prototype.updateSelection = function ( x, y, w, h ) {
         if ( !this.selectRect ) {
-            this.selectRect = this.svg.rect();
+            this.selectRect = this.foreground.rect();
         }
 
         this.selectRect.move( _snapPixel(x), _snapPixel(y) ) 
@@ -209,10 +231,10 @@ Fire.SvgGizmos = (function () {
     };
 
     SvgGizmos.prototype.icon = function ( url, w, h ) {
-        var icon = this.svg.image(url)
-                           .move( -w * 0.5, -h * 0.5 )
-                           .size( w, h )
-                           ;
+        var icon = this.scene.image(url)
+                             .move( -w * 0.5, -h * 0.5 )
+                             .size( w, h )
+                             ;
 
         icon.on( 'mousemove', function ( event ) {
             event.stopPropagation();
@@ -233,7 +255,7 @@ Fire.SvgGizmos = (function () {
     };
 
     SvgGizmos.prototype.scaleSlider = function ( size, color, callbacks ) {
-        var group = this.svg.group();
+        var group = this.scene.group();
         var line = group.line( 0, 0, size, 0 )
                         .stroke( { width: 1, color: color } )
                         ;
@@ -301,7 +323,7 @@ Fire.SvgGizmos = (function () {
     };
 
     SvgGizmos.prototype.arrowTool = function ( size, color, callbacks ) {
-        var group = this.svg.group();
+        var group = this.scene.group();
         var line = group.line( 0, 0, size, 0 )
                         .stroke( { width: 1, color: color } )
                         ;
@@ -364,7 +386,7 @@ Fire.SvgGizmos = (function () {
     };
     
     SvgGizmos.prototype.positionTool = function ( position, rotation, callbacks ) {
-        var group = this.svg.group();
+        var group = this.scene.group();
         var xarrow, yarrow, moveRect;
 
         group.position = position;
@@ -486,7 +508,7 @@ Fire.SvgGizmos = (function () {
     };
 
     SvgGizmos.prototype.rotationTool = function ( position, rotation, callbacks ) {
-        var group = this.svg.group();
+        var group = this.scene.group();
         var circle, line, arrow, arc, txtDegree;
         var dragging = false;
         var color = "#f00";
@@ -624,7 +646,7 @@ Fire.SvgGizmos = (function () {
     };
 
     SvgGizmos.prototype.scaleTool = function ( position, rotation, callbacks ) {
-        var group = this.svg.group();
+        var group = this.scene.group();
         var xarrow, yarrow, scaleRect;
 
         group.position = position;
