@@ -20,11 +20,48 @@
         type = type || extname;
         switch ( type ) {
         case 'root':
-            newEL.setIcon('database');
+            newEL.setIcon('db');
             break;
 
         case 'folder':
             newEL.setIcon('folder');
+            break;
+
+        case '.fire':
+            newEL.setIcon('fa fa-fire');
+            break;
+
+        case '.js':
+            newEL.setIcon('js');
+            break;
+
+        case '.coffee':
+            newEL.setIcon('co');
+            break;
+
+        case '.ts':
+            newEL.setIcon('ts');
+            break;
+
+        case '.txt':
+            newEL.setIcon('txt');
+            break;
+
+        case '.html':
+        case '.xml':
+        case '.json':
+            newEL.setIcon('html');
+            break;
+
+        case '.css':
+        case '.less':
+        case '.css':
+        case '.styl':
+            newEL.setIcon('css');
+            break;
+
+        case '.anim':
+            newEL.setIcon('anim');
             break;
 
         case '.png':
@@ -32,10 +69,6 @@
             img = new Image();
             img.src = 'uuid://' + id;
             newEL.setIcon(img);
-            break;
-
-        case '.fire':
-            newEL.setIcon('fa fa-fire');
             break;
                 
         default:

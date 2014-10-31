@@ -4,7 +4,7 @@ Fire.SvgGizmos = (function () {
         return Math.floor(p) + 0.5; 
     }
 
-    function _updateGizmo ( gizmo, camera ) {
+    function _updateGizmo ( gizmo, camera, view ) {
         if ( gizmo.entity ) {
             var localToWorld = gizmo.entity.transform.getLocalToWorldMatrix();
             var worldpos = new Fire.Vec2(localToWorld.tx, localToWorld.ty);
@@ -22,6 +22,13 @@ Fire.SvgGizmos = (function () {
                     var worldrot = gizmo.entity.transform.worldRotation;
                     gizmo.rotation = -worldrot;
                 }
+            }
+            else if ( gizmo.type === "icon" ) {
+                var scale = camera.size/view.height;
+                // scale = Math.max( scale, 0.5 );
+                gizmo.move( -20 * scale, -20 * scale )
+                     .size( 40 * scale, 40 * scale )
+                     ;
             }
         }
 
@@ -76,6 +83,7 @@ Fire.SvgGizmos = (function () {
 
     function SvgGizmos ( svgEL ) {
         this.svg = SVG(svgEL);
+        this.view = { width: 0, height : 0 };
         this.hoverRect = this.svg.polygon();
         this.hoverRect.hide();
         this.hoverEntity = null;
@@ -88,19 +96,20 @@ Fire.SvgGizmos = (function () {
 
     SvgGizmos.prototype.resize = function ( width, height ) {
         this.svg.size( width, height );
+        this.view = { width: width, height : height };
     };
 
     SvgGizmos.prototype.update = function () {
         for ( var i = 0; i < this.gizmos.length; ++i ) {
             var gizmo = this.gizmos[i];
-            _updateGizmo( gizmo, this.camera );
+            _updateGizmo( gizmo, this.camera, this.view );
         }
 
         this.hover(this.hoverEntity);
     };
 
     SvgGizmos.prototype.add = function ( gizmo ) {
-        _updateGizmo( gizmo, this.camera );
+        _updateGizmo( gizmo, this.camera, this.view );
         this.gizmos.push(gizmo);
     };
 
@@ -113,6 +122,30 @@ Fire.SvgGizmos = (function () {
                 break;
             }
         }
+    };
+
+    SvgGizmos.prototype.hitTest = function ( x, y, w, h ) {
+        var rect = this.svg.node.createSVGRect();
+        rect.x = x;
+        rect.y = y;
+        rect.width = w;
+        rect.height = h;
+
+        var els = this.svg.node.getIntersectionList(rect, null);
+        var results = [];
+
+        for ( var i = 0; i < this.gizmos.length; ++i ) {
+            var gizmo = this.gizmos[i];
+            if ( gizmo.hitTest ) {
+                for ( var j = 0; j < els.length; ++j ) {
+                    if ( gizmo.node === els[j] ) {
+                        results.push(gizmo);
+                    }
+                }
+            }
+        }
+
+        return results;
     };
 
     SvgGizmos.prototype.updateSelection = function ( x, y, w, h ) {
@@ -180,6 +213,22 @@ Fire.SvgGizmos = (function () {
                            .move( -w * 0.5, -h * 0.5 )
                            .size( w, h )
                            ;
+
+        icon.on( 'mousemove', function ( event ) {
+            event.stopPropagation();
+        } );
+        icon.on( 'mouseover', function ( event ) {
+            event.stopPropagation();
+            var e = new CustomEvent('hovergizmos', {
+                detail: { entity: this.entity },
+            } );
+            this.node.dispatchEvent(e); 
+        } );
+
+        icon.on( 'mouseout', function ( event ) {
+            event.stopPropagation();
+        } );
+        
         return icon;
     };
 
@@ -209,7 +258,9 @@ Fire.SvgGizmos = (function () {
             rect.fill( { color: lightColor } );
 
             event.stopPropagation();
-            this.node.dispatchEvent( new CustomEvent('hovergizmos') );
+            this.node.dispatchEvent( new CustomEvent('hovergizmos', { 
+                detail: { entity: null }
+            } ) );
         } );
 
         group.on( 'mouseout', function ( event ) {
@@ -270,7 +321,9 @@ Fire.SvgGizmos = (function () {
             arrow.fill( { color: lightColor } );
 
             event.stopPropagation();
-            this.node.dispatchEvent( new CustomEvent('hovergizmos') );
+            this.node.dispatchEvent( new CustomEvent('hovergizmos', { 
+                detail: { entity: null }
+            } ) );
         } );
 
         group.on( 'mouseout', function ( event ) {
@@ -390,7 +443,9 @@ Fire.SvgGizmos = (function () {
                 .stroke( { color: lightColor } )
                 ;
             event.stopPropagation();
-            this.node.dispatchEvent( new CustomEvent('hovergizmos') );
+            this.node.dispatchEvent( new CustomEvent('hovergizmos', { 
+                detail: { entity: null }
+            } ) );
         } );
         moveRect.on( 'mouseout', function ( event ) {
             if ( !dragging ) {
@@ -482,7 +537,9 @@ Fire.SvgGizmos = (function () {
             arrow.fill( { color: lightColor } );
 
             event.stopPropagation();
-            this.node.dispatchEvent( new CustomEvent('hovergizmos') );
+            this.node.dispatchEvent( new CustomEvent('hovergizmos', { 
+                detail: { entity: null }
+            } ) );
         } );
         group.on( 'mouseout', function ( event ) {
             if ( !dragging ) {
@@ -652,7 +709,9 @@ Fire.SvgGizmos = (function () {
                 .stroke( { color: lightColor } )
                 ;
             event.stopPropagation();
-            this.node.dispatchEvent( new CustomEvent('hovergizmos') );
+            this.node.dispatchEvent( new CustomEvent('hovergizmos', { 
+                detail: { entity: null }
+            } ) );
         } );
         scaleRect.on( 'mouseout', function ( event ) {
             if ( !dragging ) {

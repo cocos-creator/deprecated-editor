@@ -187,13 +187,11 @@
                 var classname = Fire.getClassName(comp);
                 var gizmos = Fire.gizmos[classname];
                 if ( gizmos && gizmos.icon ) {
-                    var iconGizmo = this.svgGizmos.icon( gizmos.icon.url, 
-                                                         gizmos.icon.width, 
-                                                         gizmos.icon.height );
-                    iconGizmo.entity = comp.entity;
-                    iconGizmo.type = "icon";
-
-                    this.svgGizmos.add (iconGizmo);
+                    var tool = this.newIconTools( comp.entity, 
+                                                  gizmos.icon.url, 
+                                                  gizmos.icon.width, 
+                                                  gizmos.icon.height );
+                    this.svgGizmos.add (tool);
                 }
             }
         },
@@ -243,6 +241,15 @@
                 this._layoutTool = this.newLayoutTools(this._editingEdities[0]);
                 this.svgGizmos.add( this._layoutTool );
             }
+        },
+
+        newIconTools: function ( entity, url, w, h ) {
+            var tool = this.svgGizmos.icon( url, w, h ); 
+            tool.entity = entity;
+            tool.type = "icon";
+            tool.hitTest = true;
+
+            return tool;
         },
 
         newLayoutTools: function ( entity ) {
@@ -308,6 +315,7 @@
 
             tool.entity = entity;
             tool.type = "handle";
+            tool.hitTest = false;
             tool.handle = Fire.mainWindow.settings.handle;
             tool.pivot = Fire.mainWindow.settings.pivot;
             tool.coordinate = Fire.mainWindow.settings.coordinate;
@@ -318,6 +326,11 @@
         hitTest: function ( x, y ) {
             if ( !this.renderContext )
                 return null;
+
+            // check if we hit gizmos
+            var gizmos = this.svgGizmos.hitTest ( x, y, 1, 1 );
+            if ( gizmos.length > 0 )
+                return gizmos[0].entity;
 
             var mousePos = new Fire.Vec2(x,y); 
             var worldMousePos = this.renderContext.camera.screenToWorld(mousePos);
@@ -395,6 +408,12 @@
                         break;
                     }
                 }
+            }
+
+            // get hit test from gizmos
+            var gizmos = this.svgGizmos.hitTest ( rect.x, rect.y, rect.width, rect.height );
+            for ( i = 0; i < gizmos.length; ++i ) {
+                entities.push(gizmos[i].entity);
             }
 
             return entities;
@@ -555,7 +574,11 @@
         },
 
         hovergizmosAction: function ( event ) {
-            Fire.Selection.hoverEntity(null);
+            var entity = event.detail.entity;
+            if ( entity )
+                Fire.Selection.hoverEntity(entity.hashKey);
+            else
+                Fire.Selection.hoverEntity(null);
 
             event.stopPropagation();
         },
