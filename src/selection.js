@@ -60,6 +60,9 @@ Fire.Selection = (function () {
          * @param {boolean} [confirm=true]
          */
         selectEntity: function (id, unselectOthers, confirm) {
+            unselectOthers = (typeof unselectOthers !== 'undefined') ? unselectOthers : true;
+            confirm = (typeof confirm !== 'undefined') ? confirm : true;
+
             Fire.command(APP_SELECT_ENTITY, id, unselectOthers, confirm);
         },
 
@@ -68,6 +71,8 @@ Fire.Selection = (function () {
          * @param {boolean} [confirm=true]
          */
         unselectEntity: function (id, confirm) {
+            confirm = (typeof confirm !== 'undefined') ? confirm : true;
+
             Fire.command(APP_UNSELECT_ENTITY, id, confirm);
         },
 
@@ -81,6 +86,9 @@ Fire.Selection = (function () {
          * @param {boolean} [confirm=true]
          */
         selectAsset: function (id, unselectOthers, confirm) {
+            unselectOthers = (typeof unselectOthers !== 'undefined') ? unselectOthers : true;
+            confirm = (typeof confirm !== 'undefined') ? confirm : true;
+
             Fire.command(APP_SELECT_ASSET, id, unselectOthers, confirm);
         },
 
@@ -89,6 +97,8 @@ Fire.Selection = (function () {
          * @param {boolean} [confirm=true]
          */
         unselectAsset: function (id, confirm) {
+            confirm = (typeof confirm !== 'undefined') ? confirm : true;
+
             Fire.command(APP_UNSELECT_ASSET, id, confirm);
         },
 
@@ -139,12 +149,12 @@ Fire.Selection = (function () {
     });
     Ipc.on( WEB_ENTITY_UNSELECTED, function (ids) {
         Selection.entities = Selection.entities.filter( function (x) {
-            ids.indexOf(x) === -1;
+            return ids.indexOf(x) === -1;
         });
     });
     Ipc.on( WEB_ASSET_UNSELECTED, function (ids) {
         Selection.assets = Selection.assets.filter( function (x) {
-            ids.indexOf(x) === -1;
+            return ids.indexOf(x) === -1;
         });
     });
     Ipc.on( WEB_ENTITY_ACTIVATED, function (id) {
