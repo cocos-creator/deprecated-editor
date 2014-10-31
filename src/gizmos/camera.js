@@ -10,11 +10,17 @@
         create: function ( svg, target ) {
             var group = svg.group();
             group.target = target;
+            var color = "#ff0";
 
             var rect = group.rect ()
                  .fill( "none" )
-                 .stroke( { width: 1, color: "#ff0" } )
+                 .stroke( { width: 1, color: color } )
                  ;
+
+            var l1 = group.line().stroke( { width: 1, color: color } );
+            var l2 = group.line().stroke( { width: 1, color: color } );
+            var l3 = group.line().stroke( { width: 1, color: color } );
+            var l4 = group.line().stroke( { width: 1, color: color } );
 
             group.update = function ( camera, view ) {
                 var zoom = camera.size/view.height;
@@ -32,6 +38,12 @@
                 rect.size( width, height )
                     .move( -0.5 * width, -0.5 * height )
                     ;
+
+                var len = 10;
+                l1.plot(  0.0, -0.5 * height, 0, -0.5 * height + len );
+                l2.plot(  0.0,  0.5 * height, 0,  0.5 * height - len );
+                l3.plot( -0.5 * width, 0.0, -0.5 * width + len, 0 );
+                l4.plot(  0.5 * width, 0.0,  0.5 * width - len, 0 );
 
                 this.translate( this.position.x, this.position.y ) 
                      .rotate( this.rotation, this.position.x, this.position.y )
