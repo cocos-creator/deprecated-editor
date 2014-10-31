@@ -177,10 +177,9 @@
                 this.startDragging = false;
                 if ( this.dragging ) {
                     // check
-                    if ( this.isValidForDrop ) {
-                        if ( this.curDragoverEL ) {
-                            this.moveSelection( this.curDragoverEL );
-                        }
+                    if ( this.isValidForDrop && this.curDragoverEL ) {
+                        this.moveSelection( this.curDragoverEL );
+                        Fire.Selection.confirm();
                     }
 
                     this.cancelHighligting();
@@ -494,7 +493,7 @@
                     this.startDragging = true;
                     this.startDragAt = [event.detail.x, event.detail.y];
                     if ( !event.target.selected ) {
-                        Fire.Selection.selectEntity(event.target.userId, true, false);
+                        Fire.Selection.selectAsset(event.target.userId, true, false);
                     }
                 }
             }

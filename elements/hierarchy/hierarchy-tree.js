@@ -65,6 +65,7 @@
                 if ( this.dragging ) {
                     if ( this.isValidForDrop && this.curDragoverEL ) {
                         this.moveSelection( this.curDragoverEL );
+                        Fire.Selection.confirm();
                     }
 
                     this.cancelHighligting();
@@ -422,7 +423,7 @@
                 // FIXME: Johnny Said: I found this will swallow some keyaction such as Command+R to refresh the page
                 var activeId = Fire.Selection.activeEntityId;
                 var activeEL = activeId && this.idToItem[activeId];
-
+                
                 this.super([event, activeEL]);
                 if (event.cancelBubble) {
                     return;
@@ -443,6 +444,7 @@
                             if ( prev ) {
                                 // Todo toggle?
                                 Fire.Selection.selectEntity(prev.userId, true, true);
+
                                 if (prev !== activeEL) {
                                     if ( prev.offsetTop <= this.scrollTop ) {
                                         this.scrollTop = prev.offsetTop;
@@ -461,6 +463,12 @@
                             if ( next ) {
                                 // Todo toggle?
                                 Fire.Selection.selectEntity(next.userId, true, true);
+
+                                if ( next !== activeEL ) {
+                                    if ( next.offsetTop + 16 >= this.scrollTop + this.offsetHeight ) {
+                                        this.scrollTop = next.offsetTop + 16 - this.offsetHeight;
+                                    }
+                                }
                             }
                         }
                         event.preventDefault();
@@ -473,7 +481,7 @@
         dropAction: function ( event ) {
             event.preventDefault();
             event.stopPropagation();
-
+            
             var targetEl = this.curDragoverEL;
 
             this.cancelHighligting();
