@@ -43,18 +43,15 @@
 
     var onEntityIndexChanged = 'entity:indexChanged';
     editorCallback.onEntityIndexChanged = function (entity, oldIndex, newIndex) {
-        // get next sibling in game
+        // get next sibling, skip object hidden in editor
         var next = null;
         var i = newIndex;
         do {
             ++i;
             next = entity.getSibling(i);
-        } while (next && (next._objFlags & SceneGizmo));
+        } while (next && (next._objFlags & Fire._ObjectFlags.HideInEditor));
         //
-        Fire.broadcast( onEntityIndexChanged,
-                        entity.hashKey,
-                        next && next.hashKey
-                      );
+        Fire.broadcast( onEntityIndexChanged, entity.hashKey, next && next.hashKey );
         Fire.broadcast('scene:dirty');
     };
 

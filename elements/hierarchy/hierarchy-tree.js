@@ -173,7 +173,7 @@
         },
 
         newItem: function ( name, flags, id, parentEL ) {
-            if (flags & Fire._ObjectFlags.SceneGizmo) {
+            if (flags & Fire._ObjectFlags.HideInEditor) {
                 return;
             }
             var newEL = new HierarchyItem();
@@ -287,7 +287,9 @@
                 else {
                     this.startDragging = true;
                     this.startDragAt = [event.detail.x, event.detail.y];
-                    Fire.Selection.selectEntity(event.target.userId, true, false);
+                    if ( !event.target.selected ) {
+                        Fire.Selection.selectEntity(event.target.userId, true, false);
+                    }
                 }
             }
             event.stopPropagation();

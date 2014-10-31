@@ -493,7 +493,9 @@
                 else {
                     this.startDragging = true;
                     this.startDragAt = [event.detail.x, event.detail.y];
-                    Fire.Selection.selectAsset(event.target.userId, true, false);
+                    if ( !event.target.selected ) {
+                        Fire.Selection.selectEntity(event.target.userId, true, false);
+                    }
                 }
             }
             event.stopPropagation();

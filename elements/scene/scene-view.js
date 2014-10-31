@@ -58,7 +58,7 @@
                 if ( this.renderContext.camera === null ) {
                     // TODO: add this code to EditorUtils
                     var cameraEnt = new Fire.Entity.createWithFlags('Scene Camera', 
-                                        Fire._ObjectFlags.SceneGizmo | Fire._ObjectFlags.EditorOnly);
+                                        Fire._ObjectFlags.Hide | Fire._ObjectFlags.EditorOnly);
                     var camera = cameraEnt.addComponent(Fire.Camera);
                     camera.size = this.view.height;
                     this.renderContext.camera = camera;
@@ -180,7 +180,7 @@
             if ( enabled ) {
 
                 var comp = Fire._getInstanceById(id);
-                if ( comp.entity._objFlags & Fire._ObjectFlags.SceneGizmo ) {
+                if ( comp.entity._objFlags & Fire._ObjectFlags.HideInEditor ) {
                     return;
                 }
 
