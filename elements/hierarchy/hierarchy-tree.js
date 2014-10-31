@@ -173,7 +173,7 @@
         },
 
         newItem: function ( name, flags, id, parentEL ) {
-            if (flags & Fire._ObjectFlags.SceneGizmo) {
+            if (flags & Fire._ObjectFlags.HideInEditor) {
                 return;
             }
             var newEL = new HierarchyItem();
