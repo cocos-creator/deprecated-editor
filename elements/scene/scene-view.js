@@ -1,4 +1,5 @@
 (function () {
+
     Polymer({
         created: function () {
             this.renderContext = null;
@@ -15,7 +16,6 @@
 
             this.ipc = new Fire.IpcListener();
 
-            this._layoutTool = null;
             this._editTool = null;
             this._lasthover = null;
             this._editingEdities = [];
@@ -96,8 +96,8 @@
                     camera.addComponent(Fire.Camera);
 
                     // sprites
-                    for ( var x = -5; x < 5; ++x ) {
-                        for ( var y = -5; y < 5; ++y ) {
+                    for ( var x = -2; x < 2; ++x ) {
+                        for ( var y = -2; y < 2; ++y ) {
                             var testEnt = new Fire.Entity('sprite ' + x + "," + y );
                             testEnt.transform.position = new Fire.Vec2( x * 400, y * 400 );
                             var sprite = new Fire.Sprite();
@@ -162,19 +162,12 @@
         },
 
         rebuildGizmos: function () {
-            for ( var i = 0; i < this.svgGizmos.gizmos.length; ++i ) {
-                var gizmo = this.svgGizmos.gizmos[i];
-                if ( gizmo.entity && gizmo.type === "handle" ) {
-                    var newGizmo = this.newLayoutTool(gizmo.entity);
-                    this.svgGizmos.gizmos[i] = newGizmo;
-
-                    if ( this._layoutTool === gizmo ) {
-                        this._layoutTool = newGizmo;
-                    }
-                    gizmo.remove();
+            if ( this._editingEdities.length > 0 ) {
+                if ( this._editTool ) {
+                    this.svgGizmos.remove(this._editTool);
                 }
+                this.edit(this._editingEdities);
             }
-            this.updateGizmos();
         },
 
         updateComponent: function ( enabled, id ) {
@@ -186,13 +179,11 @@
                 }
 
                 var classname = Fire.getClassName(comp);
-                var gizmos = Fire.gizmos[classname];
-                if ( gizmos && gizmos.icon ) {
-                    var tool = this.newIconTool( comp.entity, 
-                                                 gizmos.icon.url, 
-                                                 gizmos.icon.width, 
-                                                 gizmos.icon.height );
-                    this.svgGizmos.add (tool);
+                var gizmosDef = Fire.gizmos[classname];
+                if ( gizmosDef ) {
+                    var gizmo = new gizmosDef( this.svgGizmos, comp );
+                    gizmo.update();
+                    this.svgGizmos.add (gizmo);
                 }
             }
         },
@@ -208,27 +199,15 @@
         },
 
         select: function ( entities ) {
-            if ( this._layoutTool ) {
-                this.svgGizmos.remove(this._layoutTool);
-                this._layoutTool = null;
-            }
             if ( this._editTool ) {
                 this.svgGizmos.remove(this._editTool);
                 this._editTool = null;
             }
 
-            this._editingEdities = entities;
+            this._editingEdities = this._editingEdities.concat(entities);
 
-            if ( entities.length > 0 ) {
-                this._layoutTool = this.newLayoutTool(entities[0]);
-                this.svgGizmos.add( this._layoutTool );
-            }
-
-            if ( entities.length === 1 ) {
-                this._editTool = this.newCustomTool(entities[0]);
-                if ( this._editTool ) {
-                    this.svgGizmos.add( this._editTool );
-                }
+            if ( this._editingEdities.length > 0 ) {
+                this.edit(this._editingEdities);
             }
         },
 
@@ -242,11 +221,13 @@
                         break;
                     }
                 }
-            }
 
-            if ( this._layoutTool ) {
-                this.svgGizmos.remove(this._layoutTool);
-                this._layoutTool = null;
+                gizmo = this.svgGizmos.gizmosTable[ent.hashKey];
+                if ( gizmo ) {
+                    gizmo.selecting = false;
+                    gizmo.editing = false;
+                    gizmo.update();
+                }
             }
 
             if ( this._editTool ) {
@@ -255,113 +236,56 @@
             }
 
             if ( this._editingEdities.length > 0 ) {
-                this._layoutTool = this.newLayoutTool(this._editingEdities[0]);
-                this.svgGizmos.add( this._layoutTool );
+                this.edit(this._editingEdities);
             }
         },
 
-        newIconTool: function ( entity, url, w, h ) {
-            var tool = this.svgGizmos.icon( url, w, h ); 
-            tool.entity = entity;
-            tool.type = "icon";
-            tool.hitTest = true;
-
-            return tool;
-        },
-
-        newCustomTool: function ( entity ) {
-            var tool = null;
-
-            for ( c = 0; c < entity._components.length; ++c ) {
-                var comp = entity._components[c];
-
-                var classname = Fire.getClassName(comp);
-                var gizmos = Fire.gizmos[classname];
-
-                if ( gizmos && gizmos.create ) {
-                    tool = gizmos.create( this.svgGizmos.scene, comp );
-                    break;
-                }
-            }
-
-            if ( tool ) {
-                tool.entity = entity;
-                tool.type = "custom";
-                tool.hitTest = false;
-            }
-
-            return tool;
-        },
-
-        newLayoutTool: function ( entity ) {
-            var sceneView = this;
-            var tool;
-
-            var localToWorld = entity.transform.getLocalToWorldMatrix();
-            var worldpos = new Fire.Vec2(localToWorld.tx, localToWorld.ty);
-            var screenpos = this.renderContext.camera.worldToScreen(worldpos);
-            screenpos.x = Math.floor(screenpos.x) + 0.5;
-            screenpos.y = Math.floor(screenpos.y) + 0.5;
-            var rotation = Math.rad2deg(-localToWorld.getRotation());
+        edit: function ( entities ) {
+            var entity = entities[0];
+            var gizmo;
 
             switch ( Fire.mainWindow.settings.handle ) {
                 case "move":
-                    tool = this.svgGizmos.positionTool ( screenpos, rotation, {
-                        start: function () {
-                            worldpos = this.entity.transform.worldPosition;
-                        },
-
-                        update: function ( dx, dy ) {
-                            var delta = new Fire.Vec2( dx/sceneView.sceneCamera.scale, 
-                                                      -dy/sceneView.sceneCamera.scale );
-                            this.entity.transform.worldPosition = worldpos.add(delta);
-                            sceneView.repaint();
-                        }, 
-                    } ); 
+                    gizmo = new Fire.PositionGizmo( this.svgGizmos, entity );
                     break;
 
                 case "rotate":
-                    var worldrot;
-                    tool = this.svgGizmos.rotationTool ( screenpos, rotation, {
-                        start: function () {
-                            worldrot = this.entity.transform.worldRotation;
-                        },
-
-                        update: function ( delta ) {
-                            var rot = Math.deg180(worldrot + delta);
-                            rot = Math.floor(rot);
-                            this.entity.transform.worldRotation = rot;
-                            sceneView.repaint();
-                        }, 
-                    } ); 
+                    gizmo = new Fire.RotationGizmo( this.svgGizmos, entity );
                     break;
 
                 case "scale":
-                    var localscale = entity.transform.scale;
-                    tool = this.svgGizmos.scaleTool ( screenpos, rotation, {
-                        start: function () {
-                            localscale = this.entity.transform.scale;
-                        },
-
-                        update: function ( dx, dy ) {
-                            this.entity.transform.scale = new Fire.Vec2 ( 
-                                localscale.x * (1.0 + dx),
-                                localscale.y * (1.0 - dy)
-                            ); 
-                            sceneView.repaint();
-                        }, 
-                    } ); 
+                    gizmo = new Fire.ScaleGizmo( this.svgGizmos, entity );
                     break;
             }
 
-            tool.entity = entity;
-            tool.type = "handle";
-            tool.hitTest = false;
-            tool.handle = Fire.mainWindow.settings.handle;
-            tool.pivot = Fire.mainWindow.settings.pivot;
-            tool.coordinate = Fire.mainWindow.settings.coordinate;
+            gizmo.hitTest = false;
+            gizmo.pivot = Fire.mainWindow.settings.pivot;
+            gizmo.coordinate = Fire.mainWindow.settings.coordinate;
+            gizmo.update();
 
-            return tool;
+            this._editTool = gizmo;
+            this.svgGizmos.add( gizmo );
+
+            //
+            if ( entities.length === 1 ) {
+                gizmo = this.svgGizmos.gizmosTable[entity.hashKey];
+                if ( gizmo && (gizmo.selecting === false || gizmo.editing === false) ) {
+                    gizmo.selecting = true;
+                    gizmo.editing = true;
+                    gizmo.update();
+                }
+            }
+            else {
+                for ( var i = 0; i < entities.length; ++i ) {
+                    var ent = entities[i];
+                    gizmo = this.svgGizmos.gizmosTable[ent.hashKey];
+                    if ( gizmo && (gizmo.selecting === false || gizmo.editing === true) ) {
+                        gizmo.selecting = true;
+                        gizmo.editing = false;
+                        gizmo.update();
+                    }
+                }
+            }
         },
 
         hitTest: function ( x, y ) {
@@ -614,13 +538,18 @@
             event.stopPropagation();
         },
 
-        hovergizmosAction: function ( event ) {
+        gizmoshoverAction: function ( event ) {
             var entity = event.detail.entity;
             if ( entity )
                 Fire.Selection.hoverEntity(entity.hashKey);
             else
                 Fire.Selection.hoverEntity(null);
 
+            event.stopPropagation();
+        },
+
+        gizmosdirtyAction: function ( event ) {
+            this.repaint();
             event.stopPropagation();
         },
     });

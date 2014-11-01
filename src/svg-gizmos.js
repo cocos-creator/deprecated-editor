@@ -4,55 +4,6 @@ Fire.SvgGizmos = (function () {
         return Math.floor(p) + 0.5; 
     }
 
-    function _updateGizmo ( gizmo, camera, view ) {
-        var localToWorld, worldpos, screenpos, rotation, zoom;
-
-        if ( gizmo.type === "custom" ) {
-            gizmo.update( camera, view );
-        }
-        else if ( gizmo.type === "handle" ) {
-            localToWorld = gizmo.entity.transform.getLocalToWorldMatrix();
-            worldpos = new Fire.Vec2(localToWorld.tx, localToWorld.ty);
-            screenpos = camera.worldToScreen(worldpos);
-            rotation = -gizmo.entity.transform.worldRotation;
-
-            screenpos.x = _snapPixel(screenpos.x);
-            screenpos.y = _snapPixel(screenpos.y);
-            gizmo.position = screenpos;
-            gizmo.rotation = 0.0; 
-
-            if ( gizmo.handle === "move" && gizmo.coordinate === "global" ) {
-                gizmo.rotation = 0.0;
-            }
-            else {
-                gizmo.rotation = rotation;
-            }
-
-            gizmo.translate( gizmo.position.x, gizmo.position.y ) 
-                 .rotate( gizmo.rotation, gizmo.position.x, gizmo.position.y )
-                 ;
-        }
-        else if ( gizmo.type === "icon" ) {
-            localToWorld = gizmo.entity.transform.getLocalToWorldMatrix();
-            worldpos = new Fire.Vec2(localToWorld.tx, localToWorld.ty);
-            screenpos = camera.worldToScreen(worldpos);
-
-            screenpos.x = _snapPixel(screenpos.x);
-            screenpos.y = _snapPixel(screenpos.y);
-            gizmo.position = screenpos;
-            gizmo.rotation = -gizmo.entity.transform.worldRotation;
-
-            zoom = camera.size/view.height;
-
-            var s = Math.max( zoom, 0.5 );
-            gizmo.scale(s,s);
-
-            gizmo.translate( gizmo.position.x, gizmo.position.y ) 
-                 .rotate( gizmo.rotation, gizmo.position.x, gizmo.position.y )
-                 ;
-        }
-    }
-
     function _addMoveHandles ( gizmo, callbacks ) {
         var pressx, pressy;
 
@@ -104,6 +55,7 @@ Fire.SvgGizmos = (function () {
         this.view = { width: 0, height : 0 };
         this.hoverEntity = null;
         this.gizmos = [];
+        this.gizmosTable = {}; // entity to gizmo
 
         this.scene = this.svg.group();  
         this.foreground = this.svg.group();  
@@ -124,15 +76,21 @@ Fire.SvgGizmos = (function () {
     SvgGizmos.prototype.update = function () {
         for ( var i = 0; i < this.gizmos.length; ++i ) {
             var gizmo = this.gizmos[i];
-            _updateGizmo( gizmo, this.camera, this.view );
+            gizmo.update();
         }
 
         this.hover(this.hoverEntity);
     };
 
     SvgGizmos.prototype.add = function ( gizmo ) {
-        _updateGizmo( gizmo, this.camera, this.view );
         this.gizmos.push(gizmo);
+
+        if ( gizmo.allowMultiTarget === false ) {
+            var entity = gizmo.entity;
+            if ( entity ) {
+                this.gizmosTable[entity.hashKey] = gizmo;
+            }
+        }
     };
 
     SvgGizmos.prototype.remove = function ( gizmo ) {
@@ -142,6 +100,13 @@ Fire.SvgGizmos = (function () {
                 g.remove();
                 this.gizmos.splice( i, 1 );
                 break;
+            }
+        }
+
+        if ( gizmo.allowMultiTarget === false ) {
+            var entity = gizmo.entity;
+            if ( entity ) {
+                delete this.gizmosTable[entity.hashKey];
             }
         }
     };
@@ -158,12 +123,8 @@ Fire.SvgGizmos = (function () {
 
         for ( var i = 0; i < this.gizmos.length; ++i ) {
             var gizmo = this.gizmos[i];
-            if ( gizmo.hitTest ) {
-                for ( var j = 0; j < els.length; ++j ) {
-                    if ( gizmo.node === els[j] ) {
-                        results.push(gizmo);
-                    }
-                }
+            if ( gizmo.hitTest && gizmo.contains(els) ) {
+                results.push(gizmo);
             }
         }
 
@@ -230,7 +191,7 @@ Fire.SvgGizmos = (function () {
         this.hoverRect.hide();
     };
 
-    SvgGizmos.prototype.icon = function ( url, w, h ) {
+    SvgGizmos.prototype.icon = function ( url, w, h, hoverEntity ) {
         var icon = this.scene.image(url)
                              .move( -w * 0.5, -h * 0.5 )
                              .size( w, h )
@@ -241,8 +202,8 @@ Fire.SvgGizmos = (function () {
         } );
         icon.on( 'mouseover', function ( event ) {
             event.stopPropagation();
-            var e = new CustomEvent('hovergizmos', {
-                detail: { entity: this.entity },
+            var e = new CustomEvent('gizmoshover', {
+                detail: { entity: hoverEntity },
             } );
             this.node.dispatchEvent(e); 
         } );
@@ -280,7 +241,7 @@ Fire.SvgGizmos = (function () {
             rect.fill( { color: lightColor } );
 
             event.stopPropagation();
-            this.node.dispatchEvent( new CustomEvent('hovergizmos', { 
+            this.node.dispatchEvent( new CustomEvent('gizmoshover', { 
                 detail: { entity: null }
             } ) );
         } );
@@ -343,7 +304,7 @@ Fire.SvgGizmos = (function () {
             arrow.fill( { color: lightColor } );
 
             event.stopPropagation();
-            this.node.dispatchEvent( new CustomEvent('hovergizmos', { 
+            this.node.dispatchEvent( new CustomEvent('gizmoshover', { 
                 detail: { entity: null }
             } ) );
         } );
@@ -465,7 +426,7 @@ Fire.SvgGizmos = (function () {
                 .stroke( { color: lightColor } )
                 ;
             event.stopPropagation();
-            this.node.dispatchEvent( new CustomEvent('hovergizmos', { 
+            this.node.dispatchEvent( new CustomEvent('gizmoshover', { 
                 detail: { entity: null }
             } ) );
         } );
@@ -559,7 +520,7 @@ Fire.SvgGizmos = (function () {
             arrow.fill( { color: lightColor } );
 
             event.stopPropagation();
-            this.node.dispatchEvent( new CustomEvent('hovergizmos', { 
+            this.node.dispatchEvent( new CustomEvent('gizmoshover', { 
                 detail: { entity: null }
             } ) );
         } );
@@ -731,7 +692,7 @@ Fire.SvgGizmos = (function () {
                 .stroke( { color: lightColor } )
                 ;
             event.stopPropagation();
-            this.node.dispatchEvent( new CustomEvent('hovergizmos', { 
+            this.node.dispatchEvent( new CustomEvent('gizmoshover', { 
                 detail: { entity: null }
             } ) );
         } );

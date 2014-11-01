@@ -41,7 +41,13 @@ var paths = {
 
         //'src/main-menu.js',
         'src/plugins/hierarchy.js',
-        'src/gizmos/camera.js',
+
+        'src/gizmos/gizmo.js',
+        'src/gizmos/position-gizmo.js',
+        'src/gizmos/rotation-gizmo.js',
+        'src/gizmos/scale-gizmo.js',
+        'src/gizmos/camera-gizmo.js',
+        'src/gizmos/sprite-renderer-gizmo.js',
     ],
 };
 
