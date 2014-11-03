@@ -88,7 +88,7 @@ Fire.SvgGizmos = (function () {
         if ( gizmo.allowMultiTarget === false ) {
             var entity = gizmo.entity;
             if ( entity ) {
-                this.gizmosTable[entity.hashKey] = gizmo;
+                this.gizmosTable[entity.id] = gizmo;
             }
         }
     };
@@ -106,7 +106,7 @@ Fire.SvgGizmos = (function () {
         if ( gizmo.allowMultiTarget === false ) {
             var entity = gizmo.entity;
             if ( entity ) {
-                delete this.gizmosTable[entity.hashKey];
+                delete this.gizmosTable[entity.id];
             }
         }
     };

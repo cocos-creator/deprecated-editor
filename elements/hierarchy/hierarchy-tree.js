@@ -226,7 +226,7 @@
             var selection = Fire.Selection.entities;
             var self = this;
             function createItem(entity, parentEL) {
-                var el = self.newItem(entity.name, entity._objFlags, entity.hashKey, parentEL);
+                var el = self.newItem(entity.name, entity._objFlags, entity.id, parentEL);
                 if (el) {
                     var children = entity._children;
                     for (var i = 0, len = children.length; i < len; i++) {

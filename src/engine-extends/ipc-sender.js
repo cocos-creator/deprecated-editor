@@ -22,22 +22,22 @@
         Fire.broadcast( onEntityCreated,
                         entity._name,
                         entity._objFlags,
-                        entity.hashKey//,
-                        //entity.parent && entity.parent.hashKey
+                        entity.id//,
+                        //entity.parent && entity.parent.id
                       );
     };
 
     var onEntityRemoved = 'entity:removed';
     editorCallback.onEntityRemoved = function (entity) {
-        Fire.broadcast( onEntityRemoved, entity.hashKey );
+        Fire.broadcast( onEntityRemoved, entity.id );
         Fire.broadcast('scene:dirty');
     };
 
     var onEntityParentChanged = 'entity:parentChanged';
     editorCallback.onEntityParentChanged = function (entity) {
         Fire.broadcast( onEntityParentChanged,
-                        entity.hashKey,
-                        entity.parent && entity.parent.hashKey
+                        entity.id,
+                        entity.parent && entity.parent.id
                       );
         Fire.broadcast('scene:dirty');
     };
@@ -52,23 +52,23 @@
             next = entity.getSibling(i);
         } while (next && (next._objFlags & Fire._ObjectFlags.HideInEditor));
         //
-        Fire.broadcast( onEntityIndexChanged, entity.hashKey, next && next.hashKey );
+        Fire.broadcast( onEntityIndexChanged, entity.id, next && next.id );
         Fire.broadcast('scene:dirty');
     };
 
     editorCallback.onEntityRenamed = function (entity) {
         Fire.broadcast('entity:renamed',
-                        entity.hashKey,
+                        entity.id,
                         entity._name
                       );
     };
 
     editorCallback.onComponentEnabled = function (component) {
-        Fire.broadcast('component:enabled', component.hashKey);
+        Fire.broadcast('component:enabled', component.id);
     };
 
     editorCallback.onComponentDisabled = function (component) {
-        Fire.broadcast('component:disabled', component.hashKey);
+        Fire.broadcast('component:disabled', component.id);
     };
 
 })();

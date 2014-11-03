@@ -12,14 +12,14 @@
     };
 
     // register id
-    Object.defineProperty ( Entity.prototype, 'hashKey', {
+    Object.defineProperty ( Entity.prototype, 'id', {
         get: function () {
-            var retval = this._hashKey;
+            var retval = this._id;
             if (retval) {
                 return retval;
             }
-            //retval = Object.getOwnPropertyDescriptor(HashObject.prototype, 'hashKey').get.call(this);
-            retval = (this._hashKey = '' + this.hashId);
+            //retval = Object.getOwnPropertyDescriptor(HashObject.prototype, 'id').get.call(this);
+            retval = (this._id = '' + this.hashCode);
             Fire._idToObject[retval] = this;
             return retval;
         }
@@ -29,7 +29,7 @@
     var doOnPreDestroy = Entity.prototype._onPreDestroy;
     Entity.prototype._onPreDestroy = function () {
         doOnPreDestroy.call(this);
-        delete Fire._idToObject[this._hashKey];
+        delete Fire._idToObject[this._id];
     };
 
 })();
