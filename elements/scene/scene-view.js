@@ -190,7 +190,7 @@
 
         hover: function ( entity ) {
             this._lasthover = entity;
-            var gizmo = this.svgGizmos.gizmosTable[entity.hashKey];
+            var gizmo = this.svgGizmos.gizmosTable[entity.id];
             if ( gizmo ) {
                 gizmo.hovering = true;
                 gizmo.update();
@@ -198,7 +198,7 @@
         },
 
         hoverout: function ( entity ) {
-            var gizmo = this.svgGizmos.gizmosTable[entity.hashKey];
+            var gizmo = this.svgGizmos.gizmosTable[entity.id];
             if ( gizmo ) {
                 gizmo.hovering = false;
                 gizmo.update();
