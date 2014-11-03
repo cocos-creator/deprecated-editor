@@ -35,7 +35,7 @@
     //    doAddSprite.call(this, target);
     //    if (target._renderObjInScene) {
     //        // allow get entity from pixi object
-    //        target._renderObjInScene.entityId = target.entity.hashKey;
+    //        target._renderObjInScene.entityId = target.entity.id;
     //    }
     //};
 

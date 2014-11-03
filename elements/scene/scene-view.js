@@ -230,7 +230,7 @@
                     }
                 }
 
-                gizmo = this.svgGizmos.gizmosTable[ent.hashKey];
+                gizmo = this.svgGizmos.gizmosTable[ent.id];
                 if ( gizmo ) {
                     gizmo.selecting = false;
                     gizmo.editing = false;
@@ -276,7 +276,7 @@
 
             //
             if ( entities.length === 1 ) {
-                gizmo = this.svgGizmos.gizmosTable[entity.hashKey];
+                gizmo = this.svgGizmos.gizmosTable[entity.id];
                 if ( gizmo && (gizmo.selecting === false || gizmo.editing === false) ) {
                     gizmo.selecting = true;
                     gizmo.editing = true;
@@ -286,7 +286,7 @@
             else {
                 for ( var i = 0; i < entities.length; ++i ) {
                     var ent = entities[i];
-                    gizmo = this.svgGizmos.gizmosTable[ent.hashKey];
+                    gizmo = this.svgGizmos.gizmosTable[ent.id];
                     if ( gizmo && (gizmo.selecting === false || gizmo.editing === true) ) {
                         gizmo.selecting = true;
                         gizmo.editing = false;
@@ -399,7 +399,7 @@
             //
             if ( hoverEntity ) {
                 if ( this._lasthover === null || this._lasthover !== hoverEntity ) {
-                    Fire.Selection.hoverEntity(hoverEntity.hashKey);
+                    Fire.Selection.hoverEntity(hoverEntity.id);
                 }
             }
             else {
@@ -483,7 +483,7 @@
                     if ( entities.length > 0 ) {
                         var ids = [];
                         for ( var i = 0; i < entities.length; ++i ) {
-                            ids.push( entities[i].hashKey );
+                            ids.push( entities[i].id );
                         }
                         Fire.Selection.selectEntity ( ids, true, false );
                     }
@@ -515,7 +515,7 @@
                     else {
                         var entity = this.hitTest( x, y );
                         if ( entity ) {
-                            Fire.Selection.selectEntity ( entity.hashKey, true );
+                            Fire.Selection.selectEntity ( entity.id, true );
                         }
                         else {
                             Fire.Selection.clearEntity ();
@@ -549,7 +549,7 @@
         gizmoshoverAction: function ( event ) {
             var entity = event.detail.entity;
             if ( entity )
-                Fire.Selection.hoverEntity(entity.hashKey);
+                Fire.Selection.hoverEntity(entity.id);
             else
                 Fire.Selection.hoverEntity(null);
 
