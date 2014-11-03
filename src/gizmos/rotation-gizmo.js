@@ -7,24 +7,26 @@ Fire.RotationGizmo = (function () {
         RotationGizmo.$super.call(this, svg, target, options );
         this.allowMultiTarget = true;
 
-        var localToWorld = target.transform.getLocalToWorldMatrix();
-        var worldpos = new Fire.Vec2(localToWorld.tx, localToWorld.ty);
-        var screenpos = this._svg.camera.worldToScreen(worldpos);
-        screenpos.x = Fire.SvgGizmos.snapPixel(screenpos.x);
-        screenpos.y = Fire.SvgGizmos.snapPixel(screenpos.y);
-        var rotation = Math.rad2deg(-localToWorld.getRotation());
-
+        var activeTarget = this.entity;
+        var worldrotList = [];
+        var entities = target;
         var self = this;
-        var worldrot;
-        this._root = svg.rotationTool ( screenpos, rotation, {
+
+        this._root = svg.rotationTool ( {
             start: function () {
-                worldrot = self.target.transform.worldRotation;
+                worldrotList.length = 0;
+                for ( var i = 0; i < entities.length; ++i ) {
+                    worldrotList.push(entities[i].transform.worldRotation);
+                }
             },
 
             update: function ( delta ) {
-                var rot = Math.deg180(worldrot + delta);
-                rot = Math.floor(rot);
-                self.target.transform.worldRotation = rot;
+                for ( var i = 0; i < worldrotList.length; ++i ) {
+                    var rot = Math.deg180(worldrotList[i] + delta);
+                    rot = Math.floor(rot);
+                    entities[i].transform.worldRotation = rot;
+                }
+
                 self.dirty();
             }, 
         } ); 
@@ -32,10 +34,12 @@ Fire.RotationGizmo = (function () {
 
     //
     RotationGizmo.prototype.update = function () {
-        localToWorld = this.target.transform.getLocalToWorldMatrix();
-        worldpos = new Fire.Vec2(localToWorld.tx, localToWorld.ty);
-        screenpos = this._svg.camera.worldToScreen(worldpos);
-        rotation = -this.target.transform.worldRotation;
+        var ent = this.entity;
+
+        var localToWorld = ent.transform.getLocalToWorldMatrix();
+        var worldpos = new Fire.Vec2(localToWorld.tx, localToWorld.ty);
+        var screenpos = this._svg.camera.worldToScreen(worldpos);
+        var rotation = -ent.transform.worldRotation;
 
         screenpos.x = Fire.SvgGizmos.snapPixel(screenpos.x);
         screenpos.y = Fire.SvgGizmos.snapPixel(screenpos.y);

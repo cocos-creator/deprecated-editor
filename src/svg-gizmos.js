@@ -304,12 +304,12 @@ Fire.SvgGizmos = (function () {
         return group;
     };
     
-    SvgGizmos.prototype.positionTool = function ( position, rotation, callbacks ) {
+    SvgGizmos.prototype.positionTool = function ( callbacks ) {
         var group = this.scene.group();
         var xarrow, yarrow, moveRect;
 
-        group.position = position;
-        group.rotation = rotation;
+        group.position = new Fire.Vec2(0,0);
+        group.rotation = 0.0;
 
         // x-arrow
         xarrow = this.arrowTool( 80, "#f00", {
@@ -426,14 +426,14 @@ Fire.SvgGizmos = (function () {
         return group;
     };
 
-    SvgGizmos.prototype.rotationTool = function ( position, rotation, callbacks ) {
+    SvgGizmos.prototype.rotationTool = function ( callbacks ) {
         var group = this.scene.group();
         var circle, line, arrow, arc, txtDegree;
         var dragging = false;
         var color = "#f00";
 
-        group.position = position;
-        group.rotation = rotation;
+        group.position = new Fire.Vec2(0,0);
+        group.rotation = 0.0;
 
         // circle
         circle = group.path('M50,-10 A50,50, 0 1,0 50,10')
@@ -564,12 +564,12 @@ Fire.SvgGizmos = (function () {
         return group;
     };
 
-    SvgGizmos.prototype.scaleTool = function ( position, rotation, callbacks ) {
+    SvgGizmos.prototype.scaleTool = function ( callbacks ) {
         var group = this.scene.group();
         var xarrow, yarrow, scaleRect;
 
-        group.position = position;
-        group.rotation = rotation;
+        group.position = new Fire.Vec2(0,0);
+        group.rotation = 0.0;
 
         // x-slider
         xarrow = this.scaleSlider( 100, "#f00", {

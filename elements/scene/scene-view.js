@@ -249,20 +249,19 @@
         },
 
         edit: function ( entities ) {
-            var entity = entities[0];
             var gizmo;
 
             switch ( Fire.mainWindow.settings.handle ) {
                 case "move":
-                    gizmo = new Fire.PositionGizmo( this.svgGizmos, entity );
+                    gizmo = new Fire.PositionGizmo( this.svgGizmos, entities );
                     break;
 
                 case "rotate":
-                    gizmo = new Fire.RotationGizmo( this.svgGizmos, entity );
+                    gizmo = new Fire.RotationGizmo( this.svgGizmos, entities );
                     break;
 
                 case "scale":
-                    gizmo = new Fire.ScaleGizmo( this.svgGizmos, entity );
+                    gizmo = new Fire.ScaleGizmo( this.svgGizmos, entities );
                     break;
             }
 
@@ -276,6 +275,7 @@
 
             //
             if ( entities.length === 1 ) {
+                var entity = entities[0];
                 gizmo = this.svgGizmos.gizmosTable[entity.id];
                 if ( gizmo && (gizmo.selecting === false || gizmo.editing === false) ) {
                     gizmo.selecting = true;

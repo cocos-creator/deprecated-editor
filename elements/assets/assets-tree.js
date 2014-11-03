@@ -531,9 +531,7 @@
         openAction: function (event) {
             if ( event.target instanceof AssetsItem ) {
                 // TODO: Fire.broadcast( 'scene:load', uuid );
-                var url = this.getUrl(event.target);
-                var uuid = Fire.AssetDB.urlToUuid(url);
-                Fire.Engine.loadScene(uuid, function (scene) {});
+                Fire.Engine.loadScene(event.target.userId, function (scene) {});
             }
             event.stopPropagation();
         },

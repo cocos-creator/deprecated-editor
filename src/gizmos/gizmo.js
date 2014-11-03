@@ -33,14 +33,44 @@ Fire.Gizmo = (function () {
     // used in hitTest
     Object.defineProperty(Gizmo.prototype, 'entity', { 
         get: function () { 
-            if ( this.target instanceof Fire.Entity )
-                return this.target; 
-            else if ( this.target instanceof Fire.Component )
-                return this.target.entity; 
+            var target = this.target; 
+            if ( Array.isArray(target) ) {
+                target = target[0];
+            }
+
+            if ( target instanceof Fire.Entity )
+                return target; 
+            else if ( target instanceof Fire.Component )
+                return target.entity; 
 
             return null;
         } 
     });
+
+    Object.defineProperty(Gizmo.prototype, 'entities', { 
+        get: function () { 
+            var entities = [];
+            var target = this.target; 
+            if ( Array.isArray(target) ) {
+                for ( var i = 0; i < target.length; ++i ) {
+                    var t = target[i];
+                    if ( t instanceof Fire.Entity )
+                        entities.push(t);
+                    else if ( t instanceof Fire.Component )
+                        entities.push(t.entity);
+                }
+            }
+            else {
+                if ( target instanceof Fire.Entity )
+                    entities.push(target);
+                else if ( target instanceof Fire.Component )
+                    entities.push(target.entity);
+            }
+
+            return entities;
+        } 
+    });
+
 
     // used in gizmos update
     Gizmo.prototype.update = function () {
