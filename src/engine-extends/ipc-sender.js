@@ -12,9 +12,10 @@
         Fire.broadcast('scene:launched');
         Fire.broadcast('scene:dirty');
     };
-    //editorCallback.onSceneLoaded = function (scene) {
-    //    Fire.broadcast('scene:loaded', scene.entities);
-    //};
+
+    editorCallback.onSceneLoaded = function (scene) {
+        Fire.broadcast('scene:loaded', scene.entities);
+    };
 
     var onEntityCreated = 'entity:created';
     editorCallback.onEntityCreated = function (entity) {
