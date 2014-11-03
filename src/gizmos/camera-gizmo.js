@@ -46,8 +46,8 @@
         var localToWorld = this.target.entity.transform.getLocalToWorldMatrix();
         var worldpos = new Fire.Vec2(localToWorld.tx, localToWorld.ty);
         var screenpos = this._svg.camera.worldToScreen(worldpos);
-        screenpos.x = Fire.SvgGizmos.snapPixel(screenpos.x);
-        screenpos.y = Fire.SvgGizmos.snapPixel(screenpos.y);
+        screenpos.x = Fire.GizmosUtils.snapPixel(screenpos.x);
+        screenpos.y = Fire.GizmosUtils.snapPixel(screenpos.y);
         var rotation = -this.target.entity.transform.worldRotation;
 
         var s = Math.max( zoom, 0.5 );

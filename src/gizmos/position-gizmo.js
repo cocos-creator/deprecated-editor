@@ -7,7 +7,6 @@ Fire.PositionGizmo = (function () {
         PositionGizmo.$super.call(this, svg, target );
         this.allowMultiTarget = true;
 
-        var activeTarget = this.entity;
         var worldposList = [];
         var entities = target;
         var self = this;
@@ -35,21 +34,34 @@ Fire.PositionGizmo = (function () {
 
     //
     PositionGizmo.prototype.update = function () {
-        var ent = this.entity;
+        var activeTarget = this.entity;
+        var worldpos,screenpos,rotation;
 
-        var localToWorld = ent.transform.getLocalToWorldMatrix();
-        var worldpos = new Fire.Vec2(localToWorld.tx, localToWorld.ty);
-        var screenpos = this._svg.camera.worldToScreen(worldpos);
-        var rotation = -ent.transform.worldRotation;
+        if ( this.pivot === "center" ) {
+            worldpos = Fire.GizmosUtils.getCenter(this.target);
+            screenpos = this._svg.camera.worldToScreen(worldpos);
 
-        screenpos.x = Fire.SvgGizmos.snapPixel(screenpos.x);
-        screenpos.y = Fire.SvgGizmos.snapPixel(screenpos.y);
+            screenpos.x = Fire.GizmosUtils.snapPixel(screenpos.x);
+            screenpos.y = Fire.GizmosUtils.snapPixel(screenpos.y);
 
-        this._root.position = screenpos;
-        this._root.rotation = 0.0; 
+            this._root.position = screenpos;
+            this._root.rotation = 0.0; 
+        }
+        else {
+            var localToWorld = activeTarget.transform.getLocalToWorldMatrix();
+            worldpos = new Fire.Vec2(localToWorld.tx, localToWorld.ty);
+            screenpos = this._svg.camera.worldToScreen(worldpos);
+            rotation = -activeTarget.transform.worldRotation;
 
-        if ( this.coordinate !== "global" ) {
-            this._root.rotation = rotation;
+            screenpos.x = Fire.GizmosUtils.snapPixel(screenpos.x);
+            screenpos.y = Fire.GizmosUtils.snapPixel(screenpos.y);
+
+            this._root.position = screenpos;
+            this._root.rotation = 0.0; 
+
+            if ( this.coordinate !== "global" ) {
+                this._root.rotation = rotation;
+            }
         }
 
         this._root.translate( this._root.position.x, this._root.position.y ) 

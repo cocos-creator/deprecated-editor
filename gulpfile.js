@@ -33,6 +33,7 @@ var paths = {
         'src/bootstrap.js',
         'src/ipc-listener.js',
         'src/selection.js',
+        'src/gizmos-utils.js',
 
         'src/pixi-grids.js',
         'src/svg-grids.js',

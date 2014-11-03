@@ -1,9 +1,5 @@
 Fire.SvgGizmos = (function () {
 
-    function _snapPixel (p) {
-        return Math.floor(p) + 0.5; 
-    }
-
     function _addMoveHandles ( gizmo, callbacks ) {
         var pressx, pressy;
 
@@ -47,8 +43,6 @@ Fire.SvgGizmos = (function () {
             event.stopPropagation();
         } );
     } 
-
-    SvgGizmos.snapPixel = _snapPixel;
 
     function SvgGizmos ( svgEL ) {
         this.svg = SVG(svgEL);
@@ -130,7 +124,7 @@ Fire.SvgGizmos = (function () {
             this.selectRect = this.foreground.rect();
         }
 
-        this.selectRect.move( _snapPixel(x), _snapPixel(y) ) 
+        this.selectRect.move( Fire.GizmosUtils.snapPixel(x), Fire.GizmosUtils.snapPixel(y) ) 
                        .size( w, h )
                        .fill( { color: "#09f", opacity: 0.4 } )
                        .stroke( { width: 1, color: "#09f", opacity: 1.0 } )

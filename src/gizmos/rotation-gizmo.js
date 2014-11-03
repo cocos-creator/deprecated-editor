@@ -7,7 +7,6 @@ Fire.RotationGizmo = (function () {
         RotationGizmo.$super.call(this, svg, target, options );
         this.allowMultiTarget = true;
 
-        var activeTarget = this.entity;
         var worldrotList = [];
         var entities = target;
         var self = this;
@@ -34,18 +33,30 @@ Fire.RotationGizmo = (function () {
 
     //
     RotationGizmo.prototype.update = function () {
-        var ent = this.entity;
+        var activeTarget = this.entity;
+        var worldpos,screenpos,rotation;
 
-        var localToWorld = ent.transform.getLocalToWorldMatrix();
-        var worldpos = new Fire.Vec2(localToWorld.tx, localToWorld.ty);
-        var screenpos = this._svg.camera.worldToScreen(worldpos);
-        var rotation = -ent.transform.worldRotation;
+        if ( this.pivot === "center" ) {
+            worldpos = Fire.GizmosUtils.getCenter(this.target);
+            screenpos = this._svg.camera.worldToScreen(worldpos);
 
-        screenpos.x = Fire.SvgGizmos.snapPixel(screenpos.x);
-        screenpos.y = Fire.SvgGizmos.snapPixel(screenpos.y);
+            screenpos.x = Fire.GizmosUtils.snapPixel(screenpos.x);
+            screenpos.y = Fire.GizmosUtils.snapPixel(screenpos.y);
 
-        this._root.position = screenpos;
-        this._root.rotation = rotation;
+            this._root.position = screenpos;
+        }
+        else {
+            var localToWorld = activeTarget.transform.getLocalToWorldMatrix();
+            worldpos = new Fire.Vec2(localToWorld.tx, localToWorld.ty);
+            screenpos = this._svg.camera.worldToScreen(worldpos);
+            rotation = -activeTarget.transform.worldRotation;
+
+            screenpos.x = Fire.GizmosUtils.snapPixel(screenpos.x);
+            screenpos.y = Fire.GizmosUtils.snapPixel(screenpos.y);
+
+            this._root.position = screenpos;
+            this._root.rotation = rotation;
+        }
 
         this._root.translate( this._root.position.x, this._root.position.y ) 
                   .rotate( this._root.rotation, this._root.position.x, this._root.position.y )
