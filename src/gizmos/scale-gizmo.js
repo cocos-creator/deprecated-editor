@@ -15,15 +15,17 @@ Fire.ScaleGizmo = (function () {
 
         this._root = svg.scaleTool ( {
             start: function () {
+                var i;
+
                 localscaleList.length = 0;
-                for ( var i = 0; i < entities.length; ++i ) {
+                for ( i = 0; i < entities.length; ++i ) {
                     localscaleList.push(entities[i].transform.scale);
                 }
 
                 if ( self.pivot === "center" ) {
                     center = Fire.GizmosUtils.getCenter(entities);
                     offsetList.length = 0;
-                    for ( var i = 0; i < entities.length; ++i ) {
+                    for ( i = 0; i < entities.length; ++i ) {
                         offsetList.push(entities[i].transform.worldPosition.sub(center));
                     }
                 }
