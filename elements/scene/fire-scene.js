@@ -60,8 +60,16 @@
             this.$.view.hover(entity);
         },
 
-        hoverout: function () {
-            this.$.view.hoverout();
+        hoverout: function ( entityID ) {
+            if ( !entityID )
+                return;
+
+            var entity = Fire._getInstanceById(entityID);
+            if (!entity) {
+                return;
+            }
+
+            this.$.view.hoverout( entity );
         },
 
         delayRepaintScene: function () {

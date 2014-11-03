@@ -15,12 +15,14 @@ Fire.SpriteRendererGizmo = (function () {
 
     //
     SpriteRendererGizmo.prototype.update = function () {
+        var bounds, v1, v2, v3, v4;
+
         if ( this.selecting ) {
-            var bounds = this.target.getWorldOrientedBounds();
-            var v1  = this._svg.camera.worldToScreen(bounds[0]);
-            var v2  = this._svg.camera.worldToScreen(bounds[1]);
-            var v3  = this._svg.camera.worldToScreen(bounds[2]);
-            var v4  = this._svg.camera.worldToScreen(bounds[3]);
+            bounds = this.target.getWorldOrientedBounds();
+            v1  = this._svg.camera.worldToScreen(bounds[0]);
+            v2  = this._svg.camera.worldToScreen(bounds[1]);
+            v3  = this._svg.camera.worldToScreen(bounds[2]);
+            v4  = this._svg.camera.worldToScreen(bounds[3]);
 
             this._selectTools.show();
             this._selectTools.plot([
@@ -31,6 +33,24 @@ Fire.SpriteRendererGizmo = (function () {
             ])
             .fill( "none" )
             .stroke( { color: "#09f", width: 1 } )
+            ;
+        }
+        else if ( this.hovering ) {
+            bounds = this.target.getWorldOrientedBounds();
+            v1  = this._svg.camera.worldToScreen(bounds[0]);
+            v2  = this._svg.camera.worldToScreen(bounds[1]);
+            v3  = this._svg.camera.worldToScreen(bounds[2]);
+            v4  = this._svg.camera.worldToScreen(bounds[3]);
+
+            this._selectTools.show();
+            this._selectTools.plot([
+                [Fire.SvgGizmos.snapPixel(v1.x), Fire.SvgGizmos.snapPixel(v1.y)],
+                [Fire.SvgGizmos.snapPixel(v2.x), Fire.SvgGizmos.snapPixel(v2.y)],
+                [Fire.SvgGizmos.snapPixel(v3.x), Fire.SvgGizmos.snapPixel(v3.y)],
+                [Fire.SvgGizmos.snapPixel(v4.x), Fire.SvgGizmos.snapPixel(v4.y)],
+            ])
+            .fill( "none" )
+            .stroke( { color: "#999", width: 1 } )
             ;
         }
         else {

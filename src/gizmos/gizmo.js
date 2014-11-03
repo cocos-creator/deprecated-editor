@@ -19,6 +19,7 @@ Fire.Gizmo = (function () {
     function Gizmo ( svg, target ) {
         this.target = target;
 
+        this.hovering = false;
         this.selecting = false;
         this.editing = false;
         this.hitTest = false;

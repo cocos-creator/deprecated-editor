@@ -103,10 +103,12 @@ Fire.Selection = (function () {
         },
 
         hoverEntity: function (id) {
+            if ( !id ) id = "";
             Fire.command(APP_HOVER_ENTITY, id);
         },
 
         hoverAsset: function (id) {
+            if ( !id ) id = "";
             Fire.command(APP_HOVER_ASSET, id);
         },
 

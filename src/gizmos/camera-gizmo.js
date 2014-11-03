@@ -56,7 +56,7 @@
                   .rotate( rotation, screenpos.x, screenpos.y )
                   ;
 
-        if ( this.selecting ) {
+        if ( this.hovering || this.selecting ) {
             var gameViewSize = Fire.Engine.screenSize;
             var height = this.target.size * zoom;
             var width = gameViewSize.x/gameViewSize.y * height;

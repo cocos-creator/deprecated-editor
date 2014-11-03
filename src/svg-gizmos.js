@@ -53,15 +53,11 @@ Fire.SvgGizmos = (function () {
     function SvgGizmos ( svgEL ) {
         this.svg = SVG(svgEL);
         this.view = { width: 0, height : 0 };
-        this.hoverEntity = null;
         this.gizmos = [];
         this.gizmosTable = {}; // entity to gizmo
 
         this.scene = this.svg.group();  
         this.foreground = this.svg.group();  
-
-        this.hoverRect = this.scene.polygon();
-        this.hoverRect.hide();
     }
 
     SvgGizmos.prototype.setCamera = function ( camera ) {
@@ -78,8 +74,6 @@ Fire.SvgGizmos = (function () {
             var gizmo = this.gizmos[i];
             gizmo.update();
         }
-
-        this.hover(this.hoverEntity);
     };
 
     SvgGizmos.prototype.add = function ( gizmo ) {
@@ -153,42 +147,6 @@ Fire.SvgGizmos = (function () {
             this.remove();
         }.bind(this.selectRect) );
         this.selectRect = null;
-    };
-
-    SvgGizmos.prototype.hover = function ( entity ) {
-        this.hoverEntity = entity;
-
-        var renderer = null;
-        if ( entity ) {
-            renderer = entity.getComponent( Fire.Renderer );
-        }
-
-        if ( renderer ) {
-            var bounds = renderer.getWorldOrientedBounds();
-            var v1  = this.camera.worldToScreen(bounds[0]);
-            var v2  = this.camera.worldToScreen(bounds[1]);
-            var v3  = this.camera.worldToScreen(bounds[2]);
-            var v4  = this.camera.worldToScreen(bounds[3]);
-
-            this.hoverRect.show();
-            this.hoverRect.plot([
-                [_snapPixel(v1.x), _snapPixel(v1.y)],
-                [_snapPixel(v2.x), _snapPixel(v2.y)],
-                [_snapPixel(v3.x), _snapPixel(v3.y)],
-                [_snapPixel(v4.x), _snapPixel(v4.y)],
-            ])
-            .fill( "none" )
-            .stroke( { color: "#999", width: 1 } )
-            ;
-        }
-        else {
-            this.hoverout();
-        }
-    };
-
-    SvgGizmos.prototype.hoverout = function () {
-        this.hoverEntity = null;
-        this.hoverRect.hide();
     };
 
     SvgGizmos.prototype.icon = function ( url, w, h, hoverEntity ) {

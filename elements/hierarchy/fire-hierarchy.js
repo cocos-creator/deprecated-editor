@@ -14,8 +14,6 @@
             this.focused = false;
 
             this.ipc = new Fire.IpcListener();
-
-            this._lasthover = null;
         },
 
         ready: function () {
@@ -47,17 +45,12 @@
             if (el) {
                 el.hover = true;
             }
-
-            if ( this._lasthover && this._lasthover !== el ) {
-                this._lasthover.hover = false;
-            }
-            this._lasthover = el;
         },
 
-        hoverout: function () {
-            if ( this._lasthover ) {
-                this._lasthover.hover = false;
-                this._lasthover = null;
+        hoverout: function ( entityID ) {
+            var el = this.$.hierarchyTree.idToItem[entityID];
+            if (el) {
+                el.hover = false;
             }
         },
 

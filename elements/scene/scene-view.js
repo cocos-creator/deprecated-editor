@@ -190,12 +190,20 @@
 
         hover: function ( entity ) {
             this._lasthover = entity;
-            this.svgGizmos.hover(entity);
+            var gizmo = this.svgGizmos.gizmosTable[entity.hashKey];
+            if ( gizmo ) {
+                gizmo.hovering = true;
+                gizmo.update();
+            }
         },
 
-        hoverout: function () {
+        hoverout: function ( entity ) {
+            var gizmo = this.svgGizmos.gizmosTable[entity.hashKey];
+            if ( gizmo ) {
+                gizmo.hovering = false;
+                gizmo.update();
+            }
             this._lasthover = null;
-            this.svgGizmos.hoverout();
         },
 
         select: function ( entities ) {
