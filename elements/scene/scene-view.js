@@ -96,8 +96,8 @@
                     camera.addComponent(Fire.Camera);
 
                     // sprites
-                    for ( var x = -2; x < 2; ++x ) {
-                        for ( var y = -2; y < 2; ++y ) {
+                    for ( var x = -1; x <= 1; ++x ) {
+                        for ( var y = -1; y <= 1; ++y ) {
                             var testEnt = new Fire.Entity('sprite ' + x + "," + y );
                             testEnt.transform.position = new Fire.Vec2( x * 400, y * 400 );
                             var sprite = new Fire.Sprite();

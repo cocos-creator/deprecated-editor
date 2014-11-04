@@ -88,17 +88,20 @@
         sectionEL.classList.add('entity-section');
         sectionEL.setAttribute('flex-row','');
 
-        var el = new FireField();
+        var el = new FireCheckbox();
         el.bind( 'value', new PathObserver(target,'active') );
+        el.setAttribute( 'value', '{{value}}' );
         sectionEL.appendChild( el );
 
         el = document.createElement('span'); 
         el.classList.add('space');
         sectionEL.appendChild( el );
 
-        el = new FireField();
+        el = new FireTextInput();
         el.bind( 'value', new PathObserver(target,'name') );
+        el.setAttribute( 'value', '{{value}}' );
         el.setAttribute('flex-1','');
+        el.placeholder = "No Name";
         sectionEL.appendChild( el );
 
         return sectionEL;
