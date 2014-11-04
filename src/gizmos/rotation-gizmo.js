@@ -6,28 +6,77 @@ Fire.RotationGizmo = (function () {
 
         RotationGizmo.$super.call(this, svg, target, options );
         this.allowMultiTarget = true;
+        this.rotating = false;
 
-        var worldrotList = [];
-        var entities = target;
-        var self = this;
+        var rotList = [], offsetList = [],
+            entities = target,
+            self = this,
+            center
+            ;
 
         this._root = svg.rotationTool ( {
             start: function () {
-                worldrotList.length = 0;
+                self.rotating = true;
+                rotList.length = 0;
                 for ( var i = 0; i < entities.length; ++i ) {
-                    worldrotList.push(entities[i].transform.worldRotation);
+                    rotList.push(entities[i].transform.rotation);
+                }
+
+                if ( self.pivot === "center" ) {
+                    center = Fire.GizmosUtils.getCenter(entities);
+                    offsetList.length = 0;
+                    for ( i = 0; i < entities.length; ++i ) {
+                        offsetList.push(entities[i].transform.worldPosition.sub(center));
+                    }
                 }
             },
 
             update: function ( delta ) {
-                for ( var i = 0; i < worldrotList.length; ++i ) {
-                    var rot = Math.deg180(worldrotList[i] + delta);
-                    rot = Math.floor(rot);
-                    entities[i].transform.worldRotation = rot;
+                var i, rot, deltaInt;
+
+                deltaInt = Math.floor(delta);
+
+                if ( self.pivot === "center" ) {
+                    for ( i = 0; i < rotList.length; ++i ) {
+                        rot = Math.deg180(rotList[i] + deltaInt);
+                        rot = Math.floor(rot);
+
+                        var offset = offsetList[i].clone();
+                        offset.rotate(Math.deg2rad(deltaInt));
+                        entities[i].transform.worldPosition = center.add(offset);
+                        entities[i].transform.rotation = rot;
+
+                        this.rotation = -delta;
+                    }
+                }
+                else {
+                    for ( i = 0; i < rotList.length; ++i ) {
+                        rot = Math.deg180(rotList[i] + delta);
+                        rot = Math.floor(rot);
+                        entities[i].transform.rotation = rot;
+                    }
                 }
 
                 self.dirty();
             }, 
+
+            end: function () {
+                if ( self.pivot === "center" ) {
+                    var worldpos = Fire.GizmosUtils.getCenter(entities);
+                    var screenpos = self._svg.camera.worldToScreen(worldpos);
+
+                    screenpos.x = Fire.GizmosUtils.snapPixel(screenpos.x);
+                    screenpos.y = Fire.GizmosUtils.snapPixel(screenpos.y);
+
+                    this.rotation = 0;
+                    this.position = screenpos;
+
+                    this.translate( this.position.x, this.position.y ) 
+                        .rotate( this.rotation, this.position.x, this.position.y )
+                        ;
+                }
+                self.rotating = false;
+            },
         } ); 
     }); 
 
@@ -37,6 +86,13 @@ Fire.RotationGizmo = (function () {
         var worldpos,screenpos,rotation;
 
         if ( this.pivot === "center" ) {
+            if ( this.rotating ) {
+                this._root.rotate( this._root.rotation, 
+                                   this._root.position.x, 
+                                   this._root.position.y );
+                return;
+            }
+
             worldpos = Fire.GizmosUtils.getCenter(this.target);
             screenpos = this._svg.camera.worldToScreen(worldpos);
 
