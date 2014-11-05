@@ -386,7 +386,7 @@
         getToplevelElements: function ( uuids ) {
             var resultIDs = Fire.Selection.filter( uuids, 'top-level', function ( idA, idB ) {
                 var elA = this.idToItem[idA];
-                var elB = this.idToItem[idA];
+                var elB = this.idToItem[idB];
 
                 if ( elA.contains(elB) ) {
                     return 1;
@@ -395,7 +395,7 @@
                     return -1;
                 }
                 return 0;
-            } );
+            }.bind(this) );
 
             var resultELs = [];
             for ( var i = 0; i < resultIDs.length; ++i ) {
@@ -555,8 +555,8 @@
                     // name collision check
                     var names = [];
                     var i = 0;
-                    if (event.detail.files) {
-                        var files = event.detail.files;
+                    if ( event.detail.dataTransfer ) {
+                        var files = event.detail.dataTransfer.files;
                         for (i = 0; i < files.length; i++) {
                             names.push(files[i].name);
                         }
@@ -581,7 +581,9 @@
                     }
                 }
 
-
+                if ( this.isValidForDrop && event.detail.dataTransfer ) {
+                    event.detail.dataTransfer.dropEffect = "copy";
+                }
             }
             event.stopPropagation();
         },
@@ -712,10 +714,25 @@
                 return;
             }
             
-            // TODO: we should have better solution { 
-            // var url = this.getUrl(targetEl);
-            // var files = event.dataTransfer.files;
-            // var dstFsDir = Fire.AssetDB.fspath(url);
+            var dstUrl = this.getUrl(targetEl);
+            var files = event.dataTransfer.files;
+            var paths = [];
+            for ( var i = 0; i < files.length; ++ i) {
+                var exists = false;
+
+                for ( var j = 0; j < paths.length; ++j ) {
+                    if ( Path.contains( paths[j], files[i].path ) ) {
+                        exists = true;
+                        break;
+                    }
+                }
+
+                if ( !exists ) {
+                    paths.push( files[i].path );
+                }
+            }
+
+            Fire.command('asset-db:import', dstUrl, paths );
 
             // for ( var i = 0; i < files.length; i++ ) {
             //     Fs.copySync(files[i].path, dstFsDir);

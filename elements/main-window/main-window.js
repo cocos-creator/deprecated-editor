@@ -12,6 +12,9 @@
 
         domReady: function () {
             // init document events
+            document.addEventListener( "dragstart", function (event) {
+                event.preventDefault(); 
+            } );
             document.addEventListener( "drop", function (event) {
                 event.preventDefault(); 
             } );
