@@ -1,6 +1,9 @@
 (function () {
     Polymer({
         created: function () {
+            this.icon = new Image();
+            this.icon.src = "fire://static/img/plugin-console.png";
+
             this.ipc = new Fire.IpcListener();
         },
 

@@ -1,6 +1,9 @@
 (function () {
     Polymer({
         created: function () {
+            this.icon = new Image();
+            this.icon.src = "fire://static/img/plugin-game.png";
+
             this.renderContext = null;
 
             window.addEventListener('resize', function() {

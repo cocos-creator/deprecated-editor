@@ -11,6 +11,9 @@
         },
 
         created: function () {
+            this.icon = new Image();
+            this.icon.src = "fire://static/img/plugin-inspector.png";
+
             this.focused = false;
 
             this.ipc = new Fire.IpcListener();

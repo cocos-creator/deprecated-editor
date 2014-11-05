@@ -28,7 +28,7 @@
             break;
 
         case '.fire':
-            newEL.setIcon('fa fa-fire');
+            newEL.setIcon('fire');
             break;
 
         case '.js':

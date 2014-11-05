@@ -8,6 +8,9 @@
         },
 
         created: function () {
+            this.icon = new Image();
+            this.icon.src = "fire://static/img/plugin-assets.png";
+
             this.focused = false;
             this.ipc = new Fire.IpcListener();
         },
