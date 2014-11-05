@@ -8,7 +8,7 @@ Fire.gizmos = {};
 function loadUserScripts () {
     var script = document.createElement('script');
     script.setAttribute('type','text/javascript');
-    script.setAttribute('src', Fire.AssetDB.getLibraryPath() + '/bundle.js');
+    script.setAttribute('src', 'library://bundle.js');
     document.head.appendChild(script);
 }
 

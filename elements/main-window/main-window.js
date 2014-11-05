@@ -31,7 +31,7 @@
 
             // init engine
             Fire.log('fire-engine initializing...');
-            Fire.AssetLibrary.init(Fire.AssetDB.getLibraryPath());
+            Fire.AssetLibrary.init("library://");
             var renderContext = Fire.Engine.init( this.$.game.$.view.clientWidth,
                                                   this.$.game.$.view.clientHeight );
 
