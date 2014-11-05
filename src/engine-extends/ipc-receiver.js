@@ -40,7 +40,7 @@
     });
 
     Ipc.on('engine:moveEntity', function (idList, parentId, nextSiblingId) {
-        var parentT = parentId && Fire._getInstanceById(parentId);
+        var parent = parentId && Fire._getInstanceById(parentId);
         
         var index = -1;
         if (nextSiblingId) {
@@ -53,8 +53,21 @@
             var id = idList[i];
             var entity = Fire._getInstanceById(id);
             if (entity) {
-                if (parentT.isChildOf(entity) === false) {
-                    entity.parent = parentT;
+                if (entity.parent !== parent && parent.isChildOf(entity) === false) {
+                    // keep world transform not changed
+                    var worldPos = entity.transform.worldPosition;
+                    var worldRotation = entity.transform.worldRotation;
+                    var lossyScale = entity.transform.worldScale;
+                    entity.parent = parent;
+                    // restore world transform
+                    entity.transform.worldPosition = worldPos;
+                    entity.transform.worldRotation = worldRotation;
+                    if (parent) {
+                        entity.transform.scale = lossyScale.divSelf(parent.transform.worldScale);
+                    }
+                    else {
+                        entity.transform.scale = lossyScale;
+                    }
                 }
                 if (index !== -1) {
                     entity.setSiblingIndex(index + i);
