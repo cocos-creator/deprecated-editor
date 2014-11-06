@@ -114,15 +114,11 @@
             this.contextmenuAt = null;
 
             // dragging
-            this.startDragging = false;
-            this.startDragAt = [-1,-1];
-            this.dragging = false;
             this.curDragoverEL = null; 
-            this.dragenterCnt = 0;
             this.lastDragoverEL = null;
+            this.dragenterCnt = 0;
 
             // confliction
-            this.isValidForDrop = true;
             this.confliction = [];
 
             this._ipc_newItem = this.newItem.bind(this);
@@ -141,59 +137,6 @@
             this.super();
             this.initContextMenu();
 
-            // register events
-            this.addEventListener('mousemove', function ( event ) {
-                if ( this.startDragging ) {
-                    var dx = event.x - this.startDragAt[0]; 
-                    var dy = event.y - this.startDragAt[1]; 
-                    if ( dx * dx  + dy * dy >= 100.0 ) {
-                        this.dragging = true;
-                        this.startDragging = false;
-                    }
-                    event.stopPropagation();
-                }
-                else if ( this.dragging ) {
-                    // do nothing here
-                }
-                else {
-                    event.stopPropagation();
-                }
-            }, true );
-
-            this.addEventListener('mouseleave', function ( event ) {
-                if ( this.dragging ) {
-                    this.cancelHighligting();
-                    this.cancelConflictsHighliting();
-
-                    this.curDragoverEL = null;
-                    this.lastDragoverEL = null;
-                    this.isValidForDrop = true;
-
-                    event.stopPropagation();
-                }
-            }, true );
-
-            this.addEventListener('mouseup', function ( event ) {
-                this.startDragging = false;
-                if ( this.dragging ) {
-                    // check
-                    if ( this.isValidForDrop && this.curDragoverEL ) {
-                        this.moveSelection( this.curDragoverEL );
-                        Fire.Selection.confirm();
-                    }
-
-                    this.cancelHighligting();
-                    this.cancelConflictsHighliting();
-
-                    this.curDragoverEL = null;
-                    this.lastDragoverEL = null;
-                    this.isValidForDrop = true;
-                    this.dragging = false;
-
-                    event.stopPropagation();
-                }
-            }, true );
-
             this.addEventListener( "dragenter", function (event) {
                 ++this.dragenterCnt;
             }, true);
@@ -201,12 +144,7 @@
             this.addEventListener( "dragleave", function (event) {
                 --this.dragenterCnt;
                 if ( this.dragenterCnt === 0 ) {
-                    this.cancelHighligting();
-                    this.cancelConflictsHighliting();
-
-                    this.curDragoverEL = null;
-                    this.lastDragoverEL = null;
-                    this.isValidForDrop = true;
+                    this.cancelDragging();
                 }
             }, true);
 
@@ -452,8 +390,17 @@
             }
         },
 
-        moveSelection: function ( targetEL ) {
-            var elements = this.getToplevelElements(Fire.Selection.assets);
+        cancelDragging: function () {
+            this.cancelHighligting();
+            this.cancelConflictsHighliting();
+
+            this.curDragoverEL = null;
+            this.lastDragoverEL = null;
+            this.dragenterCnt = 0;
+        },
+
+        moveAssets: function ( targetEL, assets ) {
+            var elements = this.getToplevelElements(assets);
             var targetUrl = this.getUrl(targetEL);
 
             for ( var i = 0; i < elements.length; ++i ) {
@@ -489,12 +436,8 @@
                         Fire.Selection.selectAsset(event.target.userId, false, false);
                     }
                 }
-                else {
-                    this.startDragging = true;
-                    this.startDragAt = [event.detail.x, event.detail.y];
-                    if ( !event.target.selected ) {
-                        Fire.Selection.selectAsset(event.target.userId, true, false);
-                    }
+                else if ( !event.target.selected ) {
+                    Fire.Selection.selectAsset(event.target.userId, true, false);
                 }
             }
             event.stopPropagation();
@@ -536,76 +479,8 @@
             event.stopPropagation();
         },
 
-        draghoverAction: function (event) {
-            if ( event.target ) {
-                this.lastDragoverEL = this.curDragoverEL;
-                var target = event.target;
-                if ( event.target.isFolder === false )
-                    target = event.target.parentElement;
-
-                if ( target !== this.lastDragoverEL ) {
-
-                    this.cancelHighligting();
-                    this.cancelConflictsHighliting();
-
-                    this.isValidForDrop = true;
-                    this.curDragoverEL = target;
-                    this.highlight(this.curDragoverEL);
-
-                    // name collision check
-                    var names = [];
-                    var i = 0;
-                    if ( event.detail.dataTransfer ) {
-                        var files = event.detail.dataTransfer.files;
-                        for (i = 0; i < files.length; i++) {
-                            names.push(files[i].name);
-                        }
-                    }
-                    else {
-                        var srcELs = this.getToplevelElements(Fire.Selection.assets);
-                        for (i = 0; i < srcELs.length; i++) {
-                            var srcEL = srcELs[i];
-                            if (target !== srcEL.parentElement) {
-                                names.push(srcEL.name + srcEL.extname);
-                            }
-                        }
-                    }
-
-                    // check if we have conflicts names
-                    if ( names.length > 0 ) {
-                        var collisions = _getNameCollisions( target, names );
-                        if ( collisions.length > 0 ) {
-                            this.highlightConflicts(collisions);
-                            this.isValidForDrop = false;
-                        }
-                    }
-                }
-
-                if ( this.isValidForDrop && event.detail.dataTransfer ) {
-                    event.detail.dataTransfer.dropEffect = "copy";
-                }
-            }
-            event.stopPropagation();
-        },
-
-        dragcancelAction: function (event) {
-            this.cancelHighligting();
-            this.cancelConflictsHighliting();
-
-            this.curDragoverEL = null;
-            this.lastDragoverEL = null;
-            this.isValidForDrop = true;
-        },
-
         contextmenuAction: function (event) {
-            this.cancelHighligting();
-            this.cancelConflictsHighliting();
-
-            this.curDragoverEL = null;
-            this.lastDragoverEL = null;
-            this.isValidForDrop = true;
-            this.startDragging = false;
-            this.dragging = false;
+            this.cancelDragging();
 
             //
             this.contextmenuAt = null;
@@ -620,164 +495,153 @@
         },
 
         keydownAction: function (event) {
-            if ( this.dragging ) {
-                switch ( event.which ) {
-                    // esc
-                    case 27:
-                        this.cancelHighligting();
-                        this.cancelConflictsHighliting();
-
-                        this.curDragoverEL = null;
-                        this.lastDragoverEL = null;
-                        this.isValidForDrop = true;
-                        this.dragging = false;
-                        event.stopPropagation();
-
-                        Fire.Selection.cancel();
-                    break;
-                }
+            var activeId = Fire.Selection.activeAssetUuid;
+            var activeEL = activeId && this.idToItem[activeId];
+            
+            this.super([event, activeEL]);
+            if (event.cancelBubble) {
+                return;
             }
-            else {
-                var activeId = Fire.Selection.activeAssetUuid;
-                var activeEL = activeId && this.idToItem[activeId];
-                
-                this.super([event, activeEL]);
-                if (event.cancelBubble) {
-                    return;
-                }
-                switch ( event.which ) {
-                    // delete
-                    case 46:
-                        this.deleteSelection();
-                        event.stopPropagation();
-                    break;
+            switch ( event.which ) {
+                // delete
+                case 46:
+                    this.deleteSelection();
+                    event.stopPropagation();
+                break;
 
-                    // key-up
-                    case 38:
-                        if ( activeEL ) {
-                            var prev = this.prevItem(activeEL);
-                            if ( prev ) {
-                                // Todo toggle?
-                                Fire.Selection.selectAsset(prev.userId, true, true);
-                                
-                                if (prev !== activeEL) {
-                                    if ( prev.offsetTop <= this.scrollTop ) {
-                                        this.scrollTop = prev.offsetTop;
-                                    }
+                // key-up
+                case 38:
+                    if ( activeEL ) {
+                        var prev = this.prevItem(activeEL);
+                        if ( prev ) {
+                            // Todo toggle?
+                            Fire.Selection.selectAsset(prev.userId, true, true);
+                            
+                            if (prev !== activeEL) {
+                                if ( prev.offsetTop <= this.scrollTop ) {
+                                    this.scrollTop = prev.offsetTop;
                                 }
                             }
                         }
-                        event.preventDefault();
-                        event.stopPropagation();
-                    break;
+                    }
+                    event.preventDefault();
+                    event.stopPropagation();
+                break;
 
-                    // key-down
-                    case 40:
-                        if ( activeEL ) {
-                            var next = this.nextItem(activeEL, false);
-                            if ( next ) {
-                                // Todo toggle?
-                                Fire.Selection.selectAsset(next.userId, true, true);
-                                
-                                if ( next !== activeEL ) {
-                                    if ( next.offsetTop + 16 >= this.scrollTop + this.offsetHeight ) {
-                                        this.scrollTop = next.offsetTop + 16 - this.offsetHeight;
-                                    }
+                // key-down
+                case 40:
+                    if ( activeEL ) {
+                        var next = this.nextItem(activeEL, false);
+                        if ( next ) {
+                            // Todo toggle?
+                            Fire.Selection.selectAsset(next.userId, true, true);
+                            
+                            if ( next !== activeEL ) {
+                                if ( next.offsetTop + 16 >= this.scrollTop + this.offsetHeight ) {
+                                    this.scrollTop = next.offsetTop + 16 - this.offsetHeight;
                                 }
                             }
                         }
-                        event.preventDefault();
-                        event.stopPropagation();
-                    break;
+                    }
+                    event.preventDefault();
+                    event.stopPropagation();
+                break;
+            }
+        },
+
+        dragstartAction: function ( event ) {
+            Fire.DragDrop.start( event.dataTransfer, 'move', 'assets', Fire.Selection.assets );
+
+            event.stopPropagation();
+        },
+
+        dragcancelAction: function (event) {
+            this.cancelDragging();
+            Fire.DragDrop.cancel();
+        },
+
+        itemDragoverAction: function (event) {
+            var dragType = Fire.DragDrop.type(event.detail.dataTransfer);
+            if ( dragType !== "files" && dragType !== "assets" )
+                return;
+
+            if ( event.target ) {
+                this.lastDragoverEL = this.curDragoverEL;
+                var target = event.target;
+                if ( event.target.isFolder === false )
+                    target = event.target.parentElement;
+
+                if ( target !== this.lastDragoverEL ) {
+
+                    this.cancelHighligting();
+                    this.cancelConflictsHighliting();
+
+                    this.curDragoverEL = target;
+                    this.highlight(this.curDragoverEL);
+
+                    // name collision check
+                    var names = [];
+                    var i = 0;
+                    var dragItems = Fire.DragDrop.items(event.detail.dataTransfer);
+
+                    if ( dragType === "files" ) {
+                        for (i = 0; i < dragItems.length; i++) {
+                            names.push(Path.basename(dragItems[i]));
+                        }
+                    }
+                    else if ( dragType === "assets" ) {
+                        var srcELs = this.getToplevelElements(dragItems);
+                        for (i = 0; i < srcELs.length; i++) {
+                            var srcEL = srcELs[i];
+                            if (target !== srcEL.parentElement) {
+                                names.push(srcEL.name + srcEL.extname);
+                            }
+                        }
+                    }
+
+                    var valid = true;
+
+                    // check if we have conflicts names
+                    if ( names.length > 0 ) {
+                        var collisions = _getNameCollisions( target, names );
+                        if ( collisions.length > 0 ) {
+                            this.highlightConflicts(collisions);
+                            valid = false;
+                        }
+                    }
+
+                    //
+                    if ( valid ) {
+                        Fire.DragDrop.allow(event.detail.dataTransfer, true);
+                    }
+                    else {
+                        Fire.DragDrop.allow(event.detail.dataTransfer, false);
+                    }
                 }
             }
+            event.stopPropagation();
         },
 
         dropAction: function ( event ) {
             event.preventDefault();
             event.stopPropagation();
 
-            var targetEl = this.curDragoverEL;
+            var targetEL = this.curDragoverEL;
 
-            this.cancelHighligting();
-            this.cancelConflictsHighliting();
+            var dragType = Fire.DragDrop.type(event.dataTransfer);
+            var items = Fire.DragDrop.drop(event.dataTransfer);
+            this.cancelDragging();
 
-            this.curDragoverEL = null;
-            this.lastDragoverEL = null;
-            this.startDragging = false;
-            this.dragging = false;
-            this.dragenterCnt = 0;
-
-            // check
-            if( !this.isValidForDrop ) {
-                this.isValidForDrop = true;
-                return;
-            }
-            
-            var dstUrl = this.getUrl(targetEl);
-            var files = event.dataTransfer.files;
-            var paths = [];
-            for ( var i = 0; i < files.length; ++ i) {
-                var exists = false;
-
-                for ( var j = 0; j < paths.length; ++j ) {
-                    if ( Path.contains( paths[j], files[i].path ) ) {
-                        exists = true;
-                        break;
-                    }
+            if ( items.length > 0 ) {
+                if ( dragType === 'files' ) {
+                    var dstUrl = this.getUrl(targetEL);
+                    Fire.command('asset-db:import', dstUrl, items );
                 }
-
-                if ( !exists ) {
-                    paths.push( files[i].path );
+                else if ( dragType === 'assets' ) {
+                    this.moveAssets( targetEL, items );
+                    Fire.Selection.confirm();
                 }
             }
-
-            Fire.command('asset-db:import', dstUrl, paths );
-
-            // for ( var i = 0; i < files.length; i++ ) {
-            //     Fs.copySync(files[i].path, dstFsDir);
-            // }
-
-            // Fire.AssetDB.clean(url);
-
-            // while (targetEl.firstChild) {
-            //     targetEl.removeChild(targetEl.firstChild);
-            // }
-            // targetEl.foldable = false;
-
-            // if( !targetEl.isRoot ) {
-            //     Fire.AssetDB.importAsset(dstFsDir);
-            // }
-
-            // var folderElements = {};
-            // Fire.AssetDB.walk( 
-            //     url, 
-
-            //     function ( root, name, isDirectory ) {
-            //         var itemEL = null;
-            //         var fspath = Path.join(root, name);
-
-            //         var parentEL = folderElements[root];
-            //         parentEL = parentEL || targetEl;
-            //         if ( isDirectory ) {
-            //             itemEL = _newAssetsItem.call( this, fspath, 'folder', id, parentEL );
-            //             folderElements[fspath] = itemEL;
-            //         }
-            //         else {
-            //             itemEL = _newAssetsItem.call( this, fspath, null, id, parentEL );
-            //         }
-
-            //         // reimport
-            //         Fire.AssetDB.importAsset(fspath);
-
-            //     }.bind(targetEl), 
-
-            //     function () {
-            //         // console.log("finish walk");
-            //     }.bind(targetEl)
-            // );
-            // TODO }: 
-
         },
 
     });

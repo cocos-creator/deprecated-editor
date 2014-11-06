@@ -117,12 +117,6 @@
             event.stopPropagation();
         },
 
-        mousemoveAction: function ( event ) {
-            this.fire('draghover');
-
-            event.stopPropagation();
-        },
-
         dblclickAction: function ( event ) {
             if ( !this.isFolder )
                 this.fire('open');
@@ -130,11 +124,10 @@
         },
 
         dragoverAction: function ( event ) {
-            this.fire('draghover', {dataTransfer : event.dataTransfer});
+            this.fire('item-dragover', {dataTransfer : event.dataTransfer});
 
             event.preventDefault();
             event.stopPropagation();
         },
-
     });
 })();
