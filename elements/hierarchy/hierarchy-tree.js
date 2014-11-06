@@ -80,7 +80,7 @@
             }, true );
 
             this.addEventListener( "dragenter", function (event) {
-                //++this.dragenterCnt;
+                ++this.dragenterCnt;
             }, true);
 
             this.addEventListener( "dragleave", function (event) {

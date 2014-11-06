@@ -191,7 +191,10 @@
                     label: 'New Folder',
                     click: function () {
                         if ( this.contextmenuAt instanceof AssetsItem ) {
-                            var url = this.getUrl(this.contextmenuAt);
+                            var targetEL = this.contextmenuAt;
+                            if ( !this.contextmenuAt.isFolder )
+                                targetEL = this.contextmenuAt.parentElement;
+                            var url = this.getUrl(targetEL);
                             Fire.rpc( 'asset-db:makedirs', Url.join( url, 'New Folder' ) );
                         }
                     }.bind(this)
@@ -561,10 +564,6 @@
         },
 
         itemDragoverAction: function (event) {
-            var dragType = Fire.DragDrop.type(event.detail.dataTransfer);
-            if ( dragType !== "files" && dragType !== "assets" )
-                return;
-
             if ( event.target ) {
                 this.lastDragoverEL = this.curDragoverEL;
                 var target = event.target;
@@ -583,6 +582,7 @@
                     var names = [];
                     var i = 0;
                     var dragItems = Fire.DragDrop.items(event.detail.dataTransfer);
+                    var dragType = Fire.DragDrop.type(event.detail.dataTransfer);
 
                     if ( dragType === "files" ) {
                         for (i = 0; i < dragItems.length; i++) {
@@ -599,24 +599,17 @@
                         }
                     }
 
-                    var valid = true;
-
                     // check if we have conflicts names
+                    var valid = true;
                     if ( names.length > 0 ) {
+
                         var collisions = _getNameCollisions( target, names );
                         if ( collisions.length > 0 ) {
                             this.highlightConflicts(collisions);
                             valid = false;
                         }
                     }
-
-                    //
-                    if ( valid ) {
-                        Fire.DragDrop.allow(event.detail.dataTransfer, true);
-                    }
-                    else {
-                        Fire.DragDrop.allow(event.detail.dataTransfer, false);
-                    }
+                    Fire.DragDrop.allow(event.detail.dataTransfer, valid);
                 }
             }
             event.stopPropagation();
