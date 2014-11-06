@@ -144,7 +144,7 @@
             this.addEventListener( "dragleave", function (event) {
                 --this.dragenterCnt;
                 if ( this.dragenterCnt === 0 ) {
-                    this.cancelDragging();
+                    this.resetDragState();
                 }
             }, true);
 
@@ -393,7 +393,7 @@
             }
         },
 
-        cancelDragging: function () {
+        resetDragState: function () {
             this.cancelHighligting();
             this.cancelConflictsHighliting();
 
@@ -483,7 +483,7 @@
         },
 
         contextmenuAction: function (event) {
-            this.cancelDragging();
+            this.resetDragState();
 
             //
             this.contextmenuAt = null;
@@ -558,9 +558,9 @@
             event.stopPropagation();
         },
 
-        dragcancelAction: function (event) {
-            this.cancelDragging();
-            Fire.DragDrop.cancel();
+        dragendAction: function (event) {
+            this.resetDragState();
+            Fire.DragDrop.end();
         },
 
         itemDragoverAction: function (event) {
@@ -571,7 +571,6 @@
                     target = event.target.parentElement;
 
                 if ( target !== this.lastDragoverEL ) {
-
                     this.cancelHighligting();
                     this.cancelConflictsHighliting();
 
@@ -609,9 +608,11 @@
                             valid = false;
                         }
                     }
-                    Fire.DragDrop.allow(event.detail.dataTransfer, valid);
+                    Fire.DragDrop.allowDrop(event.detail.dataTransfer, valid);
                 }
             }
+
+            Fire.DragDrop.updateDropEffect(event.detail.dataTransfer);
             event.stopPropagation();
         },
 
@@ -623,7 +624,7 @@
 
             var dragType = Fire.DragDrop.type(event.dataTransfer);
             var items = Fire.DragDrop.drop(event.dataTransfer);
-            this.cancelDragging();
+            this.resetDragState();
 
             if ( items.length > 0 ) {
                 if ( dragType === 'files' ) {

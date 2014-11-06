@@ -125,8 +125,10 @@
 
         dragoverAction: function ( event ) {
             var dragType = Fire.DragDrop.type(event.dataTransfer);
-            if ( dragType !== "files" && dragType !== "assets" )
+            if ( dragType !== "files" && dragType !== "assets" ) {
+                Fire.DragDrop.allow( event.dataTransfer, false );
                 return;
+            }
 
             event.preventDefault();
             event.stopPropagation();

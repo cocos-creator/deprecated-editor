@@ -6,10 +6,6 @@ Fire.DragDrop = (function () {
 
     var DragDrop = {};
 
-    Object.defineProperty( DragDrop, 'valid', {
-        get: function () { return _allowed; }
-    });
-
     DragDrop.start = function ( dataTransfer, effect, type, items ) {
         _effectAllowed = effect;
         dataTransfer.effectAllowed = effect;
@@ -31,20 +27,28 @@ Fire.DragDrop = (function () {
         return results;
     };
 
-    DragDrop.cancel = function () {
+    DragDrop.end = function () {
         _effectAllowed = 'copy';
         _allowed = false;
     };
 
-    DragDrop.allow = function ( dataTransfer, allowed ) {
-        if ( allowed ) {
+    DragDrop.updateDropEffect = function ( dataTransfer ) {
+        if ( _allowed ) {
             dataTransfer.dropEffect = _effectAllowed;
         }
         else {
             dataTransfer.dropEffect = 'invalid';
         }
-        _allowed = allowed;
     };
+
+    DragDrop.allowDrop = function ( dataTransfer, allowed ) {
+        _allowed = allowed;
+        DragDrop.updateDropEffect(dataTransfer);
+    };
+
+    Object.defineProperty( DragDrop, 'allowed', {
+        get: function () { return _allowed; }
+    });
 
     DragDrop.type = function ( dataTransfer ) {
         var type = dataTransfer.getData('fire/type');
