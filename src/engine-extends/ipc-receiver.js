@@ -39,7 +39,7 @@
         }
     });
 
-    Ipc.on('engine:moveEntity', function (idList, parentId, nextSiblingId) {
+    Ipc.on('engine:moveEntities', function (idList, parentId, nextSiblingId) {
         var parent = parentId && Fire._getInstanceById(parentId);
         
         var index = -1;

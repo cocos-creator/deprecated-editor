@@ -121,16 +121,7 @@
             // confliction
             this.confliction = [];
 
-            this._ipc_newItem = this.newItem.bind(this);
-            this._ipc_newFolder = function ( url, id, parentId ) {
-                this.newItem( url, id, parentId, true );
-            }.bind(this);
-            this._ipc_newAsset = function ( url, id, parentId ) {
-                this.newItem( url, id, parentId, false );
-            }.bind(this);
-            this._ipc_deleteItem = this.deleteItemById.bind(this);
-            this._ipc_finishLoading = this.finishLoading.bind(this);
-            this._ipc_moveItem = this.moveItem.bind(this);
+            this.ipc = new Fire.IpcListener();
         },
 
         ready: function () {
@@ -149,25 +140,22 @@
             }, true);
 
             // register Ipc
-            Ipc.on('fire-assets:newItem', this._ipc_newItem );
-            Ipc.on('fire-assets:deleteItem', this._ipc_deleteItem );
-            Ipc.on('fire-assets:finishLoading', this._ipc_finishLoading );
-
-            Ipc.on('folder:created', this._ipc_newFolder );
-            Ipc.on('asset:created', this._ipc_newAsset );
-            Ipc.on('asset:moved', this._ipc_moveItem );
-            Ipc.on('asset:deleted', this._ipc_deleteItem );
+            this.ipc.on('fire-assets:newItem', this.newItem.bind(this) );
+            this.ipc.on('fire-assets:deleteItem', this.deleteItemById.bind(this) );
+            this.ipc.on('fire-assets:finishLoading', this.finishLoading.bind(this) );
+            
+            this.ipc.on('folder:created', function ( url, id, parentId ) {
+                this.newItem( url, id, parentId, true );
+            }.bind(this) );
+            this.ipc.on('asset:created', function ( url, id, parentId ) {
+                this.newItem( url, id, parentId, false );
+            }.bind(this) );
+            this.ipc.on('asset:moved', this.moveItem.bind(this) );
+            this.ipc.on('asset:deleted', this.deleteItemById.bind(this) );
         },
 
         detached: function () {
-            Ipc.removeListener('fire-assets:newItem', this._ipc_newItem );
-            Ipc.removeListener('fire-assets:deleteItem', this._ipc_deleteItem );
-            Ipc.removeListener('fire-assets:finishLoading', this._ipc_finishLoading );
-
-            Ipc.removeListener('folder:created', this._ipc_newFolder );
-            Ipc.removeListener('asset:created', this._ipc_newAsset );
-            Ipc.removeListener('asset:moved', this._ipc_moveItem );
-            Ipc.removeListener('asset:deleted', this._ipc_deleteItem );
+            this.ipc.clear();
         },
 
         initContextMenu: function () {
@@ -476,8 +464,10 @@
 
         openAction: function (event) {
             if ( event.target instanceof AssetsItem ) {
-                // TODO: Fire.broadcast( 'scene:load', uuid );
-                Fire.Engine.loadScene(event.target.userId, function (scene) {});
+                if ( event.target.extname === '.fire' ) {
+                    // TODO: Fire.broadcast( 'scene:load', uuid );
+                    Fire.Engine.loadScene(event.target.userId, function (scene) {});
+                }
             }
             event.stopPropagation();
         },
@@ -553,7 +543,7 @@
         },
 
         dragstartAction: function ( event ) {
-            Fire.DragDrop.start( event.dataTransfer, 'move', 'assets', Fire.Selection.assets );
+            Fire.DragDrop.start( event.dataTransfer, 'move', 'asset', Fire.Selection.assets );
 
             event.stopPropagation();
         },
@@ -573,8 +563,8 @@
                 if ( target !== this.lastDragoverEL ) {
                     this.cancelHighligting();
                     this.cancelConflictsHighliting();
-
                     this.curDragoverEL = target;
+
                     this.highlight(this.curDragoverEL);
 
                     // name collision check
@@ -583,12 +573,12 @@
                     var dragItems = Fire.DragDrop.items(event.detail.dataTransfer);
                     var dragType = Fire.DragDrop.type(event.detail.dataTransfer);
 
-                    if ( dragType === "files" ) {
+                    if ( dragType === "file" ) {
                         for (i = 0; i < dragItems.length; i++) {
                             names.push(Path.basename(dragItems[i]));
                         }
                     }
-                    else if ( dragType === "assets" ) {
+                    else if ( dragType === "asset" ) {
                         var srcELs = this.getToplevelElements(dragItems);
                         for (i = 0; i < srcELs.length; i++) {
                             var srcEL = srcELs[i];
@@ -601,7 +591,6 @@
                     // check if we have conflicts names
                     var valid = true;
                     if ( names.length > 0 ) {
-
                         var collisions = _getNameCollisions( target, names );
                         if ( collisions.length > 0 ) {
                             this.highlightConflicts(collisions);
@@ -627,11 +616,11 @@
             this.resetDragState();
 
             if ( items.length > 0 ) {
-                if ( dragType === 'files' ) {
+                if ( dragType === 'file' ) {
                     var dstUrl = this.getUrl(targetEL);
                     Fire.command('asset-db:import', dstUrl, items );
                 }
-                else if ( dragType === 'assets' ) {
+                else if ( dragType === 'asset' ) {
                     this.moveAssets( targetEL, items );
                     Fire.Selection.confirm();
                 }

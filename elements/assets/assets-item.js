@@ -117,16 +117,10 @@
             event.stopPropagation();
         },
 
-        dblclickAction: function ( event ) {
-            if ( !this.isFolder )
-                this.fire('open');
-            event.stopPropagation();
-        },
-
         dragoverAction: function ( event ) {
             var dragType = Fire.DragDrop.type(event.dataTransfer);
-            if ( dragType !== "files" && dragType !== "assets" ) {
-                Fire.DragDrop.allow( event.dataTransfer, false );
+            if ( dragType !== "file" && dragType !== "asset" ) {
+                Fire.DragDrop.allowDrop( event.dataTransfer, false );
                 return;
             }
 

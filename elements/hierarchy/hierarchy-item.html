@@ -1,9 +1,9 @@
 <polymer-element name="hierarchy-item"
                  extends="fire-ui-ti"
                  constructor="HierarchyItem"
-                 on-mousemove="{{mousemoveAction}}"
+                 draggable="true"
                  on-dragover="{{dragoverAction}}"
-                 on-dragenter="{{dragenterAction}}">
+                 >
     <template>
         <link rel="stylesheet" href="hierarchy-item.css">
         <!--

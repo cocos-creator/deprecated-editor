@@ -12,7 +12,7 @@ Fire.DragDrop = (function () {
         dataTransfer.setData('fire/type', type);
         dataTransfer.setData('fire/items', items.join());
 
-        // event.dataTransfer.setDragImage( null, 0, 0 );
+        // TODO: event.dataTransfer.setDragImage( null, 0, 0 );
     };
 
     DragDrop.drop = function ( dataTransfer ) {
@@ -84,7 +84,12 @@ Fire.DragDrop = (function () {
         }
         else {
             items = dataTransfer.getData('fire/items');
-            items = items.split(',');
+            if ( items !== "" ) {
+                items = items.split(',');
+            }
+            else {
+                items = [];
+            }
         }
 
         return items;

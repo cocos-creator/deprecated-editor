@@ -77,11 +77,6 @@
             }
         },
 
-        mousemoveAction: function ( event ) {
-            this.fire('draghover');
-            event.stopPropagation();
-        },
-
         mouseenterAction: function ( event ) {
             Fire.Selection.hoverEntity(this.userId);
             event.stopPropagation();
@@ -92,11 +87,17 @@
             event.stopPropagation();
         },
 
-        //dragoverAction: function ( event ) {
-        //    this.fire('draghover', {files : event.dataTransfer.files});
+        dragoverAction: function ( event ) {
+            var dragType = Fire.DragDrop.type(event.dataTransfer);
+            if ( dragType !== "entity" && dragType !== "asset" ) {
+                Fire.DragDrop.allowDrop( event.dataTransfer, false );
+                return;
+            }
 
-        //    event.preventDefault();
-        //    event.stopPropagation();
-        //},
+            event.preventDefault();
+            event.stopPropagation();
+
+            this.fire('item-dragover', {dataTransfer : event.dataTransfer});
+        },
     });
 })();

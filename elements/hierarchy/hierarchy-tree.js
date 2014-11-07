@@ -10,15 +10,9 @@
             this.contextmenuAt = null;
 
             // dragging
-            this.startDragging = false;
-            this.startDragAt = [-1,-1];
-            this.dragging = false;
             this.curDragoverEL = null; 
             this.dragenterCnt = 0;
             this.lastDragoverEL = null;
-
-            // confliction
-            this.isValidForDrop = true;
 
             // debug
             hierarchy = this;
@@ -30,55 +24,6 @@
             this.tabIndex = EditorUI.getParentTabIndex(this) + 1;
 
             // register events
-            this.addEventListener('mousemove', function ( event ) {
-                if ( this.startDragging ) {
-                    var dx = event.x - this.startDragAt[0]; 
-                    var dy = event.y - this.startDragAt[1]; 
-                    if ( dx * dx  + dy * dy >= 100.0 ) {
-                        this.dragging = true;
-                        this.startDragging = false;
-                    }
-                    event.stopPropagation();
-                }
-                else if ( this.dragging ) {
-                    // do nothing here
-                }
-                else {
-                    event.stopPropagation();
-                }
-            }, true );
-
-            this.addEventListener('mouseleave', function ( event ) {
-                if ( this.dragging ) {
-                    this.cancelHighligting();
-
-                    this.curDragoverEL = null;
-                    this.lastDragoverEL = null;
-                    this.isValidForDrop = true;
-
-                    event.stopPropagation();
-                }
-            }, true );
-
-            this.addEventListener('mouseup', function ( event ) {
-                this.startDragging = false;
-                if ( this.dragging ) {
-                    if ( this.isValidForDrop && this.curDragoverEL ) {
-                        this.moveSelection( this.curDragoverEL );
-                        Fire.Selection.confirm();
-                    }
-
-                    this.cancelHighligting();
-
-                    this.curDragoverEL = null;
-                    this.lastDragoverEL = null;
-                    this.isValidForDrop = true;
-                    this.dragging = false;
-
-                    event.stopPropagation();
-                }
-            }, true );
-
             this.addEventListener( "dragenter", function (event) {
                 ++this.dragenterCnt;
             }, true);
@@ -86,11 +31,7 @@
             this.addEventListener( "dragleave", function (event) {
                 --this.dragenterCnt;
                 if ( this.dragenterCnt === 0 ) {
-                    this.cancelHighligting();
-
-                    this.curDragoverEL = null;
-                    this.lastDragoverEL = null;
-                    this.isValidForDrop = true;
+                    this.resetDragState();
                 }
             }, true);
 
@@ -261,10 +202,17 @@
             }
         },
 
-        moveSelection: function ( targetEL ) {
-            // TODO: sort selection
-            var nextSiblingId;  // Todo: = ? 
-            Fire.broadcast('engine:moveEntity', Fire.Selection.entities, targetEL.userId, nextSiblingId);
+        resetDragState: function () {
+            this.cancelHighligting();
+
+            this.curDragoverEL = null;
+            this.lastDragoverEL = null;
+            this.dragenterCnt = 0;
+        },
+
+        moveEntities: function ( targetEL, entities, nextSiblingId ) {
+            // TODO: Fire.Selection.filter(entities,'sorted');
+            Fire.broadcast('engine:moveEntities', entities, targetEL.userId, nextSiblingId);
         },
 
         selectingAction: function (event) {
@@ -332,32 +280,6 @@
             event.stopPropagation();
         },
 
-        draghoverAction: function (event) {
-            if ( event.target ) {
-                this.lastDragoverEL = this.curDragoverEL;
-                var target = event.target;
-                
-                if ( target !== this.lastDragoverEL ) {
-
-                    this.cancelHighligting();
-
-                    this.isValidForDrop = true;
-                    this.curDragoverEL = target;
-                    this.highlight(this.curDragoverEL);
-                }
-
-            }
-            event.stopPropagation();
-        },
-
-        dragcancelAction: function (event) {
-            this.cancelHighligting();
-
-            this.curDragoverEL = null;
-            this.lastDragoverEL = null;
-            this.isValidForDrop = true;
-        },
-
         createEntity: function () {
             var parentEL = this.contextmenuAt && this.contextmenuAt.parentElement;
             if (parentEL instanceof HierarchyItem) {
@@ -379,13 +301,7 @@
         },
 
         contextmenuAction: function (event) {
-            this.cancelHighligting();
-
-            this.curDragoverEL = null;
-            this.lastDragoverEL = null;
-            this.isValidForDrop = true;
-            this.startDragging = false;
-            this.dragging = false;
+            this.resetDragState();
 
             //
             this.contextmenuAt = null;
@@ -404,101 +320,114 @@
         },
 
         keydownAction: function (event) {
-            if ( this.dragging ) {
-                switch ( event.which ) {
-                    // esc
-                    case 27:
-                        this.cancelHighligting();
-                        this.curDragoverEL = null;
-                        this.lastDragoverEL = null;
-                        this.isValidForDrop = true;
-                        this.dragging = false;
-                        event.stopPropagation();
-
-                        Fire.Selection.cancel();
-                    break;
-                }
+            // FIXME: Johnny Said: I found this will swallow some keyaction such as Command+R to refresh the page
+            var activeId = Fire.Selection.activeEntityId;
+            var activeEL = activeId && this.idToItem[activeId];
+            
+            this.super([event, activeEL]);
+            if (event.cancelBubble) {
+                return;
             }
-            else {
-                // FIXME: Johnny Said: I found this will swallow some keyaction such as Command+R to refresh the page
-                var activeId = Fire.Selection.activeEntityId;
-                var activeEL = activeId && this.idToItem[activeId];
+
+            // console.log(event.which);
+            switch ( event.which ) {
+                // delete
+                case 46:
+                    this.deleteSelection();
+                    event.stopPropagation();
+                break;
                 
-                this.super([event, activeEL]);
-                if (event.cancelBubble) {
-                    return;
-                }
+                // key-up
+                case 38:
+                    if ( activeEL ) {
+                        var prev = this.prevItem(activeEL);
+                        if ( prev ) {
+                            // Todo toggle?
+                            Fire.Selection.selectEntity(prev.userId, true, true);
 
-                // console.log(event.which);
-                switch ( event.which ) {
-                    // delete
-                    case 46:
-                        this.deleteSelection();
-                        event.stopPropagation();
-                    break;
-                    
-                    // key-up
-                    case 38:
-                        if ( activeEL ) {
-                            var prev = this.prevItem(activeEL);
-                            if ( prev ) {
-                                // Todo toggle?
-                                Fire.Selection.selectEntity(prev.userId, true, true);
-
-                                if (prev !== activeEL) {
-                                    if ( prev.offsetTop <= this.scrollTop ) {
-                                        this.scrollTop = prev.offsetTop;
-                                    }
+                            if (prev !== activeEL) {
+                                if ( prev.offsetTop <= this.scrollTop ) {
+                                    this.scrollTop = prev.offsetTop;
                                 }
                             }
                         }
-                        event.preventDefault();
-                        event.stopPropagation();
-                    break;
+                    }
+                    event.preventDefault();
+                    event.stopPropagation();
+                break;
 
-                    // key-down
-                    case 40:
-                        if ( activeEL ) {
-                            var next = this.nextItem(activeEL, false);
-                            if ( next ) {
-                                // Todo toggle?
-                                Fire.Selection.selectEntity(next.userId, true, true);
+                // key-down
+                case 40:
+                    if ( activeEL ) {
+                        var next = this.nextItem(activeEL, false);
+                        if ( next ) {
+                            // Todo toggle?
+                            Fire.Selection.selectEntity(next.userId, true, true);
 
-                                if ( next !== activeEL ) {
-                                    if ( next.offsetTop + 16 >= this.scrollTop + this.offsetHeight ) {
-                                        this.scrollTop = next.offsetTop + 16 - this.offsetHeight;
-                                    }
+                            if ( next !== activeEL ) {
+                                if ( next.offsetTop + 16 >= this.scrollTop + this.offsetHeight ) {
+                                    this.scrollTop = next.offsetTop + 16 - this.offsetHeight;
                                 }
                             }
                         }
-                        event.preventDefault();
-                        event.stopPropagation();
-                    break;
-                }
+                    }
+                    event.preventDefault();
+                    event.stopPropagation();
+                break;
             }
+        },
+
+        dragstartAction: function ( event ) {
+            Fire.DragDrop.start( event.dataTransfer, 'move', 'entity', Fire.Selection.entities );
+
+            event.stopPropagation();
+        },
+
+        dragendAction: function (event) {
+            this.resetDragState();
+            Fire.DragDrop.end();
+        },
+
+        itemDragoverAction: function (event) {
+            if ( event.target ) {
+                this.lastDragoverEL = this.curDragoverEL;
+                var target = event.target;
+                
+                if ( target !== this.lastDragoverEL ) {
+                    this.cancelHighligting();
+                    this.curDragoverEL = target;
+
+                    this.highlight(this.curDragoverEL);
+
+                    Fire.DragDrop.allowDrop(event.detail.dataTransfer, true);
+                }
+
+            }
+
+            Fire.DragDrop.updateDropEffect(event.detail.dataTransfer);
+            event.stopPropagation();
         },
 
         dropAction: function ( event ) {
             event.preventDefault();
             event.stopPropagation();
             
-            var targetEl = this.curDragoverEL;
+            var targetEL = this.curDragoverEL;
 
-            this.cancelHighligting();
+            var dragType = Fire.DragDrop.type(event.dataTransfer);
+            var items = Fire.DragDrop.drop(event.dataTransfer);
+            this.resetDragState();
 
-            this.curDragoverEL = null;
-            this.lastDragoverEL = null;
-            this.startDragging = false;
-            this.dragging = false;
-            this.dragenterCnt = 0;
-
-            // check
-            if( !this.isValidForDrop ) {
-                this.isValidForDrop = true;
-                return;
+            if ( items.length > 0 ) {
+                if ( dragType === 'entity' ) {
+                    var nextSiblingId = null; // TODO
+                    this.moveEntities( targetEL, items, nextSiblingId );
+                    Fire.Selection.confirm();
+                }
+                else if ( dragType === 'asset' ) {
+                    // TODO: instantiate
+                }
             }
-            
-            // TODO: instantiate
         },
 
     });
