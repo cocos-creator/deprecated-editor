@@ -302,8 +302,9 @@
 
             // check if we hit gizmos
             var gizmos = this.svgGizmos.hitTest ( x, y, 1, 1 );
-            if ( gizmos.length > 0 )
+            if ( gizmos.length > 0 ) {
                 return gizmos[0].entity;
+            }
 
             var mousePos = new Fire.Vec2(x,y); 
             var worldMousePos = this.renderContext.camera.screenToWorld(mousePos);

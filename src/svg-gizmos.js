@@ -235,6 +235,66 @@ Fire.SvgGizmos = (function () {
         return group;
     };
 
+    SvgGizmos.prototype.freemoveTool = function ( size, color, callbacks ) {
+        // move rect
+        var dragging = false;
+        circle = this.svg.circle( size, size )
+                         .move( -size * 0.5, -size * 0.5 )
+                         .fill( { color: color, opacity: 0.6 } )
+                         .stroke( { width: 2, color: color } )
+                         ;
+        // swallow mousemove event to prevent scene-view mousemove
+        circle.on( 'mousemove', function ( event ) {
+            event.stopPropagation();
+        } );
+        circle.on( 'mouseover', function ( event ) {
+            var lightColor = chroma(color).brighter().hex();
+            this.fill( { color: lightColor } )
+                .stroke( { color: lightColor } )
+                ;
+            event.stopPropagation();
+            this.node.dispatchEvent( new CustomEvent('gizmoshover', { 
+                detail: { entity: null }
+            } ) );
+        } );
+        circle.on( 'mouseout', function ( event ) {
+            if ( !dragging ) {
+                this.fill( { color: color } )
+                    .stroke( { color: color } )
+                    ;
+            }
+            event.stopPropagation();
+        } );
+        _addMoveHandles( circle, {
+            start: function ( x, y ) {
+                dragging = true;
+                this.fill( { color: "#cc5" } )
+                    .stroke( { color: "#cc5" } )
+                    ;
+
+                if ( callbacks.start )
+                    callbacks.start( x, y );
+            },
+
+            update: function ( dx, dy ) {
+                if ( callbacks.update )
+                    callbacks.update(dx, dy);
+            },
+
+            end: function () {
+                dragging = false;
+                this.fill( { color: color } )
+                    .stroke( { color: color } )
+                    ;
+
+                if ( callbacks.end )
+                    callbacks.end();
+            }
+        } );
+
+        return circle;
+    };
+
     SvgGizmos.prototype.arrowTool = function ( size, color, callbacks ) {
         var group = this.scene.group();
         var line = group.line( 0, 0, size, 0 )
