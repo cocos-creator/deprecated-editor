@@ -25,7 +25,7 @@ Fire.SpriteRendererGizmo = (function () {
                 var self = this;
                 var center, vtable = {};
                 var pressx, pressy;
-                var worldpos;
+                var worldpos, worldrot;
                 var entity = this.entity;
 
                 var onstart = function ( x, y ) {
@@ -42,78 +42,103 @@ Fire.SpriteRendererGizmo = (function () {
                     pressx = x;
                     pressy = y;
                     worldpos = entity.transform.worldPosition;
+                    worldrot = entity.transform.worldRotation;
 
                     var delta = bounds[3].sub(bounds[1]);
                     var length = delta.mag();
                     delta.normalizeSelf();
                     center = bounds[1].add( delta.mul(length*0.5) );
                 };
-                var onresize = function ( vname, applyWidth, applyHeight ) {
+                var onresize = function ( name, oppositeName, ratioW, ratioH ) {
                     return function ( dx, dy ) {
+                        var delta, length, theta, dir, new_center;
+
                         var mousex = pressx + dx;
                         var mousey = pressy + dy;
                         var new_point = self._svg.camera.screenToWorld( new Fire.Vec2(mousex,mousey) );
-                        var opposite = vtable[vname];
-
-                        var delta = opposite.sub(new_point);
-                        var length = delta.mag();
-                        delta.normalizeSelf();
-                        var new_center = new_point.add( delta.mul(length*0.5) );
+                        var old_point = vtable[name];
 
                         var right = new Fire.Vec2(1,0);
-                        right.rotate(Math.deg2rad(entity.transform.worldRotation));
-                        var theta = right.angle( new Fire.Vec2( delta.x, delta.y ) );
+                        right.rotate(Math.deg2rad(worldrot));
 
-                        if ( applyWidth ) self.target.width = Math.cos(theta) * length;
-                        if ( applyHeight ) self.target.height = Math.sin(theta) * length;
+                        var up = new Fire.Vec2(0,1);
+                        up.rotate(Math.deg2rad(worldrot));
+                        
+                        // calculate new_point by direction
+                        if ( ratioW === 0.0 ) {
+                            delta = new_point.sub(old_point);
+                            length = delta.mag();
+                            theta = up.angle(delta);
+                            length = length * Math.cos(theta);
+                            new_point = old_point.add(up.mul(length));
+                        }
+                        else if ( ratioH === 0.0 ) {
+                            delta = new_point.sub(old_point);
+                            length = delta.mag();
+                            theta = right.angle(delta);
+                            length = length * Math.cos(theta);
+                            new_point = old_point.add(right.mul(length));
+                        }
 
-                        entity.transform.worldPosition = new Fire.Vec2(
-                            worldpos.x + new_center.x - center.x,
-                            worldpos.y + new_center.y - center.y 
-                        ); 
+                        // calculate center offset
+                        var opposite = vtable[oppositeName];
+                        delta = opposite.sub(new_point);
+                        length = delta.mag();
+                        delta.normalizeSelf();
+                        new_center = new_point.add( delta.mul(length*0.5) );
 
+                        // calculate width, height
+                        theta = right.signAngle(delta);
+                        // theta = Math.atan2( right.y, right.x ) - Math.atan2( delta.y, delta.x );
+                        if ( ratioW !== 0.0 )
+                            self.target.width = ratioW * Math.cos(theta) * length;
+
+                        if ( ratioH !== 0.0 )
+                            self.target.height = ratioH * Math.sin(theta) * length;
+
+                        entity.transform.worldPosition = worldpos.add(new_center.sub(center));
                         self.dirty();
                     };
                 };
 
                 var tl = this._svg.freemoveTool( radius * 2.0, "#09f", {
                     start: onstart,
-                    update: onresize("bottom-right", true, true)
+                    update: onresize("top-left", "bottom-right", 1.0, 1.0)
                 });
 
                 var tm = this._svg.freemoveTool( radius * 2.0, "#09f", {
                     start: onstart,
-                    update: onresize("bottom-middle", false, true)
+                    update: onresize("top-middle", "bottom-middle", 0.0, 1.0)
                 });
 
                 var tr = this._svg.freemoveTool( radius * 2.0, "#09f", {
                     start: onstart,
-                    update: onresize("bottom-left", true, true)
+                    update: onresize("top-right", "bottom-left", -1.0, 1.0)
                 });
 
                 var ml = this._svg.freemoveTool( radius * 2.0, "#09f", {
                     start: onstart,
-                    update: onresize("middle-right", true, false)
+                    update: onresize("middle-left", "middle-right", 1.0, 0.0)
                 });
 
                 var mr = this._svg.freemoveTool( radius * 2.0, "#09f", {
                     start: onstart,
-                    update: onresize("middle-left", true, false)
+                    update: onresize("middle-right", "middle-left", -1.0, 0.0)
                 });
 
                 var bl = this._svg.freemoveTool( radius * 2.0, "#09f", {
                     start: onstart,
-                    update: onresize("top-right", true, true)
+                    update: onresize("bottom-left", "top-right", 1.0, -1.0)
                 });
 
                 var bm = this._svg.freemoveTool( radius * 2.0, "#09f", {
                     start: onstart,
-                    update: onresize("top-middle", false, true)
+                    update: onresize("bottom-middle", "top-middle", 0.0, -1.0)
                 });
 
                 var br = this._svg.freemoveTool( radius * 2.0, "#09f", {
                     start: onstart,
-                    update: onresize("top-left", true, true)
+                    update: onresize("bottom-right", "top-left", -1.0, -1.0)
                 });
 
                 this._editTools = this._svg.scene.group();
