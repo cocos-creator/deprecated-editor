@@ -7,6 +7,10 @@
     var Menu = Remote.require('menu');
     var MenuItem = Remote.require('menu-item');
 
+    function _isTexture ( extname ) {
+        return extname === '.png' || extname === '.jpg';
+    }
+
     function _newAssetsItem ( url, type, id, parent ) {
         var extname = Url.extname(url); 
         var basename = Url.basename(url, extname); 
@@ -193,6 +197,33 @@
                             var newAssetUrl = Url.join( url, 'New Folder' );
                             this._focusUrl = newAssetUrl;
                             Fire.rpc( 'asset-db:makedirs', newAssetUrl );
+                        }
+                    }.bind(this)
+                },
+
+                // New Sprite From Texture
+                {
+                    label: 'New Sprite From Texture',
+                    click: function () {
+                        if ( this.contextmenuAt instanceof AssetsItem ) {
+                            var targetEL = this.contextmenuAt;
+
+                            if ( _isTexture(targetEL.extname) ) {
+                                var textureName = targetEL.name;
+
+                                if ( !this.contextmenuAt.isFolder )
+                                    targetEL = this.contextmenuAt.parentElement;
+                                var url = this.getUrl(targetEL);
+                                var newSprite = new Fire.Sprite();
+                                var newAssetUrl = Url.join( url, textureName + '.sprite' );
+                                this._focusUrl = newAssetUrl;
+                                Fire.command( 'asset-db:save', 
+                                              newAssetUrl, 
+                                              Fire.serialize(newSprite) );
+                            }
+                            else {
+                                Fire.warn( "Can not create sprite from non-texture element, please select a texture first." );
+                            }
                         }
                     }.bind(this)
                 },
