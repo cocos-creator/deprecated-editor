@@ -1,11 +1,12 @@
 <polymer-element 
     name="scene-view" 
     constructor="SceneView"
-    on-mousemove="mousemoveAction"
-    on-mousedown="mousedownAction"
-    on-mousewheel="mousewheelAction"
-    on-gizmoshover="gizmoshoverAction"
-    on-gizmosdirty="gizmosdirtyAction"
+    on-mousemove="{{mousemoveAction}}"
+    on-mousedown="{{mousedownAction}}"
+    on-mousewheel="{{mousewheelAction}}"
+    on-mouseleave="{{mouseleaveAction}}"
+    on-gizmoshover="{{gizmoshoverAction}}"
+    on-gizmosdirty="{{gizmosdirtyAction}}"
     >
 <template>
 <link rel="stylesheet" href="scene-view.css">

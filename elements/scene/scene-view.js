@@ -547,6 +547,11 @@
             event.stopPropagation();
         },
 
+        mouseleaveAction: function ( event ) {
+            Fire.Selection.hoverEntity(null);
+            event.stopPropagation();
+        },
+
         gizmoshoverAction: function ( event ) {
             var entity = event.detail.entity;
             if ( entity )
