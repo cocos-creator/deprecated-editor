@@ -122,6 +122,8 @@
             this.confliction = [];
 
             this.ipc = new Fire.IpcListener();
+
+            this._focusUrl = null;
         },
 
         ready: function () {
@@ -165,10 +167,15 @@
                     label: 'New Scene',
                     click: function () {
                         if ( this.contextmenuAt instanceof AssetsItem ) {
-                            var url = this.getUrl(this.contextmenuAt);
+                            var targetEL = this.contextmenuAt;
+                            if ( !this.contextmenuAt.isFolder )
+                                targetEL = this.contextmenuAt.parentElement;
+                            var url = this.getUrl(targetEL);
                             var newScene = new Fire._Scene();
+                            var newAssetUrl = Url.join( url, 'New Scene.fire' );
+                            this._focusUrl = newAssetUrl;
                             Fire.command( 'asset-db:save', 
-                                          Url.join( url, 'New Scene.fire' ), 
+                                          newAssetUrl, 
                                           Fire.serialize(newScene) );
                         }
                     }.bind(this)
@@ -183,7 +190,9 @@
                             if ( !this.contextmenuAt.isFolder )
                                 targetEL = this.contextmenuAt.parentElement;
                             var url = this.getUrl(targetEL);
-                            Fire.rpc( 'asset-db:makedirs', Url.join( url, 'New Folder' ) );
+                            var newAssetUrl = Url.join( url, 'New Folder' );
+                            this._focusUrl = newAssetUrl;
+                            Fire.rpc( 'asset-db:makedirs', newAssetUrl );
                         }
                     }.bind(this)
                 },
@@ -267,7 +276,13 @@
                 return;
             }
             var type = isDirectory ? 'folder' : '';
-            _newAssetsItem.call(this, url, type, id, parentEL);
+            var newEL = _newAssetsItem.call(this, url, type, id, parentEL);
+
+            if ( this._focusUrl === url ) {
+                this._focusUrl = null;
+                this.scrollTop = newEL.offsetTop + 16 - this.offsetHeight/2;
+                Fire.Selection.selectAsset(newEL.userId, true, true);
+            }
         },
         
         moveItem: function ( id, destUrl, destDirId ) {
@@ -496,13 +511,21 @@
                 return;
             }
             switch ( event.which ) {
-                // delete
+                // delete (Windows)
                 case 46:
                     this.deleteSelection();
                     event.stopPropagation();
                 break;
 
-                // key-up
+                // command + delete (Mac)
+                case 8:
+                    if ( event.metaKey ) {
+                        this.deleteSelection();
+                        event.stopPropagation();
+                    }
+                    break;
+
+                // up-arrow
                 case 38:
                     if ( activeEL ) {
                         var prev = this.prevItem(activeEL);
@@ -521,7 +544,7 @@
                     event.stopPropagation();
                 break;
 
-                // key-down
+                // down-arrow
                 case 40:
                     if ( activeEL ) {
                         var next = this.nextItem(activeEL, false);
