@@ -24,8 +24,9 @@
 
             this.ipc.on('selection:entity:selected', this.select.bind(this, true));
             this.ipc.on('selection:entity:unselected', this.select.bind(this, false));
-            this.ipc.on('selection:entity:hover', this.hover.bind(this) );
-            this.ipc.on('selection:entity:hoverout', this.hoverout.bind(this) );
+            this.ipc.on('selection:entity:hover', this.hover.bind(this));
+            this.ipc.on('selection:entity:hoverout', this.hoverout.bind(this));
+            this.ipc.on('scene:launched', this.reload.bind(this));
         },
 
         detached: function () {
@@ -60,6 +61,27 @@
         createAction: function () {
             var type = 'create';
             Fire.popupMenu(Fire.plugins.hierarchy.getMenuTemplate(type));
+        },
+
+        reload: function (sceneSnapshot) {
+            var tree = this.$.hierarchyTree;
+            tree.clear();
+
+            var selection = Fire.Selection.entities;
+            function createItem(entityData, parentEL) {
+                var el = tree.newItem(entityData.name, entityData.objFlags, entityData.id, parentEL);
+                if (el) {
+                    var children = entityData.children;
+                    for (var i = 0, len = children.length; i < len; i++) {
+                        createItem(children[i], el);
+                    }
+                    el.selected = selection.indexOf(el.userId) !== -1;
+                }
+            }
+            var entityDatas = sceneSnapshot.entities;
+            for (var i = 0, len = entityDatas.length; i < len; i++) {
+                createItem(entityDatas[i]);
+            }
         },
     });
 })();

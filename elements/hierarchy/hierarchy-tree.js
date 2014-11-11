@@ -36,8 +36,6 @@
             }, true);
 
             // register Ipc
-            this.ipc.on('scene:launched', this.refresh.bind(this));
-
             this.ipc.on('entity:created', this.newItem.bind(this));
             this.ipc.on('entity:removed', this.deleteItemById.bind(this));
             this.ipc.on('entity:parentChanged', this.setItemParentById.bind(this));
@@ -155,12 +153,10 @@
 
         refresh: function () {
             this.clear();
-            
-            //
-            // 目前hierarchy和engine处在同一context，直接访问场景就行。
-            // 将来如有需要再改成ipc。
-            // 由于这里会同步访问场景，因此可能导致hierarchy提前更新到最新状态，然后才收到刷新事件，
-            // 所以刷新时需要做容错。
+
+            // 这里只是直接读取场景，但场景在读取过程中很可能发生改变，也可能在读取之前改变的消息这时并没收到。
+            // 目前先假设在读取之前和读取过程中，场景不会改变。
+
             if (!Fire.Engine._scene) {
                 return;
             }

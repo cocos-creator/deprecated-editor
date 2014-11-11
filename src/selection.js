@@ -177,7 +177,7 @@ Fire.Selection = (function () {
     /**
      * @param {string[]} idList
      * @param {string} mode ['top-level','deep','name']
-     * @param {function} func 
+     * @param {function} func
      */
     Selection.filter = function ( idList, mode, func ) {
         var results = [], id, i, j;

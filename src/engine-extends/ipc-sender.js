@@ -8,14 +8,38 @@
     // pre-declaration for unit tests, overridable for editor
     Fire.broadcast = function () {};
 
+    function takeSceneSnapshot (scene) {
+        function takeEntitySnapshot(entity) {
+            var children = entity._children;
+            var snapshot = {
+                name: entity._name,
+                objFlags: entity._objFlags,
+                id: entity.id,
+                children: new Array(children.length),
+            };
+            var childrenDatas = snapshot.children;
+            for (var i = 0, len = children.length; i < len; i++) {
+                childrenDatas[i] = takeEntitySnapshot(children[i]);
+            }
+            return snapshot;
+        }
+        var entities = scene.entities;
+        var snapshot = { entities : new Array(entities.length) };
+        var entityDatas = snapshot.entities;
+        for (var i = 0, len = entities.length; i < len; i++) {
+            entityDatas[i] = takeEntitySnapshot(entities[i]);
+        }
+        return snapshot;
+    }
+
     editorCallback.onSceneLaunched = function (scene) {
-        Fire.broadcast('scene:launched');
+        Fire.broadcast('scene:launched', takeSceneSnapshot(scene));
         Fire.broadcast('scene:dirty');
     };
 
-    editorCallback.onSceneLoaded = function (scene) {
-        Fire.broadcast('scene:loaded', scene.entities);
-    };
+    //editorCallback.onSceneLoaded = function (scene) {
+    //    Fire.broadcast('scene:loaded', scene.entities);
+    //};
 
     var onEntityCreated = 'entity:created';
     editorCallback.onEntityCreated = function (entity) {
