@@ -136,10 +136,12 @@ var build_elements_html = function (strip) {
     return function () {
         return gulp.src('bin/elements/editor.html')
         .pipe(vulcanize({
-            dest: 'bin/',
+            dest: 'bin',
             inline: true,
             strip: strip,
-        }));
+        }))
+        .pipe(gulp.dest('bin'))
+        ;
     };
 };
 gulp.task('build-elements-html', [
