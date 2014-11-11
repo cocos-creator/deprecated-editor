@@ -209,17 +209,27 @@
                             var targetEL = this.contextmenuAt;
 
                             if ( _isTexture(targetEL.extname) ) {
+                                var textureEL = this.contextmenuAt;
                                 var textureName = targetEL.name;
 
                                 if ( !this.contextmenuAt.isFolder )
                                     targetEL = this.contextmenuAt.parentElement;
                                 var url = this.getUrl(targetEL);
-                                var newSprite = new Fire.Sprite();
-                                var newAssetUrl = Url.join( url, textureName + '.sprite' );
-                                this._focusUrl = newAssetUrl;
-                                Fire.command( 'asset-db:save', 
-                                              newAssetUrl, 
-                                              Fire.serialize(newSprite) );
+
+                                Fire.AssetLibrary.loadAssetByUuid ( textureEL.userId, function ( asset, error ) {
+                                    var newSprite = new Fire.Sprite();
+                                    newSprite.name = textureName;
+                                    newSprite.rawTexture = asset; 
+                                    newSprite.texture = asset;
+                                    newSprite.width = asset.width;
+                                    newSprite.height = asset.height;
+
+                                    var newAssetUrl = Url.join( url, textureName + '.sprite' );
+                                    this._focusUrl = newAssetUrl;
+                                    Fire.command( 'asset-db:save', 
+                                                  newAssetUrl, 
+                                                  Fire.serialize(newSprite) );
+                                } );
                             }
                             else {
                                 Fire.warn( "Can not create sprite from non-texture element, please select a texture first." );
