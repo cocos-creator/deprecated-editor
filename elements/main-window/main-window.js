@@ -43,6 +43,11 @@
 
             // init scene view
             this.$.scene.initRenderContext();
+
+            // TODO: load last-open scene or init new
+            Fire.Engine._setCurrentScene(new Fire._Scene());
+            var camera = new Fire.Entity('Main Window');
+            camera.addComponent(Fire.Camera);
         },
 
         resizedAction: function ( event ) {
