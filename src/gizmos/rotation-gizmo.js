@@ -41,8 +41,7 @@ Fire.RotationGizmo = (function () {
                         rot = Math.deg180(rotList[i] + deltaInt);
                         rot = Math.floor(rot);
 
-                        var offset = offsetList[i].clone();
-                        offset.rotate(Math.deg2rad(deltaInt));
+                        var offset = offsetList[i].rotate(Math.deg2rad(deltaInt));
                         entities[i].transform.worldPosition = center.add(offset);
                         entities[i].transform.rotation = rot;
 

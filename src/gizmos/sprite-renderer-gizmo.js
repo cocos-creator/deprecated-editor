@@ -42,7 +42,6 @@ Fire.SpriteRendererGizmo = (function () {
                     pressx = x;
                     pressy = y;
                     worldpos = entity.transform.worldPosition;
-                    worldrot = entity.transform.worldRotation;
 
                     var delta = bounds[3].sub(bounds[1]);
                     var length = delta.mag();
@@ -58,11 +57,8 @@ Fire.SpriteRendererGizmo = (function () {
                         var new_point = self._svg.camera.screenToWorld( new Fire.Vec2(mousex,mousey) );
                         var old_point = vtable[name];
 
-                        var right = new Fire.Vec2(1,0);
-                        right.rotate(Math.deg2rad(worldrot));
-
-                        var up = new Fire.Vec2(0,1);
-                        up.rotate(Math.deg2rad(worldrot));
+                        var right = entity.transform.right;
+                        var up = entity.transform.up;
                         
                         // calculate new_point by direction
                         if ( ratioW === 0.0 ) {
