@@ -172,8 +172,10 @@
 
         updateComponent: function ( enabled, id ) {
             if ( enabled ) {
-
                 var comp = Fire._getInstanceById(id);
+                if ( !comp ) {
+                    return;     // 就算是enabled消息，由于是异步处理，也有可能已经销毁
+                }
                 if ( comp.entity._objFlags & Fire._ObjectFlags.HideInEditor ) {
                     return;
                 }
