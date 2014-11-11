@@ -586,11 +586,13 @@
 
             var dragType = Fire.DragDrop.type(event.dataTransfer);
             var items = Fire.DragDrop.drop(event.dataTransfer);
+            var clientRect = this.getBoundingClientRect();
 
             var onload = function ( asset ) {
                 if ( asset.createEntity ) {
                     var ent = asset.createEntity();
-                    var mousePos = new Fire.Vec2(event.offsetX, event.offsetY);
+                    var mousePos = new Fire.Vec2(event.offsetX - clientRect.left, event.offsetY - clientRect.top);
+                    console.log("mousePos = " + mousePos);
                     var worldMousePos = this.renderContext.camera.screenToWorld(mousePos);
                     ent.transform.worldPosition = worldMousePos; 
                 }
