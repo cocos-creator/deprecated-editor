@@ -418,7 +418,6 @@
                 if ( dragType === 'entity' ) {
                     var nextSiblingId = null; // TODO
                     this.moveEntities( targetEL, items, nextSiblingId );
-                    Fire.Selection.confirm();
                 }
                 else if ( dragType === 'asset' ) {
                     // TODO: instantiate

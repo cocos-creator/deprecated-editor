@@ -568,5 +568,41 @@
             this.repaint();
             event.stopPropagation();
         },
+
+        dragoverAction: function ( event ) {
+            var dragType = Fire.DragDrop.type(event.dataTransfer);
+            if ( dragType !== "asset" ) {
+                Fire.DragDrop.allowDrop( event.dataTransfer, false );
+                return;
+            }
+
+            event.preventDefault();
+            event.stopPropagation();
+        },
+
+        dropAction: function ( event ) {
+            event.preventDefault();
+            event.stopPropagation();
+
+            var dragType = Fire.DragDrop.type(event.dataTransfer);
+            var items = Fire.DragDrop.drop(event.dataTransfer);
+
+            var onload = function ( asset ) {
+                if ( asset.createEntity ) {
+                    var ent = asset.createEntity();
+                    var mousePos = new Fire.Vec2(event.offsetX, event.offsetY);
+                    var worldMousePos = this.renderContext.camera.screenToWorld(mousePos);
+                    ent.transform.worldPosition = worldMousePos; 
+                }
+            }.bind(this);
+
+            if ( items.length > 0 ) {
+                if ( dragType === 'asset' ) {
+                    for ( var i = 0; i < items.length; ++i ) {
+                        Fire.AssetLibrary.loadAssetByUuid( items[i], onload );
+                    }
+                }
+            }
+        },
     });
 })();

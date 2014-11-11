@@ -21,6 +21,10 @@ var paths = {
         'elements/img/**/*.jpg'
     ],
     src: [
+        // asset extends
+        'src/assets/sprite.js',
+
+        // engine extends
         'src/engine-extends/misc.js',
         'src/engine-extends/component.js',
         'src/engine-extends/entity.js',
@@ -41,7 +45,6 @@ var paths = {
         'src/svg-gizmos.js',
         'src/menu.js',
 
-        //'src/main-menu.js',
         'src/plugins/hierarchy.js',
 
         'src/gizmos/gizmo.js',

@@ -686,7 +686,6 @@
                 }
                 else if ( dragType === 'asset' ) {
                     this.moveAssets( targetEL, items );
-                    Fire.Selection.confirm();
                 }
             }
         },
