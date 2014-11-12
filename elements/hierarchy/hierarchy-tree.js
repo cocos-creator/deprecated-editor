@@ -230,11 +230,7 @@
                     }
                 }
                 else {
-                    this.startDragging = true;
-                    this.startDragAt = [event.detail.x, event.detail.y];
-                    if ( !event.target.selected ) {
-                        Fire.Selection.selectEntity(event.target.userId, true, false);
-                    }
+                    Fire.Selection.selectEntity(event.target.userId, true, false);
                 }
             }
             event.stopPropagation();

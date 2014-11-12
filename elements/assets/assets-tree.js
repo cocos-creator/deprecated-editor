@@ -483,7 +483,7 @@
                         Fire.Selection.selectAsset(event.target.userId, false, false);
                     }
                 }
-                else if ( !event.target.selected ) {
+                else {
                     Fire.Selection.selectAsset(event.target.userId, true, false);
                 }
             }
