@@ -1,4 +1,6 @@
 (function () {
+    var Remote = require('remote');
+
     Polymer({
         created: function () {
             Fire.mainWindow = this;
@@ -8,6 +10,8 @@
                 coordinate: "local", // local, global
                 pivot: "pivot", // pivot, center
             };
+
+            this.sceneNameObserver = null; 
         },
 
         domReady: function () {
@@ -48,6 +52,16 @@
             Fire.Engine._setCurrentScene(new Fire._Scene());
             var camera = new Fire.Entity('Main Window');
             camera.addComponent(Fire.Camera);
+            this.updateTitle();
+
+            // observe the current scene name
+            if ( this.sceneNameObserver ) {
+                this.sceneNameObserver.close();
+            }
+            this.sceneNameObserver = new PathObserver( Fire.Engine._scene, "_name" );
+            this.sceneNameObserver.open( function ( newValue, oldValue ) {
+                this.updateTitle();
+            }, this );
         },
 
         resizedAction: function ( event ) {
@@ -63,5 +77,12 @@
             event.stopPropagation();
         },
 
+        updateTitle: function () {
+            var sceneName = Fire.Engine._scene.name;
+            if ( !sceneName ) {
+                sceneName = 'Untitled';
+            }
+            Remote.getCurrentWindow().setTitle( sceneName + " - Fireball-x Editor" );
+        },
     });
 })();

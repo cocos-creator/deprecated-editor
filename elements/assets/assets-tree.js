@@ -229,7 +229,7 @@
                                     Fire.command( 'asset-db:save', 
                                                   newAssetUrl, 
                                                   Fire.serialize(newSprite) );
-                                } );
+                                }.bind(this) );
                             }
                             else {
                                 Fire.warn( "Can not create sprite from non-texture element, please select a texture first." );
@@ -521,8 +521,9 @@
         openAction: function (event) {
             if ( event.target instanceof AssetsItem ) {
                 if ( event.target.extname === '.fire' ) {
-                    // TODO: Fire.broadcast( 'scene:load', uuid );
-                    Fire.Engine.loadScene(event.target.userId, function (scene) {});
+                    Fire.Engine.loadScene(event.target.userId, function ( scene ) {
+                        // TODO: Fire.broadcast( 'scene:load', uuid );
+                    });
                 }
             }
             event.stopPropagation();

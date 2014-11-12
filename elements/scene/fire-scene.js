@@ -1,4 +1,8 @@
 (function () {
+    var Path = require('fire-path');
+    var Url = require('fire-url');
+    var Remote = require('remote');
+
     Polymer({
         created: function () {
             this.icon = new Image();
@@ -9,6 +13,8 @@
             }.bind(this));
 
             this.ipc = new Fire.IpcListener();
+
+            this._newsceneUrl = null;
         },
 
         ready: function () {
@@ -18,6 +24,17 @@
             this.ipc.on('selection:entity:hover', this.hover.bind(this) );
             this.ipc.on('selection:entity:hoverout', this.hoverout.bind(this) );
             this.ipc.on('scene:dirty', this.delayRepaintScene.bind(this) );
+            this.ipc.on('scene:save', this.saveCurrentScene.bind(this) );
+            this.ipc.on('asset:saved', function ( url, uuid, parentUuid ) {
+                // update the uuid of current scene, if we first time save it
+                if ( this._newsceneUrl === url ) {
+                    this._newsceneUrl = null;
+                    var sceneName = Url.basename(url);
+                    Fire.Engine._scene._uuid = uuid;
+                    Fire.Engine._scene.name = sceneName;
+                    Fire.log(url + ' saved');
+                }
+            }.bind(this) );
 
             this._repaintID = setInterval ( this.repaintScene.bind(this), 500 );
         },
@@ -88,6 +105,52 @@
 
         repaintScene: function () {
             this.$.view.repaint();
+        },
+
+        saveCurrentScene: function () {
+            var currentScene = Fire.Engine._scene;
+            var saveUrl = null;
+            var rootPath = Fire.AssetDB.fspath("assets://");
+            var dialog = Remote.require('dialog');
+
+            if ( currentScene._uuid ) {
+                savePath = Fire.AssetDB.uuidToFspath(currentScene._uuid);
+                saveUrl = 'assets://' + Path.relative( rootPath, savePath );
+            }
+            else {
+                var savePath = dialog.showSaveDialog( Remote.getCurrentWindow(), {
+                    title: "Save Scene",
+                    defaultPath: rootPath,
+                    filters: [
+                        { name: 'Scenes', extensions: ['fire'] },
+                    ],
+                } );
+
+                if ( savePath ) {
+                    if ( Path.contains( rootPath, savePath ) ) {
+                        saveUrl = 'assets://' + Path.relative( rootPath, savePath );
+                    }
+                    else {
+                        dialog.showMessageBox ( Remote.getCurrentWindow(), {
+                            type: "warning", 
+                            buttons: ["OK"],
+                            title: "Warning",
+                            message: "Warning: please save the scene in the assets folder.",
+                            detail: "The scene needs to be saved inside the assets folder of your project.",
+                        } );
+                        // try to popup the dailog for user to save the scene
+                        this.saveCurrentScene();
+                    }
+                }
+            }
+
+            //
+            if ( saveUrl ) {
+                this._newsceneUrl = saveUrl;
+                Fire.command( 'asset-db:save', 
+                              this._newsceneUrl, 
+                              Fire.serialize(currentScene) );
+            }
         },
 
         showAction: function ( event ) {

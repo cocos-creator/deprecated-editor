@@ -73,48 +73,6 @@
             }
 
             this.resize(); // make sure we apply the size to all canvas
-
-            // TEMP {
-            // var assetPath = 'assets://Foobar/004.png';
-            // var uuid = Fire.AssetDB.urlToUuid(assetPath);
-            // if ( uuid ) {
-            //     Fire.AssetLibrary.loadAssetByUuid(uuid, function ( asset ) {
-            //         // var sprite;
-            //         // var ent = new Fire.Entity('Foobar');
-            //         // sprite = new Fire.Sprite();
-            //         // sprite.name = "Temp";
-            //         // sprite.texture = asset;
-            //         // sprite.x = 0;
-            //         // sprite.y = 0;
-            //         // sprite.width = 400;
-            //         // sprite.height = 300;
-            //         // ent.addComponent(Fire.SpriteRenderer).sprite = sprite;
-            //         // ent.transform.position = new Fire.Vec2(-200, 150);
-
-            //         // 
-            //         var camera = new Fire.Entity('camera');
-            //         camera.addComponent(Fire.Camera);
-
-            //         // sprites
-            //         for ( var x = -1; x <= 1; ++x ) {
-            //             for ( var y = -1; y <= 1; ++y ) {
-            //                 var testEnt = new Fire.Entity('sprite ' + x + "," + y );
-            //                 testEnt.transform.position = new Fire.Vec2( x * 400, y * 400 );
-            //                 var sprite = new Fire.Sprite();
-            //                 sprite.texture = asset;
-            //                 sprite.x = 0;
-            //                 sprite.y = 0;
-            //                 sprite.width = 400;
-            //                 sprite.height = 300;
-            //                 testEnt.addComponent(Fire.SpriteRenderer).sprite = sprite;
-            //             }
-            //         }
-            //     }.bind(this) );
-            // }
-            // else {
-            //     Fire.error('Failed to load ' + assetPath);
-            // }
-            // } TEMP
         }, 
 
         resize: function () {
