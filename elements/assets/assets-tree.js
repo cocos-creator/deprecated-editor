@@ -393,13 +393,25 @@
 
         highlight: function ( item ) {
             if ( item ) {
-                this.$.highlightMask.style.display = "block";
-                this.$.highlightMask.style.left = (item.offsetLeft-2) + "px";
-                this.$.highlightMask.style.top = (item.offsetTop-2) + "px";
-                this.$.highlightMask.style.width = (item.offsetWidth+4) + "px";
-                this.$.highlightMask.style.height = (item.offsetHeight+4) + "px";
+                var style = this.$.highlightBorder.style;
+                style.display = "block";
+                style.left = (item.offsetLeft-2) + "px";
+                style.top = (item.offsetTop-1) + "px";
+                style.width = (item.offsetWidth+4) + "px";
+                style.height = (item.offsetHeight+2) + "px";
 
                 item.highlighted = true;
+            }
+        },
+
+        highlightInsert: function ( item, parentEL ) {
+            if ( item && parentEL ) {
+                var style = this.$.insertLine.style;
+                style.display = "block";
+                style.left = parentEL.offsetLeft + "px";
+                style.top = (item.offsetTop-1) + "px";
+                style.width = parentEL.offsetWidth + "px";
+                style.height = "0px";
             }
         },
 
@@ -416,13 +428,14 @@
                 this.curDragoverEL.invalid = true;
             }
 
-            this.$.highlightMask.setAttribute('invalid','');
+            this.$.highlightBorder.setAttribute('invalid','');
         },
 
         cancelHighligting: function () {
             if ( this.curDragoverEL ) {
                 this.curDragoverEL.highlighted = false;
-                this.$.highlightMask.style.display = "none";
+                this.$.highlightBorder.style.display = "none";
+                this.$.insertLine.style.display = "none";
             }
         },
 
@@ -433,7 +446,7 @@
             this.confliction = [];
             if ( this.curDragoverEL ) {
                 this.curDragoverEL.invalid = false;
-                this.$.highlightMask.removeAttribute('invalid');
+                this.$.highlightBorder.removeAttribute('invalid');
             }
         },
 
@@ -618,21 +631,22 @@
             Fire.DragDrop.end();
         },
 
-        itemDragoverAction: function (event) {
-            var dragType = Fire.DragDrop.type(event.detail.dataTransfer);
-            var dropEffect = "none";
-            if ( dragType === "file" ) {
-                dropEffect = "copy";
-            }
-            else if ( dragType === "asset" ) {
-                dropEffect = "move";
+        dragoverAction: function (event) {
+            var dragType = Fire.DragDrop.type(event.dataTransfer);
+            if ( dragType !== "file" && dragType !== "asset" ) {
+                Fire.DragDrop.allowDrop( event.dataTransfer, false );
+                return;
             }
 
+            //
             if ( event.target ) {
                 this.lastDragoverEL = this.curDragoverEL;
                 var target = event.target;
                 if ( event.target.isFolder === false )
                     target = event.target.parentElement;
+
+
+                this.highlightInsert( event.target, this.curDragoverEL );
 
                 if ( target !== this.lastDragoverEL ) {
                     this.cancelHighligting();
@@ -644,7 +658,7 @@
                     // name collision check
                     var names = [];
                     var i = 0;
-                    var dragItems = Fire.DragDrop.items(event.detail.dataTransfer);
+                    var dragItems = Fire.DragDrop.items(event.dataTransfer);
 
                     if ( dragType === "file" ) {
                         for (i = 0; i < dragItems.length; i++) {
@@ -670,11 +684,22 @@
                             valid = false;
                         }
                     }
-                    Fire.DragDrop.allowDrop(event.detail.dataTransfer, valid);
+                    Fire.DragDrop.allowDrop(event.dataTransfer, valid);
                 }
             }
 
-            Fire.DragDrop.updateDropEffect(event.detail.dataTransfer, dropEffect);
+            //
+            var dropEffect = "none";
+            if ( dragType === "file" ) {
+                dropEffect = "copy";
+            }
+            else if ( dragType === "asset" ) {
+                dropEffect = "move";
+            }
+            Fire.DragDrop.updateDropEffect(event.dataTransfer, dropEffect);
+
+            //
+            event.preventDefault();
             event.stopPropagation();
         },
 

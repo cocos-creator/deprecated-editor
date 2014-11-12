@@ -180,12 +180,12 @@
 
         highlight: function ( item ) {
             if ( item ) {
-                var style = this.$.highlightMask.style;
+                var style = this.$.highlightBorder.style;
                 style.display = "block";
-                style.left = item.offsetLeft + "px";
-                style.top = item.offsetTop + "px";
-                style.width = item.offsetWidth + "px";
-                style.height = item.offsetHeight + "px";
+                style.left = (item.offsetLeft-2) + "px";
+                style.top = (item.offsetTop-1) + "px";
+                style.width = (item.offsetWidth+4) + "px";
+                style.height = (item.offsetHeight+2) + "px";
 
                 item.highlighted = true;
             }
@@ -194,7 +194,7 @@
         cancelHighligting: function () {
             if ( this.curDragoverEL ) {
                 this.curDragoverEL.highlighted = false;
-                this.$.highlightMask.style.display = "none";
+                this.$.highlightBorder.style.display = "none";
             }
         },
 
@@ -386,7 +386,14 @@
             Fire.DragDrop.end();
         },
 
-        itemDragoverAction: function (event) {
+        dragoverAction: function (event) {
+            var dragType = Fire.DragDrop.type(event.dataTransfer);
+            if ( dragType !== "entity" && dragType !== "asset" ) {
+                Fire.DragDrop.allowDrop( event.dataTransfer, false );
+                return;
+            }
+
+            //
             if ( event.target ) {
                 this.lastDragoverEL = this.curDragoverEL;
                 var target = event.target;
@@ -397,12 +404,23 @@
 
                     this.highlight(this.curDragoverEL);
 
-                    Fire.DragDrop.allowDrop(event.detail.dataTransfer, true);
+                    Fire.DragDrop.allowDrop(event.dataTransfer, true);
                 }
 
             }
 
-            Fire.DragDrop.updateDropEffect(event.detail.dataTransfer);
+            //
+            var dropEffect = "none";
+            if ( dragType === "asset" ) {
+                dropEffect = "copy";
+            }
+            else if ( dragType === "entity" ) {
+                dropEffect = "move";
+            }
+            Fire.DragDrop.updateDropEffect(event.dataTransfer, dropEffect);
+
+            //
+            event.preventDefault();
             event.stopPropagation();
         },
 

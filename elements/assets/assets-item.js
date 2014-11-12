@@ -116,18 +116,5 @@
 
             event.stopPropagation();
         },
-
-        dragoverAction: function ( event ) {
-            var dragType = Fire.DragDrop.type(event.dataTransfer);
-            if ( dragType !== "file" && dragType !== "asset" ) {
-                Fire.DragDrop.allowDrop( event.dataTransfer, false );
-                return;
-            }
-
-            event.preventDefault();
-            event.stopPropagation();
-
-            this.fire('item-dragover', {dataTransfer : event.dataTransfer});
-        },
     });
 })();

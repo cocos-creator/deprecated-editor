@@ -552,7 +552,7 @@
             var onload = function ( asset ) {
                 if ( asset.createEntity ) {
                     var ent = asset.createEntity();
-                    var mousePos = new Fire.Vec2(event.offsetX - clientRect.left, event.offsetY - clientRect.top);
+                    var mousePos = new Fire.Vec2(event.clientX - clientRect.left, event.clientY - clientRect.top);
                     var worldMousePos = this.renderContext.camera.screenToWorld(mousePos);
                     ent.transform.worldPosition = worldMousePos; 
                     Fire.Selection.selectEntity( ent.id, true, true );
