@@ -1,14 +1,13 @@
 Fire.DragDrop = (function () {
     var Path = require('fire-path');
 
-    var _effectAllowed = 'copy';
     var _allowed = false;
 
     var DragDrop = {};
 
     DragDrop.start = function ( dataTransfer, effect, type, items ) {
-        _effectAllowed = effect;
         dataTransfer.effectAllowed = effect;
+        dataTransfer.dropEffect = 'none';
         dataTransfer.setData('fire/type', type);
         dataTransfer.setData('fire/items', items.join());
 
@@ -16,36 +15,36 @@ Fire.DragDrop = (function () {
     };
 
     DragDrop.drop = function ( dataTransfer ) {
-        Fire.Selection.confirm();
+        Fire.Selection.cancel();
 
         var results = [];
         if ( _allowed ) {
             results = DragDrop.items(dataTransfer);
         }
 
-        _effectAllowed = 'copy';
         _allowed = false;
 
         return results;
     };
 
     DragDrop.end = function () {
-        _effectAllowed = 'copy';
         _allowed = false;
     };
 
-    DragDrop.updateDropEffect = function ( dataTransfer ) {
+    DragDrop.updateDropEffect = function ( dataTransfer, dropEffect ) {
         if ( _allowed ) {
-            dataTransfer.dropEffect = _effectAllowed;
+            dataTransfer.dropEffect = dropEffect;
         }
         else {
-            dataTransfer.dropEffect = 'invalid';
+            dataTransfer.dropEffect = 'none';
         }
     };
 
     DragDrop.allowDrop = function ( dataTransfer, allowed ) {
         _allowed = allowed;
-        DragDrop.updateDropEffect(dataTransfer);
+        if ( !_allowed ) {
+            dataTransfer.dropEffect = 'none';
+        }
     };
 
     Object.defineProperty( DragDrop, 'allowed', {
@@ -56,7 +55,7 @@ Fire.DragDrop = (function () {
         var type = dataTransfer.getData('fire/type');
 
         if ( type === "" && dataTransfer.files.length > 0 )
-            return "files";
+            return "file";
 
         return type;
     };
@@ -65,7 +64,7 @@ Fire.DragDrop = (function () {
         var type = DragDrop.type(dataTransfer);
         var items;
 
-        if ( type === "files" ) {
+        if ( type === "file" ) {
             var files = dataTransfer.files;
             items = [];
 

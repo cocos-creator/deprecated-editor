@@ -607,7 +607,7 @@
         },
 
         dragstartAction: function ( event ) {
-            Fire.DragDrop.start( event.dataTransfer, 'move', 'asset', Fire.Selection.assets );
+            Fire.DragDrop.start( event.dataTransfer, 'copyMove', 'asset', Fire.Selection.assets );
 
             event.stopPropagation();
         },
@@ -618,6 +618,15 @@
         },
 
         itemDragoverAction: function (event) {
+            var dragType = Fire.DragDrop.type(event.detail.dataTransfer);
+            var dropEffect = "none";
+            if ( dragType === "file" ) {
+                dropEffect = "copy";
+            }
+            else if ( dragType === "asset" ) {
+                dropEffect = "move";
+            }
+
             if ( event.target ) {
                 this.lastDragoverEL = this.curDragoverEL;
                 var target = event.target;
@@ -635,7 +644,6 @@
                     var names = [];
                     var i = 0;
                     var dragItems = Fire.DragDrop.items(event.detail.dataTransfer);
-                    var dragType = Fire.DragDrop.type(event.detail.dataTransfer);
 
                     if ( dragType === "file" ) {
                         for (i = 0; i < dragItems.length; i++) {
@@ -665,7 +673,7 @@
                 }
             }
 
-            Fire.DragDrop.updateDropEffect(event.detail.dataTransfer);
+            Fire.DragDrop.updateDropEffect(event.detail.dataTransfer, dropEffect);
             event.stopPropagation();
         },
 

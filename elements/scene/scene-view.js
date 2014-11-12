@@ -576,6 +576,9 @@
                 return;
             }
 
+            Fire.DragDrop.allowDrop( event.dataTransfer, true );
+            Fire.DragDrop.updateDropEffect(event.dataTransfer, "copy");
+
             event.preventDefault();
             event.stopPropagation();
         },
@@ -594,6 +597,8 @@
                     var mousePos = new Fire.Vec2(event.offsetX - clientRect.left, event.offsetY - clientRect.top);
                     var worldMousePos = this.renderContext.camera.screenToWorld(mousePos);
                     ent.transform.worldPosition = worldMousePos; 
+                    Fire.Selection.selectEntity( ent.id, true, true );
+                    this.repaint();
                 }
             }.bind(this);
 
