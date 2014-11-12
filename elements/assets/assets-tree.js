@@ -398,18 +398,21 @@
                 style.left = (item.offsetLeft-2) + "px";
                 style.top = (item.offsetTop-1) + "px";
                 style.width = (item.offsetWidth+4) + "px";
-                style.height = (item.offsetHeight+2) + "px";
+                style.height = (item.offsetHeight+3) + "px";
 
                 item.highlighted = true;
             }
         },
 
-        highlightInsert: function ( item, parentEL ) {
+        highlightInsert: function ( item, parentEL, position ) {
             if ( item && parentEL ) {
                 var style = this.$.insertLine.style;
                 style.display = "block";
                 style.left = parentEL.offsetLeft + "px";
-                style.top = (item.offsetTop-1) + "px";
+                if ( position === 'before' )
+                    style.top = (item.offsetTop) + "px";
+                else
+                    style.top = (item.offsetTop+item.offsetHeight) + "px";
                 style.width = parentEL.offsetWidth + "px";
                 style.height = "0px";
             }
@@ -645,9 +648,7 @@
                 if ( event.target.isFolder === false )
                     target = event.target.parentElement;
 
-
-                this.highlightInsert( event.target, this.curDragoverEL );
-
+                //
                 if ( target !== this.lastDragoverEL ) {
                     this.cancelHighligting();
                     this.cancelConflictsHighliting();
@@ -686,6 +687,14 @@
                     }
                     Fire.DragDrop.allowDrop(event.dataTransfer, valid);
                 }
+
+                // highlight insert
+                var bounding = this.getBoundingClientRect();
+                var offsetY = event.clientY - bounding.top + this.scrollTop;
+                var position = 'before';
+                if ( offsetY >= (event.target.offsetTop + event.target.offsetHeight * 0.5) )
+                    position = 'after';
+                this.highlightInsert( event.target, this.curDragoverEL, position );
             }
 
             //

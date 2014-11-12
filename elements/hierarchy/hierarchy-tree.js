@@ -10,8 +10,8 @@
             this.contextmenuAt = null;
 
             // dragging
-            this.curDragoverEL = null; 
             this.dragenterCnt = 0;
+            this.curDragoverEL = null; 
             this.lastDragoverEL = null;
 
             // debug
@@ -185,9 +185,30 @@
                 style.left = (item.offsetLeft-2) + "px";
                 style.top = (item.offsetTop-1) + "px";
                 style.width = (item.offsetWidth+4) + "px";
-                style.height = (item.offsetHeight+2) + "px";
+                style.height = (item.offsetHeight+3) + "px";
 
                 item.highlighted = true;
+            }
+        },
+
+        highlightInsert: function ( item, position ) {
+            if ( item ) {
+                var style = this.$.insertLine.style;
+                style.display = "block";
+                style.left = (item.offsetLeft-2) + "px";
+                style.width = (item.offsetWidth+4) + "px";
+
+                if ( position === 'inside' ) {
+                    style.top = (item.offsetTop-1) + "px";
+                    style.height = (item.offsetHeight+3) + "px";
+                }
+                else {
+                    if ( position === 'before' )
+                        style.top = item.offsetTop + "px";
+                    else if ( position === 'after'  )
+                        style.top = (item.offsetTop + item.offsetHeight) + "px";
+                    style.height = "0px";
+                }
             }
         },
         
@@ -195,6 +216,7 @@
             if ( this.curDragoverEL ) {
                 this.curDragoverEL.highlighted = false;
                 this.$.highlightBorder.style.display = "none";
+                this.$.insertLine.style.display = "none";
             }
         },
 
@@ -398,15 +420,26 @@
                 this.lastDragoverEL = this.curDragoverEL;
                 var target = event.target;
                 
+                //
                 if ( target !== this.lastDragoverEL ) {
-                    this.cancelHighligting();
+                    if ( target === this ) {
+                        target = this.lastElementChild;
+                    }
                     this.curDragoverEL = target;
-
-                    this.highlight(this.curDragoverEL);
-
-                    Fire.DragDrop.allowDrop(event.dataTransfer, true);
                 }
 
+                // highlight insert
+                var bounding = this.getBoundingClientRect();
+                var offsetY = event.clientY - bounding.top + this.scrollTop;
+                var position = 'inside';
+                if ( offsetY <= (target.offsetTop + target.offsetHeight * 0.3) )
+                    position = 'before';
+                if ( offsetY >= (target.offsetTop + target.offsetHeight * 0.7) )
+                    position = 'after';
+                this.highlightInsert( target, position );
+
+                //
+                Fire.DragDrop.allowDrop(event.dataTransfer, true);
             }
 
             //
@@ -436,7 +469,17 @@
 
             if ( items.length > 0 ) {
                 if ( dragType === 'entity' ) {
-                    var nextSiblingId = null; // TODO
+                    // TODO
+                    var nextSiblingId = null;
+                    // var bounding = this.getBoundingClientRect();
+                    // var offsetY = event.clientY - bounding.top + this.scrollTop;
+                    // var position = 'inside';
+                    // if ( offsetY <= (target.offsetTop + target.offsetHeight * 0.3) )
+                    //     position = 'before';
+                    // if ( offsetY >= (target.offsetTop + target.offsetHeight * 0.7) )
+                    //     position = 'after';
+                    // TODO
+
                     this.moveEntities( targetEL, items, nextSiblingId );
                 }
                 else if ( dragType === 'asset' ) {
