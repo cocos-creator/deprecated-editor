@@ -116,13 +116,13 @@
         },
 
         refresh: function () {
-            if ( !this.target ) {
-                return;
-            }
-
             // remove all children
             while (this.firstElementChild) {
                 this.removeChild(this.firstElementChild);
+            }
+
+            if ( !this.target ) {
+                return;
             }
 
             //

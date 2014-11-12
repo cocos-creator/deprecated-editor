@@ -53,6 +53,7 @@
             }
             else if (this.$.fields.target instanceof Fire.Asset) {
                 // uninspect
+                this.inspect(null);
             }
         },
 
@@ -67,6 +68,7 @@
             }
             else if (this.$.fields.target instanceof Fire.Entity) {
                 // uninspect
+                this.inspect(null);
             }
         },
 

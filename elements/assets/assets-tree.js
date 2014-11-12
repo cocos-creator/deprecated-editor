@@ -394,10 +394,10 @@
         highlight: function ( item ) {
             if ( item ) {
                 this.$.highlightMask.style.display = "block";
-                this.$.highlightMask.style.left = item.offsetLeft + "px";
-                this.$.highlightMask.style.top = item.offsetTop + "px";
-                this.$.highlightMask.style.width = item.offsetWidth + "px";
-                this.$.highlightMask.style.height = item.offsetHeight + "px";
+                this.$.highlightMask.style.left = (item.offsetLeft-2) + "px";
+                this.$.highlightMask.style.top = (item.offsetTop-2) + "px";
+                this.$.highlightMask.style.width = (item.offsetWidth+4) + "px";
+                this.$.highlightMask.style.height = (item.offsetHeight+4) + "px";
 
                 item.highlighted = true;
             }

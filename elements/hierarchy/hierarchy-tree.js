@@ -276,6 +276,12 @@
             event.stopPropagation();
         },
 
+        mousedownAction: function (event) {
+            Fire.Selection.clearEntity();
+
+            event.stopPropagation();
+        },
+
         createEntity: function () {
             var parentEL = this.contextmenuAt && this.contextmenuAt.parentElement;
             if (parentEL instanceof HierarchyItem) {
