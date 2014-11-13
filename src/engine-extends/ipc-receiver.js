@@ -53,7 +53,7 @@
             var id = idList[i];
             var entity = Fire._getInstanceById(id);
             if (entity) {
-                if (entity.parent !== parent && parent.isChildOf(entity) === false) {
+                if (entity.parent !== parent && (!parent || !parent.isChildOf(entity))) {
                     // keep world transform not changed
                     var worldPos = entity.transform.worldPosition;
                     var worldRotation = entity.transform.worldRotation;
@@ -68,8 +68,15 @@
                     else {
                         entity.transform.scale = lossyScale;
                     }
+                    if (index !== -1) {
+                        entity.setSiblingIndex(index + i);
+                    }
                 }
-                if (index !== -1) {
+                else {
+                    var lastIndex = entity.getSiblingIndex();
+                    if (index >= lastIndex) {
+                        --index;
+                    }
                     entity.setSiblingIndex(index + i);
                 }
             }
