@@ -43,12 +43,7 @@
 
     var onEntityCreated = 'entity:created';
     editorCallback.onEntityCreated = function (entity) {
-        Fire.broadcast( onEntityCreated,
-                        entity._name,
-                        entity._objFlags,
-                        entity.id//,
-                        //entity.parent && entity.parent.id
-                      );
+        Fire.broadcast( onEntityCreated, entity._name, entity._objFlags, entity.id );
     };
 
     var onEntityRemoved = 'entity:removed';
@@ -59,10 +54,7 @@
 
     var onEntityParentChanged = 'entity:parentChanged';
     editorCallback.onEntityParentChanged = function (entity) {
-        Fire.broadcast( onEntityParentChanged,
-                        entity.id,
-                        entity.parent && entity.parent.id
-                      );
+        Fire.broadcast( onEntityParentChanged, entity.id, entity.parent && entity.parent.id );
         Fire.broadcast('scene:dirty');
     };
 
@@ -81,10 +73,7 @@
     };
 
     editorCallback.onEntityRenamed = function (entity) {
-        Fire.broadcast('entity:renamed',
-                        entity.id,
-                        entity._name
-                      );
+        Fire.broadcast('entity:renamed', entity.id, entity._name);
     };
 
     editorCallback.onComponentEnabled = function (component) {

@@ -41,19 +41,13 @@
 
     Ipc.on('engine:moveEntities', function (idList, parentId, nextSiblingId) {
         var parent = parentId && Fire._getInstanceById(parentId);
-        
-        var index = -1;
-        if (nextSiblingId) {
-            var next = Fire._getInstanceById(nextSiblingId);
-            if (next) {
-                index = next.getSiblingIndex();
-            }
-        }
+        var next = nextSiblingId ? Fire._getInstanceById(nextSiblingId) : null;
+        var nextIndex = next ? next.getSiblingIndex() : -1;
         for (var i = 0; i < idList.length; i++) {
             var id = idList[i];
             var entity = Fire._getInstanceById(id);
-            if (entity) {
-                if (entity.parent !== parent && (!parent || !parent.isChildOf(entity))) {
+            if (entity && (!parent || !parent.isChildOf(entity))) {
+                if (entity.parent !== parent) {
                     // keep world transform not changed
                     var worldPos = entity.transform.worldPosition;
                     var worldRotation = entity.transform.worldRotation;
@@ -68,16 +62,29 @@
                     else {
                         entity.transform.scale = lossyScale;
                     }
-                    if (index !== -1) {
-                        entity.setSiblingIndex(index + i);
+                    if (next) {
+                        entity.setSiblingIndex(nextIndex);
+                        ++nextIndex;
+                    }
+                }
+                else if (next) {
+                    var lastIndex = entity.getSiblingIndex();
+                    var newIndex = nextIndex;
+                    if (newIndex > lastIndex) {
+                        --newIndex;
+                    }
+                    if (newIndex !== lastIndex) {
+                        entity.setSiblingIndex(newIndex);
+                        if (lastIndex > newIndex) {
+                            ++nextIndex;
+                        }
+                        else {
+                            --nextIndex;
+                        }
                     }
                 }
                 else {
-                    var lastIndex = entity.getSiblingIndex();
-                    if (index >= lastIndex) {
-                        --index;
-                    }
-                    entity.setSiblingIndex(index + i);
+                    entity.setAsLastSibling();
                 }
             }
         }
