@@ -260,7 +260,9 @@
                     }
                 }
                 else {
-                    Fire.Selection.selectEntity(event.target.userId, true, false);
+                    if ( !event.target.selected ) {
+                        Fire.Selection.selectEntity(event.target.userId, true, false);
+                    }
                 }
             }
             event.stopPropagation();
@@ -276,9 +278,7 @@
                     // TODO:
                 }
                 else {
-                    if (Fire.Selection.entities.indexOf(event.target.userId) !== -1) {
-                        Fire.Selection.selectEntity(event.target.userId, true);
-                    }
+                    Fire.Selection.selectEntity(event.target.userId, true);
                 }
                 Fire.Selection.confirm();
             }
@@ -527,7 +527,21 @@
                     this.moveEntities( targetEL, items, nextSiblingId );
                 }
                 else if ( dragType === 'asset' ) {
-                    // TODO: instantiate
+
+                    // var onload = function ( asset ) {
+                    //     if ( asset.createEntity ) {
+                    //         var ent = asset.createEntity();
+                    //         var mousePos = new Fire.Vec2(event.clientX - clientRect.left, event.clientY - clientRect.top);
+                    //         var worldMousePos = this.renderContext.camera.screenToWorld(mousePos);
+                    //         ent.transform.worldPosition = worldMousePos; 
+                    //         Fire.Selection.selectEntity( ent.id, true, true );
+                    //         this.repaint();
+                    //     }
+                    // }.bind(this);
+
+                    for ( var i = 0; i < items.length; ++i ) {
+                        Fire.AssetLibrary.loadAssetByUuid( items[i], onload );
+                    }
                 }
             }
         },

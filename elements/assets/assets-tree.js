@@ -500,7 +500,9 @@
                     }
                 }
                 else {
-                    Fire.Selection.selectAsset(event.target.userId, true, false);
+                    if ( !event.target.selected ) {
+                        Fire.Selection.selectAsset(event.target.userId, true, false);
+                    }
                 }
             }
             event.stopPropagation();
@@ -515,9 +517,7 @@
                     // TODO:
                 }
                 else {
-                    if (Fire.Selection.assets.indexOf(event.target.userId) !== -1) {
-                        Fire.Selection.selectAsset(event.target.userId, true);
-                    }
+                    Fire.Selection.selectAsset(event.target.userId, true);
                 }
                 Fire.Selection.confirm();
             }
