@@ -391,8 +391,8 @@
             return resultELs;
         },
 
-        highlight: function ( item ) {
-            if ( item ) {
+        highlightBorder: function ( item ) {
+            if ( item && item instanceof AssetsItem ) {
                 var style = this.$.highlightBorder.style;
                 style.display = "block";
                 style.left = (item.offsetLeft-2) + "px";
@@ -654,7 +654,7 @@
                     this.cancelConflictsHighliting();
                     this.curDragoverEL = target;
 
-                    this.highlight(this.curDragoverEL);
+                    this.highlightBorder(this.curDragoverEL);
 
                     // name collision check
                     var names = [];

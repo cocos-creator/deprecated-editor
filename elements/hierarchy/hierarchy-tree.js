@@ -178,31 +178,42 @@
             }
         },
 
-        highlight: function ( item ) {
-            if ( item ) {
+        highlightBorder: function ( item ) {
+            if ( item && item instanceof HierarchyItem ) {
                 var style = this.$.highlightBorder.style;
                 style.display = "block";
                 style.left = (item.offsetLeft-2) + "px";
                 style.top = (item.offsetTop-1) + "px";
                 style.width = (item.offsetWidth+4) + "px";
                 style.height = (item.offsetHeight+3) + "px";
-
-                item.highlighted = true;
+            }
+            else {
+                this.$.highlightBorder.style.display = "none";
             }
         },
 
         highlightInsert: function ( item, position ) {
             if ( item ) {
                 var style = this.$.insertLine.style;
-                style.display = "block";
-                style.left = (item.offsetLeft-2) + "px";
-                style.width = (item.offsetWidth+4) + "px";
 
                 if ( position === 'inside' ) {
-                    style.top = (item.offsetTop-1) + "px";
-                    style.height = (item.offsetHeight+3) + "px";
+                    if ( item.firstElementChild ) {
+                        style.display = "block";
+                        style.top = (item.firstElementChild.offsetTop-1) + "px";
+                        style.left = (item.firstElementChild.offsetLeft-2) + "px";
+                        style.width = (item.firstElementChild.offsetWidth+4) + "px";
+                        style.height = "0px";
+                    }
+                    else {
+                        style.display = "none";
+                    }
                 }
                 else {
+                    style.display = "block";
+
+                    style.left = (item.offsetLeft-2) + "px";
+                    style.width = (item.offsetWidth+4) + "px";
+
                     if ( position === 'before' )
                         style.top = item.offsetTop + "px";
                     else if ( position === 'after'  )
@@ -213,11 +224,8 @@
         },
         
         cancelHighligting: function () {
-            if ( this.curDragoverEL ) {
-                this.curDragoverEL.highlighted = false;
-                this.$.highlightBorder.style.display = "none";
-                this.$.insertLine.style.display = "none";
-            }
+            this.$.highlightBorder.style.display = "none";
+            this.$.insertLine.style.display = "none";
         },
 
         resetDragState: function () {
@@ -230,7 +238,7 @@
 
         moveEntities: function ( targetEL, entities, nextSiblingId ) {
             // TODO: Fire.Selection.filter(entities,'sorted');
-            Fire.broadcast('engine:moveEntities', entities, targetEL.userId, nextSiblingId);
+            Fire.broadcast('engine:moveEntities', entities, targetEL ? targetEL.userId : null, nextSiblingId);
         },
 
         selectingAction: function (event) {
@@ -428,14 +436,24 @@
                     this.curDragoverEL = target;
                 }
 
-                // highlight insert
+                // highlight insertion
+                var position;
                 var bounding = this.getBoundingClientRect();
                 var offsetY = event.clientY - bounding.top + this.scrollTop;
-                var position = 'inside';
+
                 if ( offsetY <= (target.offsetTop + target.offsetHeight * 0.3) )
                     position = 'before';
-                if ( offsetY >= (target.offsetTop + target.offsetHeight * 0.7) )
+                else if ( offsetY >= (target.offsetTop + target.offsetHeight * 0.7) )
                     position = 'after';
+                else 
+                    position = 'inside';
+
+                if ( position === 'inside' ) {
+                    this.highlightBorder( target );
+                }
+                else {
+                    this.highlightBorder( target.parentElement );
+                }
                 this.highlightInsert( target, position );
 
                 //
@@ -461,25 +479,51 @@
             event.preventDefault();
             event.stopPropagation();
             
-            var targetEL = this.curDragoverEL;
-
             var dragType = Fire.DragDrop.type(event.dataTransfer);
             var items = Fire.DragDrop.drop(event.dataTransfer);
             this.resetDragState();
 
             if ( items.length > 0 ) {
-                if ( dragType === 'entity' ) {
-                    // TODO
-                    var nextSiblingId = null;
-                    // var bounding = this.getBoundingClientRect();
-                    // var offsetY = event.clientY - bounding.top + this.scrollTop;
-                    // var position = 'inside';
-                    // if ( offsetY <= (target.offsetTop + target.offsetHeight * 0.3) )
-                    //     position = 'before';
-                    // if ( offsetY >= (target.offsetTop + target.offsetHeight * 0.7) )
-                    //     position = 'after';
-                    // TODO
+                // get next sibliing id
+                var hoverTarget = event.target;
+                var targetEL = null;
+                var nextSiblingId = null;
 
+                if ( hoverTarget === this ) {
+                    targetEL = null;
+                }
+                else {
+                    var bounding = this.getBoundingClientRect();
+                    var offsetY = event.clientY - bounding.top + this.scrollTop;
+                    if ( offsetY <= (hoverTarget.offsetTop + hoverTarget.offsetHeight * 0.3) ) {
+                        nextSiblingId = hoverTarget.userId;
+                        targetEL = hoverTarget.parentElement;
+                    }
+                    else if ( offsetY >= (hoverTarget.offsetTop + hoverTarget.offsetHeight * 0.7) ) {
+                        if ( hoverTarget.nextElementSibling ) {
+                            nextSiblingId = hoverTarget.nextElementSibling.userId;
+                        }
+                        else {
+                            nextSiblingId = null;
+                            targetEL = hoverTarget.parentElement;
+                        }
+                    }
+                    else {
+                        nextSiblingId = null;
+                        targetEL = hoverTarget;
+                        if ( targetEL.firstElementChild ) {
+                            nextSiblingId = targetEL.firstElementChild.userId;
+                        }
+                    }
+                }
+
+                // if target is root, set it to null
+                if ( targetEL === this ) {
+                    targetEL = null;
+                }
+
+                // process 
+                if ( dragType === 'entity' ) {
                     this.moveEntities( targetEL, items, nextSiblingId );
                 }
                 else if ( dragType === 'asset' ) {
