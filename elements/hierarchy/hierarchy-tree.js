@@ -527,17 +527,19 @@
                     this.moveEntities( targetEL, items, nextSiblingId );
                 }
                 else if ( dragType === 'asset' ) {
+                    var parentEnt = null;
+                    if ( targetEL )
+                        parentEnt = Fire._getInstanceById(targetEL.userId);
 
-                    // var onload = function ( asset ) {
-                    //     if ( asset.createEntity ) {
-                    //         var ent = asset.createEntity();
-                    //         var mousePos = new Fire.Vec2(event.clientX - clientRect.left, event.clientY - clientRect.top);
-                    //         var worldMousePos = this.renderContext.camera.screenToWorld(mousePos);
-                    //         ent.transform.worldPosition = worldMousePos; 
-                    //         Fire.Selection.selectEntity( ent.id, true, true );
-                    //         this.repaint();
-                    //     }
-                    // }.bind(this);
+                    var onload = function ( asset ) {
+                        if ( asset.createEntity ) {
+                            var ent = asset.createEntity();
+                            ent.parent = parentEnt;
+                            ent.transform.position = new Fire.Vec2(0,0);
+                            Fire.Selection.selectEntity( ent.id, true, true );
+                            Fire.broadcast( 'scene:dirty' );
+                        }
+                    }.bind(this);
 
                     for ( var i = 0; i < items.length; ++i ) {
                         Fire.AssetLibrary.loadAssetByUuid( items[i], onload );
