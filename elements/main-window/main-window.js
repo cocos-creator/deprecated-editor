@@ -50,7 +50,7 @@
 
             // TODO: load last-open scene or init new
             Fire.Engine._setCurrentScene(new Fire._Scene());
-            var camera = new Fire.Entity('Main Window');
+            var camera = new Fire.Entity('Main Camera');
             camera.addComponent(Fire.Camera);
             this.updateTitle();
 
