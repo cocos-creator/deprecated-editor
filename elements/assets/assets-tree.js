@@ -405,8 +405,12 @@
         },
 
         highlightInsert: function ( item, parentEL, position ) {
-            if ( item && parentEL ) {
-                var style = this.$.insertLine.style;
+            var style = this.$.insertLine.style;
+
+            if ( item === parentEL ) {
+                style.display = "none";
+            }
+            else if ( item && parentEL ) {
                 style.display = "block";
                 style.left = parentEL.offsetLeft + "px";
                 if ( position === 'before' )
@@ -642,7 +646,7 @@
             }
 
             //
-            if ( event.target ) {
+            if ( event.target && event.target instanceof AssetsItem ) {
                 this.lastDragoverEL = this.curDragoverEL;
                 var target = event.target;
                 if ( event.target.isFolder === false )

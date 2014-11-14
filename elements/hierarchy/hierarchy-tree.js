@@ -426,21 +426,25 @@
             //
             if ( event.target ) {
                 this.lastDragoverEL = this.curDragoverEL;
+                var position;
+                var bounding = this.getBoundingClientRect();
+                var offsetY = event.clientY - bounding.top + this.scrollTop;
                 var target = event.target;
                 
                 //
                 if ( target !== this.lastDragoverEL ) {
                     if ( target === this ) {
-                        target = this.lastElementChild;
+                        if ( offsetY <= this.firstElementChild.offsetTop ) {
+                            target = this.firstElementChild;
+                        }
+                        else {
+                            target = this.lastElementChild;
+                        }
                     }
                     this.curDragoverEL = target;
                 }
 
                 // highlight insertion
-                var position;
-                var bounding = this.getBoundingClientRect();
-                var offsetY = event.clientY - bounding.top + this.scrollTop;
-
                 if ( offsetY <= (target.offsetTop + target.offsetHeight * 0.3) )
                     position = 'before';
                 else if ( offsetY >= (target.offsetTop + target.offsetHeight * 0.7) )
@@ -488,13 +492,18 @@
                 var hoverTarget = event.target;
                 var targetEL = null;
                 var nextSiblingId = null;
+                var bounding = this.getBoundingClientRect();
+                var offsetY = event.clientY - bounding.top + this.scrollTop;
 
                 if ( hoverTarget === this ) {
                     targetEL = null;
+                    if ( this.firstElementChild ) {
+                        if ( offsetY <= this.firstElementChild.offsetTop ) {
+                            nextSiblingId = this.firstElementChild.userId;
+                        }
+                    }
                 }
                 else {
-                    var bounding = this.getBoundingClientRect();
-                    var offsetY = event.clientY - bounding.top + this.scrollTop;
                     if ( offsetY <= (hoverTarget.offsetTop + hoverTarget.offsetHeight * 0.3) ) {
                         nextSiblingId = hoverTarget.userId;
                         targetEL = hoverTarget.parentElement;
