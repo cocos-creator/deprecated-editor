@@ -22,7 +22,7 @@
     "fontawesome": "",
     "mousetrap": "",
     "chroma-js": "",
-    "pixi": "2.0.0",
+    "pixi": "2.1.1",
     "polymer": "Polymer/polymer#~0.5.1",
     "web-animations-js": "web-animations/web-animations-js#master"
   },
