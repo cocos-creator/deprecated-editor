@@ -12,7 +12,10 @@
         },
 
         itemAddedAction: function ( event ) {
-            this.scrollTop = this.scrollHeight;
+            // to make sure after layout and before render  
+            window.requestAnimationFrame ( function () {
+                this.scrollTop = this.scrollHeight;
+            }.bind(this) );
             event.stopPropagation();
         },
     });
