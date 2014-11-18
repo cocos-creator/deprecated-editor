@@ -138,13 +138,14 @@
                 }
                 return null;
             }
-
             var template = [];
             var items = Fire._componentMenuItems;
             // enumerate components
             for (var i = 0; i < items.length; i++) {
                 var item = items[i];
                 var subPathes = item.menuPath.split('/');
+                
+                var prio = item.priority || 0;
                 // enumerate menu path
                 var newMenu = null;
                 for (var p = 0, parent = template; p < subPathes.length; p++) {
@@ -153,8 +154,11 @@
                         continue;
                     }
                     var parentMenuArray = parent === template ? template : parent.submenu;
+                    var menu;
                     if (parentMenuArray) {
-                        var menu = findMenu(parentMenuArray, label);
+                        if (parentMenuArray.length > 0) {
+                             menu = findMenu(parentMenuArray, label);
+                        }
                         if (menu) {
                             if (menu.submenu) {
                                 parent = menu;
@@ -169,17 +173,35 @@
                     // create
                     newMenu = {
                         label: label,
+                        priority: prio
                     };
                     if ( !parentMenuArray ) {
                         parent.submenu = [newMenu];
                     }
                     else {
-                        // TODO: sort by items.order;
-                        parentMenuArray.push(newMenu);
+                        var length = parentMenuArray.length;
+                        if (length > 0) {
+                            // find from back to front to get the one less than supplied priority,
+                            // then return the last one.
+                            for (var j = length - 1; j >= 0; j--) {
+                                if (parentMenuArray[j].priority > newMenu.priority) {
+                                    // end loop
+                                    if (j === 0) {
+                                        parentMenuArray.unshift(newMenu);
+                                    }
+                                }
+                                else {
+                                    parentMenuArray.splice(j + 1, 0, newMenu);
+                                    break;
+                                }
+                            }
+                        }
+                        else {
+                            parentMenuArray.push(newMenu);
+                        }
                     }
                     parent = newMenu;
                 }
-                //
                 if (newMenu && !newMenu.submenu) {
                     // click callback
                     newMenu.click = (function (component) {
