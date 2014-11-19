@@ -1,0 +1,45 @@
+:host {
+    .logo {
+        position: absolute;
+        bottom: 0px;
+        -webkit-filter: grayscale(0.5) opacity(0.2);
+
+        z-index: 1;
+    }
+
+    .sidebar {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        width: 250px;
+
+        background-color: #171717;
+
+        ul {
+            padding: 0px;
+            margin-top: 30px;
+
+            li {
+                padding: 10px;
+                padding-left: 20px;
+                font-size: 18px;
+                list-style-type: none;
+
+                color: #aaa;
+                border-left: 4px solid #171717;
+
+                &[selected] {
+                    border-left: 4px solid #ffba00;
+                    background-color: #333;
+                }
+
+                i {
+                    width: 15px;
+                    margin-right: 10px;
+                    color: #aaa;
+                }
+            }
+        }
+    }
+}

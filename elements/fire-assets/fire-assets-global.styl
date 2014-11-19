@@ -1,0 +1,28 @@
+html /deep/ {
+    assets-tree[focused] {
+        assets-item[selected]::shadow {
+            .wrapper {
+                .bar {
+                    background: #059
+                }
+            }
+        }
+
+        assets-item[conflicted]::shadow {
+            .wrapper {
+                .bar {
+                    background: #900
+                }
+            }
+        }
+    }
+
+    // calculate by .fold-icon.(width+marginRight) + .type-icon.(width+marginRight)
+    assets-item>assets-item{
+        margin-left: 30px
+    }
+    // calculate by .type-icon.(width+marginRight)
+    assets-item>assets-item[foldable] {
+        margin-left: 18px
+    }
+}
