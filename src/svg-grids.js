@@ -59,7 +59,7 @@ Fire.SvgGrids = (function () {
                 x: this.camera.transform.position.x,
                 y: this.camera.transform.position.y
             },
-            scale: this.camera.size / this.view.height,
+            scale: this.view.height / this.camera.size,
             screenToWorld: this.camera.screenToWorld.bind(this.camera),
             worldToScreen: this.camera.worldToScreen.bind(this.camera),
         };

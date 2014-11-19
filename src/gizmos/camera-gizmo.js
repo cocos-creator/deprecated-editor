@@ -41,7 +41,7 @@
 
     //
     CameraGizmo.prototype.update = function () {
-        var zoom = this._svg.camera.size / this._svg.view.height;
+        var zoom = this._svg.view.height / this._svg.camera.size;
 
         var localToWorld = this.target.entity.transform.getLocalToWorldMatrix();
         var worldpos = new Fire.Vec2(localToWorld.tx, localToWorld.ty);

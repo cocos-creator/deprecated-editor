@@ -20,7 +20,7 @@ Fire.PositionGizmo = (function () {
             },
 
             update: function ( dx, dy ) {
-                var cameraScale = svg.camera.size / svg.view.height;
+                var cameraScale = svg.view.height / svg.camera.size;
                 var delta = new Fire.Vec2( dx/cameraScale, -dy/cameraScale );
 
                 for ( var i = 0; i < worldposList.length; ++i ) {
