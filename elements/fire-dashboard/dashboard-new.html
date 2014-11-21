@@ -9,13 +9,13 @@
             <div class="title">New Project</div>
             <div class="border">
                 <div>
-                    <input id="name" placeholder="Name"></input>
+                    <input placeholder="Name" value="{{name}}"></input>
                 </div>
                 <div>
-                    <input id="path" placeholder="Path"></input>
-                    <button class="small">...</button>
+                    <input placeholder="Path" value="{{path}}"></input>
+                    <button class="small" on-click="{{browseAction}}">...</button>
                 </div>
-                <button>Create</button>
+                <button on-click="{{createAction}}">Create</button>
             </div>
         </div>
     </template>
