@@ -3,14 +3,11 @@
         <title>Fireball-x Dashboard</title>
 
         <link rel="stylesheet" href="fire://ext/fontawesome/css/font-awesome.css">
+
         <link rel="import" href="fire://ext/polymer/polymer.html">
+        <link rel="import" href="fire://src/editor/fire-dashboard/fire-dashboard.html">
 
         <style>
-            * {
-                cursor: default;     
-                -webkit-user-select: none;
-            }
-
             body {
                 margin: 0px;
                 padding: 0px;
@@ -19,64 +16,49 @@
                 overflow: hidden;
                 color: #ddd;
                 background-color: #333;
-                font-family: "Microsoft YaHei",Helvetica,Arial,sans-serif;
             }
 
-            .logo {
-                position: absolute;
-                bottom: 0px;
-                -webkit-filter: grayscale(0.5) opacity(0.2);
-
-                z-index: 1;
+            html /deep/ .fa {
+                display: inline-block;
+                font-family: FontAwesome;
+                font-style: normal;
+                font-weight: normal;
+                line-height: 1;
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
             }
 
-            .sidebar {
-                position: absolute;
-                top: 0;
-                bottom: 0;
-                left: 0;
-                width: 250px;
-
-                background-color: #171717;
+            html /deep/ .fa-gear:before {
+                content: "\f013"
             }
 
-            .sidebar ul {
-                padding: 0px;
-                margin-top: 30px;
+            html /deep/ .fa-bars:before {
+                content: "\f0c9";
             }
 
-            .sidebar li {
-                padding: 10px;
-                padding-left: 20px;
-                font-size: 18px;
-                list-style-type: none;
-
-                color: #aaa;
-                border-left: 4px solid #171717;
-            }
-            .sidebar li[selected] {
-                border-left: 4px solid #ffba00;
-                background-color: #333;
+            html /deep/ .fa-question-circle:before {
+                content: "\f059"
             }
 
-            .sidebar i {
-                width: 15px;
-                margin-right: 10px;
-                color: #aaa;
+            html /deep/ .fa-close:before {
+                content: "\f00d"
             }
-
         </style>
+
+        <script>
+            var fireID = JSON.parse(decodeURIComponent(location.search.substr(8)));
+            var ipc = require('ipc');
+            var Fire = {
+                command: function ( name ) {
+                    'use strict';
+                    var args = arguments.length > 1 ? [].slice.call( arguments, 1 ) : [];
+                    ipc.send.apply( ipc, ['command@' + fireID, name].concat(args) );
+                },
+            };
+        </script>
     </head>
 
     <body>
-        <img class="logo" src="fire://static/img/logo-256.png"></img>
-
-        <div class="sidebar">
-            <ul>
-                <li selected><i class="fa fa-reorder"></i>Recent Proejcts</li>
-                <li><i class="fa fa-gear"></i>New Project</li>
-                <li><i class="fa fa-question-circle"></i>Help</li>
-            </ul>
-        </div>
+        <fire-dashboard></fire-dashboard>
     </body>
 </html>

@@ -1,3 +1,6 @@
+<link rel="import" href="dashboard-recent.html">
+<link rel="import" href="dashboard-new.html">
+
 <polymer-element 
     name="fire-dashboard" 
     constructor="FireDashboard"
@@ -5,14 +8,27 @@
     <template>
         <link rel="stylesheet" href="fire-dashboard.css">
 
-        <img class="logo" src="../../img/dashboard-logo.png"></img>
         <div class="sidebar">
-            <ul>
-                <li selected><i class="fa fa-reorder"></i>Recent Proejcts</li>
-                <li><i class="fa fa-gear"></i>New Project</li>
-                <li><i class="fa fa-question-circle"></i>Help</li>
-            </ul>
+            <img class="logo" src="img/dashboard-logo.png"></img>
+            <div id="menu">
+                <div class="item" on-click="{{recentAction}}">
+                    <i class="fa fa-bars"></i>Recent Proejcts
+                </div>
+                <div class="item" on-click="{{newAction}}">
+                    <i class="fa fa-gear"></i>New Project
+                </div>
+                <div class="item" on-click="{{helpAction}}">
+                    <i class="fa fa-question-circle"></i>Help
+                </div>
+            </div>
+        </div>
+
+        <div id="content" class="content">
+            <dashboard-recent></dashboard-recent>
+            <dashboard-new></dashboard-new>
+            <dashboard-help></dashboard-help>
         </div>
     </template>
+
     <script type="text/javascript" src="fire-dashboard.js"></script>
 </polymer-element>

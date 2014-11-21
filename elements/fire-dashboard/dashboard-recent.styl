@@ -1,0 +1,75 @@
+:host {
+    position: absolute
+    top: 0
+    right: 0
+    bottom: 0
+    left: 0
+    padding: 30px
+
+    .flex-col {
+        display: flex
+        flex-direction: column
+        flex-wrap: nowrap     
+        align-items: stretch
+        height: 100%
+    }
+
+    .title {
+        font-size: 25px
+        margin-bottom: 20px
+
+        color: #ffba00
+    }
+
+    .btn {
+        display: inline-block
+        margin-bottom: 20px
+        padding: 8px 10px
+        width: 100px
+        text-align: center
+
+        background: #171717
+
+        &:hover {
+            cursor: pointer
+        }
+        &:active {
+            background: #171717 + 10%
+        }
+    }
+
+    .border {
+        flex: auto
+        box-sizing: border-box
+        height: 100%
+
+        border: 1px solid black
+        color: #ddd
+        background: #232323
+
+        overflow-x: hidden
+        overflow-y: auto
+
+        &.highlight {
+            border: 1px solid #09f
+        }
+    }
+
+    ::-webkit-scrollbar {
+        height: 8px
+        width: 8px
+    }
+    ::-webkit-scrollbar-thumb {
+        background: #555
+    }
+    ::-webkit-scrollbar-track {
+        // background-clip: padding-box
+        // background-color: rgba(255,255,255,0.1)
+    }
+    ::-webkit-scrollbar-corner {
+        background-color: #171717
+    }
+    ::-webkit-scrollbar-button {
+        display: none
+    }
+}
