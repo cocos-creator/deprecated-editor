@@ -1,0 +1,72 @@
+:host {
+    position: relative
+    display: block
+    height: 50px
+    margin-bottom: 1px
+    padding: 15px 30px 5px
+
+    background: rgba( 128, 128, 128, 0.2 )
+
+    .name {
+        font-size: 22px
+    }
+
+    .path {
+        font-size: 15px
+
+        color: #777
+    }
+
+    .btn-group {
+        display: none
+        position: absolute
+        right: 5px
+        bottom: 10px
+        font-size: 15px
+        font-weight: 900
+    }
+
+    .close {
+        display: inline-block
+        padding: 5px 10px
+        font-size: 15px
+        font-weight: 900
+        width: 50px
+        text-align: center
+
+        color: #900
+
+        &:hover {
+            background: #171717
+            cursor: pointer
+        }
+        &:active {
+            background: #171717 + 10%
+        }
+    }
+
+    .open {
+        display: inline-block
+        padding: 5px 10px
+        font-size: 15px
+        font-weight: 900
+        width: 50px
+        text-align: center
+
+        color: #090
+
+        &:hover {
+            background: #171717
+            cursor: pointer
+        }
+        &:active {
+            background: #171717 + 10%
+        }
+    }
+
+    &(:hover) {
+        .btn-group {
+            display: inline-block
+        }
+    }
+}

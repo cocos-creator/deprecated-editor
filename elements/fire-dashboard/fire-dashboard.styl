@@ -1,45 +1,63 @@
 :host {
-    .logo {
-        position: absolute;
-        bottom: 0px;
-        -webkit-filter: grayscale(0.5) opacity(0.2);
+    display: flex
+    flex-direction: row
+    flex-wrap: nowrap     
+    align-items: stretch
+    height: 100%
 
-        z-index: 1;
+    font-family: Helvetica,Arial,sans-serif
+
+    * {
+        cursor: default     
+        -webkit-user-select: none
+
+        &:focus {
+            outline: 0
+        }
     }
 
     .sidebar {
-        position: absolute;
-        top: 0;
-        bottom: 0;
-        left: 0;
-        width: 250px;
+        width: 250px
 
-        background-color: #171717;
+        background-color: #171717
 
-        ul {
-            padding: 0px;
-            margin-top: 30px;
+        .logo {
+            -webkit-filter: grayscale(0.5) opacity(0.3)
+        }
 
-            li {
-                padding: 10px;
-                padding-left: 20px;
-                font-size: 18px;
-                list-style-type: none;
+        #menu {
+            margin-top: 120px
+            padding: 0px
 
-                color: #aaa;
-                border-left: 4px solid #171717;
+            .item {
+                padding: 10px
+                padding-left: 20px
+                font-size: 18px
+                list-style-type: none
 
-                &[selected] {
-                    border-left: 4px solid #ffba00;
-                    background-color: #333;
+                color: #aaa
+                border-left: 4px solid #171717
+
+                &:hover {
+                    border-left: 4px solid #222
+                    background-color: #222
+                }
+
+                &.active {
+                    border-left: 4px solid #ffba00
+                    background-color: #333
                 }
 
                 i {
-                    width: 15px;
-                    margin-right: 10px;
-                    color: #aaa;
+                    width: 20px
+                    margin-right: 10px
                 }
             }
         }
+    }
+
+    .content {
+        flex: auto
+        position: relative
     }
 }

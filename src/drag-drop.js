@@ -68,7 +68,7 @@ Fire.DragDrop = (function () {
             var files = dataTransfer.files;
             items = [];
 
-            for ( var i = 0; i < files.length; ++ i) {
+            for ( var i = 0; i < files.length; ++i ) {
                 var exists = false;
 
                 for ( var j = 0; j < items.length; ++j ) {
