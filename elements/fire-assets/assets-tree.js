@@ -298,7 +298,7 @@
 
         load: function ( url ) {
             console.time('fire-assets:load');
-            Fire.hint('start browsing ' + url);
+            Fire.hint('browsing ' + url);
 
             _newAssetsItem.call(this, url, 'root', Fire.UUID.AssetsRoot, this);
 
@@ -306,7 +306,7 @@
         },
 
         finishLoading: function ( url ) {
-            Fire.hint('finish browsing ' + url);
+            Fire.hint(url + ' finish browsing!');
             console.timeEnd('fire-assets:load');
         },
 

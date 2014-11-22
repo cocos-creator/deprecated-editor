@@ -1,19 +1,22 @@
 :host {
-    display: flex
-    flex-direction: column
-    flex-wrap: nowrap     
-    align-items: stretch
-
     position: absolute
     top: 0
     right: 0
     bottom: 0
     left: 0
-    margin: 3px
-    font-size: 12px
 
+    font-size: 12px
     font-family: Helvetica,Arial,sans-serif
     color: #ddd
+
+    .content {
+        display: flex
+        flex-direction: column
+        flex-wrap: nowrap     
+        align-items: stretch
+
+        margin: 3px
+    }
 
     span.space {
         width: 3px

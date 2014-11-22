@@ -12,6 +12,7 @@
             };
 
             this.sceneNameObserver = null; 
+            this.ipc = new Fire.IpcListener();
         },
 
         domReady: function () {
@@ -36,32 +37,58 @@
                 document.body.scrollTop = 0;
             };
 
-            // init engine
-            Fire.log('fire-engine initializing...');
-            Fire.AssetLibrary.init("library://");
-            var renderContext = Fire.Engine.init( this.$.game.$.view.clientWidth,
-                                                  this.$.game.$.view.clientHeight );
+            Fire.command('project:init');
+            this.ipc.on('project:ready', function () {
+                Polymer.import([
+                    "fire://src/editor/fire-assets/fire-assets.html",
+                    "fire://src/editor/fire-hierarchy/fire-hierarchy.html",
+                    "fire://src/editor/fire-inspector/fire-inspector.html",
+                    "fire://src/editor/fire-console/fire-console.html",
+                    "fire://src/editor/fire-scene/fire-scene.html",
+                    "fire://src/editor/fire-game/fire-game.html",
+                ], function () {
+                    this.addPlugin( this.$.hierarchyPanel, FireHierarchy, 'hierarchy', 'Hierarchy' );
+                    this.addPlugin( this.$.assetsPanel, FireAssets, 'assets', 'Assets' );
+                    this.addPlugin( this.$.inspectorPanel, FireInspector, 'inspector', 'Inspector' );
+                    this.addPlugin( this.$.consolePanel, FireConsole, 'console', 'Console' );
+                    this.addPlugin( this.$.editPanel, FireScene, 'scene', 'Scene' );
+                    this.addPlugin( this.$.editPanel, FireGame, 'game', 'Game' );
 
-            // init game view
-            this.$.game.setRenderContext(renderContext);
+                    // init engine
+                    Fire.hint('fire-engine initializing...');
+                    Fire.AssetLibrary.init("library://");
+                    var renderContext = Fire.Engine.init( this.$.game.$.view.clientWidth,
+                                                          this.$.game.$.view.clientHeight );
 
-            // init scene view
-            this.$.scene.initRenderContext();
+                    // init game view
+                    this.$.game.setRenderContext(renderContext);
 
-            // TODO: load last-open scene or init new
-            Fire.Engine._setCurrentScene(new Fire._Scene());
-            var camera = new Fire.Entity('Main Camera');
-            camera.addComponent(Fire.Camera);
-            this.updateTitle();
+                    // init scene view
+                    this.$.scene.initRenderContext();
 
-            // observe the current scene name
-            if ( this.sceneNameObserver ) {
-                this.sceneNameObserver.close();
-            }
-            this.sceneNameObserver = new PathObserver( Fire.Engine._scene, "_name" );
-            this.sceneNameObserver.open( function ( newValue, oldValue ) {
-                this.updateTitle();
-            }, this );
+                    // TODO: load last-open scene or init new
+                    Fire.Engine._setCurrentScene(new Fire._Scene());
+                    var camera = new Fire.Entity('Main Camera');
+                    camera.addComponent(Fire.Camera);
+                    this.updateTitle();
+
+                    // observe the current scene name
+                    if ( this.sceneNameObserver ) {
+                        this.sceneNameObserver.close();
+                    }
+                    this.sceneNameObserver = new PathObserver( Fire.Engine._scene, "_name" );
+                    this.sceneNameObserver.open( function ( newValue, oldValue ) {
+                        this.updateTitle();
+                    }, this );
+
+                    //
+                    this.$.launchMask.style.display = "none";
+                }.bind(this));
+            }.bind(this) );
+        },
+
+        detached: function () {
+            this.ipc.clear();
         },
 
         resizedAction: function ( event ) {
@@ -83,6 +110,16 @@
                 sceneName = 'Untitled';
             }
             Remote.getCurrentWindow().setTitle( sceneName + " - Fireball-x Editor" );
+        },
+
+        addPlugin: function ( dock, plugin, id, name ) {
+            var pluginInst = new plugin();
+            pluginInst.setAttribute('id', id);
+            pluginInst.setAttribute('name', name);
+            pluginInst.setAttribute('fit', '');
+            this.$[id] = pluginInst;
+            dock.add(pluginInst);
+            dock.$.tabs.select(0);
         },
     });
 })();

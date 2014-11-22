@@ -1,5 +1,6 @@
-<link rel="import" href="top-bar.html">
-<link rel="import" href="status-bar.html">
+<link rel="import" href="top-bar/top-bar.html">
+<link rel="import" href="status-bar/status-bar.html">
+<link rel="import" href="launch-page/launch-page.html">
 
 <polymer-element 
     name="main-window" 
@@ -9,43 +10,46 @@
 
 <link rel="stylesheet" href="main-window.css">
 
-<span class="space"></span>
+<div class="content" fit>
+    <span class="space"></span>
+    <top-bar id="toolbar"
+        on-layout-tools-changed="{{layoutToolsAction}}"
+    ></top-bar>
 
-<top-bar id="toolbar"
-    on-layout-tools-changed="{{layoutToolsAction}}"
-></top-bar>
+    <fire-ui-dock flex-1 flex-row flex-stretch
+        on-resized="{{resizedAction}}"
+        >
 
-<fire-ui-dock flex-1 flex-row flex-stretch
-    on-resized="{{resizedAction}}"
-    >
+        <fire-ui-dock flex-col flex-stretch style="min-width: 200px; width: 200px">
+            <fire-ui-dock-panel id="hierarchyPanel" flex-1>
+                <!-- <fire-hierarchy id="hierarchy" name="Hierarchy" fit></fire-hierarchy> -->
+            </fire-ui-dock-panel>
 
-    <fire-ui-dock flex-col flex-stretch style="min-width: 200px; width: 200px">
-        <fire-ui-dock-panel flex-1>
-            <fire-hierarchy id="hierarchy" name="Hierarchy" fit></fire-hierarchy>
-        </fire-ui-dock-panel>
+            <fire-ui-dock-panel id="assetsPanel" flex-1>                              
+                <!-- <fire-assets id="assets" name="Assets" fit></fire-assets> -->
+            </fire-ui-dock-panel>                                                   
+        </fire-ui-dock>
 
-        <fire-ui-dock-panel flex-1>                              
-            <fire-assets id="assets" name="Assets" fit></fire-assets>
-        </fire-ui-dock-panel>                                                   
+        <fire-ui-dock-panel id="inspectorPanel" style="min-width: 240px; width: 240px;">                
+            <!-- <fire-inspector id="inspector" name="Inspector" fit></fire-inspector> -->
+        </fire-ui-dock-panel>                                                       
+
+        <fire-ui-dock flex-1 flex-col flex-stretch>
+            <fire-ui-dock-panel id="editPanel" flex-1 style="">                        
+                <!-- <fire-scene id="scene" name="Scene" fit></fire-scene> -->
+                <!-- <fire-game id="game" name="Game" fit></fire-game>     -->
+            </fire-ui-dock-panel>                                       
+
+            <fire-ui-dock-panel id="consolePanel" style="min-height: 200px;">
+                <!-- <fire-console id="console" name="Console" fit></fire-console> -->
+            </fire-ui-dock-panel>
+        </fire-ui-dock>
     </fire-ui-dock>
 
-    <fire-ui-dock-panel style="min-width: 240px; width: 240px;">                
-        <fire-inspector id="inspector" name="Inspector" fit></fire-inspector>
-    </fire-ui-dock-panel>                                                       
+    <status-bar id="status"></status-bar>
+</div>
 
-    <fire-ui-dock flex-1 flex-col flex-stretch>
-        <fire-ui-dock-panel flex-1 style="">                        
-            <fire-scene id="scene" name="Scene" fit></fire-scene>
-            <fire-game id="game" name="Game" fit></fire-game>    
-        </fire-ui-dock-panel>                                       
-
-        <fire-ui-dock-panel style="min-height: 200px;">
-            <fire-console id="console" name="Console" fit></fire-console>
-        </fire-ui-dock-panel>
-    </fire-ui-dock>
-</fire-ui-dock>
-
-<status-bar id="status"></status-bar>
+<launch-page id="launchMask" fit></launch-page>
 
 </template>
 
