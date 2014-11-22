@@ -1,6 +1,13 @@
 (function () {
     var Remote = require('remote');
 
+    function loadUserScripts () {
+        var script = document.createElement('script');
+        script.setAttribute('type','text/javascript');
+        script.setAttribute('src', 'library://bundle.js');
+        document.head.appendChild(script);
+    }
+
     Polymer({
         created: function () {
             Fire.mainWindow = this;
@@ -54,6 +61,9 @@
                     this.addPlugin( this.$.editPanel, FireScene, 'scene', 'Scene' );
                     this.addPlugin( this.$.editPanel, FireGame, 'game', 'Game' );
 
+                    // load user scripts
+                    loadUserScripts();
+
                     // init engine
                     Fire.hint('fire-engine initializing...');
                     Fire.AssetLibrary.init("library://");
@@ -82,7 +92,8 @@
                     }, this );
 
                     //
-                    this.$.launchMask.style.display = "none";
+                    var launchPage = document.getElementById('launch-page');
+                    launchPage.remove();
                 }.bind(this));
             }.bind(this) );
         },

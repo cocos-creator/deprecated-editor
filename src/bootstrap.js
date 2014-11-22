@@ -5,13 +5,6 @@ var ipc = require('ipc');
 Fire.plugins = {};  // TODO: 做成Remote Object，确保全局只有一份?
 Fire.gizmos = {};
 
-function loadUserScripts () {
-    var script = document.createElement('script');
-    script.setAttribute('type','text/javascript');
-    script.setAttribute('src', 'library://bundle.js');
-    document.head.appendChild(script);
-}
-
 try {
     // skip "?fireID="
     var fireID = JSON.parse(decodeURIComponent(location.search.substr(8)));
@@ -74,9 +67,6 @@ try {
     // get remote globals
     Fire.AssetDB = remote.getGlobal( 'AssetDB@' + fireID );
     Fire.MainMenu = remote.getGlobal( 'MainMenu@' + fireID );
-
-    // load user scripts
-    loadUserScripts();
 
     //
     window.onload = function () {

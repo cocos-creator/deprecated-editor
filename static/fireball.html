@@ -3,20 +3,20 @@
         <title>Fireball-x</title>
 
         <script type="text/javascript" src="fire://ext/web-animations-js/web-animations.js"></script>
-        <script type="text/javascript" src="fire://ext/svg.js/dist/svg.js"></script>
-        <script type="text/javascript" src="fire://ext/chroma-js/chroma.js"></script>
-        <script type="text/javascript" src="fire://ext/pixi/bin/pixi.dev.js"></script>
+        <script type="text/javascript" src="fire://ext/svg.js/dist/svg.js"></script>                 
+        <script type="text/javascript" src="fire://ext/chroma-js/chroma.js"></script>                
+        <script type="text/javascript" src="fire://ext/pixi/bin/pixi.dev.js"></script>               
 
-        <script type="text/javascript" src="fire://src/core/core.dev.js"></script>
-        <script type="text/javascript" src="fire://src/engine/engine.dev.js"></script>
-        <script type="text/javascript" src="fire://src/editor-share/editor-share.dev.js"></script>
-        <script type="text/javascript" src="fire://src/editor/editor.dev.js"></script>
+        <script type="text/javascript" src="fire://src/core/core.dev.js"></script>                   
+        <script type="text/javascript" src="fire://src/engine/engine.dev.js"></script>               
+        <script type="text/javascript" src="fire://src/editor-share/editor-share.dev.js"></script>   
+        <script type="text/javascript" src="fire://src/editor/editor.dev.js"></script>               
 
-        <link rel="stylesheet" href="fire://ext/fontawesome/css/font-awesome.css">
-        <link rel="stylesheet" href="fire://src/editor-ui/editor-ui.css">
+        <link rel="stylesheet" href="fire://ext/fontawesome/css/font-awesome.css">                   
+        <link rel="stylesheet" href="fire://src/editor-ui/editor-ui.css">                            
 
         <link rel="import" href="fire://ext/polymer/polymer.html">                     
-        <link rel="import" href="fire://src/editor-ui/editor-ui.html">                 
+        <link rel="import" href="fire://src/editor-ui/editor-ui.html">                               
         <link rel="import" href="fire://src/editor/main-window/main-window.html">      
 
         <style>
@@ -29,10 +29,92 @@
                 color: #ddd;
                 background-color: #333;
             }
+
+            #launch-page {
+                position: absolute;
+                top: 0;
+                right: 0;
+                bottom: 0;
+                left: 0;
+
+                display: block;
+                font-family: "Microsoft YaHei",Helvetica,Arial,sans-serif;
+                background-color: rgb(33,39,51);
+                z-index: 999;
+            }
+
+            span.flex {
+                flex: auto;
+            }
+
+            .v-center-wrapper {
+                display: flex;
+                flex-direction: column; 
+                flex-wrap: nowrap;     
+
+                position: absolute;
+                top: 0;
+                right: 0;
+                bottom: 0;
+                left: 0;
+            }
+
+            .h-center-wrapper {
+                display: flex;
+                flex-direction: row; 
+                flex-wrap: nowrap;     
+            }
+
+            .logo {
+                margin-left: -50px;
+                margin-top: -50px;
+            }
+
+            .status {
+                font-size: 14px;
+                margin: auto;
+                margin-top: 20px;
+                white-space: nowrap;
+
+                color: rgb(255,75,2);
+            }
+
+            .copyright {
+                font-size: 10px;
+                margin: 0 auto 5px;
+
+                color: rgb(104,104,104);
+            }
+
+            .copyright span {
+                color: rgb(255,255,255);
+            }
+
+            .progress {
+                border: 2px solid rgb(255,75,2);
+                width: 50%;
+            }
         </style>
     </head>
 
     <body>
         <main-window></main-window>
+
+        <div id="launch-page">
+            <div class="v-center-wrapper">
+                <span class="flex"></span>
+                <div class="h-center-wrapper">
+                    <span class="flex"></span>
+                    <img class="logo" src="fire://static/img/logo-with-text.png"></img>
+                    <span class="flex"></span>
+                </div>
+                <div class="status">Loading Fireball...</div>
+                <span class="flex"></span>
+                <div class="copyright">
+                    &copy 2014 Fireball LLC All rights reserved. <span>Privacy Policy</span>
+                </div>
+                <!-- <div class="progress"></div> -->
+            </div>
+        </div>
     </body>
 </html>
