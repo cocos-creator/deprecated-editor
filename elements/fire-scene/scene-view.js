@@ -269,38 +269,20 @@
             var mousePos = new Fire.Vec2(x,y); 
             var worldMousePos = this.renderContext.camera.screenToWorld(mousePos);
 
-            var entities = []; 
-            var i, c, bounding;
-
-            for ( i = 0; i < this.interactionContext.boundings.length; ++i ) {
-                bounding = this.interactionContext.boundings[i];
-                if ( bounding.aabb.contains(worldMousePos) ) {
-                    entities.push(bounding.entity);
-                }
-            }
-
-            //
             var minDist = null;
             var resultEntity = null;
-            for ( i = 0; i < entities.length; ++i ) {
-                var entity = entities[i];
-                for ( c = 0; c < entity._components.length; ++c ) {
-                    var component = entity._components[c];
 
-                    if ( component instanceof Fire.Renderer ) { 
-                        var bounds = component.getWorldOrientedBounds();
-                        var polygon = new Fire.Polygon(bounds);
-
-                        //
-                        if ( polygon.contains( worldMousePos ) ) {
-                            var dist = worldMousePos.sub(polygon.center).magSqr();
-                            if ( minDist === null || dist < minDist ) {
-                                minDist = dist;
-                                resultEntity = entity;
-                            }
+            for ( var i = 0, boundings = this.interactionContext.boundings; i < boundings.length; ++i ) {
+                var bounding = boundings[i];
+                if ( bounding.aabb.contains(worldMousePos) ) {
+                    //
+                    var polygon = new Fire.Polygon(bounding.obb);
+                    if ( polygon.contains( worldMousePos ) ) {
+                        var dist = worldMousePos.sub(polygon.center).magSqr();
+                        if ( minDist === null || dist < minDist ) {
+                            minDist = dist;
+                            resultEntity = bounding.entity;
                         }
-
-                        break;
                     }
                 }
             }
@@ -313,33 +295,15 @@
             var v2 = this.renderContext.camera.screenToWorld(new Fire.Vec2(rect.xMax,rect.yMax));
             var worldRect = Fire.Rect.fromVec2(v1,v2); 
 
-            var entities = []; 
-            var i, c, bounding;
+            var entities = [];
+            var i;
 
-            for ( i = 0; i < this.interactionContext.boundings.length; ++i ) {
-                bounding = this.interactionContext.boundings[i];
+            for ( i = 0, boundings = this.interactionContext.boundings; i < boundings.length; ++i ) {
+                var bounding = boundings[i];
                 if ( bounding.aabb.intersects(worldRect) ) {
-                    entities.push(bounding.entity);
-                }
-            }
-
-            //
-            for ( i = 0; i < entities.length; ++i ) {
-                var entity = entities[i];
-                for ( c = 0; c < entity._components.length; ++c ) {
-                    var component = entity._components[c];
-
-                    if ( component instanceof Fire.Renderer ) { 
-                        var bounds = component.getWorldOrientedBounds();
-                        var polygon = new Fire.Polygon(bounds);
-
-                        //
-                        if ( Fire.Intersection.rectPolygon(worldRect,polygon) === false ) {
-                            entities.splice( i, 1 );
-                            --i;
-                        }
-
-                        break;
+                    var polygon = new Fire.Polygon(bounding.obb);
+                    if ( Fire.Intersection.rectPolygon(worldRect, polygon) ) {
+                        entities.push(bounding.entity);
                     }
                 }
             }
