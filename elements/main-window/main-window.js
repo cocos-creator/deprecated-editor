@@ -23,27 +23,6 @@
         },
 
         domReady: function () {
-            // init document events
-            document.addEventListener( "dragstart", function (event) {
-                event.preventDefault(); 
-            } );
-            document.addEventListener( "drop", function (event) {
-                event.preventDefault(); 
-            } );
-            document.addEventListener( "dragover", function (event) {
-                event.preventDefault(); 
-            } );
-            document.addEventListener( "contextmenu", function (event) {
-                event.preventDefault();
-                event.stopPropagation();
-            } );
-
-            // NOTE: this will prevent mac touchpad scroll the body
-            document.body.onscroll = function ( event ) {
-                document.body.scrollLeft = 0;
-                document.body.scrollTop = 0;
-            };
-
             Fire.command('project:init');
             this.ipc.on('project:ready', function () {
                 Polymer.import([
@@ -60,6 +39,21 @@
                     this.addPlugin( this.$.consolePanel, FireConsole, 'console', 'Console' );
                     this.addPlugin( this.$.editPanel, FireScene, 'scene', 'Scene' );
                     this.addPlugin( this.$.editPanel, FireGame, 'game', 'Game' );
+
+                    // for each plugin
+                    for ( var key in Fire.plugins) {
+                        var plugin = Fire.plugins[key];
+
+                        // init plugin
+                        if ( plugin.init ) {
+                            plugin.init();
+                        }
+
+                        // register menu
+                        if ( plugin.mainMenu ) {
+                            Fire.MainMenu.addTemplate(plugin.mainMenu.path, plugin.mainMenu.template);
+                        }
+                    }
 
                     // load user scripts
                     loadUserScripts();
@@ -90,10 +84,6 @@
                     this.sceneNameObserver.open( function ( newValue, oldValue ) {
                         this.updateTitle();
                     }, this );
-
-                    //
-                    var launchPage = document.getElementById('launch-page');
-                    launchPage.remove();
                 }.bind(this));
             }.bind(this) );
         },

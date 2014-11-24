@@ -1,14 +1,12 @@
-﻿
-var remote = require('remote');
-var ipc = require('ipc');
-
-Fire.plugins = {};  // TODO: 做成Remote Object，确保全局只有一份?
-Fire.gizmos = {};
-
-try {
+(function () {
     // skip "?fireID="
     var fireID = JSON.parse(decodeURIComponent(location.search.substr(8)));
 
+    //
+    var remote = require('remote');
+    var ipc = require('ipc');
+
+    //
     Fire.merge( Fire, {
         // console
         log: function ( text ) { 
@@ -69,35 +67,6 @@ try {
     Fire.MainMenu = remote.getGlobal( 'MainMenu@' + fireID );
 
     //
-    window.onload = function () {
-
-        var key, plugin;
-        // init plugins
-        for (key in Fire.plugins) {
-            plugin = Fire.plugins[key];
-            if (plugin.init) {
-                plugin.init();
-            }
-        }
-        // register menus
-        var isMainWebContext = true;
-        if (isMainWebContext) {
-            for (key in Fire.plugins) {
-                plugin = Fire.plugins[key];
-                if (plugin.mainMenu) {
-                    Fire.MainMenu.addTemplate(plugin.mainMenu.path, plugin.mainMenu.template);
-                }
-            }
-        }
-    };
-}
-catch ( error ) {
-    window.onload = function () {
-        var currentWindow = remote.getCurrentWindow();
-        currentWindow.setSize(800, 600);
-        currentWindow.center();
-        currentWindow.show();
-        currentWindow.openDevTools();
-        console.error(error.stack || error);
-    };
-}
+    Fire.plugins = {}; // TODO: 做成Remote Object，确保全局只有一份?
+    Fire.gizmos = {};
+})();

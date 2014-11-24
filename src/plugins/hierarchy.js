@@ -46,6 +46,5 @@
     };
 
     hierarchy.mainMenu.template = hierarchy.getMenuTemplate('create');
-
     Fire.plugins.hierarchy = hierarchy;
 })();

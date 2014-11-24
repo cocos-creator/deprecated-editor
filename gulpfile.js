@@ -27,19 +27,21 @@ var paths = {
         'src/engine-extends/ipc-sender.js',
         'src/engine-extends/ipc-receiver.js',
 
-        'src/bootstrap.js',
+        // editor basic
+        'src/editor.js',
+        'src/menu.js',
         'src/ipc-listener.js',
         'src/selection.js',
         'src/drag-drop.js',
-        'src/gizmos-utils.js',
-
         'src/pixi-grids.js',
         'src/svg-grids.js',
+        'src/gizmos-utils.js',
         'src/svg-gizmos.js',
-        'src/menu.js',
 
+        // plugins
         'src/plugins/hierarchy.js',
 
+        // gizmos
         'src/gizmos/gizmo.js',
         'src/gizmos/position-gizmo.js',
         'src/gizmos/rotation-gizmo.js',
