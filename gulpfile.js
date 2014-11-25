@@ -14,6 +14,9 @@ var stylish = require('jshint-stylish');
 
 var paths = {
     src: [
+        // editor basic
+        'src/selection.js',
+
         // asset extends
         'src/assets/sprite.js',
 
@@ -27,11 +30,10 @@ var paths = {
         'src/engine-extends/ipc-sender.js',
         'src/engine-extends/ipc-receiver.js',
 
-        // editor basic
+        // editor
         'src/editor.js',
         'src/menu.js',
-        'src/ipc-listener.js',
-        'src/selection.js',
+        'src/ipc-utils.js',
         'src/drag-drop.js',
         'src/pixi-grids.js',
         'src/svg-grids.js',

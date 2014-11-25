@@ -47,9 +47,30 @@
     };
 
     var onEntityRemoved = 'entity:removed';
-    editorCallback.onEntityRemoved = function (entity) {
+    editorCallback.onEntityRemoved = function (entity/*, isTopMost*/) {
         Fire.broadcast( onEntityRemoved, entity.id );
         Fire.broadcast('scene:dirty');
+        // deselect
+        if (entity.childCount > 0) {
+            var unselect = [];
+            for (var i = 0; i < Selection.entities.length; i++) {
+                var id = Selection.entities[i];
+                var selected = Fire._getInstanceById(id);
+                if (selected && selected.isChildOf(entity)) {
+                    unselect.push(id);
+                }
+            }
+            if (unselect.length > 0) {
+                Selection.cancel();
+                Selection.unselectEntity(unselect);
+            }
+        }
+        else {
+            if (Selection.entities.indexOf(entity.id) !== -1) {
+                Selection.cancel();
+                Selection.unselectEntity(entity.id);
+            }
+        }
     };
 
     var onEntityParentChanged = 'entity:parentChanged';

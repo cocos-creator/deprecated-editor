@@ -1,4 +1,4 @@
-Fire.Selection = (function () {
+var Selection = (function () {
 
     var Ipc = require('ipc');
 
@@ -225,3 +225,5 @@ Fire.Selection = (function () {
 
     return Selection;
 })();
+
+Fire.Selection = Selection;
