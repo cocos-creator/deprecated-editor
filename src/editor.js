@@ -7,7 +7,7 @@
     var ipc = require('ipc');
 
     //
-    Fire.merge( Fire, {
+    Fire.mixin( Fire, {
         // console
         log: function ( text ) { 
             console.log(text); 

@@ -98,7 +98,7 @@
 
         layoutToolsAction: function ( event ) {
             var layoutToolsSettings = this.$.toolbar.$.layoutTools.settings();
-            Fire.merge( this.settings, layoutToolsSettings );
+            Fire.mixin( this.settings, layoutToolsSettings );
 
             this.$.scene.fire('layout-tools-changed');
             event.stopPropagation();
