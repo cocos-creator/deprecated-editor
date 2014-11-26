@@ -71,6 +71,13 @@
                 Selection.unselectEntity(entity.id);
             }
         }
+        // hover out
+        if (Selection.hoveringEntityId) {
+            var hovering = Fire._getInstanceById(Selection.hoveringEntityId);
+            if (hovering && hovering.isChildOf(entity)) {
+                Fire.Selection.hoverEntity('');
+            }
+        }
     };
 
     var onEntityParentChanged = 'entity:parentChanged';

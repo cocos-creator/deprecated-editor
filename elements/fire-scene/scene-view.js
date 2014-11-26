@@ -17,7 +17,6 @@
             this.ipc = new Fire.IpcListener();
 
             this._editTool = null;
-            this._lasthover = null;
             this._editingEdities = [];
         },
 
@@ -149,7 +148,6 @@
         },
 
         hover: function ( entity ) {
-            this._lasthover = entity;
             var gizmo = this.svgGizmos.gizmosTable[entity.id];
             if ( gizmo ) {
                 gizmo.hovering = true;
@@ -163,7 +161,6 @@
                 gizmo.hovering = false;
                 gizmo.update();
             }
-            this._lasthover = null;
         },
 
         select: function ( entities ) {
@@ -320,16 +317,7 @@
         mousemoveAction: function ( event ) {
             //
             var hoverEntity = this.hitTest(event.offsetX, event.offsetY);
-
-            //
-            if ( hoverEntity ) {
-                if ( this._lasthover === null || this._lasthover !== hoverEntity ) {
-                    Fire.Selection.hoverEntity(hoverEntity.id);
-                }
-            }
-            else {
-                Fire.Selection.hoverEntity(null);
-            }
+            Fire.Selection.hoverEntity(hoverEntity && hoverEntity.id);
 
             event.stopPropagation();
         },

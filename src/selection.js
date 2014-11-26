@@ -22,10 +22,10 @@ var Selection = (function () {
     var WEB_ASSET_ACTIVATED = 'selection:asset:activated';
     var WEB_ENTITY_DEACTIVATED = 'selection:entity:deactivated';
     var WEB_ASSET_DEACTIVATED = 'selection:asset:deactivated';
-    //var WEB_ENTITY_HOVER = 'selection:entity:hover';
-    //var WEB_ASSET_HOVER = 'selection:asset:hover';
-    //var WEB_ENTITY_HOVEROUT = 'selection:entity:hoverout';
-    //var WEB_ASSET_HOVEROUT = 'selection:asset:hoverout';
+    var WEB_ENTITY_HOVER = 'selection:entity:hover';
+    var WEB_ASSET_HOVER = 'selection:asset:hover';
+    var WEB_ENTITY_HOVEROUT = 'selection:entity:hoverout';
+    var WEB_ASSET_HOVEROUT = 'selection:asset:hoverout';
     
 
     /**
@@ -103,12 +103,10 @@ var Selection = (function () {
         },
 
         hoverEntity: function (id) {
-            if ( !id ) id = "";
             Fire.command(APP_HOVER_ENTITY, id);
         },
 
         hoverAsset: function (id) {
-            if ( !id ) id = "";
             Fire.command(APP_HOVER_ASSET, id);
         },
 
@@ -119,6 +117,16 @@ var Selection = (function () {
         clearAsset: function () {
             Fire.command(APP_CLEAR_ASSET);
         },
+
+        /**
+         * @property {string} hoveringEntityId - (Read Only)
+         */
+        hoveringEntityId: '',
+
+        /**
+         * @property {string} hoveringAssetUuid - (Read Only)
+         */
+        hoveringAssetUuid: '',
 
         /**
          * @property {string} activeEntityId - (Read Only)
@@ -171,8 +179,18 @@ var Selection = (function () {
     Ipc.on( WEB_ASSET_DEACTIVATED, function (id) {
         Selection.activeAssetUuid = '';
     });
-
-
+    Ipc.on( WEB_ENTITY_HOVER, function (id) {
+        Selection.hoveringEntityId = id;
+    });
+    Ipc.on( WEB_ASSET_HOVER, function (id) {
+        Selection.hoveringAssetUuid = id;
+    });
+    Ipc.on( WEB_ENTITY_HOVEROUT, function (id) {
+        Selection.hoveringEntityId = '';
+    });
+    Ipc.on( WEB_ASSET_HOVEROUT, function (id) {
+        Selection.hoveringAssetUuid = '';
+    });
 
     /**
      * @param {string[]} idList
