@@ -94,4 +94,7 @@
     //
     Fire.plugins = {}; // TODO: 做成Remote Object，确保全局只有一份?
     Fire.gizmos = {};
+
+    // init editor-shares after Fire inited
+    Fire.Selection.registerCommands(ipc);
 })();
