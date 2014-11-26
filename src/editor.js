@@ -37,18 +37,43 @@
         // app
         command: function ( name ) {
             'use strict';
-            var args = arguments.length > 1 ? [].slice.call( arguments, 1 ) : [];
-            ipc.send.apply( ipc, ['command@' + fireID, name].concat(args) );
+            if ( typeof name === 'string' ) {
+                var args = [].slice.call( arguments );
+                ipc.send.apply( ipc, ['command@' + fireID].concat( args ) );
+            }
+            else {
+                Fire.error('The name of command must be provided');
+            }
         },
         broadcast: function ( name ) {
             'use strict';
-            var args = arguments.length > 1 ? [].slice.call( arguments, 1 ) : [];
-            ipc.send.apply( ipc, ['broadcast@' + fireID, name].concat(args) );
+            if ( typeof name === 'string' ) {
+                var args = [].slice.call( arguments );
+                ipc.send.apply( ipc, ['broadcast@' + fireID].concat( args ) );
+            }
+            else {
+                Fire.error('The name of broadcast must be provided');
+            }
+        },
+        broadcastOthers: function ( name ) {
+            'use strict';
+            if ( typeof name === 'string' ) {
+                var args = [].slice.call( arguments );
+                ipc.send.apply( ipc, ['broadcast-others@' + fireID].concat( args ) );
+            }
+            else {
+                Fire.error('The name of broadcastOthers must be provided');
+            }
         },
         rpc: function ( name ) {
             'use strict';
-            var args = arguments.length > 1 ? [].slice.call( arguments, 1 ) : [];
-            ipc.send.apply( ipc, ['rpc@' + fireID, name].concat(args) );
+            if ( typeof name === 'string' ) {
+                var args = [].slice.call( arguments );
+                ipc.send.apply( ipc, ['rpc@' + fireID].concat( args ) );
+            }
+            else {
+                Fire.error('The name of rpc must be provided');
+            }
         },
     });
 
@@ -69,4 +94,7 @@
     //
     Fire.plugins = {}; // TODO: 做成Remote Object，确保全局只有一份?
     Fire.gizmos = {};
+
+    // init editor-shares after Fire inited
+    Fire.Selection.registerCommands(ipc);
 })();

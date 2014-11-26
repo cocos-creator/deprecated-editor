@@ -14,9 +14,6 @@ var stylish = require('jshint-stylish');
 
 var paths = {
     src: [
-        // editor basic
-        'src/selection.js',
-
         // asset extends
         'src/assets/sprite.js',
 
