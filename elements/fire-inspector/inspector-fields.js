@@ -3,10 +3,10 @@
         return typeof value === 'number' && global.isNaN(value);
     };
     function _fireEquals(left, right) {
-        if ( left.equals )
+        if ( left && left.equals )
             return left.equals(right);
 
-        if ( right.equals )
+        if ( right && right.equals )
             return right.equals(left);
 
         if ( left === right )
