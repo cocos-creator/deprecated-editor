@@ -20,6 +20,7 @@
 
             this.ipc.on('selection:asset:selected', this.select.bind(this, true));
             this.ipc.on('selection:asset:unselected', this.select.bind(this, false));
+            this.ipc.on('asset:hint', this.hint.bind(this));
         },
 
         detached: function () {
@@ -33,6 +34,19 @@
                 if (el) {
                     el.selected = selected;
                 }
+            }
+        },
+
+        hint: function (uuid) {
+            var el = this.$.assetsTree.idToItem[uuid];
+            if (el) {
+                this.$.assetsTree.scrollTop = el.offsetTop + 16 - this.$.assetsTree.offsetHeight/2;
+                el.animate([
+                    {background: "white", transform: "scale(1.2)"},
+                    {background: "none", transform: "scale(1)"}
+                ], {
+                    duration: 200
+                });
             }
         },
 

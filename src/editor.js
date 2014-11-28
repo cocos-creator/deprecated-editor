@@ -87,6 +87,18 @@
         }
     };
 
+    Fire.hintObject = function ( target ) {
+        if ( target instanceof Fire.Entity ) {
+            Fire.broadcast('entity:hint', target.id );
+        }
+        else if ( target instanceof Fire.Component ) {
+            Fire.broadcast('entity:hint', target.entity.id );
+        }
+        else if ( target instanceof Fire.Asset ) {
+            Fire.broadcast('asset:hint', target._uuid );
+        }
+    };
+
     // get remote globals
     Fire.AssetDB = remote.getGlobal( 'AssetDB@' + fireID );
     Fire.MainMenu = remote.getGlobal( 'MainMenu@' + fireID );

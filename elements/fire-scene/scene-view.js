@@ -499,6 +499,9 @@
 
             var dragType = Fire.DragDrop.type(event.dataTransfer);
             var items = Fire.DragDrop.drop(event.dataTransfer);
+
+            Fire.Selection.cancel();
+
             var clientRect = this.getBoundingClientRect();
 
             var onload = function ( asset ) {

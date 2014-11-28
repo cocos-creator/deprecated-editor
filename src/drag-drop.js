@@ -15,8 +15,6 @@ Fire.DragDrop = (function () {
     };
 
     DragDrop.drop = function ( dataTransfer ) {
-        Fire.Selection.cancel();
-
         var results = [];
         if ( _allowed ) {
             results = DragDrop.items(dataTransfer);

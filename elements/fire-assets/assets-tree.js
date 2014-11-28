@@ -724,7 +724,9 @@
 
             var dragType = Fire.DragDrop.type(event.dataTransfer);
             var items = Fire.DragDrop.drop(event.dataTransfer);
+            
             this.resetDragState();
+            Fire.Selection.cancel();
 
             if ( items.length > 0 ) {
                 if ( dragType === 'file' ) {
