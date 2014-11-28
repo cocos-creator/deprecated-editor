@@ -110,7 +110,7 @@
             if ( this.renderContext && Fire.Engine._scene ) {
                 this.pixiGrids.update();
                 Fire.Engine._scene.render(this.renderContext);
-                Fire.Engine._scene.updateInteractionContext(this.interactionContext);
+                this.interactionContext.update(Fire.Engine._scene.entities);
             }
         },
 
@@ -266,19 +266,22 @@
             var mousePos = new Fire.Vec2(x,y); 
             var worldMousePos = this.renderContext.camera.screenToWorld(mousePos);
 
-            var minDist = null;
+            // pick the nearest one, ignore z
+
+            var minDist = Number.MAX_VALUE;
             var resultEntity = null;
 
-            for ( var i = 0, boundings = this.interactionContext.boundings; i < boundings.length; ++i ) {
-                var bounding = boundings[i];
-                if ( bounding.aabb.contains(worldMousePos) ) {
-                    //
-                    var polygon = new Fire.Polygon(bounding.obb);
-                    if ( polygon.contains( worldMousePos ) ) {
-                        var dist = worldMousePos.sub(polygon.center).magSqr();
-                        if ( minDist === null || dist < minDist ) {
+            for ( var i = 0, entities = this.interactionContext.entities; i < entities.length; ++i ) {
+                var entity = entities[i];
+                var aabb = this.interactionContext.getAABB(entity);
+                if ( aabb.contains(worldMousePos) ) {
+                    var dist = worldMousePos.sub(aabb.center).magSqr();
+                    if ( dist < minDist ) {
+                        var obb = this.interactionContext.getOBB(entity);
+                        var polygon = new Fire.Polygon(obb);
+                        if ( polygon.contains( worldMousePos ) ) {
                             minDist = dist;
-                            resultEntity = bounding.entity;
+                            resultEntity = entity;
                         }
                     }
                 }
@@ -292,15 +295,17 @@
             var v2 = this.renderContext.camera.screenToWorld(new Fire.Vec2(rect.xMax,rect.yMax));
             var worldRect = Fire.Rect.fromVec2(v1,v2); 
 
-            var entities = [];
+            var result = [];
             var i;
 
-            for ( i = 0, boundings = this.interactionContext.boundings; i < boundings.length; ++i ) {
-                var bounding = boundings[i];
-                if ( bounding.aabb.intersects(worldRect) ) {
-                    var polygon = new Fire.Polygon(bounding.obb);
+            for ( i = 0, entities = this.interactionContext.entities; i < entities.length; ++i ) {
+                var entity = entities[i];
+                var aabb = this.interactionContext.getAABB(entity);
+                if ( aabb.intersects(worldRect) ) {
+                    var obb = this.interactionContext.getOBB(entity);
+                    var polygon = new Fire.Polygon(obb);
                     if ( Fire.Intersection.rectPolygon(worldRect, polygon) ) {
-                        entities.push(bounding.entity);
+                        result.push(entity);
                     }
                 }
             }
@@ -308,10 +313,10 @@
             // get hit test from gizmos
             var gizmos = this.svgGizmos.hitTest ( rect.x, rect.y, rect.width, rect.height );
             for ( i = 0; i < gizmos.length; ++i ) {
-                entities.push(gizmos[i].entity);
+                result.push(gizmos[i].entity);
             }
 
-            return entities;
+            return result;
         },
 
         mousemoveAction: function ( event ) {

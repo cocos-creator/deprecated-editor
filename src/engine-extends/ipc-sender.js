@@ -51,29 +51,30 @@
         Fire.broadcast( onEntityRemoved, entity.id );
         Fire.broadcast('scene:dirty');
         // deselect
+        var entities = Fire.Selection.entities;
         if (entity.childCount > 0) {
             var unselect = [];
-            for (var i = 0; i < Selection.entities.length; i++) {
-                var id = Selection.entities[i];
+            for (var i = 0; i < entities.length; i++) {
+                var id = entities[i];
                 var selected = Fire._getInstanceById(id);
                 if (selected && selected.isChildOf(entity)) {
                     unselect.push(id);
                 }
             }
             if (unselect.length > 0) {
-                Selection.cancel();
-                Selection.unselectEntity(unselect);
+                Fire.Selection.cancel();
+                Fire.Selection.unselectEntity(unselect);
             }
         }
         else {
-            if (Selection.entities.indexOf(entity.id) !== -1) {
-                Selection.cancel();
-                Selection.unselectEntity(entity.id);
+            if (entities.indexOf(entity.id) !== -1) {
+                Fire.Selection.cancel();
+                Fire.Selection.unselectEntity(entity.id);
             }
         }
         // hover out
-        if (Selection.hoveringEntityId) {
-            var hovering = Fire._getInstanceById(Selection.hoveringEntityId);
+        if (Fire.Selection.hoveringEntityId) {
+            var hovering = Fire._getInstanceById(Fire.Selection.hoveringEntityId);
             if (hovering && hovering.isChildOf(entity)) {
                 Fire.Selection.hoverEntity('');
             }
