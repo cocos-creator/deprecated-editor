@@ -414,6 +414,8 @@
                 }.bind(this);
 
                 var selectexitHandle = function(event) {
+                    this._dorepaint = true;
+
                     document.removeEventListener('mousemove', selectmoveHandle);
                     document.removeEventListener('mouseup', selectexitHandle);
 

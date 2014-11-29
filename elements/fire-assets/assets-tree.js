@@ -321,7 +321,7 @@
 
             if ( this._focusUrl === url ) {
                 this._focusUrl = null;
-                this.scrollTop = newEL.offsetTop + 16 - this.offsetHeight/2;
+                this.scrollToItem(newEL);
                 Fire.Selection.selectAsset(newEL.userId, true, true);
             }
         },
@@ -339,6 +339,20 @@
             var destBasename = Path.basename(destUrl, destExtname);
             srcEL.extname = destExtname;
             srcEL.name = destBasename;
+        },
+
+        hintItem: function ( id ) {
+            var itemEL = this.idToItem[id];
+            if (itemEL) {
+                this.scrollToItem(itemEL);
+                itemEL.hint();
+            }
+        },
+
+        scrollToItem: function ( el ) {
+            window.requestAnimationFrame( function () {
+                this.scrollTop = el.offsetTop + 16 - this.offsetHeight/2;
+            }.bind(this));
         },
 
         deleteSelection: function () {

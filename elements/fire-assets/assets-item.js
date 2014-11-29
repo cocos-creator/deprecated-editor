@@ -69,6 +69,16 @@
             this.foldable = true;
         },
 
+        hint: function () {
+            var computedStyle = window.getComputedStyle(this.$.bar);
+            this.$.bar.animate([
+                { background: "white", transform: "scale(1.2)" },
+                { background: computedStyle.backgroundColor, transform: "scale(1)" }
+            ], {
+                duration: 300
+            });
+        },
+
         mousedownAction: function ( event ) {
             this.super([event]);
             if (event.cancelBubble) {

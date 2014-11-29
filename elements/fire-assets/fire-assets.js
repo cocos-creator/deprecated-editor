@@ -38,16 +38,7 @@
         },
 
         hint: function (uuid) {
-            var el = this.$.assetsTree.idToItem[uuid];
-            if (el) {
-                this.$.assetsTree.scrollTop = el.offsetTop + 16 - this.$.assetsTree.offsetHeight/2;
-                el.animate([
-                    {background: "white", transform: "scale(1.2)"},
-                    {background: "none", transform: "scale(1)"}
-                ], {
-                    duration: 200
-                });
-            }
+            this.$.assetsTree.hintItem(uuid);
         },
 
         domReady: function () {
