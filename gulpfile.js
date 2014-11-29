@@ -31,7 +31,6 @@ var paths = {
         'src/editor.js',
         'src/menu.js',
         'src/ipc-utils.js',
-        'src/drag-drop.js',
         'src/pixi-grids.js',
         'src/svg-grids.js',
         'src/gizmos-utils.js',

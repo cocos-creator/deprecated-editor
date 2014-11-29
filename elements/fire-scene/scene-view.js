@@ -17,7 +17,7 @@
             this.ipc = new Fire.IpcListener();
 
             this._editTool = null;
-            this._editingEdities = [];
+            this._editingEdityIds = [];
         },
 
         ready: function () {
@@ -119,11 +119,11 @@
         },
 
         rebuildGizmos: function () {
-            if ( this._editingEdities.length > 0 ) {
+            if ( this._editingEdityIds.length > 0 ) {
                 if ( this._editTool ) {
                     this.svgGizmos.remove(this._editTool);
                 }
-                this.edit(this._editingEdities);
+                this.edit(this._editingEdityIds);
             }
         },
 
@@ -147,47 +147,47 @@
             }
         },
 
-        hover: function ( entity ) {
-            var gizmo = this.svgGizmos.gizmosTable[entity.id];
+        hover: function ( id ) {
+            var gizmo = this.svgGizmos.gizmosTable[id];
             if ( gizmo ) {
                 gizmo.hovering = true;
                 gizmo.update();
             }
         },
 
-        hoverout: function ( entity ) {
-            var gizmo = this.svgGizmos.gizmosTable[entity.id];
+        hoverout: function ( id ) {
+            var gizmo = this.svgGizmos.gizmosTable[id];
             if ( gizmo ) {
                 gizmo.hovering = false;
                 gizmo.update();
             }
         },
 
-        select: function ( entities ) {
+        select: function ( entityIDs ) {
             if ( this._editTool ) {
                 this.svgGizmos.remove(this._editTool);
                 this._editTool = null;
             }
 
-            this._editingEdities = this._editingEdities.concat(entities);
+            this._editingEdityIds = this._editingEdityIds.concat(entityIDs);
 
-            if ( this._editingEdities.length > 0 ) {
-                this.edit(this._editingEdities);
+            if ( this._editingEdityIds.length > 0 ) {
+                this.edit(this._editingEdityIds);
             }
         },
 
-        unselect: function ( entities ) {
-            for ( var i = 0; i < entities.length; ++i ) {
-                var ent = entities[i];
+        unselect: function ( entityIDs ) {
+            for ( var i = 0; i < entityIDs.length; ++i ) {
+                var id = entityIDs[i];
 
-                for ( var j = 0; j < this._editingEdities.length; ++j ) {
-                    if ( this._editingEdities[j] === ent ) {
-                        this._editingEdities.splice(j,1);
+                for ( var j = 0; j < this._editingEdityIds.length; ++j ) {
+                    if ( this._editingEdityIds[j] === id ) {
+                        this._editingEdityIds.splice(j,1);
                         break;
                     }
                 }
 
-                gizmo = this.svgGizmos.gizmosTable[ent.id];
+                gizmo = this.svgGizmos.gizmosTable[id];
                 if ( gizmo ) {
                     gizmo.selecting = false;
                     gizmo.editing = false;
@@ -200,13 +200,19 @@
                 this._editTool = null;
             }
 
-            if ( this._editingEdities.length > 0 ) {
-                this.edit(this._editingEdities);
+            if ( this._editingEdityIds.length > 0 ) {
+                this.edit(this._editingEdityIds);
             }
         },
 
-        edit: function ( entities ) {
-            var gizmo;
+        edit: function ( entityIDs ) {
+            var i, gizmo, entities = [], entity = null;
+            for ( i = 0; i < entityIDs.length; ++i ) {
+                entity = Fire._getInstanceById(entityIDs[i]);
+                if (entity) {
+                    entities.push( entity );
+                }
+            }
 
             switch ( Fire.mainWindow.settings.handle ) {
                 case "move":
@@ -232,7 +238,7 @@
 
             //
             if ( entities.length === 1 ) {
-                var entity = entities[0];
+                entity = entities[0];
                 gizmo = this.svgGizmos.gizmosTable[entity.id];
                 if ( gizmo && (gizmo.selecting === false || gizmo.editing === false) ) {
                     gizmo.selecting = true;
@@ -241,9 +247,9 @@
                 }
             }
             else {
-                for ( var i = 0; i < entities.length; ++i ) {
-                    var ent = entities[i];
-                    gizmo = this.svgGizmos.gizmosTable[ent.id];
+                for ( i = 0; i < entities.length; ++i ) {
+                    entity = entities[i];
+                    gizmo = this.svgGizmos.gizmosTable[entity.id];
                     if ( gizmo && (gizmo.selecting === false || gizmo.editing === true) ) {
                         gizmo.selecting = true;
                         gizmo.editing = false;
@@ -485,14 +491,14 @@
         },
 
         dragoverAction: function ( event ) {
-            var dragType = Fire.DragDrop.type(event.dataTransfer);
+            var dragType = EditorUI.DragDrop.type(event.dataTransfer);
             if ( dragType !== "asset" ) {
-                Fire.DragDrop.allowDrop( event.dataTransfer, false );
+                EditorUI.DragDrop.allowDrop( event.dataTransfer, false );
                 return;
             }
 
-            Fire.DragDrop.allowDrop( event.dataTransfer, true );
-            Fire.DragDrop.updateDropEffect(event.dataTransfer, "copy");
+            EditorUI.DragDrop.allowDrop( event.dataTransfer, true );
+            EditorUI.DragDrop.updateDropEffect(event.dataTransfer, "copy");
 
             event.preventDefault();
             event.stopPropagation();
@@ -502,8 +508,8 @@
             event.preventDefault();
             event.stopPropagation();
 
-            var dragType = Fire.DragDrop.type(event.dataTransfer);
-            var items = Fire.DragDrop.drop(event.dataTransfer);
+            var dragType = EditorUI.DragDrop.type(event.dataTransfer);
+            var items = EditorUI.DragDrop.drop(event.dataTransfer);
 
             Fire.Selection.cancel();
 

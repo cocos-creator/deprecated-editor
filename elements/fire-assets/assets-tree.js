@@ -642,20 +642,20 @@
         },
 
         dragstartAction: function ( event ) {
-            Fire.DragDrop.start( event.dataTransfer, 'copyMove', 'asset', Fire.Selection.assets );
+            EditorUI.DragDrop.start( event.dataTransfer, 'copyMove', 'asset', Fire.Selection.assets );
 
             event.stopPropagation();
         },
 
         dragendAction: function (event) {
             this.resetDragState();
-            Fire.DragDrop.end();
+            EditorUI.DragDrop.end();
         },
 
         dragoverAction: function (event) {
-            var dragType = Fire.DragDrop.type(event.dataTransfer);
+            var dragType = EditorUI.DragDrop.type(event.dataTransfer);
             if ( dragType !== "file" && dragType !== "asset" ) {
-                Fire.DragDrop.allowDrop( event.dataTransfer, false );
+                EditorUI.DragDrop.allowDrop( event.dataTransfer, false );
                 return;
             }
 
@@ -677,7 +677,7 @@
                     // name collision check
                     var names = [];
                     var i = 0;
-                    var dragItems = Fire.DragDrop.items(event.dataTransfer);
+                    var dragItems = EditorUI.DragDrop.items(event.dataTransfer);
 
                     if ( dragType === "file" ) {
                         for (i = 0; i < dragItems.length; i++) {
@@ -703,7 +703,7 @@
                             valid = false;
                         }
                     }
-                    Fire.DragDrop.allowDrop(event.dataTransfer, valid);
+                    EditorUI.DragDrop.allowDrop(event.dataTransfer, valid);
                 }
 
                 // highlight insert
@@ -723,7 +723,7 @@
             else if ( dragType === "asset" ) {
                 dropEffect = "move";
             }
-            Fire.DragDrop.updateDropEffect(event.dataTransfer, dropEffect);
+            EditorUI.DragDrop.updateDropEffect(event.dataTransfer, dropEffect);
 
             //
             event.preventDefault();
@@ -736,8 +736,8 @@
 
             var targetEL = this.curDragoverEL;
 
-            var dragType = Fire.DragDrop.type(event.dataTransfer);
-            var items = Fire.DragDrop.drop(event.dataTransfer);
+            var dragType = EditorUI.DragDrop.type(event.dataTransfer);
+            var items = EditorUI.DragDrop.drop(event.dataTransfer);
             
             this.resetDragState();
             Fire.Selection.cancel();

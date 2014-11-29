@@ -54,42 +54,24 @@
         },
 
         select: function ( selected, entityIDs ) {
-            var entities = [];
-            for ( var i = 0; i < entityIDs.length; ++i ) {
-                var entity = Fire._getInstanceById(entityIDs[i]);
-                if (entity) {
-                    entities.push( entity );
-                }
-            }
-
             if ( selected )
-                this.$.view.select(entities);
+                this.$.view.select(entityIDs);
             else
-                this.$.view.unselect(entities);
+                this.$.view.unselect(entityIDs);
         },
 
         hover: function ( entityID ) {
             if ( !entityID )
                 return;
 
-            var entity = Fire._getInstanceById(entityID);
-            if (!entity) {
-                return;
-            }
-
-            this.$.view.hover(entity);
+            this.$.view.hover(entityID);
         },
 
         hoverout: function ( entityID ) {
             if ( !entityID )
                 return;
 
-            var entity = Fire._getInstanceById(entityID);
-            if (!entity) {
-                return;
-            }
-
-            this.$.view.hoverout( entity );
+            this.$.view.hoverout( entityID );
         },
 
         delayRepaintScene: function () {

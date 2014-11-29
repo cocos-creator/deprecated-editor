@@ -406,20 +406,20 @@
         },
 
         dragstartAction: function ( event ) {
-            Fire.DragDrop.start( event.dataTransfer, 'move', 'entity', Fire.Selection.entities );
+            EditorUI.DragDrop.start( event.dataTransfer, 'move', 'entity', Fire.Selection.entities );
 
             event.stopPropagation();
         },
 
         dragendAction: function (event) {
             this.resetDragState();
-            Fire.DragDrop.end();
+            EditorUI.DragDrop.end();
         },
 
         dragoverAction: function (event) {
-            var dragType = Fire.DragDrop.type(event.dataTransfer);
+            var dragType = EditorUI.DragDrop.type(event.dataTransfer);
             if ( dragType !== "entity" && dragType !== "asset" ) {
-                Fire.DragDrop.allowDrop( event.dataTransfer, false );
+                EditorUI.DragDrop.allowDrop( event.dataTransfer, false );
                 return;
             }
 
@@ -461,7 +461,7 @@
                 this.highlightInsert( target, position );
 
                 //
-                Fire.DragDrop.allowDrop(event.dataTransfer, true);
+                EditorUI.DragDrop.allowDrop(event.dataTransfer, true);
             }
 
             //
@@ -472,7 +472,7 @@
             else if ( dragType === "entity" ) {
                 dropEffect = "move";
             }
-            Fire.DragDrop.updateDropEffect(event.dataTransfer, dropEffect);
+            EditorUI.DragDrop.updateDropEffect(event.dataTransfer, dropEffect);
 
             //
             event.preventDefault();
@@ -483,8 +483,8 @@
             event.preventDefault();
             event.stopPropagation();
             
-            var dragType = Fire.DragDrop.type(event.dataTransfer);
-            var items = Fire.DragDrop.drop(event.dataTransfer);
+            var dragType = EditorUI.DragDrop.type(event.dataTransfer);
+            var items = EditorUI.DragDrop.drop(event.dataTransfer);
 
             this.resetDragState();
             Fire.Selection.cancel();
