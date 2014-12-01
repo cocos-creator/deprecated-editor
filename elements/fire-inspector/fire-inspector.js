@@ -216,13 +216,17 @@
         },
 
         addComponentAction: function () {
+            var rect = this.$.addComponent.getBoundingClientRect();
+            var x = rect.left;
+            var y = rect.bottom;
+
             var entity = this.$.fields.target;
             if (entity instanceof Fire.Entity === false) {
                 return;
             }
             var template = this.getAddCompMenuTemplate();
             var menu = Menu.buildFromTemplate(template);
-            menu.popup(Remote.getCurrentWindow());
+            menu.popup(Remote.getCurrentWindow(), x, y );
         },
 
         fieldsChangedAction: function ( event ) {

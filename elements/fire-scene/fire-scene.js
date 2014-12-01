@@ -25,6 +25,7 @@
             this.ipc.on('selection:entity:hoverout', this.hoverout.bind(this) );
             this.ipc.on('scene:dirty', this.delayRepaintScene.bind(this) );
             this.ipc.on('scene:save', this.saveCurrentScene.bind(this) );
+            this.ipc.on('scene:launched', this.sceneLaunched.bind(this));
             this.ipc.on('asset:saved', function ( url, uuid, parentUuid ) {
                 // update the uuid of current scene, if we first time save it
                 if ( this._newsceneUrl === url ) {
@@ -133,6 +134,10 @@
                               this._newsceneUrl, 
                               Fire.serialize(currentScene) );
             }
+        },
+
+        sceneLaunched: function () {
+            // TODO
         },
 
         showAction: function ( event ) {

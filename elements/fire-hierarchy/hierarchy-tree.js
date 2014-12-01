@@ -420,8 +420,10 @@
         },
 
         dragendAction: function (event) {
-            this.resetDragState();
             EditorUI.DragDrop.end();
+
+            this.resetDragState();
+            Fire.Selection.cancel();
         },
 
         dragoverAction: function (event) {

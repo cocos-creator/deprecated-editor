@@ -50,8 +50,8 @@
     /**
      * @param {object[]} template -  the template is just an array of options for constructing MenuItem
      */
-    Fire.popupMenu = function (template) {
-        Fire.command('menu:popup', template);
+    Fire.popupMenu = function (template, x, y) {
+        Fire.command('menu:popup', template, x, y);
     };
 
 })();
