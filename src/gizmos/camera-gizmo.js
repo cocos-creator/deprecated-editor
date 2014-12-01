@@ -40,6 +40,12 @@
     Fire.gizmos['Fire.Camera'] = CameraGizmo;
 
     //
+    CameraGizmo.prototype.remove = function () {
+        this._root.remove();
+        this._selectTools.remove();
+    };
+
+    //
     CameraGizmo.prototype.update = function () {
         if ( !this.target.isValid )
             return;

@@ -103,10 +103,12 @@ Fire.SvgGizmos = (function () {
         var els = this.svg.node.getIntersectionList(rect, null);
         var results = [];
 
-        for ( var i = 0; i < this.gizmos.length; ++i ) {
-            var gizmo = this.gizmos[i];
-            if ( gizmo.hitTest && gizmo.contains(els) ) {
-                results.push(gizmo);
+        if ( els.length > 0 ) {
+            for ( var i = 0; i < this.gizmos.length; ++i ) {
+                var gizmo = this.gizmos[i];
+                if ( gizmo.hitTest && gizmo.contains(els) ) {
+                    results.push(gizmo);
+                }
             }
         }
 
