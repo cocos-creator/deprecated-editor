@@ -364,6 +364,14 @@
                     this.deleteSelection();
                     event.stopPropagation();
                 break;
+
+                // command + delete (Mac)
+                case 8:
+                    if ( event.metaKey ) {
+                        this.deleteSelection();
+                        event.stopPropagation();
+                    }
+                    break;
                 
                 // key-up
                 case 38:

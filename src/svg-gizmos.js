@@ -70,31 +70,25 @@ Fire.SvgGizmos = (function () {
         }
     };
 
-    SvgGizmos.prototype.add = function ( gizmo ) {
-        this.gizmos.push(gizmo);
-
-        if ( gizmo.allowMultiTarget === false ) {
-            var entity = gizmo.entity;
-            if ( entity ) {
-                this.gizmosTable[entity.id] = gizmo;
-            }
+    SvgGizmos.prototype.add = function ( id, gizmo ) {
+        if ( id ) {
+            this.gizmosTable[id] = gizmo;
         }
+
+        this.gizmos.push(gizmo);
     };
 
-    SvgGizmos.prototype.remove = function ( gizmo ) {
+    SvgGizmos.prototype.remove = function ( id, gizmo ) {
+        if ( id ) {
+            delete this.gizmosTable[id];
+        }
+
         for ( var i = this.gizmos.length-1; i >= 0; --i ) {
             var g = this.gizmos[i];
             if ( g === gizmo ) {
                 g.remove();
                 this.gizmos.splice( i, 1 );
                 break;
-            }
-        }
-
-        if ( gizmo.allowMultiTarget === false ) {
-            var entity = gizmo.entity;
-            if ( entity ) {
-                delete this.gizmosTable[entity.id];
             }
         }
     };

@@ -121,15 +121,17 @@
         rebuildGizmos: function () {
             if ( this._editingEdityIds.length > 0 ) {
                 if ( this._editTool ) {
-                    this.svgGizmos.remove(this._editTool);
+                    this.svgGizmos.remove(null, this._editTool);
                 }
                 this.edit(this._editingEdityIds);
             }
         },
 
-        updateComponent: function ( enabled, id ) {
+        updateComponent: function ( enabled, compID ) {
+            var gizmo = null;
+
             if ( enabled ) {
-                var comp = Fire._getInstanceById(id);
+                var comp = Fire._getInstanceById(compID);
                 if ( !comp ) {
                     return;     // 就算是enabled消息，由于是异步处理，也有可能已经销毁
                 }
@@ -140,32 +142,55 @@
                 var classname = Fire.getClassName(comp);
                 var gizmosDef = Fire.gizmos[classname];
                 if ( gizmosDef ) {
-                    var gizmo = new gizmosDef( this.svgGizmos, comp );
+                    gizmo = new gizmosDef( this.svgGizmos, comp );
                     gizmo.update();
-                    this.svgGizmos.add (gizmo);
+                    this.svgGizmos.add (compID, gizmo);
+                }
+            }
+            else {
+                gizmo = this.svgGizmos.gizmosTable[compID];
+                if ( gizmo ) {
+                    this.svgGizmos.remove (compID, gizmo);
                 }
             }
         },
 
-        hover: function ( id ) {
-            var gizmo = this.svgGizmos.gizmosTable[id];
-            if ( gizmo ) {
-                gizmo.hovering = true;
-                gizmo.update();
+        updateComponentGizmos: function ( entity, options ) {
+            for (var c = 0; c < entity._components.length; ++c) {
+                var component = entity._components[c];
+                if ( component.isValid ) {
+                    var gizmo = this.svgGizmos.gizmosTable[component.id];
+                    if ( gizmo ) {
+                        Fire.mixin( gizmo, options );
+                        gizmo.update();
+                    }
+                }
             }
         },
 
-        hoverout: function ( id ) {
-            var gizmo = this.svgGizmos.gizmosTable[id];
-            if ( gizmo ) {
-                gizmo.hovering = false;
-                gizmo.update();
+        hover: function ( entityID ) {
+            var entity = Fire._getInstanceById(entityID);
+            // NOTE: entity might be destroyed
+            if ( entity ) {
+                this.updateComponentGizmos( entity, {
+                    hovering: true
+                });
+            }
+        },
+
+        hoverout: function ( entityID ) {
+            var entity = Fire._getInstanceById(entityID);
+            // NOTE: entity might be destroyed
+            if ( entity ) {
+                this.updateComponentGizmos( entity, {
+                    hovering: false
+                });
             }
         },
 
         select: function ( entityIDs ) {
             if ( this._editTool ) {
-                this.svgGizmos.remove(this._editTool);
+                this.svgGizmos.remove(null, this._editTool);
                 this._editTool = null;
             }
 
@@ -187,16 +212,18 @@
                     }
                 }
 
-                gizmo = this.svgGizmos.gizmosTable[id];
-                if ( gizmo ) {
-                    gizmo.selecting = false;
-                    gizmo.editing = false;
-                    gizmo.update();
+                var entity = Fire._getInstanceById(entityIDs[i]);
+                // NOTE: entity might be destroyed
+                if ( entity ) {
+                    this.updateComponentGizmos( entity, {
+                        selecting: false,
+                        editing: false,
+                    });
                 }
             }
 
             if ( this._editTool ) {
-                this.svgGizmos.remove(this._editTool);
+                this.svgGizmos.remove(null, this._editTool);
                 this._editTool = null;
             }
 
@@ -234,27 +261,39 @@
             gizmo.update();
 
             this._editTool = gizmo;
-            this.svgGizmos.add( gizmo );
+            this.svgGizmos.add( null, gizmo );
 
             //
+            var c, component;
             if ( entities.length === 1 ) {
                 entity = entities[0];
-                gizmo = this.svgGizmos.gizmosTable[entity.id];
-                if ( gizmo && (gizmo.selecting === false || gizmo.editing === false) ) {
-                    gizmo.selecting = true;
-                    gizmo.editing = true;
-                    gizmo.update();
+                for (c = 0; c < entity._components.length; ++c) {
+                    component = entity._components[c];
+                    if ( component.isValid ) {
+                        gizmo = this.svgGizmos.gizmosTable[component.id];
+                        if ( gizmo && (gizmo.selecting === false || gizmo.editing === false) ) {
+                            gizmo.selecting = true;
+                            gizmo.editing = true;
+                            gizmo.update();
+                        }
+                    }
                 }
             }
             else {
                 for ( i = 0; i < entities.length; ++i ) {
                     entity = entities[i];
-                    gizmo = this.svgGizmos.gizmosTable[entity.id];
-                    if ( gizmo && (gizmo.selecting === false || gizmo.editing === true) ) {
-                        gizmo.selecting = true;
-                        gizmo.editing = false;
-                        gizmo.update();
+                    for (c = 0; c < entity._components.length; ++c) {
+                        component = entity._components[c];
+                        if ( component.isValid ) {
+                            gizmo = this.svgGizmos.gizmosTable[component.id];
+                            if ( gizmo && (gizmo.selecting === false || gizmo.editing === true) ) {
+                                gizmo.selecting = true;
+                                gizmo.editing = false;
+                                gizmo.update();
+                            }
+                        }
                     }
+
                 }
             }
         },

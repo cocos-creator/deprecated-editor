@@ -41,6 +41,9 @@
 
     //
     CameraGizmo.prototype.update = function () {
+        if ( !this.target.isValid )
+            return;
+
         var zoom = this._svg.view.height / this._svg.camera.size;
 
         var localToWorld = this.target.entity.transform.getLocalToWorldMatrix();

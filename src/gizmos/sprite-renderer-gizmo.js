@@ -17,6 +17,9 @@ Fire.SpriteRendererGizmo = (function () {
 
     //
     SpriteRendererGizmo.prototype.update = function () {
+        if ( !this.target.isValid )
+            return;
+
         var bounds, v1, v2, v3, v4;
         var radius = 5;
 
