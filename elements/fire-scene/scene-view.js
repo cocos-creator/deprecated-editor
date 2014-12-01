@@ -54,25 +54,43 @@
                                                               this.view.height,
                                                               this.$.canvas );
             if ( this.renderContext !== null ) {
-                // create editor camera
-                if ( this.renderContext.camera === null ) {
-                    // TODO: add this code to EditorUtils
-                    var cameraEnt = new Fire.Entity.createWithFlags('Scene Camera', 
-                                        Fire._ObjectFlags.Hide | Fire._ObjectFlags.EditorOnly);
-                    var camera = cameraEnt.addComponent(Fire.Camera);
-                    camera.size = this.view.height;
-                    this.renderContext.camera = camera;
-                    this.svgGizmos.setCamera(camera);
+                var graphics = new PIXI.Graphics();
+                this.renderContext.getBackgroundNode().addChild(graphics);
+                this.pixiGrids.setGraphics(graphics);
 
-                    var graphics = new PIXI.Graphics();
-                    this.renderContext.getBackgroundNode().addChild(graphics);
-                    this.pixiGrids.setGraphics(graphics);
-                    this.pixiGrids.setCamera(camera);
+                this.initSceneCamera();
+                this.resize(); // make sure we apply the size to all canvas
+            }
+        }, 
+
+        initSceneCamera: function () {
+            if ( !Fire.Engine._scene )
+                return;
+
+            var camera = null;
+            var cameraEnt = Fire.Engine._scene.findEntityWithFlag('/Scene Camera', 
+                                                               Fire._ObjectFlags.Hide | Fire._ObjectFlags.EditorOnly); 
+            // create editor camera
+            if ( cameraEnt === null ) {
+                // TODO: add this code to EditorUtils
+                cameraEnt = new Fire.Entity.createWithFlags('Scene Camera', 
+                                    Fire._ObjectFlags.Hide | Fire._ObjectFlags.EditorOnly);
+                camera = cameraEnt.addComponent(Fire.Camera);
+            }
+            else {
+                camera = cameraEnt.getComponent(Fire.Camera);
+                if ( camera === null ) {
+                    Fire.error( "Can not find camera component in Scene Camera." );
+                    return;
                 }
             }
 
-            this.resize(); // make sure we apply the size to all canvas
-        }, 
+            //
+            camera.size = this.view.height;
+            this.renderContext.camera = camera;
+            this.svgGizmos.setCamera(camera);
+            this.pixiGrids.setCamera(camera);
+        },
 
         resize: function () {
             if ( this.renderContext !== null ) {
@@ -98,23 +116,37 @@
         },
 
         updateCamera: function () {
-            if ( this.renderContext ) {
-                this.renderContext.camera.size = this.view.height / this.sceneCamera.scale; 
-                this.renderContext.camera.transform.position = 
-                    new Vec2 ( this.sceneCamera.position.x, 
-                               this.sceneCamera.position.y );
-            }
+            if ( !Fire.Engine._scene )
+                return;
+
+            if ( !this.renderContext )
+                return;
+
+            this.renderContext.camera.size = this.view.height / this.sceneCamera.scale; 
+            this.renderContext.camera.transform.position = 
+                new Vec2 ( this.sceneCamera.position.x, 
+                           this.sceneCamera.position.y );
         },
 
         updateScene: function () {
-            if ( this.renderContext && Fire.Engine._scene ) {
-                this.pixiGrids.update();
-                Fire.Engine._scene.render(this.renderContext);
-                this.interactionContext.update(Fire.Engine._scene.entities);
-            }
+            if ( !Fire.Engine._scene )
+                return;
+
+            if ( !this.renderContext )
+                return;
+
+            this.pixiGrids.update();
+            Fire.Engine._scene.render(this.renderContext);
+            this.interactionContext.update(Fire.Engine._scene.entities);
         },
 
         updateGizmos: function () {
+            if ( !Fire.Engine._scene )
+                return;
+
+            if ( !this.renderContext )
+                return;
+
             this.svgGizmos.update();
         },
 

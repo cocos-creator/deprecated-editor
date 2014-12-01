@@ -20,4 +20,47 @@
         }
         return ent;
     };
+
+    Scene.prototype.findEntityWithFlag = function (path, flags) {
+        var nameList = path.split('/');
+        var match = null;
+
+        // visit root entities
+        var name = nameList[1];     // skip first '/'
+        var entities = this.entities;
+        for (var i = 0; i < entities.length; i++) {
+            if (entities[i].isValid && 
+                entities[i]._name === name &&
+                (entities[i]._objFlags & flags) === flags) 
+            {
+                match = entities[i];
+                break;
+            }
+        }
+        if (!match) {
+            return null;
+        }
+
+        // parse path
+        var n = 2;                  // skip first '/' and roots
+        for (n; n < nameList.length; n++) {
+            name = nameList[n];
+            // visit sub entities
+            var children = match._children;
+            match = null;
+            for (var t = 0, len = children.length; t < len; ++t) {
+                var subEntity = children[t];
+                if (subEntity.name === name &&
+                    (subEntity._objFlags & flags) === flags ) {
+                    match = subEntity;
+                    break;
+                }
+            }
+            if (!match) {
+                return null;
+            }
+        }
+
+        return match;
+    };
 })();

@@ -71,8 +71,13 @@
                     this.$.scene.initRenderContext();
 
                     // TODO: load last-open scene or init new
-                    var camera = new Fire.Entity('Main Camera');
-                    camera.addComponent(Fire.Camera);
+                    var lastEditScene = null;
+                    if ( lastEditScene === null ) {
+                        Fire.Engine._setCurrentScene(new Fire._Scene());
+
+                        var camera = new Fire.Entity('Main Camera');
+                        camera.addComponent(Fire.Camera);
+                    }
 
                     // observe the current scene name
                     this.updateTitle();

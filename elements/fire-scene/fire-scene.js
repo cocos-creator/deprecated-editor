@@ -137,7 +137,7 @@
         },
 
         sceneLaunched: function () {
-            // TODO
+            this.$.view.initSceneCamera();
         },
 
         showAction: function ( event ) {
