@@ -78,6 +78,9 @@
     });
 
     Fire.observe = function ( target, enabled ) {
+        if ( !target.isValid ) {
+            return;
+        }
         target._observing = enabled;
         if ( target instanceof Fire.Entity ) {
             for ( var i = 0; i < target._components.length; ++i ) {
