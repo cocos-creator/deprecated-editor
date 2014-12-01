@@ -2,34 +2,40 @@
     Polymer({
 
         playAction: function ( event ) {
+            event.stopPropagation();
+
             if ( !Fire.Engine.isPlaying ) {
-                this.$.play.setAttribute('active','');
-                this.setAttribute('active','');
+                this.$.play.active = true;
+                this.$.group.active = true;
                 Fire.Engine.play();
             }
             else {
-                this.$.play.removeAttribute('active');
-                this.$.pause.removeAttribute('active');
-                this.removeAttribute('active');
+                this.$.play.active = false;
+                this.$.pause.active = false;
+                this.$.group.active = false;
                 Fire.Engine.stop();
             }
         },
 
         pauseAction: function ( event ) {
+            event.stopPropagation();
+            
             if ( !Fire.Engine.isPaused ) {
-                this.$.pause.setAttribute('active','');
+                this.$.pause.active = true;
                 Fire.Engine.pause();
             }
             else {
-                this.$.pause.removeAttribute('active');
+                this.$.pause.active = false;
                 Fire.Engine.play();
             }
         },
 
         stepAction: function ( event ) {
-            this.$.pause.setAttribute('active','');
-            this.$.play.setAttribute('active','');
-            this.setAttribute('active','');
+            event.stopPropagation();
+
+            this.$.pause.active = true;
+            this.$.play.active = true;
+            this.$.group.active = true;
             Fire.Engine.step();
         },
 

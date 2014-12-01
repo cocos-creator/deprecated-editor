@@ -7,7 +7,7 @@
         CameraGizmo.$super.call(this, svg, target );
         this.hitTest = true;
         
-        this._root = svg.icon( "fire://static/img/gizmos-camera.png", 40, 40, target.entity );
+        this._icon = svg.icon( "fire://static/img/gizmos-camera.png", 40, 40, target.entity );
 
         //
         var selectTools = svg.scene.group();
@@ -41,8 +41,17 @@
 
     //
     CameraGizmo.prototype.remove = function () {
-        this._root.remove();
+        this._icon.remove();
         this._selectTools.remove();
+    };
+
+    //
+    CameraGizmo.prototype.contains = function ( svgElements ) {
+        for ( var j = 0; j < svgElements.length; ++j ) {
+            if ( this._icon.node === svgElements[j] ) {
+                return true;
+            }
+        }
     };
 
     //
@@ -60,8 +69,8 @@
         var rotation = -this.target.entity.transform.worldRotation;
 
         var s = Math.max( zoom, 0.5 );
-        this._root.scale(s,s);
-        this._root.translate( screenpos.x, screenpos.y ) 
+        this._icon.scale(s,s);
+        this._icon.translate( screenpos.x, screenpos.y ) 
                   .rotate( rotation, screenpos.x, screenpos.y )
                   ;
 

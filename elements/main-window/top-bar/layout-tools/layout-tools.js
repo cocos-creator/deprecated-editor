@@ -10,8 +10,10 @@
             this.pivotID = 0;
         },
 
-        isActive: function ( val, id ) {
-            return val === id; 
+        ready: function () {
+            this.$.transform.select(0);
+            this.$.coordinate.select(0);
+            this.$.pivot.select(0);
         },
 
         // handle

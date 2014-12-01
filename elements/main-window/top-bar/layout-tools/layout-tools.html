@@ -5,39 +5,33 @@
 <template>
 <link rel="stylesheet" href="layout-tools.css">
 
-<div flex-row class="transform">
-    <div class="btn left" on-click="{{selectMove}}" active?="{{handleID|isActive(0)}}">
-        <i class="fa fa-arrows"></i>
-    </div>
-    <div class="btn" on-click="{{selectRotate}}" active?="{{handleID|isActive(1)}}">
-        <i class="fa fa-rotate-left"></i>
-    </div>
-    <div class="btn right" on-click="{{selectScale}}" active?="{{handleID|isActive(2)}}">
-        <i class="fa fa-expand"></i>
-    </div>
-</div>
+<fire-ui-button-group id="transform">
+    <fire-ui-bi on-active="{{selectMove}}"><i class="fa fa-arrows"></i></fire-ui-bi>
+    <fire-ui-bi on-active="{{selectRotate}}"><i class="fa fa-rotate-left"></i></fire-ui-bi>
+    <fire-ui-bi on-active="{{selectScale}}"><i class="fa fa-expand"></i></fire-ui-bi>
+</fire-ui-button-group>
 
 <span class="space"></span>
 
-<div flex-row class="coordinate">
-    <div class="btn left" on-click="{{selectLocal}}" active?="{{coordinateID|isActive(0)}}">
+<fire-ui-button-group id="coordinate">
+    <fire-ui-bi on-active="{{selectLocal}}">
         <img src="../../img/tools-local.png"></img>
-    </div>
-    <div class="btn right" on-click="{{selectGlobal}}" active?="{{coordinateID|isActive(1)}}">
-        <img src="../../img/tools-global.png"></img>
-    </div>
-</div>
+    </fire-ui-bi>
+    <fire-ui-bi on-active="{{selectGlobal}}">
+        <img src="../../img/tools-global.png"></img>                                          
+    </fire-ui-bi>
+</fire-ui-button-group>
 
 <span class="space"></span>
 
-<div flex-row class="pivot">
-    <div class="btn left" on-click="{{selectPivot}}" active?="{{pivotID|isActive(0)}}">
+<fire-ui-button-group id="pivot">
+    <fire-ui-bi on-active="{{selectPivot}}">
         <img src="../../img/tools-pivot.png"></img>
-    </div>
-    <div class="btn right" on-click="{{selectCenter}}" active?="{{pivotID|isActive(1)}}">
-        <img src="../../img/tools-center.png"></img>
-    </div>
-</div>
+    </fire-ui-bi>
+    <fire-ui-bi on-active="{{selectCenter}}">
+        <img src="../../img/tools-center.png"></img>                                          
+    </fire-ui-bi>
+</fire-ui-button-group>
 
 </template>
 

@@ -11,91 +11,46 @@
         width: 10px
     }
 
-    .left {
-        border-top-left-radius: 2px
-        border-bottom-left-radius: 2px
-    }
-
-    .right {
-        border-top-right-radius: 2px
-        border-bottom-right-radius: 2px
-    }
-
-    .transform {
-        .btn {
-            display: inline-block
-            box-sizing: border-box
+    #transform {
+        fire-ui-bi {                         
             font-size: 14px
-            padding: 6px 15px
 
-            color: #aaa
-            background-color: #444
-
-            &:hover {
-                background-color: #555
+            &::shadow .border {
+                padding: 6px 12px
             }
 
-            &[active] {
+            &[active]::shadow .border {
                 color: #00aa00
-                background-color: #222
-            }
-
-            &:active {
-                background-color: #171717
             }
         }
     }
 
-    .coordinate {
-        .btn {
-            display: inline-block
-            box-sizing: border-box
+    #coordinate {
+        fire-ui-bi {                         
             font-size: 12px
-            padding: 3px 0px
-            text-align: center
-            width: 40px
 
-            color: #aaa
-            background-color: #444
-
-            &:hover {
-                background-color: #555
+            &::shadow .border {
+                padding: 0px 10px
+                height: 15px
             }
 
-            &[active] {
+            &[active]::shadow .border {
                 color: #aa0
-                background-color: #222
-            }
-
-            &:active {
-                background-color: #171717
             }
         }
     }
 
-    .pivot {
-        .btn {
-            display: inline-block
-            box-sizing: border-box
+    #pivot {
+        fire-ui-bi {                         
             font-size: 12px
-            text-align: center
-            width: 30px
-            height: 12px
 
-            color: #aaa
-            background-color: #444
-
-            &:hover {
-                background-color: #555
+            &::shadow .border {
+                padding: 0px 10px
+                height: 15px
             }
 
-            &[active] {
+            &[active]::shadow .border {
                 color: #a00
-                background-color: #222
-            }
-
-            &:active {
-                background-color: #171717
             }
         }
     }
