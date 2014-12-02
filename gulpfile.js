@@ -193,6 +193,7 @@ task_plugin ( 'fire-hierarchy' );
 task_plugin ( 'fire-inspector' );
 task_plugin ( 'fire-scene' );
 task_plugin ( 'main-window' );
+task_plugin ( 'quick-assets' );
 
 // tasks
 gulp.task('copy', task_copy_deps );

@@ -1,6 +1,18 @@
 (function () {
     // skip "?fireID="
-    var fireID = JSON.parse(decodeURIComponent(location.search.substr(8)));
+    // var fireID = JSON.parse(decodeURIComponent(location.search.substr(8)));
+    var fireID = -1;
+
+    // format: "?foo=bar&hell=world"
+    // skip "?"
+    var queryString = decodeURIComponent(location.search.substr(1));
+    var queryList = queryString.split('&');
+    for ( var i = 0; i < queryList.length; ++i ) {
+        var pair = queryList[i].split("=");
+        if ( pair[0] === "fireID" ) {
+            fireID = parseInt(pair[1]);
+        }
+    }
 
     //
     var remote = require('remote');
@@ -99,6 +111,26 @@
         }
         else if ( target instanceof Fire.Asset ) {
             Fire.broadcast('asset:hint', target._uuid );
+        }
+    };
+
+    Fire.browseObject = function ( type ) {
+        if ( Fire.isChildClassOf( type, Fire.Entity ) ) {
+            Fire.warning('TODO: ask johnny how to do this.');
+        }
+        else if ( Fire.isChildClassOf( type, Fire.Component ) ) {
+            Fire.warning('TODO: ask johnny how to do this.');
+        }
+        else if ( Fire.isChildClassOf( type, Fire.Asset ) ) {
+            var typename = Fire.getClassName(type);
+            Fire.command('window:open', 'quick-assets', 'fire://static/quick-assets.html', {
+                title: "Quick Assets",
+                width: 800, 
+                height: 600,
+                show: true,
+                resizable: true,
+                query: { typename: typename },
+            } );
         }
     };
 
