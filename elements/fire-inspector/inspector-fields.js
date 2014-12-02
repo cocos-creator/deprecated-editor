@@ -42,6 +42,12 @@
         return type;
     }
 
+    function _makeWatcher ( attrs, target, propEL ) {
+        return function () {
+            attrs.watchCallback( target, propEL );
+        };
+    }
+
     function _fieldSection ( name, target ) {
         //
         var fireSectionEL = new FireSection();
@@ -75,6 +81,20 @@
                     propEL.enumList = attrs.enumList;
                 }
                 propEL.id = propName;
+
+                //
+                if ( attrs.watch && attrs.watchCallback ) {
+                    if ( attrs.watch.length > 0 ) {
+                        var observer = new CompoundObserver();
+                        for ( var i = 0; i < attrs.watch.length; ++i ) {
+                            observer.addObserver( new FireObserver( target, attrs.watch[i] ) );
+                        }
+                        var watcher = _makeWatcher( attrs, target, propEL );
+                        watcher(); // NOTE: we need to invoke it once to make sure our propEL intialize correctly
+                        observer.open(watcher);
+                    }
+                } 
+
                 fireSectionEL.$[propName] = propEL;
                 fireSectionEL.appendChild( propEL );
             }
