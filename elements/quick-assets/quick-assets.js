@@ -1,12 +1,12 @@
 (function () {
     Polymer({
+
         created: function () {
             this.ipc = new Fire.IpcListener();
         },
 
         domReady: function () {
             var typename = "";
-
             // get typename from url query
             var queryString = decodeURIComponent(location.search.substr(1));
             var queryList = queryString.split('&');
@@ -17,14 +17,22 @@
                 }
             }
 
-            Fire.command('asset-db:query', typename );
-
-            this.ipc.on('asset-db:query-results', function () {
+            Fire.command('asset-db:query', "assets://", typename );
+            this.ipc.on('asset-db:query-results', function ( results ) {
+                this.$.dataView.dataList = results;
+                this.$.dataView.typename = typename;
+                console.log(typename);
+                this.$.dataView.update();
             }.bind(this) );
         },
 
         detached: function () {
             this.ipc.clear();
         },
+
+        oninput: function () {
+            console.log('ipt');
+        },
+
     });
 })();
