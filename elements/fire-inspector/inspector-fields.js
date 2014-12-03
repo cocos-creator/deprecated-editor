@@ -90,8 +90,10 @@
                             observer.addObserver( new FireObserver( target, attrs.watch[i] ) );
                         }
                         var watcher = _makeWatcher( attrs, target, propEL );
-                        watcher(); // NOTE: we need to invoke it once to make sure our propEL intialize correctly
                         observer.open(watcher);
+
+                        // NOTE: we need to invoke it once to make sure our propEL intialize correctly
+                        propEL.onFieldCreated = watcher;
                     }
                 } 
 

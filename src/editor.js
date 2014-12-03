@@ -116,10 +116,10 @@
 
     Fire.browseObject = function ( type ) {
         if ( Fire.isChildClassOf( type, Fire.Entity ) ) {
-            Fire.warning('TODO: ask johnny how to do this.');
+            Fire.warn('TODO: ask johnny how to do this.');
         }
         else if ( Fire.isChildClassOf( type, Fire.Component ) ) {
-            Fire.warning('TODO: ask johnny how to do this.');
+            Fire.warn('TODO: ask johnny how to do this.');
         }
         else if ( Fire.isChildClassOf( type, Fire.Asset ) ) {
             var typename = Fire.getClassName(type);
