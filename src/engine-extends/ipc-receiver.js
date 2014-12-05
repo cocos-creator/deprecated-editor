@@ -9,6 +9,11 @@
     var Entity = Fire.Entity;
     var FObject = Fire.FObject;
 
+    Ipc.on('asset:renamed', function (uuid, name) {
+        // TODO:
+        Fire.warn( "TODO: @jare, please implement this!" );
+    });
+
     Ipc.on('engine:renameEntity', function (id, name) {
         var entity = Fire._getInstanceById(id);
         if (entity) {
