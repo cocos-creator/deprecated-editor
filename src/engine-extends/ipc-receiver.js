@@ -90,4 +90,14 @@
         }
     });
 
+    Ipc.on('asset:moved', function (uuid, destUrl) {
+        // rename asset
+        var asset = Fire.AssetLibrary.getAssetByUuid(uuid);
+        if (asset) {
+            var Url = require('fire-url');
+            var name = Url.basename(destUrl, Url.extname(destUrl));
+            asset.name = name;
+        }
+    });
+
 })();
