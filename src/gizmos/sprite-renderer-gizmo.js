@@ -16,6 +16,14 @@ Fire.SpriteRendererGizmo = (function () {
     Fire.gizmos['Fire.SpriteRenderer'] = SpriteRendererGizmo;
 
     //
+    SpriteRendererGizmo.prototype.remove = function () {
+        this._root.remove();
+        if ( this._editTools ) {
+            this._editTools.remove();
+        }
+    };
+
+    //
     SpriteRendererGizmo.prototype.update = function () {
         if ( !this.target.isValid )
             return;
