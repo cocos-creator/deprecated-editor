@@ -28,6 +28,7 @@ var paths = {
         'src/engine-extends/ipc-receiver.js',
 
         // editor
+        'src/sandbox.js',
         'src/editor.js',
         'src/menu.js',
         'src/ipc-utils.js',

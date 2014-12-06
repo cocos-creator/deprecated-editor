@@ -7,13 +7,17 @@
             if ( !Fire.Engine.isPlaying ) {
                 this.$.play.active = true;
                 this.$.group.active = true;
+                //
+                Sandbox.launchScene();
                 Fire.Engine.play();
             }
             else {
                 this.$.play.active = false;
                 this.$.pause.active = false;
                 this.$.group.active = false;
+                //
                 Fire.Engine.stop();
+                Sandbox.rewindScene();
             }
         },
 
