@@ -382,29 +382,6 @@
             return url;
         },
 
-        getToplevelElements: function ( uuids ) {
-            var resultIDs = Fire.Selection.filter( uuids, 'top-level', function ( idA, idB ) {
-                var elA = this.idToItem[idA];
-                var elB = this.idToItem[idB];
-
-                if ( elA.contains(elB) ) {
-                    return 1;
-                }
-                if ( elB.contains(elA) ) {
-                    return -1;
-                }
-                return 0;
-            }.bind(this) );
-
-            var resultELs = [];
-            for ( var i = 0; i < resultIDs.length; ++i ) {
-                var el = this.idToItem[resultIDs[i]];
-                resultELs.push(el);
-            }
-
-            return resultELs;
-        },
-
         highlightBorder: function ( item ) {
             if ( item && item instanceof AssetsItem ) {
                 var style = this.$.highlightBorder.style;

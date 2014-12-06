@@ -8,28 +8,18 @@
     // pre-declaration for unit tests, overridable for editor
     Fire.broadcast = function () {};
 
+    function takeEntitySnapshot(entity) {
+        return {
+            name: entity._name,
+            objFlags: entity._objFlags,
+            id: entity.id,
+            children: entity._children.map(takeEntitySnapshot),
+        };
+    }
     function takeSceneSnapshot (scene) {
-        function takeEntitySnapshot(entity) {
-            var children = entity._children;
-            var snapshot = {
-                name: entity._name,
-                objFlags: entity._objFlags,
-                id: entity.id,
-                children: new Array(children.length),
-            };
-            var childrenDatas = snapshot.children;
-            for (var i = 0, len = children.length; i < len; i++) {
-                childrenDatas[i] = takeEntitySnapshot(children[i]);
-            }
-            return snapshot;
-        }
-        var entities = scene.entities;
-        var snapshot = { entities : new Array(entities.length) };
-        var entityDatas = snapshot.entities;
-        for (var i = 0, len = entities.length; i < len; i++) {
-            entityDatas[i] = takeEntitySnapshot(entities[i]);
-        }
-        return snapshot;
+        return {
+            entities : scene.entities.map(takeEntitySnapshot)
+        };
     }
 
     editorCallback.onSceneLaunched = function (scene) {
@@ -43,7 +33,13 @@
 
     var onEntityCreated = 'entity:created';
     editorCallback.onEntityCreated = function (entity) {
-        Fire.broadcast( onEntityCreated, entity._name, entity._objFlags, entity.id );
+        if (entity._children.length === 0) {
+            Fire.broadcast( onEntityCreated, entity._name, entity._objFlags, entity.id );
+        }
+        else {
+            Fire.broadcast( onEntityCreated, takeEntitySnapshot(entity) );
+        }
+        Fire.broadcast('scene:dirty');
     };
 
     var onEntityRemoved = 'entity:removed';

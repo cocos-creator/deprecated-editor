@@ -90,6 +90,18 @@
         }
     });
 
+    Ipc.on('engine:duplicateEntities', function (idList) {
+        for (var i = 0; i < idList.length; i++) {
+            var id = idList[i];
+            var entity = Fire._getInstanceById(id);
+            if (entity) {
+                // duplicate
+                var clone = Fire.instantiate(entity);
+                clone.parent = entity.parent;
+            }
+        }
+    });
+
     Ipc.on('asset:moved', function (uuid, destUrl) {
         // rename asset
         var asset = Fire.AssetLibrary.getAssetByUuid(uuid);

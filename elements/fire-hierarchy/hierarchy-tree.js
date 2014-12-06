@@ -36,7 +36,6 @@
             }, true);
 
             // register Ipc
-            this.ipc.on('entity:created', this.newItem.bind(this));
             this.ipc.on('entity:removed', this.deleteItemById.bind(this));
             this.ipc.on('entity:parentChanged', this.setItemParentById.bind(this));
             this.ipc.on('entity:indexChanged', this.setItemIndex.bind(this));
@@ -50,7 +49,8 @@
                 }
             }.bind(this));
             this.ipc.on('hierarchy:delete', this.deleteSelection.bind(this));
-
+            this.ipc.on('hierarchy:duplicate', this.duplicateSelection.bind(this));
+            
             //
             this.refresh();
         },
@@ -79,16 +79,14 @@
                 //    }.bind(this)
                 //},
 
-                //// Duplicate
-                //{
-                //    label: 'Duplicate',
-                //    click: function () {
-                //        // TODO
-                //    }.bind(this)
-                //},
+                // Duplicate
+                {
+                    label: 'Duplicate',
+                    message: 'hierarchy:duplicate',
+                },
 
-                //// =====================
-                //{ type: 'separator' },
+                // =====================
+                { type: 'separator' },
                 
                 // Rename
                 {
@@ -112,10 +110,7 @@
             return template;
         },
 
-        newItem: function ( name, flags, id, parentEL ) {
-            if (flags & Fire._ObjectFlags.HideInEditor) {
-                return;
-            }
+        newItem: function ( name, id, parentEL ) {
             var newEL = new HierarchyItem();
             this.initItem(newEL, name, id, parentEL);
             return newEL;
@@ -161,9 +156,8 @@
                 return;
             }
             var selection = Fire.Selection.entities;
-            var self = this;
             function createItem(entity, parentEL) {
-                var el = self.newItem(entity.name, entity._objFlags, entity.id, parentEL);
+                var el = Fire.plugins.hierarchy.newEntity(entity.name, entity._objFlags, entity.id, parentEL);
                 if (el) {
                     var children = entity._children;
                     for (var i = 0, len = children.length; i < len; i++) {
@@ -345,6 +339,13 @@
 
         deleteSelection: function () {
             Fire.broadcast('engine:deleteEntities', Fire.Selection.entities);
+        },
+
+        duplicateSelection: function () {
+            var entities = this.getToplevelElements(Fire.Selection.entities).map(function (element) {
+                return element && element.userId;
+            });
+            Fire.broadcast('engine:duplicateEntities', entities);
         },
 
         keydownAction: function (event) {

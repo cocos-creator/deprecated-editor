@@ -2,6 +2,20 @@
     var Remote = require('remote');
     var Menu = Remote.require('menu');
 
+    function createEntityFromSnapshot(tree, selection, entityData, parentEL) {
+        if ( !(entityData.objFlags & Fire._ObjectFlags.HideInEditor) ) {
+            var el = tree.newItem(entityData.name, entityData.id, parentEL);
+            if (selection) {
+                el.selected = selection.indexOf(el.userId) !== -1;
+            }
+
+            var children = entityData.children;
+            for (var i = 0, len = children.length; i < len; i++) {
+                createEntityFromSnapshot(tree, selection, children[i], el);
+            }
+        }
+    }
+
     Polymer({
         publish: {
             focused: {
@@ -21,12 +35,14 @@
 
         ready: function () {
             this.tabIndex = EditorUI.getParentTabIndex(this) + 1;
+            
+            this.ipc.on('entity:created', this.newEntity.bind(this));
+            this.ipc.on('scene:launched', this.reload.bind(this));
 
             this.ipc.on('selection:entity:selected', this.select.bind(this, true));
             this.ipc.on('selection:entity:unselected', this.select.bind(this, false));
             this.ipc.on('selection:entity:hover', this.hover.bind(this));
             this.ipc.on('selection:entity:hoverout', this.hoverout.bind(this));
-            this.ipc.on('scene:launched', this.reload.bind(this));
         },
 
         detached: function () {
@@ -68,19 +84,22 @@
             tree.clear();
 
             var selection = Fire.Selection.entities;
-            function createItem(entityData, parentEL) {
-                var el = tree.newItem(entityData.name, entityData.objFlags, entityData.id, parentEL);
-                if (el) {
-                    var children = entityData.children;
-                    for (var i = 0, len = children.length; i < len; i++) {
-                        createItem(children[i], el);
-                    }
-                    el.selected = selection.indexOf(el.userId) !== -1;
-                }
-            }
             var entityDatas = sceneSnapshot.entities;
             for (var i = 0, len = entityDatas.length; i < len; i++) {
-                createItem(entityDatas[i]);
+                createEntityFromSnapshot(tree, selection, entityDatas[i]);
+            }
+        },
+
+        newEntity: function ( name, flags, id, parentEL ) {
+            var tree = this.$.hierarchyTree;
+            if (typeof name !== 'object') {
+                if ( !(flags & Fire._ObjectFlags.HideInEditor) ) {
+                    return tree.newItem(name, id, parentEL);
+                }
+            }
+            else {
+                var snapshot = name;
+                createEntityFromSnapshot(tree, null, snapshot);
             }
         },
     });
