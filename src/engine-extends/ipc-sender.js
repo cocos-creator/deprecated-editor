@@ -8,6 +8,16 @@
     // pre-declaration for unit tests, overridable for editor
     Fire.broadcast = function () {};
 
+    editorCallback.onEnginePlayed = function (continued) {
+        Fire.broadcast('engine:played', continued);
+    };
+    editorCallback.onEngineStopped = function () {
+        Fire.broadcast('engine:stopped');
+    };
+    editorCallback.onEnginePaused = function () {
+        Fire.broadcast('engine:paused');
+    };
+    
     function takeEntitySnapshot(entity) {
         return {
             name: entity._name,
