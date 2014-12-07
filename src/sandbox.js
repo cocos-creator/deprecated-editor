@@ -17,14 +17,14 @@
     var Sandbox = function () {};
 
     // 保存当前场景，然后启动新场景。
-    Sandbox.launchScene = function () {
+    Sandbox.stashScene = function () {
         purgeMemory();
         // backup scene
         stashedScene = cloneScene(Fire.Engine._scene);
-        // clone current scene
-        var shadowScene = cloneScene(Fire.Engine._scene);
-        // switch scene
-        launchScene(shadowScene);
+        //// clone current scene
+        //var shadowScene = cloneScene(Fire.Engine._scene);
+        //// switch scene
+        //launchScene(shadowScene);
     };
 
     // 销毁当前场景，将之前保存的场景还原

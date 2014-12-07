@@ -8,7 +8,7 @@
                 this.$.play.active = true;
                 this.$.group.active = true;
                 //
-                Sandbox.launchScene();
+                Sandbox.stashScene();
                 Fire.Engine.play();
             }
             else {
