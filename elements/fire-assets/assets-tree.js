@@ -532,9 +532,8 @@
         openAction: function (event) {
             if ( event.target instanceof AssetsItem ) {
                 if ( event.target.extname === '.fire' ) {
-                    Fire.Engine.loadScene(event.target.userId, function ( scene ) {
-                        // TODO: Fire.broadcast( 'scene:load', uuid );
-                    });
+                    Fire.Engine.stop();
+                    Fire.Engine.loadScene(event.target.userId);
                 }
             }
             event.stopPropagation();
