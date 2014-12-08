@@ -24,27 +24,28 @@
     .discription {
         width: 100%
         height: 70px
-        background: gray
+        background: rgb(51,51,51)
+        border-top: 1px solid rgba(255,255,255,0.2);
         position: absolute
         bottom: 0px
 
         img {
-            margin: 10px
-            width: 50px
-            height: 50px
+            margin: 5px
+
+            height: 60px
         }
     }
 
     ul {
         margin: 0
         padding: 0
+        outline: none
         li {
             height: 20px
             color: #aaa
             margin-bottom: 1px
-
             background: rgb(34,34,34)
-            line-height:20px
+            line-height: 20px
             &:hover {
                 background: rgb(85,85,85)
             }
@@ -52,18 +53,43 @@
             &:hover[selected] {
                 background: rgb(0,85,153)
             }
-            i {
-            line-height: 20px
+            lable {
+                margin-top: -5px
             }
             img {
                 width: 14px
                 height: 14px
-                line-height:20px
+                line-height: 20px
                 margin-top: 3px
             }
         }
     }
 
+    ul[inLine] {
+        li {
+            display: inline-block
+            box-shadow:1px 1px 1px #0D0C0C
+            width: 120px
+            height: 140px
+            margin: 5px
+            text-align: center
+            overflow: hidden
+            img {
+                width: 90px
+                height: 90px
+                margin: 15px
+                border-radius: 2px
+            }
+
+            span {
+                width: 100px
+                overflow: hidden
+                display: inline-block
+                margin: 2px
+                font-size: 11px
+            }
+        }
+    }
 
     ::-webkit-scrollbar {
         height: 5px

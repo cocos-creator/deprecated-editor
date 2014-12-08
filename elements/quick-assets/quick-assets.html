@@ -14,13 +14,24 @@
         <i class="fa fa-search"></i>
     </div>
 
-    <fire-ui-tabs id="tabs" >
+    <fire-ui-tabs id="tabs">
         <fire-ui-tab  class="">Assets</fire-ui-tab>
+        <span class="space"></span>
+        <fire-ui-button-group id="btnGroup" >
+            <fire-ui-bi on-active="{{ChangeView}}" active>
+                <i class="fa fa-view-list"></i>
+            </fire-ui-bi>
+            <fire-ui-bi on-active="{{ChangeView}}">
+                <i class="fa fa-view-img"></i>
+            </fire-ui-bi>
+        </fire-ui-button-group>
         <!--<fire-ui-slider value="{{size}}"></fire-ui-slider>-->
     </fire-ui-tabs>
+
+
     <div class="content" flex-1="" flex-col="" flex-stretch="">
         <div class="border" fit="">
-            <data-view id="dataView" size="{{size}}" searchValue="{{datalist}}" fit></data-view>
+            <data-view id="dataView" view="{{viewMode}}" size="{{size}}" searchValue="{{datalist}}" fit></data-view>
         </div>
     </div>
 
