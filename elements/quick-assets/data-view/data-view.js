@@ -61,7 +61,7 @@
                 break;
                 case "Fire.Sprite":
                     for (var i = 0; i < this.list.length; i++) {
-                        this.list[i].uuid = "fire://src/editor/fire-assets/img/assets-fire.png";
+                        this.list[i].uuid = "../src/editor/fire-assets/img/assets-fire.png";
                         var extname = Url.extname(this.list[i].url);
                         var basename = Url.basename(this.list[i].url, extname);
                         this.list[i].url = basename;
@@ -70,6 +70,7 @@
             }
 
             this.tempList = this.list;
+
             //this.bindding(this.list);
         },
 
