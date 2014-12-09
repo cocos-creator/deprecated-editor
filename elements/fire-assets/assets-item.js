@@ -7,7 +7,7 @@
 
         while (lo <= hi) {
             mid = ((lo + hi) >> 1);
-            name = elements[mid].name;
+            name = elements[mid].name + elements[mid].extname;
 
             if (name < key) {
                 lo = mid + 1;
@@ -23,7 +23,7 @@
     }
 
     function _binaryInsert( parentEL, el ) {
-        var idx = _binaryIndexOf( parentEL.children, el.name );
+        var idx = _binaryIndexOf( parentEL.children, el.name + el.extname );
         if ( idx === -1 ) {
             parentEL.appendChild(el);
         }

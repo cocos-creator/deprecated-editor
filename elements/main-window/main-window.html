@@ -14,33 +14,33 @@
     on-layout-tools-changed="{{layoutToolsAction}}"
 ></top-bar>
 
-<fire-ui-dock flex-1 flex-row flex-stretch
+<fire-ui-dock flex-1 row
     on-resized="{{resizedAction}}"
     >
 
-    <fire-ui-dock flex-col flex-stretch style="min-width: 200px; width: 200px">
-        <fire-ui-dock-panel id="hierarchyPanel" flex-1>
+    <fire-ui-dock width="200" min-width="200">
+        <fire-ui-panel id="hierarchyPanel" height="300">
             <!-- <fire-hierarchy id="hierarchy" name="Hierarchy" fit></fire-hierarchy> -->
-        </fire-ui-dock-panel>
+        </fire-ui-panel>
 
-        <fire-ui-dock-panel id="assetsPanel" flex-1>                              
+        <fire-ui-panel id="assetsPanel">                              
             <!-- <fire-assets id="assets" name="Assets" fit></fire-assets> -->
-        </fire-ui-dock-panel>                                                   
+        </fire-ui-panel>                                                   
     </fire-ui-dock>
 
-    <fire-ui-dock-panel id="inspectorPanel" style="min-width: 240px; width: 240px;">                
+    <fire-ui-panel id="inspectorPanel" width="240" min-width="240">                
         <!-- <fire-inspector id="inspector" name="Inspector" fit></fire-inspector> -->
-    </fire-ui-dock-panel>                                                       
+    </fire-ui-panel>                                                       
 
-    <fire-ui-dock flex-1 flex-col flex-stretch>
-        <fire-ui-dock-panel id="editPanel" flex-1 style="">                        
+    <fire-ui-dock>
+        <fire-ui-panel id="editPanel" flex-1 style="">                        
             <!-- <fire-scene id="scene" name="Scene" fit></fire-scene> -->
             <!-- <fire-game id="game" name="Game" fit></fire-game>     -->
-        </fire-ui-dock-panel>                                       
+        </fire-ui-panel>                                       
 
-        <fire-ui-dock-panel id="consolePanel" style="min-height: 200px;">
+        <fire-ui-panel id="consolePanel" height="200">
             <!-- <fire-console id="console" name="Console" fit></fire-console> -->
-        </fire-ui-dock-panel>
+        </fire-ui-panel>
     </fire-ui-dock>
 </fire-ui-dock>
 
