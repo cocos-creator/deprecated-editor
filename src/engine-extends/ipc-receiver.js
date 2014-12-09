@@ -102,6 +102,12 @@
         }
     });
 
+    Ipc.on('engine:openScene', function (uuid) {
+        Fire.Engine.stop();
+        Fire.AssetLibrary._clearAllCache();
+        Fire.Engine.loadScene(uuid);
+    });
+
     Ipc.on('asset:moved', function (uuid, destUrl) {
         // rename asset
         var asset = Fire.AssetLibrary.getAssetByUuid(uuid);

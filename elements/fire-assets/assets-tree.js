@@ -532,8 +532,7 @@
         openAction: function (event) {
             if ( event.target instanceof AssetsItem ) {
                 if ( event.target.extname === '.fire' ) {
-                    Fire.Engine.stop();
-                    Fire.Engine.loadScene(event.target.userId);
+                    Fire.broadcast('engine:openScene', event.target.userId);
                 }
             }
             event.stopPropagation();
