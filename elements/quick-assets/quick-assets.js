@@ -5,7 +5,7 @@
             this.ipc = new Fire.IpcListener();
         },
 
-        domReady: function () {
+        attached: function () {
             var typename = "";
             // get typename from url query
             var queryString = decodeURIComponent(location.search.substr(1));
@@ -17,7 +17,6 @@
                 }
             }
 
-            Fire.command('asset-db:query', "assets://", typename );
             this.ipc.on('asset-db:query-results', function ( results ) {
                 this.$.dataView.dataList = results;
                 this.$.dataView.typename = typename;
@@ -29,6 +28,8 @@
                 this.$.btnGroup.style.display = "none";
             }
             this.$.btnGroup.select(0);
+
+            Fire.command('asset-db:query', "assets://", typename );
         },
 
         detached: function () {
