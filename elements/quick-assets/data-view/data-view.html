@@ -1,0 +1,23 @@
+<polymer-element
+name="data-view"
+constructor="DataView"
+>
+<template >
+    <link rel="stylesheet" href="data-view.css">
+    <div fit on-keydown="{{ keydownAction }}" class="scroll" id="scrolls" on-scroll="{{ ScrollAction }}">
+        <ul id="uls" tabindex="1" >
+            <template repeat="{{ item, index in list }}" >
+                <li index="{{ index }}" on-click="{{ clickAction }}"  id="li" class="list" >
+                    <img src="{{ item.uuid }}">
+                    <span>{{ item.url }}</span>
+                </li>
+            </template>
+        <ul>
+    </div>
+
+    <div class="discription">
+        <img src="{{ img }}">
+    </div>
+</template>
+<script type="text/javascript" src="data-view.js"></script>
+</polymer-element>
