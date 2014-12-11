@@ -22,8 +22,7 @@
             this.ipc = new Fire.IpcListener();
         },
 
-        domReady: function () {
-            Fire.command('project:init');
+        attached: function () {
             this.ipc.on('project:ready', function () {
                 Polymer.import([
                     "fire://src/editor/fire-assets/fire-assets.html",
@@ -94,6 +93,10 @@
 
         detached: function () {
             this.ipc.clear();
+        },
+
+        domReady: function () {
+            Fire.command('project:init');
         },
 
         resizedAction: function ( event ) {

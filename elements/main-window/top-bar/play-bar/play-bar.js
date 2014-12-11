@@ -5,7 +5,7 @@
             this.ipc = new Fire.IpcListener();
         },
 
-        ready: function () {
+        attached: function () {
             this.ipc.on('engine:played', this.onEnginePlayed.bind(this));
             this.ipc.on('engine:stopped', this.onEngineStopped.bind(this));
             this.ipc.on('engine:paused', this.onEnginePaused.bind(this));

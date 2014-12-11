@@ -10,6 +10,23 @@
         },
 
         ready: function () {
+            //
+            this.$.border.addEventListener( "dragenter", function (event) {
+                if ( this.dragenterCnt === 0 ) {
+                    this.$.border.classList.add('highlight');
+                }
+                ++this.dragenterCnt;
+            }.bind(this), true);
+
+            this.$.border.addEventListener( "dragleave", function (event) {
+                --this.dragenterCnt;
+                if ( this.dragenterCnt === 0 ) {
+                    this.$.border.classList.remove('highlight');
+                }
+            }.bind(this), true);
+        },
+
+        attached: function () {
             Ipc.on( 'dashboard:recent-projects', function ( list ) {
                 for ( var i = 0; i < list.length; ++i ) {
                     var path = list[i];
@@ -39,21 +56,12 @@
 
             //
             Fire.command( 'dashboard:request-recent-projects' );
+        },
 
-            //
-            this.$.border.addEventListener( "dragenter", function (event) {
-                if ( this.dragenterCnt === 0 ) {
-                    this.$.border.classList.add('highlight');
-                }
-                ++this.dragenterCnt;
-            }.bind(this), true);
-
-            this.$.border.addEventListener( "dragleave", function (event) {
-                --this.dragenterCnt;
-                if ( this.dragenterCnt === 0 ) {
-                    this.$.border.classList.remove('highlight');
-                }
-            }.bind(this), true);
+        detached: function () {
+            Ipc.removeAllListeners('dashboard:recent-projects');
+            Ipc.removeAllListeners('dashboard:project-added');
+            Ipc.removeAllListeners('dashboard:project-removed');
         },
 
         browseAction: function ( event ) {

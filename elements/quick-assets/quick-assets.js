@@ -17,9 +17,12 @@
                 }
             }
 
-            Fire.command('asset-db:query', typename );
+            Fire.command('asset-db:query', "assets://", typename );
 
-            this.ipc.on('asset-db:query-results', function () {
+            this.ipc.on('asset-db:query-results', function ( urls ) {
+                for ( var i = 0; i < urls.length; ++i ) {
+                    Fire.log( urls[i] );
+                }
             }.bind(this) );
         },
 

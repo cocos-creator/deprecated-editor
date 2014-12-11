@@ -21,7 +21,9 @@
 
         ready: function () {
             this.tabIndex = EditorUI.getParentTabIndex(this)+1;
+        },
 
+        attached: function () {
             // register Ipc
             this.ipc.on('selection:asset:activated', this.inspectAsset.bind(this, true) );
             this.ipc.on('selection:entity:activated', this.inspectEntity.bind(this, true) );

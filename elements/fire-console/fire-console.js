@@ -7,7 +7,7 @@
             this.ipc = new Fire.IpcListener();
         },
 
-        ready: function () {
+        attached: function () {
             // register ipc
             this.ipc.on('console:log', function ( text ) {
                 this.$.view.add( 'log', text );

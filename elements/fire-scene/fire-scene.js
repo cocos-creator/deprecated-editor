@@ -18,6 +18,9 @@
         },
 
         ready: function () {
+        },
+
+        attached: function () {
             // register ipc
             this.ipc.on('selection:entity:selected', this.select.bind(this, true) );
             this.ipc.on('selection:entity:unselected', this.select.bind(this, false) );
@@ -41,9 +44,9 @@
         },
 
         detached: function () {
-            this.ipc.clear();
-
             clearInterval (this._repaintID);
+
+            this.ipc.clear();
         },
 
         initRenderContext: function () {

@@ -17,7 +17,9 @@
 
         ready: function () {
             this.tabIndex = EditorUI.getParentTabIndex(this) + 1;
+        },
 
+        attached: function () {
             this.ipc.on('selection:asset:selected', this.select.bind(this, true));
             this.ipc.on('selection:asset:unselected', this.select.bind(this, false));
             this.ipc.on('asset:hint', this.hint.bind(this));
