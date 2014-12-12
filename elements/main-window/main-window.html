@@ -14,7 +14,7 @@
     on-layout-tools-changed="{{layoutToolsAction}}"
 ></top-bar>
 
-<fire-ui-dock id="mainDock" flex-1 row>
+<fire-ui-dock id="mainDock" flex-1 row no-collapse>
     <fire-ui-dock width="200" min-width="200">
         <fire-ui-panel id="hierarchyPanel" height="300">
             <!-- <fire-hierarchy id="hierarchy" name="Hierarchy" fit></fire-hierarchy> -->
@@ -30,7 +30,7 @@
     </fire-ui-panel>                                                       
 
     <fire-ui-dock>
-        <fire-ui-panel id="editPanel" auto style="">                        
+        <fire-ui-panel id="editPanel" auto-layout style="">                        
             <!-- <fire-scene id="scene" name="Scene" fit></fire-scene> -->
             <!-- <fire-game id="game" name="Game" fit></fire-game>     -->
         </fire-ui-panel>                                       
