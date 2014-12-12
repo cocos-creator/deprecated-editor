@@ -28,7 +28,9 @@
 
             // init gizmos
             this.svgGizmos = new Fire.SvgGizmos( this.$.gizmos );
+        },
 
+        attached: function () {
             this.ipc.on('component:enabled', this.updateComponent.bind(this,true) );
             this.ipc.on('component:disabled', this.updateComponent.bind(this,false) );
         },

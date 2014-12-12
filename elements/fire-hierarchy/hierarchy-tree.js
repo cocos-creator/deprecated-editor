@@ -34,7 +34,12 @@
                     this.resetDragState();
                 }
             }, true);
+            
+            //
+            this.refresh();
+        },
 
+        attached: function () {
             // register Ipc
             this.ipc.on('entity:removed', this.deleteItemById.bind(this));
             this.ipc.on('entity:parentChanged', this.setItemParentById.bind(this));
@@ -50,9 +55,6 @@
             }.bind(this));
             this.ipc.on('hierarchy:delete', this.deleteSelection.bind(this));
             this.ipc.on('hierarchy:duplicate', this.duplicateSelection.bind(this));
-            
-            //
-            this.refresh();
         },
 
         detached: function () {

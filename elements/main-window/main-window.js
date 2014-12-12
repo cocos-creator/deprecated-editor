@@ -22,8 +22,13 @@
             this.ipc = new Fire.IpcListener();
         },
 
-        domReady: function () {
-            Fire.command('project:init');
+        ready: function () {
+            window.addEventListener('resize', function() {
+                this.$.mainDock._notifyResize();
+            }.bind(this));
+        },
+
+        attached: function () {
             this.ipc.on('project:ready', function () {
                 Polymer.import([
                     "fire://src/editor/fire-assets/fire-assets.html",
@@ -96,9 +101,8 @@
             this.ipc.clear();
         },
 
-        resizedAction: function ( event ) {
-            this.$.game.resize();
-            this.$.scene.resize();
+        domReady: function () {
+            Fire.command('project:init');
         },
 
         layoutToolsAction: function ( event ) {
@@ -117,14 +121,14 @@
             Remote.getCurrentWindow().setTitle( sceneName + " - Fireball-x Editor" );
         },
 
-        addPlugin: function ( dock, plugin, id, name ) {
+        addPlugin: function ( panel, plugin, id, name ) {
             var pluginInst = new plugin();
             pluginInst.setAttribute('id', id);
             pluginInst.setAttribute('name', name);
             pluginInst.setAttribute('fit', '');
             this.$[id] = pluginInst;
-            dock.add(pluginInst);
-            dock.$.tabs.select(0);
+            panel.add(pluginInst);
+            panel.$.tabs.select(0);
         },
     });
 })();

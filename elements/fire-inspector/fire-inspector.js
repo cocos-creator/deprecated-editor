@@ -21,7 +21,9 @@
 
         ready: function () {
             this.tabIndex = EditorUI.getParentTabIndex(this)+1;
+        },
 
+        attached: function () {
             // register Ipc
             this.ipc.on('selection:activated', this.onInspect.bind(this, true) );
             this.ipc.on('selection:deactivated', this.onInspect.bind(this, false) );
@@ -199,10 +201,12 @@
                     parent = newMenu;
                 }
                 if (newMenu && !newMenu.submenu) {
-                    // click callback
+                    // click callback 
+                    // jshint ignore:start
                     newMenu.click = (function (component) {
                         this.addComponent(component);
                     }).bind(this, item.component);
+                    // jshint ignore:end
                 }
                 else {
                     Fire.error('Invalid component menu path: ' + item.menuPath);

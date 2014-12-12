@@ -144,7 +144,9 @@
                     this.resetDragState();
                 }
             }, true);
+        },
 
+        attached: function () {
             // register Ipc
             this.ipc.on('fire-assets:newItem', this.newItem.bind(this) );
             this.ipc.on('fire-assets:deleteItem', this.deleteItemById.bind(this) );
