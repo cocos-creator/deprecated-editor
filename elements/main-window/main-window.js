@@ -121,14 +121,14 @@
             Remote.getCurrentWindow().setTitle( sceneName + " - Fireball-x Editor" );
         },
 
-        addPlugin: function ( dock, plugin, id, name ) {
+        addPlugin: function ( panel, plugin, id, name ) {
             var pluginInst = new plugin();
             pluginInst.setAttribute('id', id);
             pluginInst.setAttribute('name', name);
             pluginInst.setAttribute('fit', '');
             this.$[id] = pluginInst;
-            dock.add(pluginInst);
-            dock.$.tabs.select(0);
+            panel.add(pluginInst);
+            panel.$.tabs.select(0);
         },
     });
 })();
