@@ -1,4 +1,4 @@
-(function () {
+﻿(function () {
     var Path = require('fire-path');
     var Url = require('fire-url');
 
@@ -495,6 +495,7 @@
                     }
                 }
                 else {
+                    // 如果已经选中，不unselect other
                     if ( !event.target.selected ) {
                         Fire.Selection.selectAsset(event.target.userId, true, false);
                     }

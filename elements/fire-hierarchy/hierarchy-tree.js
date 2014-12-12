@@ -1,4 +1,4 @@
-(function () {
+﻿(function () {
     var Ipc = require('ipc');
     var Remote = require('remote');
     var Menu = Remote.require('menu');
@@ -254,6 +254,7 @@
                     }
                 }
                 else {
+                    // 如果已经选中，不unselect other
                     if ( !event.target.selected ) {
                         Fire.Selection.selectEntity(event.target.userId, true, false);
                     }
@@ -297,9 +298,12 @@
         },
 
         mousedownAction: function (event) {
-            Fire.Selection.clearEntity();
+            if (event.which === 1) {
+                // left down
+                Fire.Selection.clearEntity();
 
-            event.stopPropagation();
+                event.stopPropagation();
+            }
         },
 
         createEntity: function () {
