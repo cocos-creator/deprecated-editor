@@ -37,21 +37,13 @@
 
         inspectAsset: function ( inspect, uuid ) {
             if (inspect) {
-                var promise = new Promise(function(resolve, reject) {
-                    this.lastUuid = uuid;
-                    var meta = Fire.AssetDB.loadMeta(uuid);
-                    var importer = Fire.deserialize(meta);
+                this.lastUuid = uuid;
+                var meta = Fire.AssetDB.loadMeta(uuid);
+                var importer = Fire.deserialize(meta);
 
-                    if ( this.lastUuid === uuid ) {
-                        resolve(importer);
-                    }
-                    else {
-                        reject();
-                    }
-                }.bind(this));
-                promise.then ( function ( importer ) {
+                if ( this.lastUuid === uuid ) {
                     this.inspect(importer);
-                }.bind(this));
+                }
             }
             else if (this.$.fields.target instanceof Fire.Asset) {
                 // uninspect
@@ -205,10 +197,12 @@
                     parent = newMenu;
                 }
                 if (newMenu && !newMenu.submenu) {
-                    // click callback
+                    // click callback 
+                    // jshint ignore:start
                     newMenu.click = (function (component) {
                         this.addComponent(component);
                     }).bind(this, item.component);
+                    // jshint ignore:end
                 }
                 else {
                     Fire.error('Invalid component menu path: ' + item.menuPath);
