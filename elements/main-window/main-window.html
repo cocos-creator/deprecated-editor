@@ -14,10 +14,7 @@
     on-layout-tools-changed="{{layoutToolsAction}}"
 ></top-bar>
 
-<fire-ui-dock flex-1 row
-    on-resized="{{resizedAction}}"
-    >
-
+<fire-ui-dock id="mainDock" flex-1 row>
     <fire-ui-dock width="200" min-width="200">
         <fire-ui-panel id="hierarchyPanel" height="300">
             <!-- <fire-hierarchy id="hierarchy" name="Hierarchy" fit></fire-hierarchy> -->

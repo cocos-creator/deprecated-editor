@@ -22,6 +22,12 @@
             this.ipc = new Fire.IpcListener();
         },
 
+        ready: function () {
+            window.addEventListener('resize', function() {
+                this.$.mainDock._notifyResize();
+            }.bind(this));
+        },
+
         attached: function () {
             this.ipc.on('project:ready', function () {
                 Polymer.import([
@@ -97,11 +103,6 @@
 
         domReady: function () {
             Fire.command('project:init');
-        },
-
-        resizedAction: function ( event ) {
-            this.$.game.resize();
-            this.$.scene.resize();
         },
 
         layoutToolsAction: function ( event ) {

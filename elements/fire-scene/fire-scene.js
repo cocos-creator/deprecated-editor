@@ -8,10 +8,6 @@
             this.icon = new Image();
             this.icon.src = "fire://static/img/plugin-scene.png";
 
-            window.addEventListener('resize', function() {
-                this.resize();
-            }.bind(this));
-
             this.ipc = new Fire.IpcListener();
 
             this._newsceneUrl = null;
@@ -143,13 +139,17 @@
             this.$.view.initSceneCamera();
         },
 
+        layoutToolsAction: function ( event ) {
+            this.$.view.rebuildGizmos();
+            event.stopPropagation();
+        },
+
         showAction: function ( event ) {
             this.resize();
         },
 
-        layoutToolsAction: function ( event ) {
-            this.$.view.rebuildGizmos();
-            event.stopPropagation();
+        resizeAction: function ( event ) {
+            this.resize();
         },
     });
 })();

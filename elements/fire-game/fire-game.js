@@ -4,11 +4,17 @@
             this.icon = new Image();
             this.icon.src = "fire://static/img/plugin-game.png";
 
-            this.renderContext = null;
+            this.ipc = new Fire.IpcListener();
 
-            window.addEventListener('resize', function() {
-                this.resize();
-            }.bind(this));
+            this.renderContext = null;
+        },
+
+        attached: function () {
+            this.ipc.on('scene:dirty', this.delayRepaintScene.bind(this) );
+        },
+
+        detached: function () {
+            this.ipc.clear();
         },
 
         setRenderContext: function ( renderContext ) {
@@ -23,18 +29,35 @@
             }
         }, 
 
-        showAction: function ( event ) {
-            this.resize();
-        },
-
         resize: function () {
             if ( this.renderContext !== null ) {
                 this.renderContext.size = new Fire.Vec2( this.$.view.clientWidth, 
                                                          this.$.view.clientHeight );
-
-                Fire.Engine._scene.render(this.renderContext);
+                this.repaintScene();
             }
         },
 
+        repaintScene: function () {
+            Fire.Engine._scene.render(this.renderContext);
+        },
+
+        delayRepaintScene: function () {
+            if ( this._repainting )
+                return;
+
+            this._repainting = true;
+            setTimeout( function () {
+                this.repaintScene();
+                this._repainting = false;
+            }.bind(this), 100 );
+        },
+
+        showAction: function ( event ) {
+            this.resize();
+        },
+
+        resizeAction: function ( event ) {
+            this.resize();
+        },
     });
 })();
