@@ -1,4 +1,4 @@
-(function () {
+﻿(function () {
     var Remote = require('remote');
     var Menu = Remote.require('menu');
 
@@ -25,44 +25,48 @@
 
         attached: function () {
             // register Ipc
-            this.ipc.on('selection:asset:activated', this.inspectAsset.bind(this, true) );
-            this.ipc.on('selection:entity:activated', this.inspectEntity.bind(this, true) );
-            this.ipc.on('selection:asset:deactivated', this.inspectAsset.bind(this, false) );
-            this.ipc.on('selection:entity:deactivated', this.inspectEntity.bind(this, false) );
+            this.ipc.on('selection:activated', this.onInspect.bind(this, true) );
+            this.ipc.on('selection:deactivated', this.onInspect.bind(this, false) );
         },
 
         detached: function () {
             this.ipc.clear();
         },
 
-        inspectAsset: function ( inspect, uuid ) {
-            if (inspect) {
-                this.lastUuid = uuid;
-                var meta = Fire.AssetDB.loadMeta(uuid);
-                var importer = Fire.deserialize(meta);
-
-                if ( this.lastUuid === uuid ) {
-                    this.inspect(importer);
+        onInspect: function ( inspect, type, id ) {
+            if (type === 'entity') {
+                if (inspect) {
+                    var entity = Fire._getInstanceById(id);
+                    if (entity) {
+                        this.inspect(entity);
+                    }
+                }
+                else if (this.$.fields.target instanceof Fire.Entity) {
+                    // uninspect
+                    this.inspect(null);
                 }
             }
-            else if (this.$.fields.target instanceof Fire.Asset) {
-                // uninspect
-                this.inspect(null);
-            }
-        },
-
-        inspectEntity: function ( inspect, id ) {
-            if (inspect) {
-                // only support entity currently
-                var entity = Fire._getInstanceById(id);
-                if (!entity) {
-                    return;
+            else if (type === 'asset') {
+                if (inspect) {
+                    this.lastUuid = id;
+                    var meta = Fire.AssetDB.loadMeta(id);
+                    // Checks whether last uuid modified to ensure call stack not suspended by another ipc event
+                    // This may occurred after ipc sync invocation such as AssetDB.xxx
+                    if (this.lastUuid === id) {
+                        // this.inspect 前如果不延迟一帧，点右键菜单时渲染会只进行到一半，同时 inspector 切换也会有问题。
+                        process.nextTick(function (meta) {
+                            // Only inspect the lastest one
+                            if (this.lastUuid === id) {
+                                var importer = Fire.deserialize(meta);
+                                this.inspect(importer);
+                            }
+                        }.bind(this, meta));
+                    }
                 }
-                this.inspect(entity);
-            }
-            else if (this.$.fields.target instanceof Fire.Entity) {
-                // uninspect
-                this.inspect(null);
+                else if (this.$.fields.target instanceof Fire.Asset) {
+                    // uninspect
+                    this.inspect(null);
+                }
             }
         },
 

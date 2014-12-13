@@ -23,10 +23,10 @@
         this.saveGlobalVars();
         // backup scene
         stashedScene = cloneScene(Fire.Engine._scene);
-        //// clone current scene
-        //var shadowScene = cloneScene(Fire.Engine._scene);
-        //// switch scene
-        //this._launchScene(shadowScene);
+        // clone current scene
+        var shadowScene = cloneScene(Fire.Engine._scene);
+        // switch scene
+        this._launchScene(shadowScene);
     };
 
     // 销毁当前场景，将之前保存的场景还原
