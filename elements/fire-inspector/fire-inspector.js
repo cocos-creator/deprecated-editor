@@ -19,10 +19,6 @@
             this.ipc = new Fire.IpcListener();
         },
 
-        ready: function () {
-            this.tabIndex = EditorUI.getParentTabIndex(this)+1;
-        },
-
         attached: function () {
             // register Ipc
             this.ipc.on('selection:activated', this.onInspect.bind(this, true) );

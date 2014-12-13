@@ -33,10 +33,6 @@
             this.ipc = new Fire.IpcListener();
         },
 
-        ready: function () {
-            this.tabIndex = EditorUI.getParentTabIndex(this) + 1;
-        },
-
         attached: function () {
             this.ipc.on('entity:created', this.newEntity.bind(this));
             this.ipc.on('scene:launched', this.reload.bind(this));
