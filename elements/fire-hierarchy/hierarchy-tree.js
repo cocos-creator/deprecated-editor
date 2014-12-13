@@ -493,12 +493,15 @@
         },
 
         dropAction: function ( event ) {
+            var dragType = EditorUI.DragDrop.type(event.dataTransfer);
+            if ( dragType !== 'asset' && dragType !== 'entity' )
+                return;
+
             event.preventDefault();
             event.stopPropagation();
-            
-            var dragType = EditorUI.DragDrop.type(event.dataTransfer);
-            var items = EditorUI.DragDrop.drop(event.dataTransfer);
 
+            var items = EditorUI.DragDrop.drop(event.dataTransfer);
+            
             this.resetDragState();
             Fire.Selection.cancel();
 
