@@ -41,9 +41,9 @@
             console.log('%c' + text, "color: red"); 
             Fire.command('console:failed', text);
         },
-        hint: function ( text ) { 
+        info: function ( text ) { 
             console.log('%c' + text, "color: blue"); 
-            Fire.command('console:hint', text);
+            Fire.command('console:info', text);
         },
 
         // app
