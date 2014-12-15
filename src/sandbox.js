@@ -11,6 +11,11 @@
         Fire.FObject._deferredDestroy();    // 预先释放一批对象，方便 GC
     }
 
+    var IgnoreGlobalVars = {
+        webkitIndexedDB: true,
+        webkitStorageInfo: true,
+    };
+
     var Sandbox = function () {};
 
     Sandbox._launchScene = function (scene, onUnloaded) {
@@ -67,7 +72,7 @@
         savedGlobalVars = {};
         var globals = window;
         for (var key in globals) {
-            if (globals.hasOwnProperty(key)) {
+            if (globals.hasOwnProperty(key) && !IgnoreGlobalVars[key]) {
                 savedGlobalVars[key] = globals[key];
             }
         }
@@ -80,7 +85,7 @@
         var key;
         var globals = window;
         for (key in globals) {
-            if (globals.hasOwnProperty(key)) {
+            if (globals.hasOwnProperty(key) && !IgnoreGlobalVars[key]) {
                 if (key in savedGlobalVars) {
                     var lastValue = savedGlobalVars[key];
                     var type = typeof lastValue;
