@@ -17,8 +17,9 @@
         // save selection
         var selection = Fire.Selection.entities;
         var paths = [];
-        for (var i = 0; i < selection.length; i++) {
-            var entity = Fire._getInstanceById(id);
+        var i;
+        for (i = 0; i < selection.length; i++) {
+            var entity = Fire._getInstanceById(selection[i]);
             if (entity) {
                 paths.push(entity._getIndices());
             }
@@ -29,7 +30,7 @@
 
         // restore selection
         selection.length = 0;
-        for (var i = 0; i < paths.length; i++) {
+        for (i = 0; i < paths.length; i++) {
             var indices = paths[0];
             var ent = Fire.Engine._scene.findEntityByIndices(indices);
             if (!ent) {
