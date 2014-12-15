@@ -63,4 +63,24 @@
 
         return match;
     };
+
+    /**
+     * @param {number[]} indices - the array contains index of all entities parents in the hierarchy
+     * @returns {Entity} the entity or null if not found
+     */
+    Scene.prototype.findEntityByIndices = function (indices) {
+        var entity;
+        for (var i = 0, children = this.entities; i < indices.length; i++, children = entity.children) {
+            var index = indices[i];
+            if (index < children.length) {
+                entity = children[index];
+                if (Fire.isValid(entity)) {
+                    continue;
+                }
+            }
+            return null;
+        }
+        return entity;
+    };
+
 })();

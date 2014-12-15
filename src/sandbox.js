@@ -14,7 +14,30 @@
     var Sandbox = function () {};
 
     Sandbox._launchScene = function (scene, onUnloaded) {
+        // save selection
+        var selection = Fire.Selection.entities;
+        var paths = [];
+        for (var i = 0; i < selection.length; i++) {
+            var entity = Fire._getInstanceById(id);
+            if (entity) {
+                paths.push(entity._getIndices());
+            }
+        }
+
+        // launch
         Fire.Engine._setCurrentScene(scene, onUnloaded);
+
+        // restore selection
+        selection.length = 0;
+        for (var i = 0; i < paths.length; i++) {
+            var indices = paths[0];
+            var ent = Fire.Engine._scene.findEntityByIndices(indices);
+            if (!ent) {
+                Fire.error('Can not find entity: ' + indices);
+            }
+            selection.push(ent.id);
+        }
+        Fire.Selection.selectEntity(selection, false, true);
     };
 
     // 保存当前场景
@@ -59,7 +82,8 @@
             if (globals.hasOwnProperty(key)) {
                 if (key in savedGlobalVars) {
                     var lastValue = savedGlobalVars[key];
-                    if (globals[key] !== lastValue) {
+                    var type = typeof lastValue;
+                    if ((type === 'object' || type === 'function') && globals[key] !== lastValue) {
                         if (showWarning) {
                             Fire.warn('Modified global variable: ' + key);
                         }
