@@ -21,8 +21,8 @@
                 this.$.view.add( 'error', text );
             }.bind(this) );
 
-            this.ipc.on('console:hint', function ( text ) {
-                this.$.view.add( 'hint', text );
+            this.ipc.on('console:info', function ( text ) {
+                this.$.view.add( 'info', text );
             }.bind(this) );
         },
 
