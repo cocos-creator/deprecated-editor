@@ -32,4 +32,12 @@
         delete Fire._idToObject[this._id];
     };
 
+    Entity.prototype._getIndices = function () {
+        var indices = [];
+        for (var ent = this; ent; ent = ent._parent) {
+            indices.push(ent.getSiblingIndex());
+        }
+        return indices;
+    };
+
 })();
