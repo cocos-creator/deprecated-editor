@@ -45,6 +45,12 @@
             //this.tempLogs = temp;
         },
 
+
+        itemClickAction: function (event, detail, sender) {
+            var index = sender.getAttribute('index');
+            this.nextElementSibling.info = "type:"+this.logs[index].type+",info:"+this.logs[index].text;
+        },
+
         mySelectChanged: function () {
             var type= "";
             switch(this.mySelect) {

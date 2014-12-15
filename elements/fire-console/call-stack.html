@@ -1,0 +1,31 @@
+<polymer-element
+    name="call-stack"
+    constructor="CallStack"
+    >
+<template>
+    <style>
+        :host{
+            height: 50px;
+            box-shadow: inset 0 0 8px 2px rgba(0,0,0,0.2);
+            background: #333;
+        }
+    </style>
+
+    <span>{{info}}</span>
+</template>
+<script>
+    Polymer({
+        publish: {
+            info: '',
+        },
+
+        observe: {
+            info: 'infoChanged',
+        },
+
+        infoChanged: function () {
+            //console.log("info:"+this.info);
+        },
+    });
+</script>
+</polymer-element>
