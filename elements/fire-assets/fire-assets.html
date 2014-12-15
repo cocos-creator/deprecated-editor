@@ -9,11 +9,12 @@
 <template>
 <link rel="stylesheet" href="fire-assets.css">
 
-<div id="searchBar" flex-row>
+<fire-ui-toolbar>
     <fire-ui-text-input flex-1 placeholder="Search..."></fire-ui-text-input>   
     <span class="space"></span>
     <i class="fa fa-search"></i>
-</div>                                                 
+    <span class="space"></span>
+</fire-ui-toolbar>
 <assets-tree id="assetsTree" flex-1></assets-tree>
 
 </template>
