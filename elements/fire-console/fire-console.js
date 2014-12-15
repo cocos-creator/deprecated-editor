@@ -1,5 +1,22 @@
 (function () {
     Polymer({
+        publish: {
+            mySelect: 0,
+            mySelectList: [
+                { name: 'all',value: 0 },
+                { name: 'log',value: 1 },
+                { name: 'warn',value: 2 },
+                { name: 'error',value: 3 },
+                { name: 'hint',value: 4},
+            ],
+            searchValue: '',
+        },
+
+        observe: {
+            searchValue: 'searchValueChanged',
+            mySelect: 'mySelectChanged',
+        },
+
         created: function () {
             this.icon = new Image();
             this.icon.src = "fire://static/img/plugin-console.png";
@@ -29,5 +46,22 @@
         detached: function () {
             this.ipc.clear();
         },
+
+        clearConsole: function (event,target) {
+            var nextEle = event.target;
+            if (event.target.tagName == "I") {
+                nextEle = event.target.parentNode;
+            }
+            nextEle.parentNode.nextElementSibling.clear();
+        },
+
+        searchValueChanged: function () {
+            this.$.view.searchValue = this.searchValue;
+        },
+
+        mySelectChanged: function () {
+            this.$.view.mySelect = this.mySelect;
+        },
+
     });
 })();
