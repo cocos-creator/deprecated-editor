@@ -55,7 +55,7 @@
             }.bind(this) );
 
             //
-            Fire.command( 'dashboard:request-recent-projects' );
+            Fire.sendToCore( 'dashboard:request-recent-projects' );
         },
 
         detached: function () {
@@ -73,7 +73,7 @@
             } );
 
             if ( result ) {
-                Fire.command( 'dashboard:add-project', result[0] );
+                Fire.sendToCore( 'dashboard:add-project', result[0] );
             }
         },
 
@@ -87,7 +87,7 @@
             var files = event.dataTransfer.files;
             for ( var i = 0; i < files.length; ++i ) {
                 var file = files[i];
-                Fire.command( 'dashboard:add-project', file.path );
+                Fire.sendToCore( 'dashboard:add-project', file.path );
             }
         },
     });

@@ -29,7 +29,7 @@
             }
             this.$.btnGroup.select(0);
 
-            Fire.command('asset-db:query', "assets://", typename );
+            Fire.sendToCore('asset-db:query', "assets://", typename );
         },
 
         detached: function () {

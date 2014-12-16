@@ -129,7 +129,7 @@
             //
             if ( saveUrl ) {
                 this._newsceneUrl = saveUrl;
-                Fire.command( 'asset-db:save', 
+                Fire.sendToCore( 'asset-db:save', 
                               this._newsceneUrl, 
                               Fire.serialize(currentScene) );
             }

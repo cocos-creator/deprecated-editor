@@ -234,7 +234,7 @@
 
         moveEntities: function ( targetEL, entities, nextSiblingId ) {
             // TODO: Fire.Selection.filter(entities,'sorted');
-            Fire.broadcast('engine:moveEntities', entities, targetEL ? targetEL.userId : null, nextSiblingId);
+            Fire.sendToPages('engine:moveEntities', entities, targetEL ? targetEL.userId : null, nextSiblingId);
         },
 
         selectingAction: function (event) {
@@ -287,7 +287,7 @@
             var item = event.target;
             if ( item instanceof FireTreeItem ) {
                 this.focus();
-                Fire.broadcast('engine:renameEntity', item.userId, event.detail.name);
+                Fire.sendToPages('engine:renameEntity', item.userId, event.detail.name);
             }
             event.stopPropagation();
         },
@@ -311,20 +311,20 @@
         createEntity: function () {
             var parentEL = this.contextmenuAt && this.contextmenuAt.parentElement;
             if (parentEL instanceof HierarchyItem) {
-                Fire.broadcast('engine:createEntity', parentEL.userId);
+                Fire.sendToPages('engine:createEntity', parentEL.userId);
             }
             else {
-                Fire.broadcast('engine:createEntity');
+                Fire.sendToPages('engine:createEntity');
             }
         },
 
         createChildEntity: function () {
             if (this.contextmenuAt) {
-                Fire.broadcast('engine:createEntity', this.contextmenuAt.userId);
+                Fire.sendToPages('engine:createEntity', this.contextmenuAt.userId);
             }
             else {
                 var activeId = Fire.Selection.activeEntityId;
-                Fire.broadcast('engine:createEntity', activeId);
+                Fire.sendToPages('engine:createEntity', activeId);
             }
         },
 
@@ -344,14 +344,14 @@
         },
 
         deleteSelection: function () {
-            Fire.broadcast('engine:deleteEntities', Fire.Selection.entities);
+            Fire.sendToPages('engine:deleteEntities', Fire.Selection.entities);
         },
 
         duplicateSelection: function () {
             var entities = this.getToplevelElements(Fire.Selection.entities).map(function (element) {
                 return element && element.userId;
             });
-            Fire.broadcast('engine:duplicateEntities', entities);
+            Fire.sendToPages('engine:duplicateEntities', entities);
         },
 
         keydownAction: function (event) {
@@ -568,7 +568,7 @@
                             ent.parent = parentEnt;
                             ent.transform.position = new Fire.Vec2(0,0);
                             Fire.Selection.selectEntity( ent.id, true, true );
-                            Fire.broadcast( 'scene:dirty' );
+                            Fire.sendToPages( 'scene:dirty' );
                         }
                     }.bind(this);
 
