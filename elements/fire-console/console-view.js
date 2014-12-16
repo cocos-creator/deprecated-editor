@@ -2,6 +2,8 @@
     Polymer({
         publish: {
             searchValue: '',
+            minheight: 0,
+            minwidth: 0,
         },
 
         observe: {
@@ -14,6 +16,7 @@
             this.logs = [];
             this.tempLogs = [];
             this.mySelect = 0;
+            this.tempSender = null;
         },
 
         add: function ( type, text ) {
@@ -37,18 +40,34 @@
 
         searchValueChanged: function () {
             this.tempLogs = [];
-            for (var i = 0;i <this.logs.length;i++) {
+            for (var i = 0;i < this.logs.length;i++) {
                 if (this.logs[i].text.toUpperCase().indexOf(this.searchValue.toUpperCase()) > -1) {
                     this.tempLogs.push(this.logs[i]);
                 }
             }
-            //this.tempLogs = temp;
         },
 
 
         itemClickAction: function (event, detail, sender) {
             var index = sender.getAttribute('index');
-            this.nextElementSibling.info = "type:"+this.logs[index].type+",info:"+this.logs[index].text;
+            this.nextElementSibling.nextElementSibling.info = this.tempLogs[index].text;
+            var infoclass= "";
+            switch (this.tempLogs[index].type) {
+                case "log": infoclass = "fa fa-info";
+                break;
+                case "hint": infoclass = "fa fa-info";
+                break;
+                case "warn": infoclass = "fa fa-warning";
+                break;
+                case "error": infoclass = "fa fa-times-circle";
+                break;
+            }
+            this.nextElementSibling.nextElementSibling.class = infoclass;
+            if (this.tempSender != null ){
+                this.tempSender.removeAttribute("focused");
+            }
+            sender.setAttribute("focused","");
+            this.tempSender = sender;
         },
 
         mySelectChanged: function () {

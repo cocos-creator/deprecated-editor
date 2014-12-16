@@ -21,28 +21,28 @@
     //
     Fire.mixin( Fire, {
         // console
-        log: function ( text ) { 
-            console.log(text); 
+        log: function ( text ) {
+            console.log(text);
             Fire.command('console:log', text);
         },
-        warn: function ( text ) { 
-            console.warn(text); 
+        warn: function ( text ) {
+            console.warn(text);
             Fire.command('console:warn', text);
         },
-        error: function ( text ) { 
-            console.error(text); 
+        error: function ( text ) {
+            console.error(text);
             Fire.command('console:error', text);
         },
-        success: function ( text ) { 
-            console.log('%c' + text, "color: green"); 
+        success: function ( text ) {
+            console.log('%c' + text, "color: green");
             Fire.command('console:success', text);
         },
-        failed: function ( text ) { 
-            console.log('%c' + text, "color: red"); 
+        failed: function ( text ) {
+            console.log('%c' + text, "color: red");
             Fire.command('console:failed', text);
         },
-        hint: function ( text ) { 
-            console.log('%c' + text, "color: blue"); 
+        hint: function ( text ) {
+            console.log('%c' + text, "color: blue");
             Fire.command('console:hint', text);
         },
 
@@ -125,7 +125,7 @@
             var typename = Fire.getClassName(type);
             Fire.command('window:open', 'quick-assets', 'fire://static/quick-assets.html', {
                 title: "Quick Assets",
-                width: 800, 
+                width: 812, 
                 height: 600,
                 show: true,
                 resizable: true,

@@ -7,26 +7,24 @@
     constructor="FireConsole"
     >
     <template>
-        <style>
-            .space{
-                width:5px;
-            }
-        </style>
         <link rel="stylesheet" href="fire-console.css">
-        <console-toolbar>
-            <fire-ui-button on-click="{{clearConsole}}"><i class="fa fa-times"></i></fire-ui-button>
+        <fire-ui-toolbar>
+            <fire-ui-button on-click="{{clearConsole}}"><i style="line-height:13px" class="fa fa-times"></i></fire-ui-button>
             <span class="space"></span>
-            <fire-ui-text-input id="search" inputValue="{{searchValue}}" placeholder="search"></fire-ui-text-input>
+            <fire-ui-text-input id="search"  inputValue="{{searchValue}}" placeholder="search"></fire-ui-text-input>
             <span class="space"></span>
             <i class="fa fa-search" style="line-height:25px"></i>
             <span class="space"></span>
             <span class="space"></span>
             <fire-ui-select value="{{mySelect}}" options="{{mySelectList}}"></fire-ui-select>
             <span class="space"></span>
-            <i class="fa fa-flag"  style="line-height:20px"></i>
-        </console-toolbar>
-        <console-view id="view" flex-1></console-view>
-        <call-stack></call-stack>
+            <i class="fa fa-flag"  style="line-height:27px"></i>
+        </fire-ui-toolbar>
+        <div flex-1 flex-col flex-stretch>
+            <console-view id="view" flex-1></console-view>
+            <fire-ui-splitter></fire-ui-splitter>
+            <call-stack id="stack"></call-stack>
+        </div>
     </template>
     <script type="text/javascript" src="fire-console.js"></script>
 </polymer-element>

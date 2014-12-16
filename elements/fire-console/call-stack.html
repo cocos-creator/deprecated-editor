@@ -3,29 +3,10 @@
     constructor="CallStack"
     >
 <template>
-    <style>
-        :host{
-            height: 50px;
-            box-shadow: inset 0 0 8px 2px rgba(0,0,0,0.2);
-            background: #333;
-        }
-    </style>
-
-    <span>{{info}}</span>
+    <link rel="stylesheet" href="call-stack.css">
+    <span class="space"></span>
+    <i class="{{class}}" style="float:left;font-size:15px;padding-right:8px;"></i>
+    <span class="sp-info"><info>{{info}}</info></span>
 </template>
-<script>
-    Polymer({
-        publish: {
-            info: '',
-        },
-
-        observe: {
-            info: 'infoChanged',
-        },
-
-        infoChanged: function () {
-            //console.log("info:"+this.info);
-        },
-    });
-</script>
+<script type="text/javascript" src="call-stack.js"></script>
 </polymer-element>

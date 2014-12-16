@@ -52,7 +52,8 @@
             if (event.target.tagName == "I") {
                 nextEle = event.target.parentNode;
             }
-            nextEle.parentNode.nextElementSibling.clear();
+
+            nextEle.parentNode.nextElementSibling.children[0].clear();
         },
 
         searchValueChanged: function () {
