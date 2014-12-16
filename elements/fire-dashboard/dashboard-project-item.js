@@ -6,11 +6,11 @@
         },
 
         openAction: function ( event ) {
-            Fire.command('dashboard:open-project', this.path);
+            Fire.sendToCore('dashboard:open-project', this.path);
         },
 
         closeAction: function ( event ) {
-            Fire.command('dashboard:remove-project', this.path);
+            Fire.sendToCore('dashboard:remove-project', this.path);
         },
     });
 })();

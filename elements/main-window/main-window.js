@@ -102,7 +102,7 @@
         },
 
         domReady: function () {
-            Fire.command('project:init');
+            Fire.sendToCore('project:init');
         },
 
         layoutToolsAction: function ( event ) {

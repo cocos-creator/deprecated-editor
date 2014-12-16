@@ -231,7 +231,7 @@
         },
 
         fieldsChangedAction: function ( event ) {
-            Fire.broadcast( 'scene:dirty' );
+            Fire.sendToPages( 'scene:dirty' );
         },
 
         propertyChangedAction: function ( event ) {

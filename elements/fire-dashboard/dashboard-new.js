@@ -39,7 +39,7 @@
             if ( Fs.existsSync(projectPath) && Fs.statSync(projectPath).isDirectory() )
                 return;
 
-            Fire.command( 'dashboard:create-project', projectPath );
+            Fire.sendToCore( 'dashboard:create-project', projectPath );
         },
     });
 })();
