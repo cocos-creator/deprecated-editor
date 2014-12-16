@@ -5,6 +5,8 @@
     Polymer({
         created: function () {
             this.target = null;
+            this.isEntity = false;
+            this.isImporter = false;
             this.icon = new Image();
             this.icon.src = "fire://static/img/plugin-inspector.png";
 
@@ -19,6 +21,12 @@
 
         detached: function () {
             this.ipc.clear();
+        },
+
+        _reimport: function () {
+            var meta = Fire.AssetDB.loadMeta(this.lastUuid);
+            var importer = Fire.deserialize(meta);
+            this.inspect(importer,true);
         },
 
         _onInspect: function ( active, type, id ) {
@@ -51,41 +59,41 @@
                         }.bind(this, meta));
                     }
                 }
-                else if (this.$.fields.target instanceof Fire.Asset) {
+                else if (this.$.fields.target instanceof Fire.Importer) {
                     // uninspect
                     this.inspect(null);
                 }
             }
         },
 
-        inspect: function ( obj ) {
-            this.target = obj;
-
+        inspect: function ( obj, force ) {
             //
-            if ( this.$.fields.target === obj ) {
-                return;
-            }
-            
-            //
-            if ( this.$.fields.target instanceof Fire.Importer &&
-                 obj instanceof Fire.Importer ) 
-            {
-                if ( this.$.fields.target.uuid === obj.uuid ) {
+            if ( !force ) {
+                //
+                if ( this.$.fields.target === obj ) {
                     return;
                 }
+                
+                //
+                if ( this.$.fields.target instanceof Fire.Importer &&
+                     obj instanceof Fire.Importer ) 
+                {
+                    if ( this.$.fields.target.uuid === obj.uuid ) {
+                        return;
+                    }
+                }
             }
+
+            //
+            this.target = obj;
+            this.isEntity = obj instanceof Fire.Entity;
+            this.isImporter = obj instanceof Fire.Importer;
 
             //
             if ( this.$.preview.firstChild ) {
                 this.$.preview.removeChild(this.$.preview.firstChild);
             }
             this.$.preview.setAttribute('hidden','');
-
-            //
-            var isEntity = obj instanceof Fire.Entity;
-            var isAsset = obj instanceof Fire.Asset;
-            this.$.entityBar.style.display = isEntity ? 'flex' : '';
-            this.$.assetBar.style.display = isAsset ? 'flex' : '';
 
             //
             if ( this.$.fields.target ) {
@@ -208,7 +216,8 @@
         },
 
         addComponentAction: function () {
-            var rect = this.$.btnAddComp.getBoundingClientRect();
+            var btnAddComp = this.shadowRoot.getElementById('btnAddComp');
+            var rect = btnAddComp.getBoundingClientRect();
             var x = rect.left;
             var y = rect.bottom;
 
@@ -223,6 +232,19 @@
 
         fieldsChangedAction: function ( event ) {
             Fire.broadcast( 'scene:dirty' );
+        },
+
+        propertyChangedAction: function ( event ) {
+            if ( this.target )
+                this.target.dirty = true;
+        },
+
+        applyAction: function ( event ) {
+            // TODO
+        },
+
+        revertAction: function ( event ) {
+            this._reimport();
         },
     });
 })();

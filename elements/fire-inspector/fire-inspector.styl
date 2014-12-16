@@ -40,12 +40,41 @@
         }
     }
 
-    #entityBar {
-        display: none
+    .entity-bar {
     }
 
-    #assetBar {
-        display: none
+    .importer-bar {
+        fire-ui-button {
+            .fa-close {
+                color: #f00
+
+                &:hover {
+                    color: #f00
+                } 
+
+                &:active {
+                    color: #f00
+                }
+            }
+
+            .fa-check {
+                color: #0f9
+
+                &:hover {
+                    color: #0f9
+                } 
+
+                &:active {
+                    color: #0f9
+                }
+            }
+
+            &[disabled] {
+                .fa-close, .fa-check {
+                    color: inherit
+                }
+            }
+        }
     }
 
     ::-webkit-scrollbar {

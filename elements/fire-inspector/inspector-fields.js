@@ -52,6 +52,7 @@
         //
         var fireSectionEL = new FireSection();
         fireSectionEL.setAttribute('name', name );
+        fireSectionEL.$ = {};
 
         var klass = target.constructor;
         if (klass.__props__) {
