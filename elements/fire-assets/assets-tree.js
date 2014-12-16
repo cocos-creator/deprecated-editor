@@ -3,9 +3,7 @@
     var Url = require('fire-url');
 
     var Remote = require('remote');
-    var Ipc = require('ipc');
     var Menu = Remote.require('menu');
-    var MenuItem = Remote.require('menu-item');
 
     function _isTexture ( extname ) {
         return extname === '.png' || extname === '.jpg';

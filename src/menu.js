@@ -9,7 +9,7 @@
      * @param {number} [priority] - the order which the menu item are displayed
      */
     Fire.MainMenu.addCommandItem = function (menuPath, message, params, priority) {
-        Fire.sendToCore('menu:main:add-item', menuPath, message, params, priority);
+        Fire.rpc('menu:main-add-item', menuPath, message, params, priority);
     };
 
     ///**
@@ -43,7 +43,7 @@
      */
     Fire.MainMenu.addTemplate = function (menuPath, template) {
         if (checkTemplate(template)) {
-            Fire.sendToCore('menu:main:add-template', menuPath, template);
+            Fire.rpc('menu:main-add-template', menuPath, template);
         }
     };
 
@@ -51,7 +51,7 @@
      * @param {object[]} template -  the template is just an array of options for constructing MenuItem
      */
     Fire.popupMenu = function (template, x, y) {
-        Fire.sendToCore('menu:popup', template, x, y);
+        Fire.rpc('menu:popup', template, x, y);
     };
 
 })();

@@ -49,15 +49,6 @@
         // messages
 
         /**
-         * This option used to indicate that the message should not send to self.
-         * It must be supplied before the first argument of your message if you want.
-         */
-        SelfExcluded: {
-            'FIRE_MSG_OPTIONS': true,
-            'SelfExcluded': true,
-        },
-
-        /**
          * Send message to editor-core, which is so called as main app, or atom shell's browser side.
          * @param {string} message - the message to send
          * @param {...*} [arg] - whatever arguments the message needs
