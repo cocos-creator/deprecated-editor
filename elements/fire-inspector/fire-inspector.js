@@ -3,35 +3,27 @@
     var Menu = Remote.require('menu');
 
     Polymer({
-        publish: {
-            focused: {
-                value: false,
-                reflect: true
-            },
-        },
-
         created: function () {
+            this.target = null;
             this.icon = new Image();
             this.icon.src = "fire://static/img/plugin-inspector.png";
-
-            this.focused = false;
 
             this.ipc = new Fire.IpcListener();
         },
 
         attached: function () {
             // register Ipc
-            this.ipc.on('selection:activated', this.onInspect.bind(this, true) );
-            this.ipc.on('selection:deactivated', this.onInspect.bind(this, false) );
+            this.ipc.on('selection:activated', this._onInspect.bind(this, true) );
+            this.ipc.on('selection:deactivated', this._onInspect.bind(this, false) );
         },
 
         detached: function () {
             this.ipc.clear();
         },
 
-        onInspect: function ( inspect, type, id ) {
+        _onInspect: function ( active, type, id ) {
             if (type === 'entity') {
-                if (inspect) {
+                if (active) {
                     var entity = Fire._getInstanceById(id);
                     if (entity) {
                         this.inspect(entity);
@@ -43,7 +35,7 @@
                 }
             }
             else if (type === 'asset') {
-                if (inspect) {
+                if (active) {
                     this.lastUuid = id;
                     var meta = Fire.AssetDB.loadMeta(id);
                     // Checks whether last uuid modified to ensure call stack not suspended by another ipc event
@@ -67,6 +59,8 @@
         },
 
         inspect: function ( obj ) {
+            this.target = obj;
+
             //
             if ( this.$.fields.target === obj ) {
                 return;
@@ -89,7 +83,9 @@
 
             //
             var isEntity = obj instanceof Fire.Entity;
-            this.$.addComponent.style.display = isEntity ? '' : 'none';
+            var isAsset = obj instanceof Fire.Asset;
+            this.$.entityBar.style.display = isEntity ? 'flex' : '';
+            this.$.assetBar.style.display = isAsset ? 'flex' : '';
 
             //
             if ( this.$.fields.target ) {
@@ -212,7 +208,7 @@
         },
 
         addComponentAction: function () {
-            var rect = this.$.addComponent.getBoundingClientRect();
+            var rect = this.$.btnAddComp.getBoundingClientRect();
             var x = rect.left;
             var y = rect.bottom;
 

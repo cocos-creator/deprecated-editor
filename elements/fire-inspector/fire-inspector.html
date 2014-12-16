@@ -7,19 +7,23 @@
 <template>
 <link rel="stylesheet" href="fire-inspector.css">
 
+<fire-ui-toolbar id="entityBar">
+    <span class="space"></span>
+    <fire-ui-checkbox value="{{target.active}}"></fire-ui-checkbox>
+    <span class="space"></span>
+    <fire-ui-text-input value="{{target.name}}" flex-1></fire-ui-text-input>
+    <i id="btnAddComp" on-click="{{addComponentAction}}" class="fa fa-plus"></i>
+</fire-ui-toolbar>
+
+<fire-ui-toolbar id="assetBar" justify-end>
+</fire-ui-toolbar>
+
 <div class="fields" flex-1>
-    <inspector-fields id="fields" 
+    <inspector-fields id="fields" fit 
     on-changed="{{fieldsChangedAction}}"
-        fit
     >
     </inspector-fields>
 </div>
-
-<fire-ui-button id="addComponent"
-                style="display: none"
-                on-click="{{addComponentAction}}">
-    Add Component
-</fire-ui-button>
 
 <div class="preview" id="preview" hidden>
 </div>
