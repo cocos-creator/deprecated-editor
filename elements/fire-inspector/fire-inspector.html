@@ -1,7 +1,7 @@
 <link rel="import" href="inspector-fields.html">
 
-<polymer-element 
-    name="fire-inspector" 
+<polymer-element
+    name="fire-inspector"
     constructor="FireInspector"
     on-changed="{{propertyChangedAction}}"
     >
@@ -26,11 +26,11 @@
         <fire-ui-button disabled="{{!target.dirty}}" on-click="{{applyAction}}">
             <i class="fa fa-check"></i>
         </fire-ui-button>
-    </fire-ui-toolbar>                         
+    </fire-ui-toolbar>
 </template>
 
 <div class="fields" flex-1>
-    <inspector-fields id="fields" fit 
+    <inspector-fields id="fields" fit
     on-changed="{{fieldsChangedAction}}"
     >
     </inspector-fields>
