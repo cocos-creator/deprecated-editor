@@ -1,6 +1,5 @@
 <link rel="import" href="console-item.html">
 <link rel="import" href="console-view.html">
-<link rel="import" href="toolbar/console-toolbar.html">
 <link rel="import" href="call-stack.html">
 <polymer-element
     name="fire-console"
@@ -8,17 +7,22 @@
     >
     <template>
         <link rel="stylesheet" href="fire-console.css">
-        <fire-ui-toolbar>
-            <fire-ui-button on-click="{{clearConsole}}"><i style="line-height:13px" class="fa fa-times-circle"></i></fire-ui-button>
-            <span class="space"></span>
-            <fire-ui-text-input id="search"  inputValue="{{searchValue}}" placeholder="search"></fire-ui-text-input>
-            <span class="space"></span>
-            <i class="fa fa-search" style="line-height:20px"></i>
-            <span class="space"></span>
-            <span class="space"></span>
-            <fire-ui-select value="{{option}}" options="{{options}}"></fire-ui-select>
-            <span class="space"></span>
-            <i class="fa fa-flag"  style="line-height:20px"></i>
+        <fire-ui-toolbar justify-between>
+            <div flex-row>
+            </div>
+            <div flex-row>
+                <fire-ui-button on-click="{{clearConsoleAction}}">
+                    <i class="fa fa-times-circle"></i>
+                </fire-ui-button>
+                <span class="space"></span>
+
+                <fire-ui-select style="width: 50px;" value="{{option}}" options="{{options}}">
+                </fire-ui-select>
+                <i class="fa fa-flag"></i>
+                <span class="space"></span>
+                <fire-ui-text-input value="{{searchValue}}" placeholder="search"></fire-ui-text-input>
+                <i class="fa fa-search"></i>
+            </div>
         </fire-ui-toolbar>
         <div flex-1 flex-col flex-stretch>
             <console-view id="view" flex-1></console-view>

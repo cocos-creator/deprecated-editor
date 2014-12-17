@@ -2,11 +2,13 @@
     display: block
     padding: 5px
     margin-bottom: 1px
-    color: #999
+    border-left: 3px solid #222
 
+    color: #999
     background: #222
 
     &(:nth-child(even)) {
+        border-left: 3px solid #292929
         background: #292929
     }
 
@@ -33,7 +35,7 @@
     }
 
     &([focused]) {
-        background: #666
+        border-left: 3px solid #f00
     }
 
     // .text.warn {

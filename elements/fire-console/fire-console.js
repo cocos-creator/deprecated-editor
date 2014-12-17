@@ -3,11 +3,11 @@
         publish: {
             option: 0,
             options: [
-                { name: 'all',value: 0 },
-                { name: 'info',value: 1 },
-                { name: 'warn',value: 2 },
-                { name: 'error',value: 3 },
-                { name: 'hint',value: 4},
+                { name: 'All',value: 0 },
+                { name: 'Log',value: 1 },
+                { name: 'Warn',value: 2 },
+                { name: 'Error',value: 3 },
+                { name: 'Info',value: 4},
             ],
             searchValue: '',
         },
@@ -47,15 +47,6 @@
             this.ipc.clear();
         },
 
-        clearConsole: function (event,target) {
-            var nextEle = event.target;
-            if (event.target.tagName == "I") {
-                nextEle = event.target.parentNode;
-            }
-
-            nextEle.parentNode.nextElementSibling.children[0].clear();
-        },
-
         searchValueChanged: function () {
             this.$.view.searchValue = this.searchValue;
         },
@@ -64,5 +55,8 @@
             this.$.view.option = this.option;
         },
 
+        clearConsoleAction: function (event) {
+            this.$.view.clear();
+        },
     });
 })();
