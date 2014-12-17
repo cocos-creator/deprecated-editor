@@ -1,13 +1,13 @@
-<polymer-element 
-    name="console-view" 
+<polymer-element
+    name="console-view"
     constructor="ConsoleView"
     on-item-added="itemAddedAction"
     >
     <template>
         <link rel="stylesheet" href="console-view.css">
 
-        <template repeat="{{log in logs}}">
-            <console-item type="[[log.type]]" text="[[log.text]]"></console-item>
+        <template repeat="{{log,index in tempLogs}}">
+            <console-item type="[[log.type]]" index="{{index}}" on-click="{{itemClickAction}}" text="[[log.text]]"></console-item>
         </template>
     </template>
     <script type="text/javascript" src="console-view.js"></script>
