@@ -21,15 +21,15 @@
     //
     Fire.mixin( Fire, {
         // console
-        log: function ( text ) { 
-            console.log(text); 
+        log: function ( text ) {
+            console.log(text);
             Fire.sendToCore('console:log', text);
         },
-        warn: function ( text ) { 
-            console.warn(text); 
+        warn: function ( text ) {
+            console.warn(text);
             Fire.sendToCore('console:warn', text);
         },
-        error: function ( text ) { 
+        error: function ( text ) {
             console.error(text); 
             Fire.sendToCore('console:error', text);
         },

@@ -73,10 +73,10 @@
                 if ( this.$.fields.target === obj ) {
                     return;
                 }
-                
+
                 //
                 if ( this.$.fields.target instanceof Fire.Importer &&
-                     obj instanceof Fire.Importer ) 
+                     obj instanceof Fire.Importer )
                 {
                     if ( this.$.fields.target.uuid === obj.uuid ) {
                         return;
@@ -107,9 +107,9 @@
 
             //
             if ( obj instanceof Fire.TextureImporter ) {
-                var img = new Image(); 
+                var img = new Image();
                 img.src = "uuid://" + obj.uuid;
-                var div = document.createElement('div'); 
+                var div = document.createElement('div');
                 div.classList.add('background');
                 div.appendChild(img);
                 this.$.preview.appendChild(div);
@@ -142,7 +142,7 @@
             for (var i = 0; i < items.length; i++) {
                 var item = items[i];
                 var subPathes = item.menuPath.split('/');
-                
+
                 var prio = item.priority || 0;
                 // enumerate menu path
                 var newMenu = null;
@@ -201,7 +201,7 @@
                     parent = newMenu;
                 }
                 if (newMenu && !newMenu.submenu) {
-                    // click callback 
+                    // click callback
                     // jshint ignore:start
                     newMenu.click = (function (component) {
                         this.addComponent(component);
