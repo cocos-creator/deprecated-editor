@@ -1,8 +1,8 @@
 <link rel="import" href="top-bar/top-bar.html">
 <link rel="import" href="status-bar/status-bar.html">
 
-<polymer-element 
-    name="main-window" 
+<polymer-element
+    name="main-window"
     constructor="MainWindow"
     >
 <template>
@@ -20,22 +20,22 @@
             <!-- <fire-hierarchy id="hierarchy" name="Hierarchy" fit></fire-hierarchy> -->
         </fire-ui-panel>
 
-        <fire-ui-panel id="assetsPanel">                              
+        <fire-ui-panel id="assetsPanel">
             <!-- <fire-assets id="assets" name="Assets" fit></fire-assets> -->
-        </fire-ui-panel>                                                   
+        </fire-ui-panel>
     </fire-ui-dock>
 
-    <fire-ui-panel id="inspectorPanel" width="240" min-width="240">                
+    <fire-ui-panel id="inspectorPanel" width="240" min-width="240">
         <!-- <fire-inspector id="inspector" name="Inspector" fit></fire-inspector> -->
-    </fire-ui-panel>                                                       
+    </fire-ui-panel>
 
     <fire-ui-dock>
-        <fire-ui-panel id="editPanel" auto-layout style="">                        
+        <fire-ui-panel id="editPanel" auto-layout style="">
             <!-- <fire-scene id="scene" name="Scene" fit></fire-scene> -->
             <!-- <fire-game id="game" name="Game" fit></fire-game>     -->
-        </fire-ui-panel>                                       
+        </fire-ui-panel>
 
-        <fire-ui-panel id="consolePanel">
+        <fire-ui-panel id="consolePanel" min-width="340">
             <!-- <fire-console id="console" name="Console" fit></fire-console> -->
         </fire-ui-panel>
     </fire-ui-dock>
