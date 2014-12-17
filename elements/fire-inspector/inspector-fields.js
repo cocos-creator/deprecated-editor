@@ -32,7 +32,7 @@
         return true;
     };
 
-    
+
     function _getTypeName ( target, propName, attrs ) {
         var type = attrs.type;
         if ( type === 'object' ) {
@@ -73,7 +73,7 @@
                 else {
                     propEL.name = EditorUI.camelCaseToHuman(propName);
                 }
-                
+
                 //
                 propEL.bind( 'value', new FireObserver( target, propName ) );
                 propEL.setAttribute( 'value', '{{target.'+propName+'}}' );
@@ -96,7 +96,7 @@
                         // NOTE: we need to invoke it once to make sure our propEL intialize correctly
                         propEL.onFieldCreated = watcher;
                     }
-                } 
+                }
 
                 fireSectionEL.$[propName] = propEL;
                 fireSectionEL.appendChild( propEL );

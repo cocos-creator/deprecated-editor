@@ -17,13 +17,15 @@
             // register Ipc
             this.ipc.on('selection:activated', this._onInspect.bind(this, true) );
             this.ipc.on('selection:deactivated', this._onInspect.bind(this, false) );
+
+            this.ipc.on('asset:applied', this._onAssetApplied.bind(this) );
         },
 
         detached: function () {
             this.ipc.clear();
         },
 
-        _reimport: function () {
+        _reload: function () {
             var meta = Fire.AssetDB.loadMeta(this.lastUuid);
             var importer = Fire.deserialize(meta);
             this.inspect(importer,true);
@@ -63,6 +65,12 @@
                     // uninspect
                     this.inspect(null);
                 }
+            }
+        },
+
+        _onAssetApplied: function ( uuid ) {
+            if ( this.lastUuid === uuid ) {
+                this.target.dirty = false;
             }
         },
 
@@ -240,11 +248,12 @@
         },
 
         applyAction: function ( event ) {
-            // TODO
+            var meta = Fire.serialize(this.target);
+            Fire.sendToCore('asset-db:apply', meta );
         },
 
         revertAction: function ( event ) {
-            this._reimport();
+            this._reload();
         },
     });
 })();

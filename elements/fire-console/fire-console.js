@@ -58,5 +58,9 @@
         clearConsoleAction: function (event) {
             this.$.view.clear();
         },
+
+        searchAction: function (event) {
+            this.$.view.searchValue = event.detail.value;
+        },
     });
 })();

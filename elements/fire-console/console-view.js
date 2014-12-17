@@ -1,5 +1,5 @@
 (function () {
-    Polymer({
+    Polymer(EditorUI.mixin({
         publish: {
             searchValue: '',
             minheight: 0,
@@ -10,6 +10,10 @@
             searchValue: 'searchValueChanged',
             logs: 'logsChanged',
             option: 'optionChanged',
+        },
+
+        ready: function () {
+            this._initResizable();
         },
 
         created: function () {
@@ -104,5 +108,5 @@
         clear: function () {
             this.logs = [];
         },
-    });
+    }, EditorUI.resizable));
 })();

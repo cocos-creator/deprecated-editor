@@ -9,7 +9,7 @@
 <link rel="stylesheet" href="quick-assets.css">
 
     <div id="searchBar" flex-row class="border">
-        <fire-ui-text-input id="search" inputValue="{{datalist}}" flex-1 placeholder="Search"></fire-ui-text-input>
+        <fire-ui-text-input id="search" on-input-changed="{{inputAction}}" flex-1 placeholder="Search"></fire-ui-text-input>
         <span class="space"></span>
         <i class="fa fa-search"></i>
     </div>

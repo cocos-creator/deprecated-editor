@@ -48,5 +48,9 @@
             }
         },
 
+        inputAction: function ( event ) {
+            this.datalist = event.detail.value;
+        },
+
     });
 })();

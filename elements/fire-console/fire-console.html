@@ -1,6 +1,6 @@
 <link rel="import" href="console-item.html">
 <link rel="import" href="console-view.html">
-<link rel="import" href="call-stack.html">
+<link rel="import" href="console-detail.html">
 <polymer-element
     name="fire-console"
     constructor="FireConsole"
@@ -20,14 +20,14 @@
                 </fire-ui-select>
                 <i class="fa fa-filter"></i>
                 <span class="space"></span>
-                <fire-ui-text-input value="{{searchValue}}" placeholder="search"></fire-ui-text-input>
+                <fire-ui-text-input on-input-changed="{{searchAction}}" value="{{searchValue}}" placeholder="search"></fire-ui-text-input>
                 <i class="fa fa-search"></i>
             </div>
         </fire-ui-toolbar>
         <div flex-1 flex-col flex-stretch>
-            <console-view id="view" flex-1></console-view>
+            <console-view id="view" auto-layout min-height="50"></console-view>
             <fire-ui-splitter></fire-ui-splitter>
-            <call-stack id="stack"></call-stack>
+            <console-detail id="stack" height="100" min-height="50"></console-detail>
         </div>
     </template>
     <script type="text/javascript" src="fire-console.js"></script>
