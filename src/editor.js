@@ -156,7 +156,7 @@
             var typename = Fire.getClassName(type);
             Fire.sendToCore('window:open', 'quick-assets', 'fire://static/quick-assets.html', {
                 title: "Quick Assets",
-                width: 812, 
+                width: 800, 
                 height: 600,
                 show: true,
                 resizable: true,
