@@ -30,19 +30,19 @@
             Fire.sendToCore('console:warn', text);
         },
         error: function ( text ) {
-            console.error(text); 
+            console.error(text);
             Fire.sendToCore('console:error', text);
         },
-        success: function ( text ) { 
-            console.log('%c' + text, "color: green"); 
+        success: function ( text ) {
+            console.log('%c' + text, "color: green");
             Fire.sendToCore('console:success', text);
         },
-        failed: function ( text ) { 
-            console.log('%c' + text, "color: red"); 
+        failed: function ( text ) {
+            console.log('%c' + text, "color: red");
             Fire.sendToCore('console:failed', text);
         },
-        info: function ( text ) { 
-            console.log('%c' + text, "color: blue"); 
+        info: function ( text ) {
+            console.log('%c' + text, "color: blue");
             Fire.sendToCore('console:info', text);
         },
 
@@ -156,7 +156,7 @@
             var typename = Fire.getClassName(type);
             Fire.sendToCore('window:open', 'quick-assets', 'fire://static/quick-assets.html', {
                 title: "Quick Assets",
-                width: 800, 
+                width: 800,
                 height: 600,
                 show: true,
                 resizable: true,
