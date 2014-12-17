@@ -176,4 +176,3 @@
     // init editor-shares after Fire inited
     Fire.Selection.registerMessages(ipc);
 })();
-

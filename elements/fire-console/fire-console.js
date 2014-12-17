@@ -1,10 +1,10 @@
 (function () {
     Polymer({
         publish: {
-            mySelect: 0,
-            mySelectList: [
+            option: 0,
+            options: [
                 { name: 'all',value: 0 },
-                { name: 'log',value: 1 },
+                { name: 'info',value: 1 },
                 { name: 'warn',value: 2 },
                 { name: 'error',value: 3 },
                 { name: 'hint',value: 4},
@@ -14,7 +14,7 @@
 
         observe: {
             searchValue: 'searchValueChanged',
-            mySelect: 'mySelectChanged',
+            option: 'optionChanged',
         },
 
         created: function () {
@@ -60,8 +60,8 @@
             this.$.view.searchValue = this.searchValue;
         },
 
-        mySelectChanged: function () {
-            this.$.view.mySelect = this.mySelect;
+        optionChanged: function () {
+            this.$.view.option = this.option;
         },
 
     });

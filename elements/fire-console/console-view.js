@@ -9,13 +9,13 @@
         observe: {
             searchValue: 'searchValueChanged',
             logs: 'logsChanged',
-            mySelect: 'mySelectChanged',
+            option: 'optionChanged',
         },
 
         created: function () {
             this.logs = [];
             this.tempLogs = [];
-            this.mySelect = 0;
+            this.option = 0;
             this.tempSender = null;
         },
 
@@ -55,7 +55,7 @@
             switch (this.tempLogs[index].type) {
                 case "log": infoclass = "fa fa-info";
                 break;
-                case "hint": infoclass = "fa fa-info";
+                case "info": infoclass = "fa fa-info";
                 break;
                 case "warn": infoclass = "fa fa-warning";
                 break;
@@ -63,16 +63,16 @@
                 break;
             }
             this.nextElementSibling.nextElementSibling.class = infoclass;
-            if (this.tempSender != null ){
+            if (this.tempSender !== null ){
                 this.tempSender.removeAttribute("focused");
             }
             sender.setAttribute("focused","");
             this.tempSender = sender;
         },
 
-        mySelectChanged: function () {
+        optionChanged: function () {
             var type= "";
-            switch(this.mySelect) {
+            switch(this.option) {
                 case 0:
                     this.tempLogs = this.logs;
                 break;
@@ -86,11 +86,11 @@
                     type = "error";
                 break;
                 case 4:
-                    type = "hint";
+                    type = "info";
                 break;
             }
 
-            if (type == "")
+            if (type === "")
                 return;
 
             this.tempLogs = [];
