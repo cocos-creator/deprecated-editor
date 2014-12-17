@@ -9,11 +9,10 @@
     <template>
         <link rel="stylesheet" href="fire-hierarchy.css">
 
-        <div id="searchBar" flex-row>
+        <fire-ui-toolbar>
             <i on-click="{{createAction}}" class="fa fa-plus"></i>
-            <span class="space"></span>
             <fire-ui-text-input flex-1 placeholder="Search..."></fire-ui-text-input>  
-        </div>
+        </fire-ui-toolbar>
 
         <hierarchy-tree id="hierarchyTree" flex-1></hierarchy-tree>
     </template>

@@ -6,16 +6,16 @@
     var editorCallback = Fire.Engine._editorCallback;
 
     // pre-declaration for unit tests, overridable for editor
-    Fire.broadcast = function () {};
+    Fire.sendToPages = function () {};
 
     editorCallback.onEnginePlayed = function (continued) {
-        Fire.broadcast('engine:played', continued);
+        Fire.sendToPages('engine:played', continued);
     };
     editorCallback.onEngineStopped = function () {
-        Fire.broadcast('engine:stopped');
+        Fire.sendToPages('engine:stopped');
     };
     editorCallback.onEnginePaused = function () {
-        Fire.broadcast('engine:paused');
+        Fire.sendToPages('engine:paused');
     };
     
     function takeEntitySnapshot(entity) {
@@ -33,29 +33,29 @@
     }
 
     editorCallback.onSceneLaunched = function (scene) {
-        Fire.broadcast('scene:launched', takeSceneSnapshot(scene));
-        Fire.broadcast('scene:dirty');
+        Fire.sendToPages('scene:launched', takeSceneSnapshot(scene));
+        Fire.sendToPages('scene:dirty');
     };
 
     //editorCallback.onSceneLoaded = function (scene) {
-    //    Fire.broadcast('scene:loaded', scene.entities);
+    //    Fire.sendToPages('scene:loaded', scene.entities);
     //};
 
     var onEntityCreated = 'entity:created';
     editorCallback.onEntityCreated = function (entity) {
         if (entity._children.length === 0) {
-            Fire.broadcast( onEntityCreated, entity._name, entity._objFlags, entity.id );
+            Fire.sendToPages( onEntityCreated, entity._name, entity._objFlags, entity.id );
         }
         else {
-            Fire.broadcast( onEntityCreated, takeEntitySnapshot(entity) );
+            Fire.sendToPages( onEntityCreated, takeEntitySnapshot(entity) );
         }
-        Fire.broadcast('scene:dirty');
+        Fire.sendToPages('scene:dirty');
     };
 
     var onEntityRemoved = 'entity:removed';
     editorCallback.onEntityRemoved = function (entity/*, isTopMost*/) {
-        Fire.broadcast( onEntityRemoved, entity.id );
-        Fire.broadcast('scene:dirty');
+        Fire.sendToPages( onEntityRemoved, entity.id );
+        Fire.sendToPages('scene:dirty');
         // deselect
         var entities = Fire.Selection.entities;
         if (entity.childCount > 0) {
@@ -89,8 +89,8 @@
 
     var onEntityParentChanged = 'entity:parentChanged';
     editorCallback.onEntityParentChanged = function (entity) {
-        Fire.broadcast( onEntityParentChanged, entity.id, entity.parent && entity.parent.id );
-        Fire.broadcast('scene:dirty');
+        Fire.sendToPages( onEntityParentChanged, entity.id, entity.parent && entity.parent.id );
+        Fire.sendToPages('scene:dirty');
     };
 
     var onEntityIndexChanged = 'entity:indexChanged';
@@ -103,20 +103,20 @@
             next = entity.getSibling(i);
         } while (next && (next._objFlags & Fire._ObjectFlags.HideInEditor));
         //
-        Fire.broadcast( onEntityIndexChanged, entity.id, next && next.id );
-        Fire.broadcast('scene:dirty');
+        Fire.sendToPages( onEntityIndexChanged, entity.id, next && next.id );
+        Fire.sendToPages('scene:dirty');
     };
 
     editorCallback.onEntityRenamed = function (entity) {
-        Fire.broadcast('entity:renamed', entity.id, entity._name);
+        Fire.sendToPages('entity:renamed', entity.id, entity._name);
     };
 
     editorCallback.onComponentEnabled = function (component) {
-        Fire.broadcast('component:enabled', component.id);
+        Fire.sendToPages('component:enabled', component.id);
     };
 
     editorCallback.onComponentDisabled = function (component) {
-        Fire.broadcast('component:disabled', component.id);
+        Fire.sendToPages('component:disabled', component.id);
     };
 
 })();

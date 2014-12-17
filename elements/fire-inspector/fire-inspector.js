@@ -3,35 +3,35 @@
     var Menu = Remote.require('menu');
 
     Polymer({
-        publish: {
-            focused: {
-                value: false,
-                reflect: true
-            },
-        },
-
         created: function () {
+            this.target = null;
+            this.isEntity = false;
+            this.isImporter = false;
             this.icon = new Image();
             this.icon.src = "fire://static/img/plugin-inspector.png";
-
-            this.focused = false;
 
             this.ipc = new Fire.IpcListener();
         },
 
         attached: function () {
             // register Ipc
-            this.ipc.on('selection:activated', this.onInspect.bind(this, true) );
-            this.ipc.on('selection:deactivated', this.onInspect.bind(this, false) );
+            this.ipc.on('selection:activated', this._onInspect.bind(this, true) );
+            this.ipc.on('selection:deactivated', this._onInspect.bind(this, false) );
         },
 
         detached: function () {
             this.ipc.clear();
         },
 
-        onInspect: function ( inspect, type, id ) {
+        _reimport: function () {
+            var meta = Fire.AssetDB.loadMeta(this.lastUuid);
+            var importer = Fire.deserialize(meta);
+            this.inspect(importer,true);
+        },
+
+        _onInspect: function ( active, type, id ) {
             if (type === 'entity') {
-                if (inspect) {
+                if (active) {
                     var entity = Fire._getInstanceById(id);
                     if (entity) {
                         this.inspect(entity);
@@ -43,7 +43,7 @@
                 }
             }
             else if (type === 'asset') {
-                if (inspect) {
+                if (active) {
                     this.lastUuid = id;
                     var meta = Fire.AssetDB.loadMeta(id);
                     // Checks whether last uuid modified to ensure call stack not suspended by another ipc event
@@ -59,37 +59,41 @@
                         }.bind(this, meta));
                     }
                 }
-                else if (this.$.fields.target instanceof Fire.Asset) {
+                else if (this.$.fields.target instanceof Fire.Importer) {
                     // uninspect
                     this.inspect(null);
                 }
             }
         },
 
-        inspect: function ( obj ) {
+        inspect: function ( obj, force ) {
             //
-            if ( this.$.fields.target === obj ) {
-                return;
-            }
-            
-            //
-            if ( this.$.fields.target instanceof Fire.Importer &&
-                 obj instanceof Fire.Importer ) 
-            {
-                if ( this.$.fields.target.uuid === obj.uuid ) {
+            if ( !force ) {
+                //
+                if ( this.$.fields.target === obj ) {
                     return;
                 }
+                
+                //
+                if ( this.$.fields.target instanceof Fire.Importer &&
+                     obj instanceof Fire.Importer ) 
+                {
+                    if ( this.$.fields.target.uuid === obj.uuid ) {
+                        return;
+                    }
+                }
             }
+
+            //
+            this.target = obj;
+            this.isEntity = obj instanceof Fire.Entity;
+            this.isImporter = obj instanceof Fire.Importer;
 
             //
             if ( this.$.preview.firstChild ) {
                 this.$.preview.removeChild(this.$.preview.firstChild);
             }
             this.$.preview.setAttribute('hidden','');
-
-            //
-            var isEntity = obj instanceof Fire.Entity;
-            this.$.addComponent.style.display = isEntity ? '' : 'none';
 
             //
             if ( this.$.fields.target ) {
@@ -212,7 +216,8 @@
         },
 
         addComponentAction: function () {
-            var rect = this.$.addComponent.getBoundingClientRect();
+            var btnAddComp = this.shadowRoot.getElementById('btnAddComp');
+            var rect = btnAddComp.getBoundingClientRect();
             var x = rect.left;
             var y = rect.bottom;
 
@@ -226,7 +231,20 @@
         },
 
         fieldsChangedAction: function ( event ) {
-            Fire.broadcast( 'scene:dirty' );
+            Fire.sendToPages( 'scene:dirty' );
+        },
+
+        propertyChangedAction: function ( event ) {
+            if ( this.target )
+                this.target.dirty = true;
+        },
+
+        applyAction: function ( event ) {
+            // TODO
+        },
+
+        revertAction: function ( event ) {
+            this._reimport();
         },
     });
 })();

@@ -17,18 +17,9 @@
     }
 
     Polymer({
-        publish: {
-            focused: {
-                value: false,
-                reflect: true
-            },
-        },
-
         created: function () {
             this.icon = new Image();
             this.icon.src = "fire://static/img/plugin-hierarchy.png";
-
-            this.focused = false;
 
             this.ipc = new Fire.IpcListener();
         },

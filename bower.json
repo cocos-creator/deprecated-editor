@@ -24,7 +24,7 @@
     "chroma-js": "",
     "pace": "",
     "pixi": "2.1.1",
-    "polymer": "Polymer/polymer#~0.5.1",
+    "polymer": "Polymer/polymer#~0.5.2",
     "web-animations-js": "web-animations/web-animations-js#master"
   },
   "devDependencies": {

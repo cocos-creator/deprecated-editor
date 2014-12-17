@@ -10,10 +10,13 @@
 <template>
 <link rel="stylesheet" href="fire-scene.css">
 
-<div id="toolBar" flex-row>
-    <span flex-1></span>
-    <fire-ui-text-input placeholder="Search..."></fire-ui-text-input>   
-</div>                                                 
+<fire-ui-toolbar justify-between>
+    <div class="left">
+    </div>
+    <div class="right">
+        <fire-ui-text-input placeholder="Search..."></fire-ui-text-input>   
+    </div>
+</fire-ui-toolbar>
 
 <div class="border" flex-1>
     <scene-view id="view" fit></scene-view>

@@ -3,9 +3,7 @@
     var Url = require('fire-url');
 
     var Remote = require('remote');
-    var Ipc = require('ipc');
     var Menu = Remote.require('menu');
-    var MenuItem = Remote.require('menu-item');
 
     function _isTexture ( extname ) {
         return extname === '.png' || extname === '.jpg';
@@ -180,7 +178,7 @@
                             var newScene = new Fire._Scene();
                             var newAssetUrl = Url.join( url, 'New Scene.fire' );
                             this._focusUrl = newAssetUrl;
-                            Fire.command( 'asset-db:save', 
+                            Fire.sendToCore( 'asset-db:save', 
                                           newAssetUrl, 
                                           Fire.serialize(newScene) );
                         }
@@ -228,7 +226,7 @@
 
                                     var newAssetUrl = Url.join( url, textureName + '.sprite' );
                                     this._focusUrl = newAssetUrl;
-                                    Fire.command( 'asset-db:save', 
+                                    Fire.sendToCore( 'asset-db:save', 
                                                   newAssetUrl, 
                                                   Fire.serialize(newSprite) );
                                 }.bind(this) );
@@ -248,7 +246,7 @@
                     label: 'Show in finder',
                     click: function () {
                         if ( this.contextmenuAt instanceof AssetsItem ) {
-                            Fire.command( 'asset-db:explore', this.getUrl(this.contextmenuAt) );
+                            Fire.sendToCore( 'asset-db:explore', this.getUrl(this.contextmenuAt) );
                         }
                     }.bind(this)
                 },
@@ -290,7 +288,7 @@
                                 }
                                 selectedItemEl.foldable = false;
                             }
-                            Fire.command( 'asset-db:reimport', url );
+                            Fire.sendToCore( 'asset-db:reimport', url );
                         }
                     }.bind(this)
                 },
@@ -300,15 +298,15 @@
 
         load: function ( url ) {
             console.time('fire-assets:load');
-            Fire.hint('browsing ' + url);
+            Fire.info('browsing ' + url);
 
             _newAssetsItem.call(this, url, 'root', Fire.UUID.AssetsRoot, this);
 
-            Fire.command('asset-db:browse', url);
+            Fire.sendToCore('asset-db:browse', url);
         },
 
         finishLoading: function ( url ) {
-            Fire.hint(url + ' finish browsing!');
+            Fire.info(url + ' finish browsing!');
             console.timeEnd('fire-assets:load');
         },
 
@@ -360,7 +358,7 @@
         deleteSelection: function () {
             var elements = this.getToplevelElements(Fire.Selection.assets);
             for (var i = 0; i < elements.length; i++) {
-                Fire.command( 'asset-db:delete', elements[i].userId );
+                Fire.sendToCore( 'asset-db:delete', elements[i].userId );
             }
         },
 
@@ -473,7 +471,7 @@
                 if ( el.contains(targetEL) === false ) {
                     var srcUrl = this.getUrl(el);
                     var destUrl = Url.join( targetUrl, el.name + el.extname );
-                    Fire.command('asset-db:move', srcUrl, destUrl );
+                    Fire.sendToCore('asset-db:move', srcUrl, destUrl );
                 }
             }
         },
@@ -527,7 +525,7 @@
                 this.focus();
                 var srcUrl = this.getUrl(event.target);
                 var destUrl = Url.join( Url.dirname(srcUrl), event.detail.name + event.target.extname );
-                Fire.command('asset-db:move', srcUrl, destUrl );
+                Fire.sendToCore('asset-db:move', srcUrl, destUrl );
             }
             event.stopPropagation();
         },
@@ -535,7 +533,7 @@
         openAction: function (event) {
             if ( event.target instanceof AssetsItem ) {
                 if ( event.target.extname === '.fire' ) {
-                    Fire.broadcast('engine:openScene', event.target.userId);
+                    Fire.sendToPages('engine:openScene', event.target.userId);
                 }
             }
             event.stopPropagation();
@@ -727,7 +725,7 @@
             if ( items.length > 0 ) {
                 if ( dragType === 'file' ) {
                     var dstUrl = this.getUrl(targetEL);
-                    Fire.command('asset-db:import', dstUrl, items );
+                    Fire.sendToCore('asset-db:import', dstUrl, items );
                 }
                 else if ( dragType === 'asset' ) {
                     this.moveAssets( targetEL, items );

@@ -52,6 +52,7 @@
         //
         var fireSectionEL = new FireSection();
         fireSectionEL.setAttribute('name', name );
+        fireSectionEL.$ = {};
 
         var klass = target.constructor;
         if (klass.__props__) {
@@ -105,30 +106,6 @@
         return fireSectionEL;
     }
 
-    function _entitySection ( target ) {
-        var sectionEL = document.createElement('div'); 
-        sectionEL.classList.add('entity-section');
-        sectionEL.setAttribute('flex-row','');
-
-        var el = new FireCheckbox();
-        el.bind( 'value', new PathObserver(target,'active') );
-        el.setAttribute( 'value', '{{value}}' );
-        sectionEL.appendChild( el );
-
-        el = document.createElement('span'); 
-        el.classList.add('space');
-        sectionEL.appendChild( el );
-
-        el = new FireTextInput();
-        el.bind( 'value', new PathObserver(target,'name') );
-        el.setAttribute( 'value', '{{value}}' );
-        el.setAttribute('flex-1','');
-        el.placeholder = "No Name";
-        sectionEL.appendChild( el );
-
-        return sectionEL;
-    }
-
     Polymer({
         created: function () {
             this.target = null;
@@ -154,9 +131,6 @@
                 this.appendChild( el );
             }
             else if ( this.target instanceof Fire.Entity ) {
-                el = _entitySection( this.target );
-                this.appendChild( el );
-
                 for ( var i = 0; i < this.target._components.length; ++i ) {
                     var comp = this.target._components[i];
                     el = _fieldSection( Fire.getClassName(comp), comp );

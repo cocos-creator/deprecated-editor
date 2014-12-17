@@ -64,7 +64,7 @@
                     loadUserScripts();
 
                     // init engine
-                    Fire.hint('fire-engine initializing...');
+                    Fire.info('fire-engine initializing...');
                     Fire.AssetLibrary.init("library://");
                     var renderContext = Fire.Engine.init( this.$.game.$.view.clientWidth,
                                                           this.$.game.$.view.clientHeight );
@@ -102,7 +102,7 @@
         },
 
         domReady: function () {
-            Fire.command('project:init');
+            Fire.sendToCore('project:init');
         },
 
         layoutToolsAction: function ( event ) {
