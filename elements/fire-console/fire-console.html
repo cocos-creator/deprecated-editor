@@ -11,23 +11,39 @@
             <div flex-row>
             </div>
             <div flex-row>
-                <fire-ui-button on-click="{{clearConsoleAction}}">
+                <fire-ui-button on-click="{{clearAction}}">
                     <i class="fa fa-ban"></i>
                 </fire-ui-button>
                 <span class="space"></span>
 
-                <fire-ui-select style="width: 50px;" value="{{option}}" options="{{options}}">
-                </fire-ui-select>
                 <i class="fa fa-filter"></i>
+                <fire-ui-select style="width: 50px;" value="{{option}}" options="[[options]]">
+                </fire-ui-select>
                 <span class="space"></span>
-                <fire-ui-text-input on-input-changed="{{searchAction}}" value="{{searchValue}}" placeholder="search"></fire-ui-text-input>
-                <i class="fa fa-search"></i>
+                <fire-ui-text-input placeholder="filter"
+                    value="{{filterText}}"
+                    on-input-changed="{{filterAction}}"
+                    >
+                </fire-ui-text-input>
+                <span class="space"></span>
+                <fire-ui-checkbox value="{{useRegex}}">Regex</fire-ui-checkbox>
+                <span class="space"></span>
             </div>
         </fire-ui-toolbar>
         <div flex-1 flex-col flex-stretch>
-            <console-view id="view" auto-layout min-height="50"></console-view>
+            <console-view id="view" auto-layout min-height="50">
+                <template repeat="{{log,index in filterLogs}}">
+                    <console-item
+                        type="[[log.type]]"
+                        text="[[log.text]]"
+                        index="[[index]]"
+                        on-click="{{itemClickAction}}"
+                        >
+                        </console-item>
+                </template>
+            </console-view>
             <fire-ui-splitter></fire-ui-splitter>
-            <console-detail id="stack" height="100" min-height="50"></console-detail>
+            <console-detail id="detail" height="100" min-height="50"></console-detail>
         </div>
     </template>
     <script type="text/javascript" src="fire-console.js"></script>

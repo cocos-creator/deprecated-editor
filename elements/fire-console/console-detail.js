@@ -1,20 +1,27 @@
 (function () {
     Polymer(EditorUI.mixin({
         publish: {
-            info: '',
-            class: '',
-        },
-
-        observe: {
-            info: 'infoChanged',
+            type: '',
+            log: '',
         },
 
         ready: function () {
             this._initResizable();
         },
 
-        infoChanged: function () {
-            //console.log("info:"+this.info);
+        toIconClass: function ( value ) {
+            switch ( value ) {
+                case "log": return "fa-info";
+                case "info": return "fa-info";
+                case "warn": return "fa-warning";
+                case "error": return "fa-times-circle";
+            }
         },
+
+        clear: function () {
+            this.log = '';
+            this.type = '';
+        },
+
     }, EditorUI.resizable));
 })();

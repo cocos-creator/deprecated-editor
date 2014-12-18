@@ -3,9 +3,10 @@
         publish: {
             type: 'log',
             text: '',
-        },
-
-        created: function () {
+            selected: {
+                value: false,
+                reflect: true
+            },
         },
 
         attached: function () {

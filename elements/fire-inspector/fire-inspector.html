@@ -10,9 +10,7 @@
 
 <template if="{{ isEntity }}">
     <fire-ui-toolbar class="entity-bar">
-        <span class="space"></span>
         <fire-ui-checkbox value="{{target.active}}"></fire-ui-checkbox>
-        <span class="space"></span>
         <fire-ui-text-input value="{{target.name}}" flex-1></fire-ui-text-input>
         <i id="btnAddComp" on-click="{{addComponentAction}}" class="fa fa-plus"></i>
     </fire-ui-toolbar>
