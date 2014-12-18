@@ -10,8 +10,8 @@
     }
 
     function _newAssetsItem ( url, type, id, parent ) {
-        var extname = Url.extname(url); 
-        var basename = Url.basename(url, extname); 
+        var extname = Url.extname(url);
+        var basename = Url.basename(url, extname);
         var img;
 
         var newEL = new AssetsItem();
@@ -72,7 +72,7 @@
             img.src = 'uuid://' + id;
             newEL.setIcon(img);
             break;
-                
+
         default:
             newEL.setIcon('fa fa-cube');
             break;
@@ -85,7 +85,7 @@
     function _getNameCollisions ( target, list ) {
 
         var nodes = target.childNodes;
-        
+
         var nodesLen = nodes.length;
         var len = list.length;
         var i,j;
@@ -95,9 +95,9 @@
 
         for(i = 0; i < len; i++) {
             name = list[i];
-        
+
             for(j = 0; j < nodesLen; j++) {
-                
+
                 node = nodes[j];
                 if (node.name + node.extname === name) {
                     collisions.push(node);
@@ -116,7 +116,7 @@
             this.contextmenuAt = null;
 
             // dragging
-            this.curDragoverEL = null; 
+            this.curDragoverEL = null;
             this.lastDragoverEL = null;
             this.dragenterCnt = 0;
 
@@ -149,7 +149,7 @@
             this.ipc.on('fire-assets:newItem', this.newItem.bind(this) );
             this.ipc.on('fire-assets:deleteItem', this.deleteItemById.bind(this) );
             this.ipc.on('fire-assets:finishLoading', this.finishLoading.bind(this) );
-            
+
             this.ipc.on('folder:created', function ( url, id, parentId ) {
                 this.newItem( url, id, parentId, true );
             }.bind(this) );
@@ -178,8 +178,8 @@
                             var newScene = new Fire._Scene();
                             var newAssetUrl = Url.join( url, 'New Scene.fire' );
                             this._focusUrl = newAssetUrl;
-                            Fire.sendToCore( 'asset-db:save', 
-                                          newAssetUrl, 
+                            Fire.sendToCore( 'asset-db:save',
+                                          newAssetUrl,
                                           Fire.serialize(newScene) );
                         }
                     }.bind(this)
@@ -219,15 +219,15 @@
                                 Fire.AssetLibrary.loadAssetByUuid ( textureEL.userId, function ( asset, error ) {
                                     var newSprite = new Fire.Sprite();
                                     newSprite.name = textureName;
-                                    newSprite.rawTexture = asset; 
+                                    newSprite.rawTexture = asset;
                                     newSprite.texture = asset;
                                     newSprite.width = asset.width;
                                     newSprite.height = asset.height;
 
                                     var newAssetUrl = Url.join( url, textureName + '.sprite' );
                                     this._focusUrl = newAssetUrl;
-                                    Fire.sendToCore( 'asset-db:save', 
-                                                  newAssetUrl, 
+                                    Fire.sendToCore( 'asset-db:save',
+                                                  newAssetUrl,
                                                   Fire.serialize(newSprite) );
                                 }.bind(this) );
                             }
@@ -269,12 +269,12 @@
                     click: this.deleteSelection.bind(this),
                     //enable: this.contextmenuAt && this.contextmenuAt.isRoot === false,
                 },
-                
+
                 // =====================
                 { type: 'separator' },
 
                 // Reimport
-                { 
+                {
                     label: 'Reimport',
                     click: function () {
                         if ( this.contextmenuAt instanceof AssetsItem ) {
@@ -325,16 +325,16 @@
                 Fire.Selection.selectAsset(newEL.userId, true, true);
             }
         },
-        
+
         moveItem: function ( id, destUrl, destDirId ) {
             var srcEL = this.idToItem[id];
             if ( !srcEL ) {
                 Fire.warn( 'Can not find source element: ' + id );
                 return;
             }
-            
+
             this.setItemParentById(id, destDirId);
-            
+
             var destExtname = Path.extname(destUrl);
             var destBasename = Path.basename(destUrl, destExtname);
             srcEL.extname = destExtname;
@@ -364,7 +364,7 @@
 
         getUrl: function ( element ) {
             if ( element.isRoot ) {
-                return element.name + "://"; 
+                return element.name + "://";
             }
 
             var url = element.name + element.extname;
@@ -475,7 +475,7 @@
                 }
             }
         },
-        
+
         selectingAction: function (event) {
             this.focus();
 
@@ -557,7 +557,7 @@
         keydownAction: function (event) {
             var activeId = Fire.Selection.activeAssetUuid;
             var activeEL = activeId && this.idToItem[activeId];
-            
+
             this.super([event, activeEL]);
             if (event.cancelBubble) {
                 return;
@@ -584,7 +584,7 @@
                         if ( prev ) {
                             // Todo toggle?
                             Fire.Selection.selectAsset(prev.userId, true, true);
-                            
+
                             if (prev !== activeEL) {
                                 if ( prev.offsetTop <= this.scrollTop ) {
                                     this.scrollTop = prev.offsetTop;
@@ -603,7 +603,7 @@
                         if ( next ) {
                             // Todo toggle?
                             Fire.Selection.selectAsset(next.userId, true, true);
-                            
+
                             if ( next !== activeEL ) {
                                 if ( next.offsetTop + 16 >= this.scrollTop + this.offsetHeight ) {
                                     this.scrollTop = next.offsetTop + 16 - this.offsetHeight;
@@ -718,7 +718,7 @@
 
             var items = EditorUI.DragDrop.drop(event.dataTransfer);
             var targetEL = this.curDragoverEL;
-            
+
             this.resetDragState();
             Fire.Selection.cancel();
 
