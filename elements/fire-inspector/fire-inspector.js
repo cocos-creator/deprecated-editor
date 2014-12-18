@@ -236,7 +236,7 @@
             }
             var template = this.getAddCompMenuTemplate();
             var menu = Menu.buildFromTemplate(template);
-            menu.popup(Remote.getCurrentWindow(), x, y );
+            menu.popup(Remote.getCurrentWindow(), Math.floor(x), Math.floor(y));
         },
 
         fieldsChangedAction: function ( event ) {

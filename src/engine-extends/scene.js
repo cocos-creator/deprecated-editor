@@ -14,7 +14,7 @@
         }
 
         var ent = Entity.createWithFlags(name, flags);
-        
+
         if (isCurrentScene === false) {
             Engine._canModifyCurrentScene = true;
         }
@@ -29,9 +29,9 @@
         var name = nameList[1];     // skip first '/'
         var entities = this.entities;
         for (var i = 0; i < entities.length; i++) {
-            if (entities[i].isValid && 
+            if (entities[i].isValid &&
                 entities[i]._name === name &&
-                (entities[i]._objFlags & flags) === flags) 
+                (entities[i]._objFlags & flags) === flags)
             {
                 match = entities[i];
                 break;
@@ -70,7 +70,7 @@
      */
     Scene.prototype.findEntityByIndices = function (indices) {
         var entity;
-        for (var i = 0, children = this.entities; i < indices.length; i++, children = entity.children) {
+        for (var i = 0, children = this.entities; i < indices.length; i++, children = entity._children) {
             var index = indices[i];
             if (index < children.length) {
                 entity = children[index];

@@ -1,7 +1,7 @@
 ﻿// editor utils
 
 (function () {
-    
+
     var Entity = Fire.Entity;
 
     Entity.createWithFlags = function (name, flags) {
@@ -37,7 +37,7 @@
         for (var ent = this; ent; ent = ent._parent) {
             indices.push(ent.getSiblingIndex());
         }
-        return indices;
+        return indices.reverse();
     };
 
 })();

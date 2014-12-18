@@ -1,13 +1,6 @@
 (function () {
     var Remote = require('remote');
 
-    function loadUserScripts () {
-        var script = document.createElement('script');
-        script.setAttribute('type','text/javascript');
-        script.setAttribute('src', 'library://bundle.js');
-        document.head.appendChild(script);
-    }
-
     Polymer({
         created: function () {
             Fire.mainWindow = this;
@@ -18,7 +11,7 @@
                 pivot: "pivot", // pivot, center
             };
 
-            this.sceneNameObserver = null; 
+            this.sceneNameObserver = null;
             this.ipc = new Fire.IpcListener();
         },
 
@@ -61,7 +54,7 @@
                     }
 
                     // load user scripts
-                    loadUserScripts();
+                    Sandbox.reloadUserScripts();
 
                     // init engine
                     Fire.info('fire-engine initializing...');
@@ -95,6 +88,9 @@
                     }, this );
                 }.bind(this));
             }.bind(this) );
+
+            this.ipc.on('reload:user scripts', Sandbox.reloadUserScripts.bind(Sandbox));
+
         },
 
         detached: function () {
