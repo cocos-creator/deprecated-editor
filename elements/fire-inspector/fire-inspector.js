@@ -71,6 +71,7 @@
         _onAssetApplied: function ( uuid ) {
             if ( this.lastUuid === uuid ) {
                 this.target.dirty = false;
+                Fire.warn('@Jare: Please put AssetLibrary.UpdateAsset(uuid) here');
             }
         },
 
