@@ -11,7 +11,7 @@
 
             // dragging
             this.dragenterCnt = 0;
-            this.curDragoverEL = null; 
+            this.curDragoverEL = null;
             this.lastDragoverEL = null;
 
             // debug
@@ -34,7 +34,7 @@
                     this.resetDragState();
                 }
             }, true);
-            
+
             //
             this.refresh();
         },
@@ -89,7 +89,7 @@
 
                 // =====================
                 { type: 'separator' },
-                
+
                 // Rename
                 {
                     label: 'Rename',
@@ -101,7 +101,7 @@
                     label: 'Delete',
                     message: 'hierarchy:delete',
                 },
-                
+
                 // =====================
                 { type: 'separator' },
             ];
@@ -193,7 +193,7 @@
                 var style = this.$.insertLine.style;
 
                 if ( position === 'inside' ) {
-                    if ( item.firstElementChild ) {
+                    if ( !item.folded && item.firstElementChild ) {
                         style.display = "block";
                         style.top = (item.firstElementChild.offsetTop-1) + "px";
                         style.left = (item.firstElementChild.offsetLeft-2) + "px";
@@ -218,7 +218,7 @@
                 }
             }
         },
-        
+
         cancelHighligting: function () {
             this.$.highlightBorder.style.display = "none";
             this.$.insertLine.style.display = "none";
@@ -281,7 +281,7 @@
             }
             event.stopPropagation();
         },
-        
+
         namechangedAction: function (event) {
             // TODO: pull up to view ?
             var item = event.target;
@@ -358,7 +358,7 @@
             // FIXME: Johnny Said: I found this will swallow some keyaction such as Command+R to refresh the page
             var activeId = Fire.Selection.activeEntityId;
             var activeEL = activeId && this.idToItem[activeId];
-            
+
             this.super([event, activeEL]);
             if (event.cancelBubble) {
                 return;
@@ -379,7 +379,7 @@
                         event.stopPropagation();
                     }
                     break;
-                
+
                 // key-up
                 case 38:
                     if ( activeEL ) {
@@ -447,7 +447,7 @@
                 var bounding = this.getBoundingClientRect();
                 var offsetY = event.clientY - bounding.top + this.scrollTop;
                 var target = event.target;
-                
+
                 //
                 if ( target !== this.lastDragoverEL ) {
                     if ( target === this ) {
@@ -466,7 +466,7 @@
                     position = 'before';
                 else if ( offsetY >= (target.offsetTop + target.offsetHeight * 0.7) )
                     position = 'after';
-                else 
+                else
                     position = 'inside';
 
                 if ( position === 'inside' ) {
@@ -505,7 +505,7 @@
             event.stopPropagation();
 
             var items = EditorUI.DragDrop.drop(event.dataTransfer);
-            
+
             this.resetDragState();
             Fire.Selection.cancel();
 
@@ -553,7 +553,7 @@
                     targetEL = null;
                 }
 
-                // process 
+                // process
                 if ( dragType === 'entity' ) {
                     this.moveEntities( targetEL, items, nextSiblingId );
                 }
