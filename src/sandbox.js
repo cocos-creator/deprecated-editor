@@ -248,6 +248,16 @@ Sandbox.reloadUserScripts = (function () {
         loadedScriptNodes.length = 0;
         //
         purge();
+
+        Fire.sendToCore('unload:user scripts');
+
+        // re-register menu
+        for ( var key in Fire.plugins) {
+            var plugin = Fire.plugins[key];
+            if ( plugin.mainMenu ) {
+                Fire.MainMenu.addTemplate(plugin.mainMenu.path, plugin.mainMenu.template);
+            }
+        }
     }
 
     /**
