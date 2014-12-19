@@ -20,6 +20,7 @@ var paths = {
         // engine extends
         'src/engine-extends/misc.js',
         'src/engine-extends/component.js',
+        'src/engine-extends/missing.js',
         'src/engine-extends/entity.js',
         'src/engine-extends/scene.js',
         'src/engine-extends/engine.js',
@@ -89,17 +90,17 @@ var task_plugin = function ( name ) {
 
     // copy
     gulp.task( task_copy_html, function() {
-        return gulp.src( [ 
-            basePath + '**/*.html', 
+        return gulp.src( [
+            basePath + '**/*.html',
         ], {base: 'elements'})
         .pipe(gulp.dest('bin/tmp/'))
         ;
     });
 
     gulp.task( task_copy_res, function() {
-        return gulp.src( [ 
-            basePath + '**/*.jpg', 
-            basePath + '**/*.png', 
+        return gulp.src( [
+            basePath + '**/*.jpg',
+            basePath + '**/*.png',
         ], {base: 'elements'})
         .pipe(gulp.dest('bin/'))
         ;

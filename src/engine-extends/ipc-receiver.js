@@ -118,4 +118,8 @@
         }
     });
 
+    Ipc.on('asset:deleted', function (uuid) {
+        Fire.AssetLibrary.unloadAsset(uuid, true);
+    });
+
 })();

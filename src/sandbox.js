@@ -213,7 +213,9 @@ Sandbox.reloadUserScripts = (function () {
         // deserialize scene
         var info = new Fire._DeserializeInfo();
         Fire.Engine._canModifyCurrentScene = false;
-        var newScene = Fire.deserialize(sceneSnapshot, info);
+        var newScene = Fire.deserialize(sceneSnapshot, info, true, {
+            classFinder: Fire._MissingScript.safeFindClass,
+        });
         Fire.Engine._canModifyCurrentScene = true;
         newScene._uuid = Fire.Engine._scene._uuid;
 
