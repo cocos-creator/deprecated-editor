@@ -1,0 +1,37 @@
+<polymer-element
+    name="asset-db-debugger"
+    constructor="AssetDBDebugger"
+    >
+<template>
+
+    <link rel="stylesheet" href="asset-db-debugger.css">
+
+    <fire-ui-toolbar>
+        <fire-ui-button-group id="btnGroup">
+            <fire-ui-bi on-active="{{pathUuidAction}}">path to uuid</fire-ui-bi>
+            <fire-ui-bi on-active="{{uuidPathAction}}">uuid to path</fire-ui-bi>
+            <fire-ui-bi on-active="{{libraryAction}}">library</fire-ui-bi>
+        </fire-ui-button-group>
+        <span class="space"></span>
+        <fire-ui-text-input flex-1 placeholder="Search..."></fire-ui-text-input>
+        <i class="fa fa-search"></i>
+    </fire-ui-toolbar>
+
+    <span class="space"></span>
+
+    <div class="view" flex-1>
+        <template repeat="{{info in infoList}}">
+            <div class="item" flex-row>
+                <div class="cell key" flex-1>{{info.key}}</div>
+                <div class="cell value" flex-1>{{info.value}}</div>
+            </div>
+            <!-- <tr>                        -->
+            <!--     <td>{{info.key}}</td>   -->
+            <!--     <td>{{info.value}}</td> -->
+            <!-- </tr>                       -->
+        </template>
+    </div>
+</template>
+
+<script type="text/javascript" src="asset-db-debugger.js"></script>
+</polymer-element>

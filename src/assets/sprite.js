@@ -1,5 +1,5 @@
 ﻿(function () {
-    
+
     var Sprite = Fire.Sprite;
 
     Sprite.prototype.createEntity = function () {
