@@ -1,18 +1,18 @@
 Fire.SpriteRendererGizmo = (function () {
 
-    var SpriteRendererGizmo = Fire.define("Fire.SpriteRendererGizmo", 
-                                  Fire.Gizmo, 
+    var SpriteRendererGizmo = Fire.define("Fire.SpriteRendererGizmo",
+                                  Fire.Gizmo,
                                   function ( svg, target ) {
 
         SpriteRendererGizmo.$super.call(this, svg, target );
         this.hitTest = false;
         this._root = svg.scene.group();
-        
+
         this._selectTools = this._root.polygon();
         this._selectTools.hide();
 
         this._editTools = null;
-    }); 
+    });
     Fire.gizmos['Fire.SpriteRenderer'] = SpriteRendererGizmo;
 
     //
@@ -70,7 +70,7 @@ Fire.SpriteRendererGizmo = (function () {
 
                         var right = entity.transform.right;
                         var up = entity.transform.up;
-                        
+
                         // calculate new_point by direction
                         if ( ratioW === 0.0 ) {
                             delta = new_point.sub(old_point);
@@ -158,7 +158,7 @@ Fire.SpriteRendererGizmo = (function () {
                 this._editTools.add(bm); this._editTools.bm = bm;
                 this._editTools.add(br); this._editTools.br = br;
             }
-        } 
+        }
         else {
             if ( this._editTools ) {
                 this._editTools.remove();
@@ -195,10 +195,10 @@ Fire.SpriteRendererGizmo = (function () {
                 v3.x = v3.x - radius; v3.y = v3.y - radius;
                 v4.x = v4.x - radius; v4.y = v4.y - radius;
 
-                v12 = v1.add(v2.sub(v1).mul(0.5));
-                v23 = v2.add(v3.sub(v2).mul(0.5));
-                v34 = v3.add(v4.sub(v3).mul(0.5));
-                v41 = v4.add(v1.sub(v4).mul(0.5));
+                var v12 = v1.add(v2.sub(v1).mul(0.5));
+                var v23 = v2.add(v3.sub(v2).mul(0.5));
+                var v34 = v3.add(v4.sub(v3).mul(0.5));
+                var v41 = v4.add(v1.sub(v4).mul(0.5));
 
                 this._editTools.tl.move( v2.x,  v2.y  );
                 this._editTools.tm.move( v23.x, v23.y );

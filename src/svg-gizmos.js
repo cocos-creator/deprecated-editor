@@ -234,7 +234,7 @@ Fire.SvgGizmos = (function () {
     SvgGizmos.prototype.freemoveTool = function ( size, color, callbacks ) {
         // move rect
         var dragging = false;
-        circle = this.svg.circle( size, size )
+        var circle = this.svg.circle( size, size )
                          .move( -size * 0.5, -size * 0.5 )
                          .fill( { color: color, opacity: 0.6 } )
                          .stroke( { width: 2, color: color } )

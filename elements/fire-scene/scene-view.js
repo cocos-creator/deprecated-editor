@@ -7,7 +7,7 @@
             this.svgGizmos = null;
             this.view = { width: 0, height: 0 };
             this.sceneCamera = {
-                position: { 
+                position: {
                     x: 0.0,
                     y: 0.0,
                 },
@@ -63,19 +63,19 @@
                 this.initSceneCamera();
                 this.resize(); // make sure we apply the size to all canvas
             }
-        }, 
+        },
 
         initSceneCamera: function () {
             if ( !Fire.Engine._scene )
                 return;
 
             var camera = null;
-            var cameraEnt = Fire.Engine._scene.findEntityWithFlag('/Scene Camera', 
-                                                               Fire._ObjectFlags.Hide | Fire._ObjectFlags.EditorOnly); 
+            var cameraEnt = Fire.Engine._scene.findEntityWithFlag('/Scene Camera',
+                                                               Fire._ObjectFlags.Hide | Fire._ObjectFlags.EditorOnly);
             // create editor camera
             if ( cameraEnt === null ) {
                 // TODO: add this code to EditorUtils
-                cameraEnt = new Fire.Entity.createWithFlags('Scene Camera', 
+                cameraEnt = new Fire.Entity.createWithFlags('Scene Camera',
                                     Fire._ObjectFlags.Hide | Fire._ObjectFlags.EditorOnly);
                 camera = cameraEnt.addComponent(Fire.Camera);
             }
@@ -124,9 +124,9 @@
             if ( !this.renderContext )
                 return;
 
-            this.renderContext.camera.size = this.view.height / this.sceneCamera.scale; 
-            this.renderContext.camera.transform.position = 
-                new Vec2 ( this.sceneCamera.position.x, 
+            this.renderContext.camera.size = this.view.height / this.sceneCamera.scale;
+            this.renderContext.camera.transform.position =
+                new Vec2 ( this.sceneCamera.position.x,
                            this.sceneCamera.position.y );
         },
 
@@ -342,7 +342,7 @@
                 return gizmos[0].entity;
             }
 
-            var mousePos = new Fire.Vec2(x,y); 
+            var mousePos = new Fire.Vec2(x,y);
             var worldMousePos = this.renderContext.camera.screenToWorld(mousePos);
 
             // pick the nearest one, ignore z
@@ -372,10 +372,10 @@
         rectHitTest: function ( rect ) {
             var v1 = this.renderContext.camera.screenToWorld(new Fire.Vec2(rect.x,rect.y));
             var v2 = this.renderContext.camera.screenToWorld(new Fire.Vec2(rect.xMax,rect.yMax));
-            var worldRect = Fire.Rect.fromVec2(v1,v2); 
+            var worldRect = Fire.Rect.fromVec2(v1,v2);
 
             var result = [];
-            var i;
+            var i, entities;
 
             for ( i = 0, entities = this.interactionContext.entities; i < entities.length; ++i ) {
                 var entity = entities[i];
@@ -460,8 +460,8 @@
             // process rect-selection
             if ( event.which === 1 ) {
                 var selectmoveHandle = function(event) {
-                    var x = this._rectSelectStartX - this.view.left; 
-                    var y = this._rectSelectStartY - this.view.top; 
+                    var x = this._rectSelectStartX - this.view.left;
+                    var y = this._rectSelectStartY - this.view.top;
                     var w = event.clientX - this._rectSelectStartX;
                     var h = event.clientY - this._rectSelectStartY;
                     if ( w < 0.0 ) {
@@ -496,8 +496,8 @@
                     document.removeEventListener('mousemove', selectmoveHandle);
                     document.removeEventListener('mouseup', selectexitHandle);
 
-                    var x = this._rectSelectStartX - this.view.left; 
-                    var y = this._rectSelectStartY - this.view.top; 
+                    var x = this._rectSelectStartX - this.view.left;
+                    var y = this._rectSelectStartY - this.view.top;
                     var w = event.clientX - this._rectSelectStartX;
                     var h = event.clientY - this._rectSelectStartY;
 
@@ -596,7 +596,7 @@
                     var ent = asset.createEntity();
                     var mousePos = new Fire.Vec2(event.clientX - clientRect.left, event.clientY - clientRect.top);
                     var worldMousePos = this.renderContext.camera.screenToWorld(mousePos);
-                    ent.transform.worldPosition = worldMousePos; 
+                    ent.transform.worldPosition = worldMousePos;
                     Fire.Selection.selectEntity( ent.id, true, true );
                     this.repaint();
                 }

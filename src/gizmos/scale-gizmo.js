@@ -1,13 +1,13 @@
 Fire.ScaleGizmo = (function () {
 
-    var ScaleGizmo = Fire.define("Fire.ScaleGizmo", 
-                                    Fire.Gizmo, 
+    var ScaleGizmo = Fire.define("Fire.ScaleGizmo",
+                                    Fire.Gizmo,
                                     function ( svg, target, options ) {
 
         ScaleGizmo.$super.call(this, svg, target, options );
         this.allowMultiTarget = true;
 
-        var localscaleList = [], offsetList = [], 
+        var localscaleList = [], offsetList = [],
             entities = target,
             self = this,
             center
@@ -60,9 +60,9 @@ Fire.ScaleGizmo = (function () {
                 }
 
                 self.dirty();
-            }, 
-        } ); 
-    }); 
+            },
+        } );
+    });
 
     //
     ScaleGizmo.prototype.update = function () {
@@ -78,7 +78,7 @@ Fire.ScaleGizmo = (function () {
             screenpos.y = Fire.GizmosUtils.snapPixel(screenpos.y);
 
             this._root.position = screenpos;
-            this._root.rotation = 0.0; 
+            this._root.rotation = 0.0;
         }
         else {
             var localToWorld = activeTarget.transform.getLocalToWorldMatrix();
@@ -93,7 +93,7 @@ Fire.ScaleGizmo = (function () {
             this._root.rotation = rotation;
         }
 
-        this._root.translate( this._root.position.x, this._root.position.y ) 
+        this._root.translate( this._root.position.x, this._root.position.y )
                   .rotate( this._root.rotation, this._root.position.x, this._root.position.y )
                   ;
     };
