@@ -50,7 +50,7 @@
                     var meta = Fire.AssetDB.loadMeta(id);
                     // Checks whether last uuid modified to ensure call stack not suspended by another ipc event
                     // This may occurred after ipc sync invocation such as AssetDB.xxx
-                    if (this.lastUuid === id) {
+                    if (meta && this.lastUuid === id) {
                         // this.inspect 前如果不延迟一帧，点右键菜单时渲染会只进行到一半，同时 inspector 切换也会有问题。
                         process.nextTick(function (meta) {
                             // Only inspect the lastest one
