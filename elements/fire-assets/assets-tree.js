@@ -158,6 +158,12 @@
             }.bind(this) );
             this.ipc.on('asset:moved', this.moveItem.bind(this) );
             this.ipc.on('asset:deleted', this.deleteItemById.bind(this) );
+            this.ipc.on('asset-db:reimported', function ( results ) {
+                for ( var i = 0; i < results.length; ++i ) {
+                    var info = results[i];
+                    this.newItem( info.url, info.uuid, info.parentUuid, info.isDir );
+                }
+            }.bind(this) );
         },
 
         detached: function () {
