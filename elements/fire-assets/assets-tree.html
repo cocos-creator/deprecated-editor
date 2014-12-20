@@ -1,11 +1,12 @@
-<polymer-element 
-    name="assets-tree" 
+<polymer-element
+    name="assets-tree"
     extends="fire-ui-tree"
     constructor="AssetsTree"
     on-selecting="{{selectingAction}}"
     on-select="{{selectAction}}"
     on-namechanged="{{namechangedAction}}"
     on-open="{{openAction}}"
+    on-mousedown="{{mousedownAction}}"
     on-contextmenu="{{contextmenuAction}}"
     on-dragstart="{{dragstartAction}}"
     on-dragend="{{dragendAction}}"

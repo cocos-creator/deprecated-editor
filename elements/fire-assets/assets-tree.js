@@ -542,6 +542,15 @@
             event.stopPropagation();
         },
 
+        mousedownAction: function (event) {
+            if (event.which === 1) {
+                // left down
+                Fire.Selection.clearAsset();
+
+                event.stopPropagation();
+            }
+        },
+
         contextmenuAction: function (event) {
             this.resetDragState();
 
