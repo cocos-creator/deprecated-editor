@@ -11,7 +11,6 @@
     align-items: stretch
 
     font-size: 13px
-    white-space: nowrap
 
     margin-top: 10px
     margin-left: 3px
@@ -24,6 +23,7 @@
     outline: none
 
     .view {
+        position: relative
         border: 1px solid #000
         box-shadow: inset 0 0 8px 2px rgba(0,0,0,0.2)
 
@@ -33,30 +33,53 @@
         overflow-y: auto
     }
 
-    .item {
-        padding: 2px 5px
-        background: #222
-    }
-
-    .item:nth-child(even) {
-        background: #292929
-    }
-
-    .cell {
-        overflow: hidden
-        text-overflow: ellipsis
-
-        &.key {
-        }
-
-        &.value {
-            color: #d60
-        }
-    }
-
     span.space {
         width: 5px
         height: 5px
+    }
+
+    table {
+        width: 100%
+        white-space: nowrap
+        font-size: 12px
+        font-family: Helvetica,Arial,sans-serif
+        border-bottom: 1px solid #555
+
+        .key {
+            color: #aaa
+        }
+
+        .value {
+            color: #d60
+        }
+    }
+    table, th, td {
+        border-collapse: collapse
+        table-layout: fixed
+    }
+    tr {
+        background: #333
+
+        &:nth-child(even) {
+            background: #333 - 20%
+        }
+    }
+    th {
+        font-size: 15px
+        text-align: left
+
+        background: #800
+    }
+    th, td {
+        padding: 2px 5px
+        border-left: 1px solid #555
+
+        overflow: hidden
+        text-overflow: ellipsis
+
+        &:first-child {
+            border-left: 0px
+        }
     }
 
     ::-webkit-scrollbar {

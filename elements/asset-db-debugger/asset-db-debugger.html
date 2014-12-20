@@ -13,23 +13,39 @@
             <fire-ui-bi on-active="{{libraryAction}}">library</fire-ui-bi>
         </fire-ui-button-group>
         <span class="space"></span>
-        <fire-ui-text-input flex-1 placeholder="Search..."></fire-ui-text-input>
+
+        <fire-ui-button on-click="{{refreshAction}}">
+            <i class="fa fa-rotate-right"></i>
+            Refresh
+        </fire-ui-button>
+        <span class="space"></span>
+
+        <fire-ui-checkbox value="{{watchON}}">Watch</fire-ui-checkbox>
+        <span class="space"></span>
+
+        <fire-ui-text-input flex-1 inputValue="{{searchValue}}" placeholder="Search..."></fire-ui-text-input>
         <i class="fa fa-search"></i>
     </fire-ui-toolbar>
 
     <span class="space"></span>
 
     <div class="view" flex-1>
-        <template repeat="{{info in infoList}}">
-            <div class="item" flex-row>
-                <div class="cell key" flex-1>{{info.key}}</div>
-                <div class="cell value" flex-1>{{info.value}}</div>
-            </div>
-            <!-- <tr>                        -->
-            <!--     <td>{{info.key}}</td>   -->
-            <!--     <td>{{info.value}}</td> -->
-            <!-- </tr>                       -->
-        </template>
+        <table>
+            <thead>
+                <tr>
+                    <th>{{keyName}}</th>
+                    <th>{{valueName}}</th>
+                </tr>
+            </thead>
+            <tbody>
+                <template repeat="{{info in infoList | filter(searchValue)}}">
+                    <tr>
+                        <td class="key">{{info.key}}</td>
+                        <td class="value">{{info.value}}</td>
+                    </tr>
+                </template>
+            </tbody>
+        </table>
     </div>
 </template>
 
