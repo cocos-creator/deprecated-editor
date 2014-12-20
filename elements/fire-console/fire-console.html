@@ -21,8 +21,7 @@
                 </fire-ui-select>
                 <span class="space"></span>
                 <fire-ui-text-input placeholder="filter"
-                    value="{{filterText}}"
-                    on-input-changed="{{filterAction}}"
+                    inputValue="{{filterText}}"
                     >
                 </fire-ui-text-input>
                 <span class="space"></span>
@@ -32,11 +31,10 @@
         </fire-ui-toolbar>
         <div flex-1 flex-col flex-stretch>
             <console-view id="view" auto-layout min-height="50">
-                <template repeat="{{log,index in filterLogs}}">
+                <template repeat="{{log in logs | applyFilter(filterText,option,useRegex)}}">
                     <console-item
                         type="[[log.type]]"
                         text="[[log.text]]"
-                        index="[[index]]"
                         on-click="{{itemClickAction}}"
                         >
                         </console-item>

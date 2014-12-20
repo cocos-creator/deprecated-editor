@@ -40,12 +40,12 @@
             console.log('ipt');
         },
 
-        ChangeView: function () {
-            if (this.$.dataView.viewMode == "list"){
-                this.$.dataView.viewMode = "img";
-            }else{
-                this.$.dataView.viewMode = "list";
-            }
+        listViewAction: function () {
+            this.$.dataView.viewMode = "list";
+        },
+
+        gridViewAction: function () {
+            this.$.dataView.viewMode = "grid";
         },
 
         inputAction: function ( event ) {

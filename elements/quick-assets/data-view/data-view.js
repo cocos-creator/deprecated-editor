@@ -39,31 +39,34 @@
         },
 
         viewModeChanged: function () {
-            if (this.viewMode == "list") {
-                this.$.uls.setAttribute("inline","");
+            if (this.viewMode === "list") {
+                this.$.uls.removeAttribute("inline");
             }
             else {
-                this.$.uls.removeAttribute("inline");
+                this.$.uls.setAttribute("inline","");
             }
         },
 
         update: function () {
+            var i, extname, basename;
+
             this.list = this.dataList;
             this.dataList = null;
+
             switch(this.typename.toString()) {
                 case "Fire.Texture":
-                    for (var i = 0; i<this.list.length; i++) {
+                    for (i = 0; i<this.list.length; i++) {
                         this.list[i].uuid = "uuid://" + this.list[i].uuid;
-                        var extname = Url.extname(this.list[i].url);
-                        var basename = Url.basename(this.list[i].url, extname);
+                        extname = Url.extname(this.list[i].url);
+                        basename = Url.basename(this.list[i].url, extname);
                         this.list[i].url = basename;
                     }
                 break;
                 case "Fire.Sprite":
-                    for (var i = 0; i < this.list.length; i++) {
+                    for (i = 0; i < this.list.length; i++) {
                         this.list[i].uuid = "../src/editor/fire-assets/img/assets-fire.png";
-                        var extname = Url.extname(this.list[i].url);
-                        var basename = Url.basename(this.list[i].url, extname);
+                        extname = Url.extname(this.list[i].url);
+                        basename = Url.basename(this.list[i].url, extname);
                         this.list[i].url = basename;
                     }
                 break;
@@ -75,14 +78,17 @@
         },
 
         bindding: function (list) {
-            for (var i = 0; i<this.$.uls.children.length;i++){
+            var i;
+
+            for ( i = 0; i < this.$.uls.children.length; ++i ){
                   this.$.uls.children[i] = null;
                   this.$.uls.removeChild(this.$.uls.children[i]);
-                 //delete this.$.uls.children[i].parentNode.removeChild(this.$.uls.children[i]);
-                  this.$.uls.children[i];
+                  // delete this.$.uls.children[i].parentNode.removeChild(this.$.uls.children[i]);
+                  // this.$.uls.children[i];
             }
+
             //this.$.uls.innerHTML="";
-            for (var i= 0;i<list.length;i++) {
+            for ( i= 0; i < list.length; ++i ) {
                 var li= document.createElement('li');
                 li.setAttribute("class","list");
                 var img = document.createElement('img');
@@ -97,14 +103,14 @@
 
         clickAction: function (event, detail, sender) {
             this.img = this.list[parseInt(sender.getAttribute('index'))].uuid;
-            if (this.lastSelect != null) {
+            if (this.lastSelect !== null) {
                 this.lastSelect.removeAttribute("selected");
             }
             sender.setAttribute("selected","");
             this.lastSelect = sender;
         },
         toSearch: function () {
-            if (this.lock != true) {
+            if (this.lock !== true) {
                 this.lock = true;
                 //this.list = null;
                 this.list = this.search(this.searchValue,this.tempList);
@@ -137,7 +143,7 @@
                          break;
                     }
                     else {
-                        if (this.lastSelect != null) {
+                        if (this.lastSelect !== null) {
                             this.lastSelect.removeAttribute("selected");
                         }
 
@@ -145,7 +151,7 @@
                         this.lastSelect = pre;
                         this.clickAction(event,detail,this.lastSelect);
                         if (pre.offsetTop < this.$.scrolls.scrollTop) {
-                            if (this.viewMode == "list") {
+                            if (this.viewMode !== "list") {
                                 this.$.scrolls.scrollTop -= 140;
                             }
                             this.$.scrolls.scrollTop -= 21;
@@ -160,7 +166,7 @@
                         break;
                     }
                     else {
-                        if (this.lastSelect != null) {
+                        if (this.lastSelect !== null) {
                             this.lastSelect.removeAttribute("selected");
                         }
 
@@ -168,7 +174,7 @@
                         this.lastSelect = next;
                         this.clickAction(event,detail,this.lastSelect);
                         if (next.offsetTop >= this.$.scrolls.offsetHeight) {
-                            if (this.viewMode == "list") {
+                            if (this.viewMode !== "list") {
                                 this.$.scrolls.scrollTop += 140;
                             }
                             this.$.scrolls.scrollTop += 21;

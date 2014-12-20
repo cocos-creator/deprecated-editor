@@ -8,33 +8,28 @@
 
 <link rel="stylesheet" href="quick-assets.css">
 
-    <div id="searchBar" flex-row class="border">
-        <fire-ui-text-input id="search" on-input-changed="{{inputAction}}" flex-1 placeholder="Search"></fire-ui-text-input>
-        <span class="space"></span>
-        <i class="fa fa-search"></i>
-    </div>
-
-    <fire-ui-tabs id="tabs">
-        <fire-ui-tab  class="">Assets</fire-ui-tab>
-        <span class="space"></span>
+    <fire-ui-toolbar>
         <fire-ui-button-group id="btnGroup" >
-            <fire-ui-bi on-active="{{ChangeView}}" active>
+            <fire-ui-bi on-active="{{listViewAction}}">
                 <i class="fa fa-th-list"></i>
             </fire-ui-bi>
-            <fire-ui-bi on-active="{{ChangeView}}">
+            <fire-ui-bi on-active="{{gridViewAction}}">
                 <i class="fa fa-th"></i>
             </fire-ui-bi>
         </fire-ui-button-group>
-        <!--<fire-ui-slider value="{{size}}"></fire-ui-slider>-->
-    </fire-ui-tabs>
+        <span class="space"></span>
+        <fire-ui-text-input flex-1 placeholder="Search"
+            inputValue="{{searchText}}"
+            >
+            </fire-ui-text-input>
+        <i class="fa fa-search"></i>
+    </fire-ui-toolbar>
 
+    <span class="space"></span>
 
-    <div class="content" flex-1="" flex-col="" flex-stretch="">
-        <div class="border" fit="">
-            <data-view id="dataView" view="{{viewMode}}" size="{{size}}" searchValue="{{datalist}}" fit></data-view>
-        </div>
+    <div class="view" flex-1>
+        <data-view id="dataView" view="{{viewMode}}" size="{{size}}" searchValue="{{datalist}}" fit></data-view>
     </div>
-
 </template>
 
 <script type="text/javascript" src="quick-assets.js"></script>

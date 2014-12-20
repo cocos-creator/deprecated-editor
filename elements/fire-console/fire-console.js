@@ -1,11 +1,5 @@
 (function () {
     Polymer({
-        observe: {
-            filterText: 'applyFilter',
-            option: 'applyFilter',
-            logs: 'applyFilter',
-        },
-
         options: [
             { name: 'All'  , value: 0 },
             { name: 'Log'  , value: 1 },
@@ -18,14 +12,13 @@
             this.icon = new Image();
             this.icon.src = "fire://static/img/plugin-console.png";
 
+            this.ipc = new Fire.IpcListener();
+
             this.option = 0;
             this.filterText = '';
             this.useRegex = false;
             this.logs = [];
-            this.filterLogs = [];
             this._curSelected = null;
-
-            this.ipc = new Fire.IpcListener();
         },
 
         attached: function () {
@@ -56,15 +49,18 @@
                 type: type,
                 text: text
             });
+            this.logs = this.applyFilter( this.logs, this.filterText, this.option, this.useRegex );
         },
 
         clear: function () {
             this.logs = [];
         },
 
-        applyFilter: function () {
+        applyFilter: function ( logs, filterText, option, useRegex ) {
+            var filterLogs = [];
+
             var type;
-            switch(this.option) {
+            switch(option) {
                 case 0: type = ""; break;
                 case 1: type = "log"; break;
                 case 2: type = "warn"; break;
@@ -72,24 +68,22 @@
                 case 4: type = "info"; break;
             }
 
-            this.filterLogs = [];
-
             var filter;
-            if ( this.useRegex ) {
-                filter = new RegExp(this.filterText);
+            if ( useRegex ) {
+                filter = new RegExp(filterText);
             }
             else {
-                filter = this.filterText.toLowerCase();
+                filter = filterText.toLowerCase();
             }
 
-            for ( var i = 0; i < this.logs.length; ++i ) {
-                var log = this.logs[i];
+            for ( var i = 0; i < logs.length; ++i ) {
+                var log = logs[i];
 
                 if ( type !== "" && log.type !== type ) {
                     continue;
                 }
 
-                if ( this.useRegex ) {
+                if ( useRegex ) {
                     if ( !filter.exec(log.text) ) {
                         continue;
                     }
@@ -100,8 +94,10 @@
                     }
                 }
 
-                this.filterLogs.push(log);
+                filterLogs.push(log);
             }
+
+            return filterLogs;
         },
 
         itemClickAction: function (event) {
@@ -122,10 +118,6 @@
         clearAction: function (event) {
             this.clear();
             this.$.detail.clear();
-        },
-
-        filterAction: function (event) {
-            this.filterText = event.detail.value;
         },
     });
 })();

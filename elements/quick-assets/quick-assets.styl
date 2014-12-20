@@ -1,56 +1,34 @@
 :host {
     position: absolute
-    top: 1
+    top: 0
     right: 0
     bottom: 0
     left: 0
+
     display: flex
     flex-direction: column
     flex-wrap: nowrap
     align-items: stretch
-    border-left: 1px solid #212121;
-    border-right: 1px solid #212121;
-    border-top: 1px solid #212121;
+
     font-size: 12px
     font-family: Helvetica,Arial,sans-serif
+
+    margin-top: 10px
+    margin-left: 3px
+    margin-right: 3px
+    margin-bottom: 3px
+
     color: #ddd
+    cursor: default
+    outline: none
 
-    .border {
-        border-left: 1px solid rgba(255,255,255,0.08);
-        border-right: 1px solid rgba(255,255,255,0.08);
-        border-top: 1px solid rgba(255,255,255,0.2);
-        border-bottom: 1px solid rgba(255,255,255,0.2);
+    span.space {
+        width: 5px
+        height: 5px
     }
 
-    .content {
+    .view {
         position: relative
-        box-sizing: border-box
-        border: 1px solid #212121
-        overflow: hidden
-        background: #444
+        border: 1px solid #000
     }
-
-    #search {
-        margin: 5px;
-    }
-
-    #searchBar {
-        padding-left: 5px
-        padding-right: 5px
-
-        margin-bottom: 5px
-        background: rgb(68,68,68)
-
-        span.space {
-            width: 5px
-        }
-    }
-
-    .search-bg {
-        width: 100%
-        height: 30px
-        background: rgb(68,68,68)
-    }
-
-
 }
