@@ -397,6 +397,9 @@
 
         highlightInsert: function ( item, parentEL, position ) {
             var style = this.$.insertLine.style;
+            if ( item === this ) {
+                item = this.firstChild;
+            }
 
             if ( item === parentEL ) {
                 style.display = "none";
@@ -638,19 +641,23 @@
             }
 
             //
-            if ( event.target && event.target instanceof AssetsItem ) {
+            if ( event.target ) {
                 this.lastDragoverEL = this.curDragoverEL;
-                var target = event.target;
+                var dragoverTraget = event.target;
                 if ( event.target.isFolder === false )
-                    target = event.target.parentElement;
+                    dragoverTraget = event.target.parentElement;
+
+                if ( event.target === this ) {
+                    dragoverTraget = this.firstChild;
+                }
 
                 //
-                if ( target !== this.lastDragoverEL ) {
+                if ( dragoverTraget !== this.lastDragoverEL ) {
                     this.cancelHighligting();
                     this.cancelConflictsHighliting();
-                    this.curDragoverEL = target;
+                    this.curDragoverEL = dragoverTraget;
 
-                    this.highlightBorder(this.curDragoverEL);
+                    this.highlightBorder(dragoverTraget);
 
                     // name collision check
                     var names = [];
@@ -666,7 +673,7 @@
                         var srcELs = this.getToplevelElements(dragItems);
                         for (i = 0; i < srcELs.length; i++) {
                             var srcEL = srcELs[i];
-                            if (target !== srcEL.parentElement) {
+                            if (dragoverTraget !== srcEL.parentElement) {
                                 names.push(srcEL.name + srcEL.extname);
                             }
                         }
@@ -675,7 +682,7 @@
                     // check if we have conflicts names
                     var valid = true;
                     if ( names.length > 0 ) {
-                        var collisions = _getNameCollisions( target, names );
+                        var collisions = _getNameCollisions( dragoverTraget, names );
                         if ( collisions.length > 0 ) {
                             this.highlightConflicts(collisions);
                             valid = false;
@@ -690,7 +697,7 @@
                 var position = 'before';
                 if ( offsetY >= (event.target.offsetTop + event.target.offsetHeight * 0.5) )
                     position = 'after';
-                this.highlightInsert( event.target, this.curDragoverEL, position );
+                this.highlightInsert( event.target, dragoverTraget, position );
             }
 
             //

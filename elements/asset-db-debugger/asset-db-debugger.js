@@ -12,17 +12,19 @@
         },
 
         attached: function () {
-            this.ipc.on('asset-db:debugger:path-uuid-results', function ( results ) {
+            this.ipc.on('asset-db:debugger:url-uuid-results', function ( results ) {
                 this.infoList = [];
-                for ( var p in results ) {
-                    this.infoList.push( { key: p, value: results[p] } );
+                for ( var i = 0; i < results.length; ++i ) {
+                    var info = results[i];
+                    this.infoList.push( { key: info.url, value: info.uuid } );
                 }
             }.bind(this) );
 
-            this.ipc.on('asset-db:debugger:uuid-path-results', function ( results ) {
+            this.ipc.on('asset-db:debugger:uuid-url-results', function ( results ) {
                 this.infoList = [];
-                for ( var p in results ) {
-                    this.infoList.push( { key: p, value: results[p] } );
+                for ( var i = 0; i < results.length; ++i ) {
+                    var info = results[i];
+                    this.infoList.push( { key: info.uuid, value: info.url } );
                 }
             }.bind(this) );
         },
@@ -54,18 +56,18 @@
             return filterList;
         },
 
-        pathUuidAction: function ( event ) {
-            this._option = 'path-uuid';
+        urlUuidAction: function ( event ) {
+            this._option = 'url-uuid';
             this.keyName = "URL";
             this.valueName = "UUID";
-            Fire.sendToCore('asset-db:debugger:query-path-uuid');
+            Fire.sendToCore('asset-db:debugger:query-url-uuid');
         },
 
-        uuidPathAction: function ( event ) {
-            this._option = 'uuid-path';
+        uuidUrlAction: function ( event ) {
+            this._option = 'uuid-url';
             this.keyName = "UUID";
             this.valueName = "URL";
-            Fire.sendToCore('asset-db:debugger:query-uuid-path');
+            Fire.sendToCore('asset-db:debugger:query-uuid-url');
         },
 
         libraryAction: function ( event ) {
@@ -74,13 +76,13 @@
             this.valueName = "URL";
             this.infoList = [];
             // TODO
-            // Fire.sendToCore('asset-db:debugger:query-path-uuid');
+            // Fire.sendToCore('asset-db:debugger:query-url-uuid');
         },
 
         refreshAction: function ( event ) {
             switch (this._option) {
-            case 'path-uuid': this.pathUuidAction(); break;
-            case 'uuid-path': this.uuidPathAction(); break;
+            case 'url-uuid': this.urlUuidAction(); break;
+            case 'uuid-url': this.uuidUrlAction(); break;
             case 'library': this.libraryAction(); break;
             }
         },
