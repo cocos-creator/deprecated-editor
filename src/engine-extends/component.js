@@ -25,4 +25,15 @@
         delete Fire._idToObject[this._id];
     };
 
+    // Checks Component declaration
+
+    var define = Fire.define;
+    Fire.define = function (className, baseOrConstructor, constructor) {
+        if (Fire.isChildClassOf(baseOrConstructor, Component)) {
+            //Fire.warn('Sorry, defining Component dynamically is not allowed, defines in corresponding script please.');
+        }
+        var cls = define(className, baseOrConstructor, constructor);
+        return cls;
+    };
+
 })();
