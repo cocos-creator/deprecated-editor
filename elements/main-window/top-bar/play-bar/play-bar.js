@@ -1,69 +1,67 @@
-(function () {
-    Polymer({
+Polymer({
 
-        created: function () {
-            this.ipc = new Fire.IpcListener();
-        },
+    created: function () {
+        this.ipc = new Fire.IpcListener();
+    },
 
-        attached: function () {
-            this.ipc.on('engine:played', this.onEnginePlayed.bind(this));
-            this.ipc.on('engine:stopped', this.onEngineStopped.bind(this));
-            this.ipc.on('engine:paused', this.onEnginePaused.bind(this));
-        },
+    attached: function () {
+        this.ipc.on('engine:played', this.onEnginePlayed.bind(this));
+        this.ipc.on('engine:stopped', this.onEngineStopped.bind(this));
+        this.ipc.on('engine:paused', this.onEnginePaused.bind(this));
+    },
 
-        detached: function () {
-            this.ipc.clear();
-        },
+    detached: function () {
+        this.ipc.clear();
+    },
 
-        onEnginePlayed: function (continued) {
-            if (continued) {
-                this.$.pause.active = false;
-            }
-            else {
-                this.$.play.active = true;
-                this.$.group.active = true;
-            }
-        },
-
-        onEngineStopped: function () {
-            this.$.play.active = false;
+    onEnginePlayed: function (continued) {
+        if (continued) {
             this.$.pause.active = false;
-            this.$.group.active = false;
-        },
+        }
+        else {
+            this.$.play.active = true;
+            this.$.group.active = true;
+        }
+    },
 
-        onEnginePaused: function () {
-            this.$.pause.active = true;
-        },
+    onEngineStopped: function () {
+        this.$.play.active = false;
+        this.$.pause.active = false;
+        this.$.group.active = false;
+    },
 
-        playAction: function ( event ) {
-            event.stopPropagation();
+    onEnginePaused: function () {
+        this.$.pause.active = true;
+    },
 
-            if ( !Fire.Engine.isPlaying ) {
-                Fire._Sandbox.stashScene();
-                Fire.Engine.play();
-            }
-            else {
-                Fire.Engine.stop();
-                Fire._Sandbox.rewindScene();
-            }
-        },
+    playAction: function ( event ) {
+        event.stopPropagation();
 
-        pauseAction: function ( event ) {
-            event.stopPropagation();
+        if ( !Fire.Engine.isPlaying ) {
+            Fire._Sandbox.stashScene();
+            Fire.Engine.play();
+        }
+        else {
+            Fire.Engine.stop();
+            Fire._Sandbox.rewindScene();
+        }
+    },
 
-            if ( !Fire.Engine.isPaused ) {
-                Fire.Engine.pause();
-            }
-            else {
-                Fire.Engine.play();
-            }
-        },
+    pauseAction: function ( event ) {
+        event.stopPropagation();
 
-        stepAction: function ( event ) {
-            event.stopPropagation();
+        if ( !Fire.Engine.isPaused ) {
+            Fire.Engine.pause();
+        }
+        else {
+            Fire.Engine.play();
+        }
+    },
 
-            Fire.Engine.step();
-        },
+    stepAction: function ( event ) {
+        event.stopPropagation();
 
-    });
-})();
+        Fire.Engine.step();
+    },
+
+});

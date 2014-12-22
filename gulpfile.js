@@ -60,6 +60,15 @@ gulp.task('clean', function() {
 // build
 /////////////////////////////////////////////////////////////////////////////
 
+function wrapScope () {
+    var header = new Buffer("(function () {\n");
+    var footer = new Buffer("})();\n");
+    return es.through(function (file) {
+        file.contents = Buffer.concat([header, file.contents, footer]);
+        this.emit('data', file);
+    });
+}
+
 var task_copy_deps = [];
 var task_min_deps = [ 'copy', 'src-min' ];
 var task_dev_deps = [ 'copy', 'src-dev' ];
@@ -119,6 +128,7 @@ var task_plugin = function ( name ) {
     // js
     gulp.task(task_js, function() {
         return gulp.src(basePath + '**/*.js', {base: 'elements'})
+        .pipe(wrapScope())
         .pipe(jshint({
             multistr: true,
             smarttabs: false,
@@ -132,6 +142,7 @@ var task_plugin = function ( name ) {
 
     gulp.task(task_js_dev, function() {
         return gulp.src(basePath + '**/*.js', {base: 'elements'})
+        .pipe(wrapScope())
         .pipe(gulp.dest('bin/tmp/'))
         ;
     });
@@ -164,15 +175,6 @@ gulp.task('src-jshint', function() {
     .pipe(jshint.reporter(stylish))
     ;
 });
-
-function wrapScope () {
-    var header = new Buffer("(function () {\n");
-    var footer = new Buffer("})();\n");
-    return es.through(function (file) {
-        file.contents = Buffer.concat([header, file.contents, footer]);
-        this.emit('data', file);
-    });
-}
 
 // src-dev
 gulp.task('src-dev', ['src-jshint'], function() {
