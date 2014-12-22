@@ -1,7 +1,7 @@
 ﻿// editor utils
 
 (function () {
-    
+
     var Component = Fire.Component;
 
     // register id
@@ -27,10 +27,21 @@
 
     // Checks Component declaration
 
+    Fire._requiringStack = [];
+
     var define = Fire.define;
     Fire.define = function (className, baseOrConstructor, constructor) {
         if (Fire.isChildClassOf(baseOrConstructor, Component)) {
-            //Fire.warn('Sorry, defining Component dynamically is not allowed, defines in corresponding script please.');
+            var loadingScript = Fire._requiringStack[Fire._requiringStack.length - 1];
+            if (className !== loadingScript) {
+                if (loadingScript) {
+                    Fire.error('Can\'t define Component "' + className + '" in script "' + loadingScript +
+                        '". Make sure that the file name and class name match.');
+                }
+                else {
+                    Fire.warn('Sorry, defining Component "' + className + '" dynamically is not allowed, defines in its corresponding script please.');
+                }
+            }
         }
         var cls = define(className, baseOrConstructor, constructor);
         return cls;

@@ -54,7 +54,7 @@
                     }
 
                     // load user scripts
-                    Sandbox.reloadUserScripts();
+                    Fire._Sandbox.reloadUserScripts();
 
                     // init engine
                     Fire.info('fire-engine initializing...');
@@ -89,7 +89,7 @@
                 }.bind(this));
             }.bind(this) );
 
-            this.ipc.on('reload:user-scripts', Sandbox.reloadUserScripts.bind(Sandbox));
+            this.ipc.on('reload:user-scripts', Fire._Sandbox.reloadUserScripts.bind(Fire._Sandbox));
 
             this.ipc.on('asset-library:debugger:query-uuid-asset', function () {
                 var results = [];
