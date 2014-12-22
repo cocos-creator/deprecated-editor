@@ -34,23 +34,23 @@
         onEnginePaused: function () {
             this.$.pause.active = true;
         },
-        
+
         playAction: function ( event ) {
             event.stopPropagation();
 
             if ( !Fire.Engine.isPlaying ) {
-                Sandbox.stashScene();
+                Fire._Sandbox.stashScene();
                 Fire.Engine.play();
             }
             else {
                 Fire.Engine.stop();
-                Sandbox.rewindScene();
+                Fire._Sandbox.rewindScene();
             }
         },
 
         pauseAction: function ( event ) {
             event.stopPropagation();
-            
+
             if ( !Fire.Engine.isPaused ) {
                 Fire.Engine.pause();
             }

@@ -1,4 +1,6 @@
-﻿var GlobalVarsChecker = (function () {
+﻿(function () {
+
+var GlobalVarsChecker = (function () {
 
     var DefaultIgnoreGlobalVars = [
         'webkitIndexedDB',      // deprecated warning
@@ -204,6 +206,7 @@ Sandbox.reloadUserScripts = (function () {
         // restore global variables（就算没 play 也可能会在 dev tools 里面添加全局变量）
         Sandbox.globalVarsChecker.restore(Fire.log, 'editing', 'require');
         //gVarsCheckerBetweenReload.restore(Fire.log);
+        Fire._requiringStack = [];
     }
 
     function recreateScene () {
@@ -314,4 +317,7 @@ Sandbox.reloadUserScripts = (function () {
 
     return reloadUserScripts;
 
+})();
+
+    Fire._Sandbox = Sandbox;
 })();
