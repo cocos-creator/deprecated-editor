@@ -146,10 +146,6 @@
 
         attached: function () {
             // register Ipc
-            this.ipc.on('fire-assets:newItem', this.newItem.bind(this) );
-            this.ipc.on('fire-assets:deleteItem', this.deleteItemById.bind(this) );
-            this.ipc.on('fire-assets:finishLoading', this.finishLoading.bind(this) );
-
             this.ipc.on('folder:created', function ( url, id, parentId ) {
                 this.newItem( url, id, parentId, true );
             }.bind(this) );
@@ -158,7 +154,13 @@
             }.bind(this) );
             this.ipc.on('asset:moved', this.moveItem.bind(this) );
             this.ipc.on('asset:deleted', this.deleteItemById.bind(this) );
-            this.ipc.on('asset-db:reimported', function ( results ) {
+            this.ipc.on('asset-db:imported', function ( results ) {
+                for ( var i = 0; i < results.length; ++i ) {
+                    var info = results[i];
+                    this.newItem( info.url, info.uuid, info.parentUuid, info.isDir );
+                }
+            }.bind(this) );
+            this.ipc.on('asset-db:deep-query-results', function ( url, results ) {
                 for ( var i = 0; i < results.length; ++i ) {
                     var info = results[i];
                     this.newItem( info.url, info.uuid, info.parentUuid, info.isDir );
@@ -302,24 +304,16 @@
             this.contextmenu = Menu.buildFromTemplate(template);
         },
 
-        load: function ( url ) {
-            console.time('fire-assets:load');
-            Fire.info('browsing ' + url);
-
+        browse: function ( url ) {
             _newAssetsItem.call(this, url, 'root', Fire.UUID.AssetsRoot, this);
 
-            Fire.sendToCore('asset-db:browse', url);
-        },
-
-        finishLoading: function ( url ) {
-            Fire.info(url + ' finish browsing!');
-            console.timeEnd('fire-assets:load');
+            Fire.sendToCore('asset-db:deep-query', url);
         },
 
         newItem: function ( url, id, parentId, isDirectory ) {
             var parentEL = this.idToItem[parentId];
             if ( !parentEL ) {
-                Fire.warn('Can not find element for ' + parentId);
+                Fire.warn('Can not find element for ' + parentId + " when import " + url);
                 return;
             }
             var type = isDirectory ? 'folder' : '';
