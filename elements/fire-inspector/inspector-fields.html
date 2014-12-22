@@ -5,25 +5,6 @@
 <template>
 <link rel="stylesheet" href="inspector-fields.css">
 
-<template if="{{ isEntity }}">
-    <fire-ui-toolbar class="entity-bar">
-        <fire-ui-checkbox value="{{target.active}}"></fire-ui-checkbox>
-        <fire-ui-text-input value="{{target.name}}" flex-1></fire-ui-text-input>
-        <i id="btnAddComp" on-click="{{addComponentAction}}" class="fa fa-plus"></i>
-    </fire-ui-toolbar>
-</template>
-
-<template if="{{ isImporter }}">
-    <fire-ui-toolbar class="importer-bar" justify-end>
-        <fire-ui-button disabled="{{!target.dirty}}" on-click="{{revertAction}}">
-            <i class="fa fa-close"></i>
-        </fire-ui-button>
-        <fire-ui-button disabled="{{!target.dirty}}" on-click="{{applyAction}}">
-            <i class="fa fa-check"></i>
-        </fire-ui-button>
-    </fire-ui-toolbar>
-</template>
-
 <content></content>
 
 </template>

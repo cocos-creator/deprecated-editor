@@ -49,7 +49,12 @@ Polymer({
     },
 
     resize: function () {
+        var old = this.style.display;
+        this.style.display = "";
+
         this.$.view.resize();
+
+        this.style.display = old;
     },
 
     select: function ( selected, entityIDs ) {

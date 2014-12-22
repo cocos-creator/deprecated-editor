@@ -1,40 +1,18 @@
+<script type="text/javascript" src="fire-observer.js"></script>
 <link rel="import" href="inspector-fields.html">
+<link rel="import" href="entity-inspector.html">
+<link rel="import" href="importer-inspector.html">
 
 <polymer-element
     name="fire-inspector"
     constructor="FireInspector"
-    on-changed="{{propertyChangedAction}}"
+    on-resize="{{resizeAction}}"
+    on-reload="{{reloadAction}}"
     >
 <template>
 <link rel="stylesheet" href="fire-inspector.css">
 
-<!-- NOTE: disabled because it is super slow -->
-<!-- <fire-ui-toolbar class="toolbar">                                             -->
-<!--     <fire-ui-checkbox value="{{target.active}}"></fire-ui-checkbox>              -->
-<!--     <fire-ui-text-input value="{{target.name}}" flex-1></fire-ui-text-input>     -->
-<!--     <i id="btnAddComp" on-click="{{addComponentAction}}" class="fa fa-plus"></i> -->
-<!-- </fire-ui-toolbar>                                                               -->
-
-<!-- <fire-ui-toolbar class="toolbar" justify-end>                               -->
-<!--     <fire-ui-button disabled="{{!target.dirty}}" on-click="{{revertAction}}">    -->
-<!--         <i class="fa fa-close"></i>                                              -->
-<!--     </fire-ui-button>                                                            -->
-<!--     <fire-ui-button disabled="{{!target.dirty}}" on-click="{{applyAction}}">     -->
-<!--         <i class="fa fa-check"></i>                                              -->
-<!--     </fire-ui-button>                                                            -->
-<!-- </fire-ui-toolbar>                                                               -->
-<!-- NOTE: disabled because it is super slow -->
-
-<fire-ui-toolbar id="toolbar"></fire-ui-toolbar>
-
-<div class="fields" flex-1>
-    <inspector-fields id="fields" fit
-        on-changed="{{fieldsChangedAction}}"
-    >
-    </inspector-fields>
-</div>
-
-<div class="preview" id="preview" hidden></div>
+<content></content>
 
 </template>
 

@@ -1,36 +1,3 @@
-var numberIsNaN = global.Number.isNaN || function(value) {
-    return typeof value === 'number' && global.isNaN(value);
-};
-function _fireEquals(left, right) {
-    if ( left && left.equals )
-        return left.equals(right);
-
-    if ( right && right.equals )
-        return right.equals(left);
-
-    if ( left === right )
-        return left !== 0 || 1 / left === 1 / right;
-
-    if ( numberIsNaN(left) && numberIsNaN(right) )
-        return true;
-
-    return left !== left && right !== right;
-}
-
-function FireObserver ( object, path ) {
-    PathObserver.call(this, object, path);
-}
-Fire.extend( FireObserver, PathObserver );
-FireObserver.prototype.check_ = function(changeRecords, skipChanges) {
-    var oldValue = this.value_;
-    this.value_ = this.path_.getValueFrom(this.object_);
-    if (skipChanges || _fireEquals(this.value_, oldValue))
-        return false;
-
-    this.report_([this.value_, oldValue, this]);
-    return true;
-};
-
 function _getTypeName ( target, propName, attrs ) {
     var type = attrs.type;
     if ( type === 'object' ) {
@@ -73,7 +40,7 @@ function _fieldSection ( name, target ) {
             }
 
             //
-            propEL.bind( 'value', new FireObserver( target, propName ) );
+            propEL.bind( 'value', new Fire._PathObserver( target, propName ) );
             propEL.setAttribute( 'value', '{{target.'+propName+'}}' );
             propEL.setAttribute( 'type', type );
             if ( type === 'enum' ) {
@@ -86,7 +53,7 @@ function _fieldSection ( name, target ) {
                 if ( attrs.watch.length > 0 ) {
                     var observer = new CompoundObserver();
                     for ( var i = 0; i < attrs.watch.length; ++i ) {
-                        observer.addObserver( new FireObserver( target, attrs.watch[i] ) );
+                        observer.addObserver( new Fire._PathObserver( target, attrs.watch[i] ) );
                     }
                     var watcher = _makeWatcher( attrs, target, propEL );
                     observer.open(watcher);
@@ -107,9 +74,6 @@ function _fieldSection ( name, target ) {
 Polymer({
     created: function () {
         this.target = null;
-    },
-
-    ready: function () {
     },
 
     refresh: function () {
@@ -135,8 +99,5 @@ Polymer({
                 this.appendChild( el );
             }
         }
-    },
-
-    paintEntity: function () {
     },
 });

@@ -26,12 +26,15 @@ Polymer({
         if ( this.renderContext !== null ) {
             this.$.view.appendChild(this.renderContext.canvas);
         }
-    }, 
+    },
 
     resize: function () {
         if ( this.renderContext !== null ) {
-            this.renderContext.size = new Fire.Vec2( this.$.view.clientWidth, 
+            var old = this.style.display;
+            this.style.display = "";
+            this.renderContext.size = new Fire.Vec2( this.$.view.clientWidth,
                                                      this.$.view.clientHeight );
+            this.style.display = old;
             this.repaintScene();
         }
     },

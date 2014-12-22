@@ -16,7 +16,7 @@ Polymer({
             }
         }
 
-        this.ipc.on('asset-db:query-results', function ( results ) {
+        this.ipc.on('asset-db:query-results', function ( url, typename, results ) {
             this.$.dataView.dataList = results;
             this.$.dataView.typename = typename;
             this.$.dataView.update();
