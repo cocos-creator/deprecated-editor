@@ -1,6 +1,4 @@
-﻿(function () {
-
-var GlobalVarsChecker = (function () {
+﻿var GlobalVarsChecker = (function () {
 
     var DefaultIgnoreGlobalVars = [
         'webkitIndexedDB',      // deprecated warning
@@ -319,5 +317,4 @@ Sandbox.reloadUserScripts = (function () {
 
 })();
 
-    Fire._Sandbox = Sandbox;
-})();
+Fire._Sandbox = Sandbox;
