@@ -1,11 +1,7 @@
-﻿(function () {
+﻿var idToObject = {};
 
-    var idToObject = {};
+Fire._idToObject = idToObject;
 
-    Fire._idToObject = idToObject;
-
-    Fire._getInstanceById = function (id) {
-        return idToObject[id];
-    };
-
-})();
+Fire._getInstanceById = function (id) {
+    return idToObject[id];
+};

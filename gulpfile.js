@@ -165,9 +165,19 @@ gulp.task('src-jshint', function() {
     ;
 });
 
+function wrapScope () {
+    var header = new Buffer("(function () {\n");
+    var footer = new Buffer("})();\n");
+    return es.through(function (file) {
+        file.contents = Buffer.concat([header, file.contents, footer]);
+        this.emit('data', file);
+    });
+}
+
 // src-dev
 gulp.task('src-dev', ['src-jshint'], function() {
     return gulp.src(paths.src)
+    .pipe(wrapScope())
     .pipe(concat('editor.dev.js'))
     .pipe(gulp.dest('bin'))
     ;
