@@ -32,11 +32,8 @@
         },
 
         domReady: function () {
-            this.load("assets://");
-        },
-
-        load: function ( url ) {
-            this.$.assetsTree.load(url);
+            Fire.info("browse assets://");
+            this.$.assetsTree.browse("assets://");
         },
 
     });

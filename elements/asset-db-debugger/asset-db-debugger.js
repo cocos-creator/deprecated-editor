@@ -32,7 +32,7 @@
                 this.infoList = [];
                 for ( var i = 0; i < results.length; ++i ) {
                     var info = results[i];
-                    this.infoList.push( { key: info.uuid, value: info.name } );
+                    this.infoList.push( { key: info.uuid, value: info.name + " [" + info.type + "]" } );
                 }
             }.bind(this) );
         },

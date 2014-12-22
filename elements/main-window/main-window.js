@@ -95,7 +95,7 @@
                 var results = [];
                 for ( var p in Fire.AssetLibrary._uuidToAsset ) {
                     var asset = Fire.AssetLibrary._uuidToAsset[p];
-                    results.push( { uuid: p, name: asset.name } );
+                    results.push( { uuid: p, name: asset.name, type: Fire.getClassName(asset) } );
                 }
                 Fire.sendToAll('asset-library:debugger:uuid-asset-results', results);
             }.bind(this));
