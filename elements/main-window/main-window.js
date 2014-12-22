@@ -91,6 +91,14 @@
 
             this.ipc.on('reload:user-scripts', Sandbox.reloadUserScripts.bind(Sandbox));
 
+            this.ipc.on('asset-library:debugger:query-uuid-asset', function () {
+                var results = [];
+                for ( var p in Fire.AssetLibrary._uuidToAsset ) {
+                    var asset = Fire.AssetLibrary._uuidToAsset[p];
+                    results.push( { uuid: p, name: asset.name } );
+                }
+                Fire.sendToAll('asset-library:debugger:uuid-asset-results', results);
+            }.bind(this));
         },
 
         detached: function () {

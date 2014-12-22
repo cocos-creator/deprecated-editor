@@ -27,6 +27,14 @@
                     this.infoList.push( { key: info.uuid, value: info.url } );
                 }
             }.bind(this) );
+
+            this.ipc.on('asset-library:debugger:uuid-asset-results', function ( results ) {
+                this.infoList = [];
+                for ( var i = 0; i < results.length; ++i ) {
+                    var info = results[i];
+                    this.infoList.push( { key: info.uuid, value: info.name } );
+                }
+            }.bind(this) );
         },
 
         detached: function () {
@@ -73,10 +81,8 @@
         libraryAction: function ( event ) {
             this._option = 'library';
             this.keyName = "UUID";
-            this.valueName = "URL";
-            this.infoList = [];
-            // TODO
-            // Fire.sendToCore('asset-db:debugger:query-url-uuid');
+            this.valueName = "ASSET NAME";
+            Fire.sendToAll('asset-library:debugger:query-uuid-asset');
         },
 
         refreshAction: function ( event ) {
