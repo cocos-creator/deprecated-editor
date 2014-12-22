@@ -251,7 +251,7 @@ Sandbox.reloadUserScripts = (function () {
         //
         purge();
 
-        Fire.sendToCore('unload:user scripts');
+        Fire.sendToCore('unload:user-scripts');
 
         // re-register menu
         for ( var key in Fire.plugins) {

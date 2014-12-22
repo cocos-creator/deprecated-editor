@@ -89,7 +89,7 @@
                 }.bind(this));
             }.bind(this) );
 
-            this.ipc.on('reload:user scripts', Sandbox.reloadUserScripts.bind(Sandbox));
+            this.ipc.on('reload:user-scripts', Sandbox.reloadUserScripts.bind(Sandbox));
 
         },
 
