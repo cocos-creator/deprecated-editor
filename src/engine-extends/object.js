@@ -1,10 +1,10 @@
 // fobject extends
 
 (function () {
-    
+
     var FObject = Fire.FObject;
 
-    Object.defineProperty(FObject, 'dirty', {
+    Object.defineProperty(FObject.prototype, 'dirty', {
         get: function () {
             return this._objFlags & Fire._ObjectFlags.Dirty;
         },
