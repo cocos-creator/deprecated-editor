@@ -3,51 +3,14 @@ var Path = require('fire-path');
 Polymer({
     created: function () {
         this.target = null;
-        this.showPreview = false;
+        this.asset = null;
         this.assetName = '';
     },
 
-    // _updateImporterToolbar: function () {
-    //     var toolbar = this.$.toolbar;
-    //     var target = this.target;
-    //     var fspath = Fire.AssetDB.uuidToFspath( target.uuid );
-
-    //     toolbar.setAttribute('justify-end','');
-
-    //     var el = new FireLabel();
-    //     el.setAttribute('flex-1','');
-    //     el.innerText = Path.basename(fspath);
-    //     toolbar.appendChild(el);
-
-    //     el = new FireButton();
-    //     var observer = new PathObserver(target, 'dirty');
-    //     var transformObserver = new ObserverTransform(observer, function ( value ) {
-    //         return !value;
-    //     });
-    //     el.bind('disabled', transformObserver );
-    //     el.addEventListener('click', this.revertAction.bind(this));
-    //     var icon = document.createElement('i');
-    //     icon.classList.add('fa', 'fa-close');
-    //     el.appendChild(icon);
-    //     toolbar.appendChild(el);
-
-    //     el = new FireButton();
-    //     observer = new PathObserver(target, 'dirty');
-    //     transformObserver = new ObserverTransform(observer, function ( value ) {
-    //         return !value;
-    //     });
-    //     el.bind('disabled', transformObserver );
-    //     el.addEventListener('click', this.applyAction.bind(this));
-    //     icon = document.createElement('i');
-    //     icon.classList.add('fa', 'fa-check');
-    //     el.appendChild(icon);
-    //     toolbar.appendChild(el);
-    // },
-
     resize: function () {
-        // TODO: preview element
-        // var rect = this.$.preview.getBoundingClientRect();
-        // var img = this.$.preview.firstElementChild;
+        if ( !this.$.preview.hide ) {
+            this.$.preview.resize();
+        }
     },
 
     updateAssetName: function () {
@@ -62,20 +25,18 @@ Polymer({
         this.updateAssetName();
 
         // update preview
-        if ( this.$.preview.firstElementChild ) {
-            this.$.preview.removeChild(this.$.preview.firstElementChild);
-        }
         if ( this.target instanceof Fire.TextureImporter ) {
-            var img = new Image();
-            img.src = "uuid://" + this.target.uuid;
-            var div = document.createElement('div');
-            div.classList.add('background');
-            div.appendChild(img);
-            this.$.preview.appendChild(div);
-            this.showPreview = true;
+            this.$.preview.hide = false;
+            this.$.splitter.hide = false;
+            Fire.AssetLibrary.loadAssetByUuid( this.target.uuid, function ( asset ) {
+                if ( this.target.uuid === asset._uuid ) {
+                    this.asset = asset;
+                }
+            }.bind(this) );
         }
         else {
-            this.showPreview = false;
+            this.$.preview.hide = true;
+            this.$.splitter.hide = true;
         }
     },
 

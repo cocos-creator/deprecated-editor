@@ -11,25 +11,6 @@ Polymer({
         this.$.fields.refresh();
     },
 
-    // _updateEntityToolbar: function () {
-    //     var toolbar = this.$.toolbar;
-    //     var target = this.target;
-    //     var el = new FireCheckbox();
-    //     el.bind('value', new PathObserver( target, 'active'));
-    //     toolbar.appendChild(el);
-
-    //     el = new FireTextInput();
-    //     el.bind('value', new PathObserver( target, 'name'));
-    //     el.setAttribute('flex-1','');
-    //     toolbar.appendChild(el);
-
-    //     el = document.createElement('i');
-    //     el.id = 'btnAddComp';
-    //     el.classList.add('fa', 'fa-plus');
-    //     el.addEventListener('click', this.addComponentAction.bind(this) );
-    //     toolbar.appendChild(el);
-    // },
-
     getAddCompMenuTemplate: function () {
         function findMenu (menuArray, label) {
             for (var i = 0; i < menuArray.length; i++) {
