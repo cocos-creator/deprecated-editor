@@ -13,9 +13,7 @@ Polymer({
 
     attached: function () {
         // register Ipc
-        this.ipc.on('selection:activated', this._onInspect.bind(this, true) );
-        this.ipc.on('selection:deactivated', this._onInspect.bind(this, false) );
-
+        this.ipc.on('selection:activated', this._onInspect.bind(this) );
         this.ipc.on('asset:applied', this._onAssetApplied.bind(this) );
         this.ipc.on('asset:moved', this._onAssetMoved.bind(this) );
     },
@@ -24,9 +22,9 @@ Polymer({
         this.ipc.clear();
     },
 
-    _onInspect: function ( active, type, id ) {
+    _onInspect: function ( type, id ) {
         if (type === 'entity') {
-            if (active) {
+            if (id) {
                 var entity = Fire._getInstanceById(id);
                 if (entity) {
                     this.inspect(entity);
@@ -38,7 +36,7 @@ Polymer({
             }
         }
         else if (type === 'asset') {
-            if (active) {
+            if (id) {
                 this.lastUuid = id;
                 var meta = Fire.AssetDB.loadMeta(id);
                 // Checks whether last uuid modified to ensure call stack not suspended by another ipc event

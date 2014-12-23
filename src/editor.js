@@ -21,26 +21,32 @@ var ipc = require('ipc');
 Fire.mixin( Fire, {
     // console
     log: function ( text ) {
+        text = "" + text;
         console.log(text);
         Fire.sendToCore('console:log', text);
     },
     warn: function ( text ) {
+        text = "" + text;
         console.warn(text);
         Fire.sendToCore('console:warn', text);
     },
     error: function ( text ) {
+        text = "" + text;
         console.error(text);
         Fire.sendToCore('console:error', text);
     },
     success: function ( text ) {
+        text = "" + text;
         console.log('%c' + text, "color: green");
         Fire.sendToCore('console:success', text);
     },
     failed: function ( text ) {
+        text = "" + text;
         console.log('%c' + text, "color: red");
         Fire.sendToCore('console:failed', text);
     },
     info: function ( text ) {
+        text = "" + text;
         console.log('%c' + text, "color: blue");
         Fire.sendToCore('console:info', text);
     },
