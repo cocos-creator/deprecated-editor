@@ -68,7 +68,7 @@ function _newAssetsItem ( url, type, id, parent ) {
     case '.png':
     case '.jpg':
         img = new Image();
-        img.src = 'uuid://' + id;
+        img.src = 'uuid://' + id + "?thumb";
         newEL.setIcon(img);
         break;
 
