@@ -3,6 +3,7 @@ var Path = require('fire-path');
 Polymer({
     created: function () {
         this.target = null;
+        this.showPreview = false;
         this.assetName = '';
     },
 
@@ -43,6 +44,12 @@ Polymer({
     //     toolbar.appendChild(el);
     // },
 
+    resize: function () {
+        // TODO: preview element
+        // var rect = this.$.preview.getBoundingClientRect();
+        // var img = this.$.preview.firstElementChild;
+    },
+
     updateAssetName: function () {
         var fspath = Fire.AssetDB.uuidToFspath( this.target.uuid );
         this.assetName = Path.basename(fspath);
@@ -65,10 +72,10 @@ Polymer({
             div.classList.add('background');
             div.appendChild(img);
             this.$.preview.appendChild(div);
-            this.$.preview.removeAttribute('hidden');
+            this.showPreview = true;
         }
         else {
-            this.$.preview.setAttribute('hidden','');
+            this.showPreview = false;
         }
     },
 

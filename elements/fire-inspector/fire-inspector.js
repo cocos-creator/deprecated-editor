@@ -83,9 +83,7 @@ Polymer({
             }
 
             //
-            if ( this.target instanceof Fire.Importer &&
-                 obj instanceof Fire.Importer )
-            {
+            if ( this.target instanceof Fire.Importer && obj instanceof Fire.Importer ) {
                 if ( this.target.uuid === obj.uuid ) {
                     return;
                 }
@@ -100,8 +98,8 @@ Polymer({
             Fire.observe(obj,true);
         }
 
-        if ( this.target instanceof Fire.Importer && obj instanceof Fire.Importer ||
-             this.target instanceof Fire.Entity && obj instanceof Fire.Entity )
+        if ( (this.target instanceof Fire.Importer && obj instanceof Fire.Importer) ||
+             (this.target instanceof Fire.Entity && obj instanceof Fire.Entity) )
         {
             this.target = obj;
             this.$.inspector.target = obj;
@@ -139,11 +137,13 @@ Polymer({
     },
 
     resizeAction: function ( event ) {
-        var old = this.style.display;
-        this.style.display = "";
+        if ( this.$.inspector && this.$.inspector.resize ) {
+            var old = this.style.display;
+            this.style.display = "";
 
-        // TODO
+            this.$.inspector.resize();
 
-        this.style.display = old;
+            this.style.display = old;
+        }
     },
 });
