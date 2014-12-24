@@ -61,7 +61,10 @@ Polymer({
 
     _onAssetApplied: function ( uuid ) {
         if ( this.target && this.target.uuid === uuid ) {
-            this.target.dirty = false;
+            var meta = Fire.AssetDB.loadMeta(uuid);
+            var importer = Fire.deserialize(meta);
+            this.inspect(importer,true);
+
             Fire.warn('@Jare: Please put AssetLibrary.UpdateAsset(uuid) here');
         }
     },
