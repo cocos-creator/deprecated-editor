@@ -294,7 +294,7 @@ Sandbox.reloadUserScripts = (function () {
                 console.time('reload scene');
                 var newScene = recreateScene();
                 Sandbox._launchScene(newScene, function () {
-                    Sandbox.globalVarsChecker.restore(Fire.log, 'blabla');
+                    Sandbox.globalVarsChecker.restore(Fire.log, 'destroying last scene');
                 });
                 Sandbox.globalVarsChecker.restore(Fire.warn, 'launching scene by new scripts');
                 console.timeEnd('reload scene');

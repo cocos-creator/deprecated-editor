@@ -14,6 +14,7 @@ for ( var i = 0; i < queryList.length; ++i ) {
 }
 
 //
+var Util = require('util');
 var remote = require('remote');
 var ipc = require('ipc');
 
@@ -21,33 +22,69 @@ var ipc = require('ipc');
 Fire.mixin( Fire, {
     // console
     log: function ( text ) {
-        text = "" + text;
+        'use strict';
+        if (arguments.length <= 1) {
+            text = "" + text;
+        }
+        else {
+            text = Util.format.apply(Util, arguments);
+        }
         console.log(text);
         Fire.sendToCore('console:log', text);
     },
     warn: function ( text ) {
-        text = "" + text;
+        'use strict';
+        if (arguments.length <= 1) {
+            text = "" + text;
+        }
+        else {
+            text = Util.format.apply(Util, arguments);
+        }
         console.warn(text);
         Fire.sendToCore('console:warn', text);
     },
     error: function ( text ) {
-        text = "" + text;
+        'use strict';
+        if (arguments.length <= 1) {
+            text = "" + text;
+        }
+        else {
+            text = Util.format.apply(Util, arguments);
+        }
         console.error(text);
         Fire.sendToCore('console:error', text);
     },
     success: function ( text ) {
-        text = "" + text;
+        'use strict';
+        if (arguments.length <= 1) {
+            text = "" + text;
+        }
+        else {
+            text = Util.format.apply(Util, arguments);
+        }
         console.log('%c' + text, "color: green");
         Fire.sendToCore('console:success', text);
     },
     failed: function ( text ) {
-        text = "" + text;
+        'use strict';
+        if (arguments.length <= 1) {
+            text = "" + text;
+        }
+        else {
+            text = Util.format.apply(Util, arguments);
+        }
         console.log('%c' + text, "color: red");
         Fire.sendToCore('console:failed', text);
     },
     info: function ( text ) {
-        text = "" + text;
-        console.log('%c' + text, "color: blue");
+        'use strict';
+        if (arguments.length <= 1) {
+            text = "" + text;
+        }
+        else {
+            text = Util.format.apply(Util, arguments);
+        }
+        console.info(text);
         Fire.sendToCore('console:info', text);
     },
 
