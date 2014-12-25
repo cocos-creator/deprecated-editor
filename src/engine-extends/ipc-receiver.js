@@ -117,7 +117,7 @@ Ipc.on('asset:moved', function (uuid, destUrl) {
     }
 });
 
-Ipc.on('asset:deleted', function (results) {
+Ipc.on('assets:deleted', function (results) {
     for ( var i = 0; i < results.length; ++i ) {
         Fire.AssetLibrary.unloadAsset(results[i].uuid, true);
     }

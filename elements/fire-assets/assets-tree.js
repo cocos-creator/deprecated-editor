@@ -152,12 +152,12 @@ Polymer({
             this.newItem( url, id, parentId, false );
         }.bind(this) );
         this.ipc.on('asset:moved', this.moveItem.bind(this) );
-        this.ipc.on('asset:deleted', function (results) {
+        this.ipc.on('assets:deleted', function (results) {
             var filterResults = Fire.arrayCmpFilter ( results, function ( a, b ) {
-                if ( Path.contains( a.path, b.path ) ) {
+                if ( Path.contains( a.url, b.url ) ) {
                     return 1;
                 }
-                if ( Path.contains( b.path, a.path ) ) {
+                if ( Path.contains( b.url, a.url ) ) {
                     return -1;
                 }
                 return 0;
