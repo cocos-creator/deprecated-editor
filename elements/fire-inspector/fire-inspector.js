@@ -70,7 +70,7 @@ Polymer({
     },
 
     _onAssetMoved: function ( uuid, destUrl ) {
-        if ( this.target && this.target.uuid === uuid ) {
+        if ( this.$.inspector && this.target && this.target.uuid === uuid ) {
             this.$.inspector.updateAssetName();
         }
     },
