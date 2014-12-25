@@ -58,7 +58,7 @@
                     }
                     else {
                         if (key !== ignoreName) {
-                            Fire.error('Introduced global variable while ' + processingInfo + ': ' + key);
+                            Fire.error('Introduced global variable while %s: %s', processingInfo, key);
                             delete globals[key];
                         }
                         else {

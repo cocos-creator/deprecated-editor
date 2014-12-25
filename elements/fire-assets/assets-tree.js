@@ -264,7 +264,7 @@ Polymer({
 
             // Show in finder
             {
-                label: 'Show in finder',
+                label: 'Show in ' + Fire.isWin32 ? 'Explorer' : 'finder',
                 click: function () {
                     if ( this.contextmenuAt instanceof AssetsItem ) {
                         Fire.sendToCore( 'asset-db:explore', this.getUrl(this.contextmenuAt) );

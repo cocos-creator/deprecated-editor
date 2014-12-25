@@ -47,7 +47,15 @@ Polymer({
                         // Only inspect the lastest one
                         if (this.lastUuid === id) {
                             var importer = Fire.deserialize(meta);
-                            this.inspect(importer);
+                            if (importer.init) {
+                                importer.init(Fire.AssetDB.uuidToFspath(id));
+                                if (this.lastUuid === id) {
+                                    this.inspect(importer);
+                                }
+                            }
+                            else {
+                                this.inspect(importer);
+                            }
                         }
                     }.bind(this, meta));
                 }
