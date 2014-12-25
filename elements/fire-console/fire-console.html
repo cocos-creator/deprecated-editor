@@ -7,27 +7,26 @@
     >
     <template>
         <link rel="stylesheet" href="fire-console.css">
-        <fire-ui-toolbar justify-between>
-            <div flex-row>
-            </div>
-            <div flex-row>
-                <fire-ui-button on-click="{{clearAction}}">
-                    <i class="fa fa-ban"></i>
-                </fire-ui-button>
-                <span class="space"></span>
+        <fire-ui-toolbar>
+            <fire-ui-button on-click="{{clearAction}}">
+                <i class="fa fa-ban"></i>
+            </fire-ui-button>
+            <span class="space"></span>
 
-                <i class="fa fa-filter"></i>
-                <fire-ui-select style="width: 50px;" value="{{option}}" options="[[options]]">
-                </fire-ui-select>
-                <span class="space"></span>
-                <fire-ui-text-input placeholder="filter"
-                    inputValue="{{filterText}}"
-                    >
-                </fire-ui-text-input>
-                <span class="space"></span>
-                <fire-ui-checkbox value="{{useRegex}}">Regex</fire-ui-checkbox>
-                <span class="space"></span>
-            </div>
+            <i class="fa fa-filter"></i>
+            <span class="space"></span>
+
+            <fire-ui-text-input placeholder="filter"
+                inputValue="{{filterText}}"
+                >
+            </fire-ui-text-input>
+            <span class="space"></span>
+
+            <fire-ui-checkbox value="{{useRegex}}">Regex</fire-ui-checkbox>
+            <span class="space"></span>
+
+            <fire-ui-select style="width: 50px;" value="{{option}}" options="[[options]]">
+            </fire-ui-select>
         </fire-ui-toolbar>
         <div flex-1 flex-col flex-stretch>
             <console-view id="view" auto-layout min-height="50">
