@@ -152,7 +152,21 @@ Polymer({
             this.newItem( url, id, parentId, false );
         }.bind(this) );
         this.ipc.on('asset:moved', this.moveItem.bind(this) );
-        this.ipc.on('asset:deleted', this.deleteItemById.bind(this) );
+        this.ipc.on('asset:deleted', function (results) {
+            var filterResults = Fire.arrayCmpFilter ( results, function ( a, b ) {
+                if ( Path.contains( a.path, b.path ) ) {
+                    return 1;
+                }
+                if ( Path.contains( b.path, a.path ) ) {
+                    return -1;
+                }
+                return 0;
+            } );
+
+            for ( var i = 0; i < filterResults.length; ++i ) {
+                this.deleteItemById(filterResults[i].uuid);
+            }
+        }.bind(this) );
         this.ipc.on('asset-db:imported', function ( results ) {
             for ( var i = 0; i < results.length; ++i ) {
                 var info = results[i];
@@ -357,7 +371,7 @@ Polymer({
     deleteSelection: function () {
         var elements = this.getToplevelElements(Fire.Selection.assets);
         for (var i = 0; i < elements.length; i++) {
-            Fire.sendToCore( 'asset-db:delete', elements[i].userId );
+            Fire.sendToCore( 'asset-db:delete', this.getUrl(elements[i]) );
         }
     },
 
