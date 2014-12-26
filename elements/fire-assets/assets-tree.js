@@ -240,7 +240,6 @@ Polymer({
                             Fire.AssetLibrary.loadAssetByUuid ( textureEL.userId, function ( asset, error ) {
                                 var newSprite = new Fire.Sprite();
                                 newSprite.name = textureName;
-                                newSprite.rawTexture = asset;
                                 newSprite.texture = asset;
                                 newSprite.width = asset.width;
                                 newSprite.height = asset.height;
