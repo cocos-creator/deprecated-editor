@@ -50,7 +50,7 @@ Polymer({
     applyAction: function ( event ) {
         event.stopPropagation();
 
-        var meta = Fire.serialize(this.target);
+        var meta = Fire.serialize ( this.target, false, true );
         Fire.sendToCore('asset-db:apply', meta );
     },
 
