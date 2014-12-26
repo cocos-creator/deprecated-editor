@@ -15,6 +15,7 @@ Polymer({
 
         this.option = 0;
         this.filterText = '';
+        this.regex = false;
         this.useRegex = false;
         this.logs = [];
         this._curSelected = null;
@@ -69,9 +70,11 @@ Polymer({
 
         var filter;
         if ( useRegex ) {
+            this.regex = true;
             filter = new RegExp(filterText);
         }
         else {
+            this.regex = false;
             filter = filterText.toLowerCase();
         }
 
