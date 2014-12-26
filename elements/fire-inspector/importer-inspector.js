@@ -2,9 +2,9 @@ var Path = require('fire-path');
 
 Polymer({
     created: function () {
-        this.target = null;
         this.asset = null;
-        this.assetName = '';
+        this.meta = null;
+        this.inspector = null;
     },
 
     resize: function () {
@@ -13,45 +13,50 @@ Polymer({
         }
     },
 
-    updateAssetName: function () {
-        var fspath = Fire.AssetDB.uuidToFspath( this.target.uuid );
-        this.assetName = Path.basename(fspath);
-    },
+    metaChanged: function () {
+        if ( !this.meta.inspector ) {
+            while ( this.firstElementChild ) {
+                this.removeChild(this.firstElementChild);
+            }
+            return;
+        }
 
-    targetChanged: function () {
-        this.$.fields.target = this.target;
-        this.$.fields.refresh();
 
-        this.updateAssetName();
+        Fire.AssetLibrary.loadAssetByUuid( this.meta.uuid, function ( asset ) {
+            if ( this.meta.uuid === asset._uuid ) {
+                this.asset = asset;
+                this.inspector = new this.meta.inspector( this.asset, this.meta );
 
-        // update preview
-        if ( this.target instanceof Fire.TextureImporter ) {
-            this.$.preview.hide = false;
-            this.$.splitter.hide = false;
-            Fire.AssetLibrary.loadAssetByUuid( this.target.uuid, function ( asset ) {
-                if ( this.target.uuid === asset._uuid ) {
-                    this.asset = asset;
+                this.$.fields.target = this.inspector;
+                this.$.fields.refresh();
+
+                // update preview
+                if ( this.asset instanceof Fire.Texture ) {
+                    this.$.preview.hide = false;
+                    this.$.splitter.hide = false;
                 }
-            }.bind(this) );
-        }
-        else {
-            this.$.preview.hide = true;
-            this.$.splitter.hide = true;
-        }
+                else {
+                    this.$.preview.hide = true;
+                    this.$.splitter.hide = true;
+                }
+            }
+        }.bind(this) );
+
     },
 
     fieldsChangedAction: function ( event ) {
         event.stopPropagation();
 
-        if ( this.target )
-            this.target.dirty = true;
+        if ( this.inspector )
+            this.inspector.dirty = true;
     },
 
     applyAction: function ( event ) {
         event.stopPropagation();
 
-        var meta = Fire.serialize ( this.target, false, true );
-        Fire.sendToCore('asset-db:apply', meta );
+        // TODO:
+        // var meta = Fire.serialize ( this.inspector );
+        // Fire.sendToCore('asset-db:apply', meta );
     },
 
     revertAction: function ( event ) {

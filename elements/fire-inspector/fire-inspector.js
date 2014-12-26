@@ -38,21 +38,21 @@ Polymer({
         else if (type === 'asset') {
             if (id) {
                 this.lastUuid = id;
-                var meta = Fire.AssetDB.loadMeta(id);
+                var metaJson = Fire.AssetDB.loadMetaJson(id);
                 // Checks whether last uuid modified to ensure call stack not suspended by another ipc event
                 // This may occurred after ipc sync invocation such as AssetDB.xxx
-                if (meta && this.lastUuid === id) {
+                if (metaJson && this.lastUuid === id) {
                     // one frame dely to make sure mouse right click event (contextmenu popup) will not suspend the rendering
-                    process.nextTick(function (meta) {
+                    process.nextTick(function (metaJson) {
                         // Only inspect the lastest one
                         if (this.lastUuid === id) {
-                            var importer = Fire.deserialize(meta);
-                            this.inspect(importer);
+                            var meta = Fire.deserialize(metaJson);
+                            this.inspect(meta);
                         }
-                    }.bind(this, meta));
+                    }.bind(this, metaJson));
                 }
             }
-            else if (this.target instanceof Fire.Importer) {
+            else if (this.target instanceof Fire.AssetMeta) {
                 // uninspect
                 this.inspect(null);
             }
@@ -61,9 +61,9 @@ Polymer({
 
     _onAssetApplied: function ( uuid ) {
         if ( this.target && this.target.uuid === uuid ) {
-            var meta = Fire.AssetDB.loadMeta(uuid);
-            var importer = Fire.deserialize(meta);
-            this.inspect(importer,true);
+            var metaJson = Fire.AssetDB.loadMetaJson(uuid);
+            var meta = Fire.deserialize(metaJson);
+            this.inspect(meta,true);
 
             Fire.warn('@Jare: Please put AssetLibrary.UpdateAsset(uuid) here');
         }
@@ -84,7 +84,7 @@ Polymer({
             }
 
             //
-            if ( this.target instanceof Fire.Importer && obj instanceof Fire.Importer ) {
+            if ( this.target instanceof Fire.AssetMeta && obj instanceof Fire.AssetMeta ) {
                 if ( this.target.uuid === obj.uuid ) {
                     return;
                 }
@@ -99,9 +99,11 @@ Polymer({
             Fire.observe(obj,true);
         }
 
-        if ( (this.target instanceof Fire.Importer && obj instanceof Fire.Importer) ||
-             (this.target instanceof Fire.Entity && obj instanceof Fire.Entity) )
-        {
+        if ( this.target instanceof Fire.AssetMeta && obj instanceof Fire.AssetMeta ) {
+            this.target = obj;
+            this.$.inspector.meta = obj;
+        }
+        else if ( this.target instanceof Fire.Entity && obj instanceof Fire.Entity ) {
             this.target = obj;
             this.$.inspector.target = obj;
         }
@@ -110,9 +112,9 @@ Polymer({
                 this.removeChild(this.firstElementChild);
             }
             var inspector = null;
-            if ( obj instanceof Fire.Importer ) {
+            if ( obj instanceof Fire.AssetMeta ) {
                 inspector = new ImporterInspector();
-                inspector.target = obj;
+                inspector.meta = obj;
             }
             else if ( obj instanceof Fire.Entity ) {
                 inspector = new EntityInspector();
@@ -130,10 +132,10 @@ Polymer({
     reloadAction: function ( event ) {
         event.stopPropagation();
 
-        if ( this.target && this.target instanceof Fire.Importer ) {
-            var meta = Fire.AssetDB.loadMeta(this.target.uuid);
-            var importer = Fire.deserialize(meta);
-            this.inspect(importer,true);
+        if ( this.target && this.target instanceof Fire.AssetMeta ) {
+            var metaJson = Fire.AssetDB.loadMetaJson(this.target.uuid);
+            var meta = Fire.deserialize(metaJson);
+            this.inspect(meta,true);
         }
     },
 

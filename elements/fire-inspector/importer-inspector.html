@@ -9,11 +9,11 @@
 
 <fire-ui-resize-wrapper auto-layout flex-col flex-stretch>
     <fire-ui-toolbar class="toolbar" justify-end>
-        <span flex-1>{{assetName}}</span>
-        <fire-ui-button disabled="{{!target.dirty}}" on-click="{{revertAction}}">
+        <span flex-1>{{asset.name}}</span>
+        <fire-ui-button disabled="{{!inspector.dirty}}" on-click="{{revertAction}}">
             <i class="fa fa-close"></i>
         </fire-ui-button>
-        <fire-ui-button disabled="{{!target.dirty}}" on-click="{{applyAction}}">
+        <fire-ui-button disabled="{{!inspector.dirty}}" on-click="{{applyAction}}">
             <i class="fa fa-check"></i>
         </fire-ui-button>
     </fire-ui-toolbar>
