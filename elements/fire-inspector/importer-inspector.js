@@ -38,7 +38,9 @@ Polymer({
                     this.inspector = null;
 
                     if ( this.meta.inspector ) {
-                        this.inspector = new this.meta.inspector( this.asset, this.meta );
+                        var inspector = new this.meta.inspector();
+                        inspector.init( this.asset, this.meta );
+                        this.inspector = inspector;
                     }
 
                     this.$.fields.target = this.inspector;
@@ -57,7 +59,11 @@ Polymer({
 
     applyAction: function ( event ) {
         event.stopPropagation();
-        Fire.sendToCore('asset-db:apply', Fire.serialize(this.inspector) );
+        Fire.sendToCore('asset-db:apply',
+                        Fire.serialize(this.asset),
+                        Fire.serialize(this.meta),
+                        Fire.serialize(this.inspector)
+                       );
     },
 
     revertAction: function ( event ) {
