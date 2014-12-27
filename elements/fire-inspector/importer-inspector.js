@@ -57,10 +57,7 @@ Polymer({
 
     applyAction: function ( event ) {
         event.stopPropagation();
-
-        var assetJson = Fire.serialize ( this.asset );
-        var metaJson = Fire.serialize ( this.meta );
-        Fire.sendToCore('asset-db:apply', assetJson, metaJson );
+        Fire.sendToCore('asset-db:apply', Fire.serialize(this.inspector) );
     },
 
     revertAction: function ( event ) {
