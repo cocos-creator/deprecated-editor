@@ -14,34 +14,38 @@ Polymer({
     },
 
     metaChanged: function () {
-        if ( !this.meta.inspector ) {
-            while ( this.firstElementChild ) {
-                this.removeChild(this.firstElementChild);
-            }
-            return;
+        // update preview
+        if ( this.meta instanceof Fire.TextureMeta ) {
+            this.$.preview.hide = false;
+            this.$.splitter.hide = false;
+        }
+        else {
+            this.$.preview.hide = true;
+            this.$.splitter.hide = true;
         }
 
+        // load asset
+        if ( this.meta instanceof Fire.FolderMeta ) {
+            this.asset = null;
+            this.inspector = null;
+            this.$.fields.target = this.inspector;
+            this.$.fields.refresh();
+        }
+        else {
+            Fire.AssetLibrary.loadAssetByUuid( this.meta.uuid, function ( asset ) {
+                if ( asset && this.meta.uuid === asset._uuid ) {
+                    this.asset = asset;
+                    this.inspector = null;
 
-        Fire.AssetLibrary.loadAssetByUuid( this.meta.uuid, function ( asset ) {
-            if ( this.meta.uuid === asset._uuid ) {
-                this.asset = asset;
-                this.inspector = new this.meta.inspector( this.asset, this.meta );
+                    if ( this.meta.inspector ) {
+                        this.inspector = new this.meta.inspector( this.asset, this.meta );
+                    }
 
-                this.$.fields.target = this.inspector;
-                this.$.fields.refresh();
-
-                // update preview
-                if ( this.asset instanceof Fire.Texture ) {
-                    this.$.preview.hide = false;
-                    this.$.splitter.hide = false;
+                    this.$.fields.target = this.inspector;
+                    this.$.fields.refresh();
                 }
-                else {
-                    this.$.preview.hide = true;
-                    this.$.splitter.hide = true;
-                }
-            }
-        }.bind(this) );
-
+            }.bind(this) );
+        }
     },
 
     fieldsChangedAction: function ( event ) {
