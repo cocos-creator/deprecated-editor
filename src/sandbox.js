@@ -214,7 +214,7 @@ Sandbox.reloadUserScripts = (function () {
         // deserialize scene
         var info = new Fire._DeserializeInfo();
         Fire.Engine._canModifyCurrentScene = false;
-        var newScene = Fire.deserialize(sceneSnapshot, info, true, {
+        var newScene = Fire.deserialize(sceneSnapshot, info, {
             classFinder: Fire._MissingScript.safeFindClass,
         });
         Fire.Engine._canModifyCurrentScene = true;
