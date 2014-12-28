@@ -209,7 +209,7 @@ Sandbox.reloadUserScripts = (function () {
 
     function recreateScene () {
         // serialize scene
-        var sceneSnapshot = Fire.serialize(Fire.Engine._scene, false, false, false);
+        var sceneSnapshot = Fire.serialize(Fire.Engine._scene, { stringify: false });
 
         // deserialize scene
         var info = new Fire._DeserializeInfo();
