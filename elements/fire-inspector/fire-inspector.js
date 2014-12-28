@@ -15,7 +15,6 @@ Polymer({
         // register Ipc
         this.ipc.on('selection:activated', this._onInspect.bind(this) );
         this.ipc.on('asset:applied', this._onAssetApplied.bind(this) );
-        this.ipc.on('asset:moved', this._onAssetMoved.bind(this) );
     },
 
     detached: function () {
@@ -66,12 +65,6 @@ Polymer({
             this.inspect(meta,true);
 
             Fire.warn('@Jare: Please put AssetLibrary.UpdateAsset(uuid) here');
-        }
-    },
-
-    _onAssetMoved: function ( uuid, destUrl ) {
-        if ( this.$.inspector && this.target && this.target.uuid === uuid ) {
-            this.$.inspector.updateAssetName();
         }
     },
 

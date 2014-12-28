@@ -345,12 +345,14 @@ Polymer({
             return;
         }
 
-        this.setItemParentById(id, destDirId);
-
+        // rename it first
         var destExtname = Path.extname(destUrl);
         var destBasename = Path.basename(destUrl, destExtname);
         srcEL.extname = destExtname;
         srcEL.name = destBasename;
+
+        // insert it
+        this.setItemParentById(id, destDirId);
     },
 
     hintItem: function ( id ) {
