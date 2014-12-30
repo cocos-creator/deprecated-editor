@@ -64,7 +64,7 @@ Polymer({
             var meta = Fire.deserialize(metaJson);
             this.inspect(meta,true);
 
-            Fire.warn('@Jare: Please put AssetLibrary.UpdateAsset(uuid) here');
+            Fire.AssetLibrary._updateAsset(uuid);
         }
     },
 
@@ -83,7 +83,10 @@ Polymer({
                 }
             }
         }
-
+        if ( obj && obj.constructor === Fire.AssetMeta ) {
+            // unknown asset
+            obj = null;
+        }
         //
         if ( this.target ) {
             Fire.observe(this.target,false);
@@ -93,32 +96,30 @@ Polymer({
         }
 
         if ( this.target instanceof Fire.AssetMeta && obj instanceof Fire.AssetMeta ) {
-            this.target = obj;
-            this.$.inspector.meta = obj;
+            this.target = this.$.inspector.meta = obj;
         }
         else if ( this.target instanceof Fire.Entity && obj instanceof Fire.Entity ) {
-            this.target = obj;
-            this.$.inspector.target = obj;
+            this.target = this.$.inspector.target = obj;
         }
         else {
             while ( this.firstElementChild ) {
                 this.removeChild(this.firstElementChild);
             }
-            var inspector = null;
             if ( obj instanceof Fire.AssetMeta ) {
-                inspector = new ImporterInspector();
-                inspector.meta = obj;
+                this.$.inspector = new ImporterInspector();
+                this.target = this.$.inspector.meta = obj;
             }
             else if ( obj instanceof Fire.Entity ) {
-                inspector = new EntityInspector();
-                inspector.target = obj;
+                this.$.inspector = new EntityInspector();
+                this.target = this.$.inspector.target = obj;
             }
-            this.target = obj;
-            this.$.inspector = inspector;
-            if ( inspector ) {
-                inspector.setAttribute('fit','');
-                this.appendChild(inspector);
+            else {
+                this.$.inspector = null;
+                this.target = null;
+                return;
             }
+            this.$.inspector.setAttribute('fit','');
+            this.appendChild(this.$.inspector);
         }
     },
 
