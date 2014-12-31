@@ -55,7 +55,7 @@ Polymer({
         switch(this.typename.toString()) {
             case "Fire.Texture":
                 for (i = 0; i<this.list.length; i++) {
-                    this.list[i].uuid = "uuid://" + this.list[i].uuid;
+                    this.list[i].uuid = "uuid://" + this.list[i].uuid + "?thumb";
                     extname = Url.extname(this.list[i].url);
                     basename = Url.basename(this.list[i].url, extname);
                     this.list[i].url = basename;
