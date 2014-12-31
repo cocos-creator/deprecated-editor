@@ -11,7 +11,7 @@ Polymer({
         };
 
         this.sceneNameObserver = null;
-        this.ipc = new Fire.IpcListener();
+        this.ipc = new Fire.IpcListener(this);
     },
 
     ready: function () {

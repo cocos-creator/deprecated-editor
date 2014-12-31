@@ -7,7 +7,7 @@ function createChildEntity() {
     Fire.sendToPages('engine:createEntity', activeId);
 }
 
-var ipc = new Fire.IpcListener();
+var ipc = new Fire.IpcListener(this);
 
 var hierarchy = {
 

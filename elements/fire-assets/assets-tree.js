@@ -122,7 +122,7 @@ Polymer({
         // confliction
         this.confliction = [];
 
-        this.ipc = new Fire.IpcListener();
+        this.ipc = new Fire.IpcListener(this);
 
         this._focusUrl = null;
     },

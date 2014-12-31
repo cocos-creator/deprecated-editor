@@ -12,7 +12,7 @@ Polymer({
             scale: 1.0,
         };
 
-        this.ipc = new Fire.IpcListener();
+        this.ipc = new Fire.IpcListener(this);
 
         this._editTool = null;
         this._editingEdityIds = [];

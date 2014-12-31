@@ -133,6 +133,7 @@ var task_plugin = function ( name ) {
             multistr: true,
             smarttabs: false,
             loopfunc: true,
+            esnext: true,
         }))
         .pipe(jshint.reporter(stylish))
         .pipe(uglify())

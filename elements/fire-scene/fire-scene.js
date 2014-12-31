@@ -7,7 +7,7 @@ Polymer({
         this.icon = new Image();
         this.icon.src = "fire://static/img/plugin-scene.png";
 
-        this.ipc = new Fire.IpcListener();
+        this.ipc = new Fire.IpcListener(this);
 
         this._newsceneUrl = null;
     },

@@ -6,20 +6,21 @@
   "license": "MIT",
   "licenseUrl": "http://opensource.org/licenses/MIT",
   "dependencies": {
+    "weak": "^0.3.3"
   },
   "devDependencies": {
+    "del": "",
+    "event-stream": "",
+    "express": "",
     "gulp": "",
     "gulp-concat": "",
     "gulp-jshint": "",
+    "gulp-rename": "",
     "gulp-stylus": "",
     "gulp-uglify": "",
-    "gulp-rename": "",
     "gulp-util": "",
     "gulp-vulcanize": "",
     "jshint-stylish": "",
-    "event-stream": "",
     "q": "",
-    "express": "",
-    "del": ""
   }
 }

@@ -11,7 +11,7 @@ Polymer({
         this.icon = new Image();
         this.icon.src = "fire://static/img/plugin-console.png";
 
-        this.ipc = new Fire.IpcListener();
+        this.ipc = new Fire.IpcListener(this);
 
         this.option = 0;
         this.filterText = '';

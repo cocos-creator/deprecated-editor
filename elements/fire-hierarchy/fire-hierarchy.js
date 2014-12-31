@@ -20,7 +20,7 @@ Polymer({
         this.icon = new Image();
         this.icon.src = "fire://static/img/plugin-hierarchy.png";
 
-        this.ipc = new Fire.IpcListener();
+        this.ipc = new Fire.IpcListener(this);
     },
 
     attached: function () {

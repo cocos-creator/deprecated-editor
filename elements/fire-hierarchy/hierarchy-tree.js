@@ -16,7 +16,7 @@ Polymer({
         // debug
         hierarchy = this;
 
-        this.ipc = new Fire.IpcListener();
+        this.ipc = new Fire.IpcListener(this);
     },
 
     ready: function () {

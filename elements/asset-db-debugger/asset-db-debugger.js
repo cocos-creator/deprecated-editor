@@ -1,7 +1,7 @@
 Polymer({
 
     created: function () {
-        this.ipc = new Fire.IpcListener();
+        this.ipc = new Fire.IpcListener(this);
         this.infoList = [];
         this._option = -1;
         this.searchValue = "";
