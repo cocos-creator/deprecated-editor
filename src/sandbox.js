@@ -179,7 +179,6 @@ Sandbox.reloadUserScripts = (function () {
     var SRC = 'library://bundle.js';
     //var SRC = 'C:/Firebox/main/bin/projects/default/library/bundle.js';
 
-    var nodeJsRequire;
     var builtinClasses;
     var builtinComponentMenus;
 
@@ -188,7 +187,7 @@ Sandbox.reloadUserScripts = (function () {
 
     function init () {
         Sandbox.globalVarsChecker = new GlobalVarsChecker().record();
-        nodeJsRequire = require;
+        Sandbox.nodeJsRequire = require;
         builtinClasses = Fire._registeredClasses;
         builtinComponentMenus = Fire._componentMenuItems.slice();
     }
@@ -200,7 +199,7 @@ Sandbox.reloadUserScripts = (function () {
         // remove user classes
         Fire._registeredClasses = builtinClasses;
         // 清除 browserify 声明的 require 后，除非用户另外找地方存了原来的 require，否则之前的脚本都将会被垃圾回收
-        require = nodeJsRequire;
+        require = Sandbox.nodeJsRequire;
         // restore global variables（就算没 play 也可能会在 dev tools 里面添加全局变量）
         Sandbox.globalVarsChecker.restore(Fire.log, 'editing', 'require');
         //gVarsCheckerBetweenReload.restore(Fire.log);
@@ -218,26 +217,16 @@ Sandbox.reloadUserScripts = (function () {
             classFinder: Fire._MissingScript.safeFindClass,
         });
         Fire.Engine._canModifyCurrentScene = true;
-        newScene._uuid = Fire.Engine._scene._uuid;
-
+        //
         Sandbox.globalVarsChecker.restore(Fire.log, 'deserializing scene by new scripts');
 
-        // load depends
-        var getAssetByUuid = Fire.AssetLibrary.getAssetByUuid;
-        for (var i = 0, len = info.uuidList.length; i < len; i++) {
-            var uuid = info.uuidList[i];
-            var asset = getAssetByUuid(uuid);
-            if (asset) {
-                var obj = info.uuidObjList[i];
-                var prop = info.uuidPropList[i];
-                obj[prop] = asset;
-            }
-            else {
-                Fire.error('Failed to reload asset: ' + uuid);
-            }
+        newScene._uuid = Fire.Engine._scene._uuid;
+        if (newScene._uuid) {
+            Fire.AssetLibrary._replaceAsset(newScene);
         }
-        //
-        Fire.AssetLibrary._replaceAsset(newScene);
+
+        // load depends
+        info.assignAssetsBy(Fire.AssetLibrary.getAssetByUuid);
 
         return newScene;
     }

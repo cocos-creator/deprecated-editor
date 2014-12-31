@@ -39,6 +39,7 @@ var paths = {
         'src/svg-gizmos.js',
 
         // plugins
+        'src/plugins/plugin-loader.js',
         'src/plugins/hierarchy.js',
 
         // gizmos
