@@ -60,11 +60,19 @@ Polymer({
 
     _onAssetApplied: function ( uuid ) {
         if ( this.target && this.target.uuid === uuid ) {
+            // instead of reload asset, we do fast memory apply
+            if ( this.$.inspector.applyAsset ) {
+                this.$.inspector.applyAsset();
+            }
+
+            //
             var metaJson = Fire.AssetDB.loadMetaJson(uuid);
             var meta = Fire.deserialize(metaJson);
             this.inspect(meta,true);
 
-            Fire.AssetLibrary._updateAsset(uuid);
+            //
+            Fire.warn("TODO: @jare, please update asset just by uuid.");
+            // Fire.AssetLibrary._updateAsset(uuid);
         }
     },
 
