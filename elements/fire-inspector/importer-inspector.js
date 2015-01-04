@@ -13,6 +13,11 @@ Polymer({
         }
     },
 
+    // NOTE: this is call after asset successfully applied from editor-core
+    applyAsset: function () {
+        this.inspector.applyAsset(this.asset);
+    },
+
     metaChanged: function () {
         // update preview
         if ( this.meta instanceof Fire.TextureMeta ) {

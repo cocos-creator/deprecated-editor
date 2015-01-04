@@ -27,6 +27,16 @@ Polymer({
             }
         }.bind(this) );
 
+        this.ipc.on('asset-db:debugger:url-subuuids-results', function ( results ) {
+            this.infoList = [];
+            for ( var i = 0; i < results.length; ++i ) {
+                var info = results[i];
+                for ( var j = 0; j < info.uuids.length; ++j ) {
+                    this.infoList.push( { key: info.url, value: info.uuids[j] } );
+                }
+            }
+        }.bind(this) );
+
         this.ipc.on('asset-library:debugger:uuid-asset-results', function ( results ) {
             this.infoList = [];
             for ( var i = 0; i < results.length; ++i ) {
@@ -77,6 +87,13 @@ Polymer({
         Fire.sendToCore('asset-db:debugger:query-uuid-url');
     },
 
+    urlSubUuidsAction: function ( event ) {
+        this._option = 'url-subuuids';
+        this.keyName = "URL";
+        this.valueName = "SUB UUIDS";
+        Fire.sendToCore('asset-db:debugger:query-url-subuuids');
+    },
+
     libraryAction: function ( event ) {
         this._option = 'library';
         this.keyName = "UUID";
@@ -88,6 +105,7 @@ Polymer({
         switch (this._option) {
         case 'url-uuid': this.urlUuidAction(); break;
         case 'uuid-url': this.uuidUrlAction(); break;
+        case 'url-subuuids': this.urlSubUuidsAction(); break;
         case 'library': this.libraryAction(); break;
         }
     },
