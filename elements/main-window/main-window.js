@@ -45,15 +45,10 @@ Polymer({
                     if ( plugin.init ) {
                         plugin.init();
                     }
-
-                    // register menu
-                    if ( plugin.mainMenu ) {
-                        Fire.MainMenu.addTemplate(plugin.mainMenu.path, plugin.mainMenu.template);
-                    }
                 }
 
-                // load user scripts
-                Fire._Sandbox.reloadUserScripts();
+                // load scripts
+                Fire._Sandbox.reloadScripts();
 
                 // init engine
                 Fire.info('fire-engine initializing...');
@@ -88,7 +83,7 @@ Polymer({
             }.bind(this));
         }.bind(this) );
 
-        this.ipc.on('reload:user-scripts', Fire._Sandbox.reloadUserScripts.bind(Fire._Sandbox));
+        this.ipc.on('reload:user-scripts', Fire._Sandbox.reloadScripts);
 
         this.ipc.on('asset-library:debugger:query-uuid-asset', function () {
             var results = [];

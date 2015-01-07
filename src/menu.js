@@ -12,6 +12,17 @@ Fire.MainMenu.addCommandItem = function (menuPath, message, params, priority) {
 
 ///**
 // * @param {string} menuPath - the menu path name. Eg. "Entity/So Cool"
+// */
+//Fire.MainMenu.remove = function (menuPath) {
+//    Fire.rpc('menu:main-remove-item', menuPath);
+//};
+
+Fire.MainMenu.reset = function () {
+    Fire.rpc('menu:main-reset');
+};
+
+///**
+// * @param {string} menuPath - the menu path name. Eg. "Entity/So Cool"
 // * @param {function} callback
 // * @param {number} [priority] - the order which the menu item are displayed
 // */

@@ -47,7 +47,8 @@
                         if ((type === 'object' || type === 'function') && currValue !== lastValue) {
                             if (key !== ignoreName) {
                                 if (infoCallback) {
-                                    infoCallback('Modified global variable while ' + processingInfo + ': ' + key);
+                                    infoCallback('Modified global variable while %s: %s\nBefore: %s\nAfter: %s',
+                                                 processingInfo, key, lastValue, globals[key]);
                                 }
                                 globals[key] = lastValue;
                             }
@@ -174,37 +175,14 @@ var Sandbox = (function () {
     return Sandbox;
 })();
 
-Sandbox.reloadUserScripts = (function () {
+
+// 加载项目里的普通脚本
+var userScriptLoader = (function () {
 
     var SRC = 'library://bundle.js';
-    //var SRC = 'C:/Firebox/main/bin/projects/default/library/bundle.js';
-
-    var builtinClasses;
-    var builtinComponentMenus;
 
     var loadedScriptNodes = [];
     //var gVarsCheckerBetweenReload = new GlobalVarsChecker();
-
-    function init () {
-        Sandbox.globalVarsChecker = new GlobalVarsChecker().record();
-        Sandbox.nodeJsRequire = require;
-        builtinClasses = Fire._registeredClasses;
-        builtinComponentMenus = Fire._componentMenuItems.slice();
-    }
-
-    function purge () {
-        Sandbox._purgeMemory();
-        // reset menu
-        Fire._componentMenuItems = builtinComponentMenus.slice();
-        // remove user classes
-        Fire._registeredClasses = builtinClasses;
-        // 清除 browserify 声明的 require 后，除非用户另外找地方存了原来的 require，否则之前的脚本都将会被垃圾回收
-        require = Sandbox.nodeJsRequire;
-        // restore global variables（就算没 play 也可能会在 dev tools 里面添加全局变量）
-        Sandbox.globalVarsChecker.restore(Fire.log, 'editing', 'require');
-        //gVarsCheckerBetweenReload.restore(Fire.log);
-        Fire._requiringStack = [];
-    }
 
     function recreateScene () {
         // serialize scene
@@ -231,79 +209,139 @@ Sandbox.reloadUserScripts = (function () {
         return newScene;
     }
 
-    function unload () {
-        // remove script element
-        for (var i = 0; i < loadedScriptNodes.length; i++) {
-            var node = loadedScriptNodes[i];
-            node.remove();
-        }
-        loadedScriptNodes.length = 0;
-        //
-        purge();
+    var loader = {
 
-        Fire.sendToCore('unload:user-scripts');
+        load: function loadUserScripts () {
+            // do load
+            var src = SRC + '?' + window.performance.now(); // 防止浏览器使用缓存
+            var script = document.createElement('script');
+            script.onload = function () {
+                console.timeEnd('reload scripts');
 
-        // re-register menu
-        for ( var key in Fire.plugins) {
+                // after loaded
+
+                //gVarsCheckerDuringLoading.restore();
+                Sandbox.globalVarsChecker.restore(Fire.log, 'loading new scripts', 'require');
+
+                // reload scene
+                if (Fire.Engine._scene) {
+                    console.time('reload scene');
+                    var newScene = recreateScene();
+                    Sandbox._launchScene(newScene, function () {
+                        Sandbox.globalVarsChecker.restore(Fire.log, 'destroying last scene');
+                    });
+                    Sandbox.globalVarsChecker.restore(Fire.warn, 'launching scene by new scripts');
+                    console.timeEnd('reload scene');
+                }
+            };
+            script.onerror = function () {
+                console.timeEnd('reload scripts');
+                if (loadedScriptNodes.length > 0) {
+                    loader.unload();
+                }
+            };
+            script.setAttribute('type','text/javascript');
+            script.setAttribute('src', src);
+            console.time('reload scripts');
+            document.head.appendChild(script);
+            loadedScriptNodes.push(script);
+        },
+
+        unload: function unload () {
+            // remove script element
+            for (var i = 0; i < loadedScriptNodes.length; i++) {
+                var node = loadedScriptNodes[i];
+                node.remove();
+            }
+            loadedScriptNodes.length = 0;
+        },
+
+        name: 'common scripts'
+    };
+
+    return loader;
+})();
+
+var builtinPluginMenuLoader = {
+    load: function () {
+        for (var key in Fire.plugins) {
             var plugin = Fire.plugins[key];
-            if ( plugin.mainMenu ) {
+            if (plugin.mainMenu) {
                 Fire.MainMenu.addTemplate(plugin.mainMenu.path, plugin.mainMenu.template);
             }
         }
+    },
+    unload: function () {},
+    name: 'built-in plugin menu'
+};
+
+// 重新加载全部脚本和插件
+Sandbox.reloadScripts = (function () {
+
+    var builtinClasses;
+    var builtinComponentMenus;
+
+    var inited = false;
+
+    function init () {
+        Sandbox.globalVarsChecker = new GlobalVarsChecker().record();
+        Sandbox.nodeJsRequire = require;
+        builtinClasses = Fire._registeredClasses;
+        builtinComponentMenus = Fire._componentMenuItems.slice();
     }
 
-    /**
-     * Reload user scripts
-     */
-    function reloadUserScripts () {
-        if (loadedScriptNodes.length > 0) {
-            unload();
-        }
-        else {
+    function purge () {
+        Sandbox._purgeMemory();
+        // reset menus
+        Fire._componentMenuItems = builtinComponentMenus.slice();
+        Fire.MainMenu.reset();
+        // remove user classes
+        Fire._registeredClasses = builtinClasses;
+        // 清除 browserify 声明的 require 后，除非用户另外找地方存了原来的 require，否则之前的脚本都将会被垃圾回收
+        require = Sandbox.nodeJsRequire;
+        Sandbox.globalVarsChecker.restore(Fire.log, 'purging', 'require');
+        Fire._requiringStack = [];
+    }
+
+    //// 重新加载插件脚本
+    //var reloadPluginScripts = (function () {
+    //    function reloadPluginScripts () {
+
+    //    }
+    //    return reloadPluginScripts;
+    //})();
+
+    function reloadScripts () {
+        var scriptsLoaded = inited;
+        if ( !inited ) {
             init();
+            inited = true;
         }
 
-        // before load
-        //gVarsCheckerBetweenReload.record();
-        //var gVarsCheckerDuringLoading = new GlobalVarsChecker(['require']).record();
+        // restore global variables（就算没 play 也可能会在 dev tools 里面添加全局变量）
+        Sandbox.globalVarsChecker.restore(Fire.log, 'editing');
 
-        // do load
-        var src = SRC + '?' + window.performance.now(); // 防止浏览器缓存
-        var script = document.createElement('script');
-        script.onload = function () {
-            console.timeEnd('reload scripts');
+        var LoadSequence = [builtinPluginMenuLoader, userScriptLoader, Fire._PluginLoader];
 
-            // after loaded
-
-            //gVarsCheckerDuringLoading.restore();
-            Sandbox.globalVarsChecker.restore(Fire.log, 'loading new scripts', 'require');
-
-            // reload scene
-            if (Fire.Engine._scene) {
-                console.time('reload scene');
-                var newScene = recreateScene();
-                Sandbox._launchScene(newScene, function () {
-                    Sandbox.globalVarsChecker.restore(Fire.log, 'destroying last scene');
-                });
-                Sandbox.globalVarsChecker.restore(Fire.warn, 'launching scene by new scripts');
-                console.timeEnd('reload scene');
+        if (scriptsLoaded) {
+            // unload old
+            for (var i = 0; i < LoadSequence.length; i++) {
+                LoadSequence[i].unload();
+                Sandbox.globalVarsChecker.restore(Fire.warn, 'unloading ' + LoadSequence[i].name);
             }
-        };
-        script.onerror = function () {
-            console.timeEnd('reload scripts');
-            if (loadedScriptNodes.length > 0) {
-                unload();
-            }
-        };
-        script.setAttribute('type','text/javascript');
-        script.setAttribute('src', src);
-        console.time('reload scripts');
-        document.head.appendChild(script);
-        loadedScriptNodes.push(script);
+
+            // reset
+            purge();
+        }
+
+        // load new
+        for (var j = LoadSequence.length - 1; j >= 0; j--) {
+            LoadSequence[j].load();
+            Sandbox.globalVarsChecker.restore(Fire.warn, 'loading ' + LoadSequence[j].name);
+        }
     }
 
-    return reloadUserScripts;
-
+    return reloadScripts;
 })();
 
 Fire._Sandbox = Sandbox;
