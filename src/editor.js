@@ -141,15 +141,6 @@ Fire.mixin( Fire, {
         }
     },
 
-    command: function () {
-        Fire.warn('Fire.command is deprecated, use Fire.sendToCore please.');
-        Fire.sendToCore.apply(this, arguments);
-    },
-    broadcast: function ( name ) {
-        Fire.warn('Fire.broadcast is deprecated, use Fire.sendToPages please.');
-        Fire.sendToPages.apply(this, arguments);
-    },
-
     rpc: function ( name ) {
         'use strict';
         if ( typeof name === 'string' ) {
