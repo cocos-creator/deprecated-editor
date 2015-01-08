@@ -103,7 +103,7 @@ Ipc.on('engine:duplicateEntities', function (idList) {
 
 Ipc.on('engine:openScene', function (uuid) {
     Fire.Engine.stop();
-    Fire.AssetLibrary._clearAllCache();
+    Fire.AssetLibrary.clearAllCache();
     Fire.Engine.loadScene(uuid);
 });
 

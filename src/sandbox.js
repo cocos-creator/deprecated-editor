@@ -200,7 +200,7 @@ var userScriptLoader = (function () {
 
         newScene._uuid = Fire.Engine._scene._uuid;
         if (newScene._uuid) {
-            Fire.AssetLibrary._replaceAsset(newScene);
+            Fire.AssetLibrary.replaceAsset(newScene);
         }
 
         // load depends

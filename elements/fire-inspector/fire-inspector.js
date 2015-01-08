@@ -70,9 +70,9 @@ Polymer({
             var meta = Fire.deserialize(metaJson);
             this.inspect(meta,true);
 
-            //
-            Fire.warn("TODO: @jare, please update asset just by uuid.");
-            // Fire.AssetLibrary._updateAsset(uuid);
+            // 虽然在 applyAsset 时已经修改过内存中的 asset 了，但某些 Importer 会依据修改后的 meta 重新 import 一次，
+            // 对它们来说 asset 需要重新导入才能得到真正结果。
+            Fire.AssetLibrary.onAssetReimported(uuid);
         }
     },
 
