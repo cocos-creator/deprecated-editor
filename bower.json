@@ -23,7 +23,7 @@
     "mousetrap": "",
     "chroma-js": "",
     "pace": "",
-    "pixi": "2.1.1",
+    "pixi": "2.2.3",
     "polymer": "Polymer/polymer#~0.5.2",
     "web-animations-js": "web-animations/web-animations-js#master"
   },
