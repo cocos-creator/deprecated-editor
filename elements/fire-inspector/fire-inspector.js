@@ -14,7 +14,7 @@ Polymer({
     attached: function () {
         // register Ipc
         this.ipc.on('selection:activated', this._onInspect.bind(this) );
-        this.ipc.on('asset:applied', this._onAssetApplied.bind(this) );
+        this.ipc.on('asset:changed', this._onAssetChanged.bind(this) );
     },
 
     detached: function () {
@@ -58,7 +58,7 @@ Polymer({
         }
     },
 
-    _onAssetApplied: function ( uuid ) {
+    _onAssetChanged: function ( uuid ) {
         if ( this.target && this.target.uuid === uuid ) {
             // instead of reload asset, we do fast memory apply
             if ( this.$.inspector.applyAsset ) {
