@@ -16,14 +16,20 @@
         color: #f90
     }
 
-    .watch-status {
-        font-weight: bold
+    span {
+        margin-right: 5px
+    }
 
-        &.start-watching { color: #f90 }
-        &.watching { color: #0f0 }
-        &.stop-watching { color: #f90 }
+    .watch {
+        &.starting { color: #f90 }
+        &.on { color: #0f0 }
+        &.stopping { color: #f00 }
+        &.off { color: #555 }
+        &.unknown { color: #f00 }
+    }
+
+    .db {
         &.syncing { color: #f90 }
         &.normal { color: #555 }
-        &.unknown { color: #f00 }
     }
 }

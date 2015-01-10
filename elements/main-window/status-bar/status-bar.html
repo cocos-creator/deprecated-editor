@@ -5,7 +5,8 @@
 <template>
 <link rel="stylesheet" href="status-bar.css">
 
-<span class="watch-status {{dbState}}">{{dbStateText}}</span>
+<span class="watch {{watchState.state}}"><i class="fa {{watchState.icon}}"></i></span>
+<span class="db {{dbState.state}}">{{dbState.state}}</span>
 <span flex-1></span>
 <span class="version">Fireball v{{version}}</span>
 
