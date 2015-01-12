@@ -596,6 +596,7 @@ Polymer({
                 var worldMousePos = this.renderContext.camera.screenToWorld(mousePos);
                 ent.transform.worldPosition = worldMousePos;
                 Fire.Selection.selectEntity( ent.id, true, true );
+                Fire.AssetLibrary.cacheAsset( asset );
                 this.repaint();
             }
         }.bind(this);
@@ -603,7 +604,7 @@ Polymer({
         if ( items.length > 0 ) {
             if ( dragType === 'asset' ) {
                 for ( var i = 0; i < items.length; ++i ) {
-                    Fire.AssetLibrary.loadAssetByUuid( items[i], onload );
+                    Fire.AssetLibrary.loadAsset( items[i], onload );
                 }
             }
         }

@@ -1,11 +1,10 @@
 var remote = require('remote');
-var assetDBStates = {
-    "start-watching": { text: "Start Watching" },
-    "watching": { text: "Watching" },
-    "stop-watching": { text: "Stop Watching" },
-    "syncing": { text: "Syncing" },
-    "normal": { text: "Normal" },
-    "unknown": { text: "Unknown" },
+var watchStates = {
+    "start-watching": { state: "starting", text: "Start Watching", icon: "fa-eye" },
+    "watch-on": { state: "on", text: "Watching", icon: "fa-eye" },
+    "stop-watching": { state: "stopping", text: "Stop Watching", icon: "fa-eye-slash" },
+    "watch-off": { state: "off", text: "Sleep", icon: "fa-eye-slash" },
+    "unknown": { state: "unknown", text: "Unknown", icon: "fa-eye-slash" },
 };
 
 Polymer({
@@ -13,20 +12,27 @@ Polymer({
         this.ipc = new Fire.IpcListener();
 
         this.version = remote.getGlobal( 'FIRE_VER' );
-        this.dbState = "normal";
-        this.dbStateText = assetDBStates[this.dbState].text;
+        this.watchState = watchStates["watch-off"];
+        this.dbState = { state: "normal", task: "none" };
     },
 
     attached: function () {
-        this.ipc.on('asset-db:status-changed', function ( status ) {
-            var state = assetDBStates[status];
-            if ( !state ) {
-                status = "unknown";
-                state = assetDBStates.unknown;
+        this.ipc.on('asset-db:watch-changed', function ( state ) {
+            var expect = watchStates[state];
+            if ( !expect ) {
+                this.watchState = watchStates.unknown;
+                return;
             }
 
-            this.dbState = status;
-            this.dbStateText = state.text;
+            this.watchState = expect;
+        }.bind(this) );
+
+        this.ipc.on('asset-db:syncing', function ( task ) {
+            this.dbState = { state: "syncing", task: task };
+        }.bind(this) );
+
+        this.ipc.on('asset-db:synced', function () {
+            this.dbState = { state: "normal", task: "none" };
         }.bind(this) );
     },
 

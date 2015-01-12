@@ -39,7 +39,12 @@ Polymer({
 
         if ( !Fire.Engine.isPlaying ) {
             Fire._Sandbox.stashScene();
-            Fire.Engine.play();
+            if (this.$.pause.active) {
+                Fire.Engine.step();
+            }
+            else {
+                Fire.Engine.play();
+            }
         }
         else {
             Fire.Engine.stop();
@@ -50,11 +55,16 @@ Polymer({
     pauseAction: function ( event ) {
         event.stopPropagation();
 
-        if ( !Fire.Engine.isPaused ) {
-            Fire.Engine.pause();
+        if (Fire.Engine.isPlaying) {
+            if (Fire.Engine.isPaused) {
+                Fire.Engine.play();
+            }
+            else {
+                Fire.Engine.pause();
+            }
         }
         else {
-            Fire.Engine.play();
+            this.$.pause.active = !this.$.pause.active;
         }
     },
 

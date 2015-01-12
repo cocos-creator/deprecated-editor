@@ -152,6 +152,12 @@ Polymer({
             this.newItem( url, id, parentId, false );
         }.bind(this) );
         this.ipc.on('asset:moved', this.moveItem.bind(this) );
+        this.ipc.on('assets:created', function ( results ) {
+            for ( var i = 0; i < results.length; ++i ) {
+                var info = results[i];
+                this.newItem( info.url, info.uuid, info.parentUuid, info.isDir );
+            }
+        }.bind(this) );
         this.ipc.on('assets:deleted', function (results) {
             var filterResults = Fire.arrayCmpFilter ( results, function ( a, b ) {
                 if ( Path.contains( a.url, b.url ) ) {
@@ -165,12 +171,6 @@ Polymer({
 
             for ( var i = 0; i < filterResults.length; ++i ) {
                 this.deleteItemById(filterResults[i].uuid);
-            }
-        }.bind(this) );
-        this.ipc.on('asset-db:imported', function ( results ) {
-            for ( var i = 0; i < results.length; ++i ) {
-                var info = results[i];
-                this.newItem( info.url, info.uuid, info.parentUuid, info.isDir );
             }
         }.bind(this) );
         this.ipc.on('asset-db:deep-query-results', function ( url, results ) {
@@ -237,7 +237,7 @@ Polymer({
                                 targetEL = this.contextmenuAt.parentElement;
                             var url = this.getUrl(targetEL);
 
-                            Fire.AssetLibrary.loadAssetByUuid ( textureEL.userId, function ( asset, error ) {
+                            Fire.AssetLibrary.loadAsset ( textureEL.userId, function ( asset, error ) {
                                 var newSprite = new Fire.Sprite();
                                 newSprite.name = textureName;
                                 newSprite.texture = asset;

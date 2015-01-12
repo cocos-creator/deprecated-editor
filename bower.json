@@ -1,6 +1,6 @@
 {
   "name": "fireball-editor",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "homepage": "https://github.com/fireball-x/editor",
   "authors": [
     "Johnny Wu <KarasAya@gmail.com>"
@@ -23,7 +23,7 @@
     "mousetrap": "",
     "chroma-js": "",
     "pace": "",
-    "pixi": "2.1.1",
+    "pixi": "2.2.3",
     "polymer": "Polymer/polymer#~0.5.2",
     "web-animations-js": "web-animations/web-animations-js#master"
   },
