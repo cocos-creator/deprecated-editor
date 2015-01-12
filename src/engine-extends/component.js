@@ -41,6 +41,5 @@ Fire.define = function (className, baseOrConstructor, constructor) {
             }
         }
     }
-    var cls = define(className, baseOrConstructor, constructor);
-    return cls;
+    return define.apply(this, arguments);
 };
