@@ -568,12 +568,12 @@ Polymer({
                         ent.transform.position = new Fire.Vec2(0,0);
                         Fire.Selection.selectEntity( ent.id, true, true );
                         Fire.sendToPages( 'scene:dirty' );
-                        Fire.AssetLibrary._cacheAsset( asset );
+                        Fire.AssetLibrary.cacheAsset( asset );
                     }
                 }.bind(this);
 
                 for ( var i = 0; i < items.length; ++i ) {
-                    Fire.AssetLibrary._loadVolatileAsset( items[i], onload );
+                    Fire.AssetLibrary.loadAsset( items[i], onload );
                 }
             }
         }
