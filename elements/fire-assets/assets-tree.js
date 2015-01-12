@@ -237,7 +237,7 @@ Polymer({
                                 targetEL = this.contextmenuAt.parentElement;
                             var url = this.getUrl(targetEL);
 
-                            Fire.AssetLibrary.loadAssetByUuid ( textureEL.userId, function ( asset, error ) {
+                            Fire.AssetLibrary._loadVolatileAsset ( textureEL.userId, function ( asset, error ) {
                                 var newSprite = new Fire.Sprite();
                                 newSprite.name = textureName;
                                 newSprite.texture = asset;
