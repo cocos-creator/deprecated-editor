@@ -1,6 +1,9 @@
 var PositionGizmo = Fire.define("Fire.PositionGizmo",
                                 Fire.Gizmo,
-                                function ( svg, target ) {
+                                function () {
+    
+    var svg = arguments[0];
+    var target = arguments[1];
 
     PositionGizmo.$super.call(this, svg, target );
     this.allowMultiTarget = true;

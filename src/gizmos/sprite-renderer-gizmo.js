@@ -1,6 +1,9 @@
 var SpriteRendererGizmo = Fire.define("Fire.SpriteRendererGizmo",
                               Fire.Gizmo,
-                              function ( svg, target ) {
+                              function () {
+
+    var svg = arguments[0];
+    var target = arguments[1];
 
     SpriteRendererGizmo.$super.call(this, svg, target );
     this.hitTest = false;

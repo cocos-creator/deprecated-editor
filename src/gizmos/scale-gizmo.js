@@ -1,8 +1,12 @@
 var ScaleGizmo = Fire.define("Fire.ScaleGizmo",
                                 Fire.Gizmo,
-                                function ( svg, target, options ) {
+                                function () {
 
-    ScaleGizmo.$super.call(this, svg, target, options );
+    var svg = arguments[0];
+    var target = arguments[1];
+    var options = arguments[2];
+
+    ScaleGizmo.$super.call(this, svg, target, options);
     this.allowMultiTarget = true;
 
     var localscaleList = [], offsetList = [],

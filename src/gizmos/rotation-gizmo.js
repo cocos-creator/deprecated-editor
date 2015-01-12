@@ -1,6 +1,10 @@
 var RotationGizmo = Fire.define("Fire.RotationGizmo",
                                 Fire.Gizmo,
-                                function ( svg, target, options ) {
+                                function () {
+
+    var svg = arguments[0];
+    var target = arguments[1];
+    var options = arguments[2];
 
     RotationGizmo.$super.call(this, svg, target, options );
     this.allowMultiTarget = true;
