@@ -1,6 +1,9 @@
 ﻿var CameraGizmo = Fire.define("Fire.CameraGizmo",
                               Fire.Gizmo,
-                              function ( svg, target ) {
+                              function () {
+
+    var svg = arguments[0];
+    var target = arguments[1];
 
     CameraGizmo.$super.call(this, svg, target );
     this.hitTest = true;
