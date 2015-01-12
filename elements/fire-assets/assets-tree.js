@@ -258,6 +258,28 @@ Polymer({
                 }.bind(this)
             },
 
+            // New Sprite Animation Clip
+            {
+                label: 'New Sprite Animation Clip',
+                click: function () {
+                    if (this.contextmenuAt instanceof AssetsItem) {
+                        var targetEL = this.contextmenuAt;
+                        var targetName = "New Animation Clip";
+
+                        if (!this.contextmenuAt.isFolder)
+                            targetEL = this.contextmenuAt.parentElement;
+
+                        var url = this.getUrl(targetEL);
+                        var newSpriteAnimClip = new Fire.SpriteAnimationClip();
+                        var newAssetUrl = Url.join(url, 'New Animation Clip.clip');
+                        this._focusUrl = newAssetUrl;
+                        Fire.sendToCore('asset-db:save',
+                                      newAssetUrl,
+                                      Fire.serialize(newSpriteAnimClip));
+                    }
+                }.bind(this)
+            },
+
             // =====================
             { type: 'separator' },
 
