@@ -14,13 +14,13 @@ MissingScript.prop('_$erialized', null, Fire.HideInInspector, Fire.EditorOnly);
  * @param {string} className
  * @returns {function} constructor
  */
-MissingScript.safeFindClass = function (className) {
-    var cls = Fire.getClassByName(className);
+MissingScript.safeFindClass = function (id) {
+    var cls = Fire.getClassById(id);
     if (cls) {
         return cls;
     }
     // TODO: Track the rename operactions of scripts
-    if (className) {
+    if (id) {
         return MissingScript;
     }
     return null;
