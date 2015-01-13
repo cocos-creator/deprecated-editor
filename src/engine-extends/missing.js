@@ -11,7 +11,7 @@ MissingScript.get('errorInfo', function () {
 MissingScript.prop('_$erialized', null, Fire.HideInInspector, Fire.EditorOnly);
 
 /**
- * @param {string} className
+ * @param {string} id
  * @returns {function} constructor
  */
 MissingScript.safeFindClass = function (id) {

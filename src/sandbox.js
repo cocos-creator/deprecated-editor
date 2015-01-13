@@ -60,7 +60,10 @@
                     else {
                         if (key !== ignoreName) {
                             Fire.error('Introduced global variable while %s: %s', processingInfo, key);
-                            delete globals[key];
+                            var canDelete = delete globals[key];
+                            if ( !canDelete ) {
+                                this._snapshot[key] = globals[key] = undefined;
+                            }
                         }
                         else {
                             this._snapshot[key] = currValue;

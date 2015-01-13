@@ -22,24 +22,3 @@ Component.prototype._onPreDestroy = function () {
     doOnPreDestroy.call(this);
     delete Fire._idToObject[this._id];
 };
-
-// Checks Component declaration
-
-Fire._requiringStack = [];
-
-var define = Fire.define;
-Fire.define = function (className, baseOrConstructor, constructor) {
-    if (Fire.isChildClassOf(baseOrConstructor, Component)) {
-        var loadingScript = Fire._requiringStack[Fire._requiringStack.length - 1];
-        if (className !== loadingScript) {
-            if (loadingScript) {
-                Fire.error('Can\'t define Component "' + className + '" in script "' + loadingScript +
-                    '". Make sure that the file name and class name match.');
-            }
-            else {
-                Fire.warn('Sorry, defining Component "' + className + '" dynamically is not allowed, defines in its corresponding script please.');
-            }
-        }
-    }
-    return define.apply(this, arguments);
-};
