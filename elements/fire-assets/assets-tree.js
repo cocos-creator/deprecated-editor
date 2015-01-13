@@ -644,7 +644,11 @@ Polymer({
     },
 
     dragstartAction: function ( event ) {
-        EditorUI.DragDrop.start( event.dataTransfer, 'copyMove', 'asset', Fire.Selection.assets );
+        EditorUI.DragDrop.start( event.dataTransfer, 'copyMove', 'asset', Fire.Selection.assets.map(function (item) {
+            var uuid = item;
+            var itemEL = this.idToItem[uuid];
+            return { name: itemEL.name, id: item };
+        }.bind(this)) );
 
         event.stopPropagation();
     },

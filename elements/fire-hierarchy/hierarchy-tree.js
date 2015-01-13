@@ -420,7 +420,10 @@ Polymer({
     },
 
     dragstartAction: function ( event ) {
-        EditorUI.DragDrop.start( event.dataTransfer, 'move', 'entity', Fire.Selection.entities );
+        EditorUI.DragDrop.start( event.dataTransfer, 'move', 'entity', Fire.Selection.entities.map( function (item) {
+            var ent = Fire._getInstanceById(item);
+            return { name: ent.name, id: item };
+        }) );
 
         event.stopPropagation();
     },
