@@ -118,6 +118,20 @@ function _addCustomAssetMenu(target, template) {
         return null;
     }
 
+    function onclick() {
+        if (target.contextmenuAt instanceof AssetsItem) {
+            var targetEL = target.contextmenuAt;
+            if (!target.contextmenuAt.isFolder) {
+                targetEL = target.contextmenuAt.parentElement;
+            }
+            var url = target.getUrl(targetEL);
+            var newCustomAsset = new item.customAsset();
+            var newAssetUrl = Url.join(url, fileName + '.asset');
+            target._focusUrl = newAssetUrl;
+            Fire.sendToCore('asset-db:save', newAssetUrl, Fire.serialize(newCustomAsset));
+        }
+    }
+
     // Custom Asset Menu Item
     var items = Fire._customAssetMenuItems;
     for (var i = 0; i < items.length; i++) {
@@ -166,25 +180,13 @@ function _addCustomAssetMenu(target, template) {
             parent = newMenu;
         }
         if (newMenu && !newMenu.submenu) {
-            newMenu.click = (function () {
-                if (target.contextmenuAt instanceof AssetsItem) {
-                    var targetEL = target.contextmenuAt;
-                    if (!target.contextmenuAt.isFolder) {
-                        targetEL = target.contextmenuAt.parentElement;
-                    }
-                    var url = target.getUrl(targetEL);
-                    var newCustomAsset = new item.customAsset();
-                    var newAssetUrl = Url.join(url, fileName + '.asset');
-                    target._focusUrl = newAssetUrl;
-                    Fire.sendToCore('asset-db:save', newAssetUrl, Fire.serialize(newCustomAsset));
-                }
-            }).bind(target)
+            newMenu.click = onclick;
         }
         else {
             Fire.error('Invalid custom asset menu path: ' + item.menuPath);
         }
     }
-};
+}
 
 
 Polymer({
@@ -633,6 +635,19 @@ Polymer({
         if ( event.target instanceof AssetsItem ) {
             if ( event.target.extname === '.fire' ) {
                 Fire.sendToPages('engine:openScene', event.target.userId);
+                return;
+            }
+
+            if ( event.target.extname === '.js' ) {
+                Fire.sendToCore('window:open', 'code-editor', 'fire://static/code-editor.html', {
+                    title: "Code Editor",
+                    width: 800,
+                    height: 600,
+                    show: true,
+                    resizable: true,
+                    query: { url: this.getUrl(event.target) },
+                } );
+                return;
             }
         }
         event.stopPropagation();

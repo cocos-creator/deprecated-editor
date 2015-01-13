@@ -1,0 +1,31 @@
+<script src="codemirror-4.11/lib/codemirror.js"></script>
+<script src="codemirror-4.11/mode/javascript/javascript.js"></script>
+<script src="codemirror-4.11/mode/css/css.js"></script>
+<script src="codemirror-4.11/mode/htmlmixed/htmlmixed.js"></script>
+<script src="codemirror-4.11/addon/selection/active-line.js"></script>
+<script src="codemirror-4.11/addon/fold/foldcode.js"></script>
+<script src="codemirror-4.11/addon/fold/foldgutter.js"></script>
+<script src="codemirror-4.11/addon/fold/brace-fold.js"></script>
+<script src="codemirror-4.11/addon/fold/comment-fold.js"></script>
+<script src="codemirror-4.11/addon/edit/matchbrackets.js"></script>
+
+<polymer-element
+    name="code-mirror"
+    constructor="FireCodeMirror"
+    >
+<template>
+    <link rel="stylesheet" href="codemirror-4.11/lib/codemirror.css">
+    <link rel="stylesheet" href="codemirror-4.11/theme/zenburn.css">
+    <style>
+        :host {
+            display: block;
+            position: relative;
+        }
+        .CodeMirror {
+            height: auto
+        }
+    </style>
+</template>
+<script type="text/javascript" src="code-mirror.js"></script>
+
+</polymer-element>
