@@ -280,6 +280,7 @@ Sandbox.reloadScripts = (function () {
 
     var builtinClasses;
     var builtinComponentMenus;
+    var builtinCustomAssetMenus;
 
     var inited = false;
 
@@ -288,12 +289,14 @@ Sandbox.reloadScripts = (function () {
         Sandbox.nodeJsRequire = require;
         builtinClasses = Fire._registeredClasses;
         builtinComponentMenus = Fire._componentMenuItems.slice();
+        builtinCustomAssetMenus = Fire._customAssetMenuItems.slice();
     }
 
     function purge () {
         Sandbox._purgeMemory();
         // reset menus
         Fire._componentMenuItems = builtinComponentMenus.slice();
+        Fire._customAssetMenuItems = builtinCustomAssetMenus.slice();
         Fire.MainMenu.reset();
         // remove user classes
         Fire._registeredClasses = builtinClasses;
