@@ -108,6 +108,85 @@ function _getNameCollisions ( target, list ) {
     return collisions;
 }
 
+function _addCustomAssetMenu(target, template) {
+    function findMenu(menuArray, label) {
+        for (var i = 0; i < menuArray.length; i++) {
+            if (menuArray[i].label === label) {
+                return menuArray[i];
+            }
+        }
+        return null;
+    }
+
+    // Custom Asset Menu Item
+    var items = Fire._customAssetMenuItems;
+    for (var i = 0; i < items.length; i++) {
+        var item = items[i];
+        var subPathes = item.menuPath.split('/');
+        var fileName = subPathes.length > 0 ? subPathes[subPathes.length - 1] : subPathes[0];
+        if (fileName === "") {
+            Fire.error('Invalid custom asset menu path: ' + item.menuPath);
+            continue;
+        }
+        var prio = item.priority || 0;
+        // enumerate menu path
+        var newMenu = null;
+        for (var p = 0, parent = template; p < subPathes.length; p++) {
+            var label = subPathes[p];
+            if (!label) {
+                continue;
+            }
+            var parentMenuArray = parent === template ? template : parent.submenu;
+            var menu;
+            if (parentMenuArray) {
+                if (parentMenuArray.length > 0) {
+                    menu = findMenu(parentMenuArray, label);
+                }
+                if (menu) {
+                    if (menu.submenu) {
+                        parent = menu;
+                        continue;
+                    }
+                    else {
+                        Fire.error('Custom Asset menu path %s conflict', item.menuPath);
+                        break;
+                    }
+                }
+            }
+            // create
+            newMenu = {
+                label: label,
+            };
+            if (!parentMenuArray) {
+                parent.submenu = [newMenu];
+            }
+            else {
+                parentMenuArray.splice(3, 0, newMenu);
+            }
+            parent = newMenu;
+        }
+        if (newMenu && !newMenu.submenu) {
+            newMenu.click = (function () {
+                if (target.contextmenuAt instanceof AssetsItem) {
+                    var targetEL = target.contextmenuAt;
+                    if (!target.contextmenuAt.isFolder) {
+                        targetEL = target.contextmenuAt.parentElement;
+                    }
+                    var url = target.getUrl(targetEL);
+                    var newCustomAsset = new item.customAsset();
+                    var newAssetUrl = Url.join(url, fileName + '.asset');
+                    target._focusUrl = newAssetUrl;
+                    Fire.sendToCore('asset-db:save', newAssetUrl, Fire.serialize(newCustomAsset));
+                }
+            }).bind(target)
+        }
+        else {
+            Fire.error('Invalid custom asset menu path: ' + item.menuPath);
+        }
+    }
+};
+
+
 Polymer({
     created: function () {
         this.super();
@@ -313,6 +392,9 @@ Polymer({
                 }.bind(this)
             },
         ];
+
+        _addCustomAssetMenu(this, template);
+
         this.contextmenu = Menu.buildFromTemplate(template);
     },
 
