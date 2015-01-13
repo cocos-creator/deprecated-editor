@@ -20,6 +20,7 @@
     "event-stream": "",
     "q": "",
     "express": "",
-    "del": ""
+    "del": "",
+    "gulp-minify-css": ""
   }
 }

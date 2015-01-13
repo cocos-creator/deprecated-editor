@@ -7,6 +7,7 @@ var stylus = require('gulp-stylus');
 var rename = require('gulp-rename');
 var vulcanize = require('gulp-vulcanize');
 var del = require('del');
+var minifyCSS = require('gulp-minify-css');
 
 var path = require('path');
 var es = require('event-stream');
@@ -80,6 +81,7 @@ var task_plugin = function ( name ) {
     var basePath = 'elements/' + name + '/';
 
     var task_css = 'plugin-' + name + '-css';
+    var task_styl = 'plugin-' + name + '-styl';
     var task_js = 'plugin-' + name + '-js';
     var task_js_dev = 'plugin-' + name + '-js-dev';
     var task_html = 'plugin-' + name + '-html';
@@ -92,7 +94,8 @@ var task_plugin = function ( name ) {
     task_dev_deps.push(task_html_dev);
 
     var watcher = {
-        css: { files: basePath + '**/*.styl', tasks: [task_css, task_html_dev] },
+        css: { files: basePath + '**/*.css', tasks: [task_css, task_html_dev] },
+        styl: { files: basePath + '**/*.styl', tasks: [task_styl, task_html_dev] },
         js: { files: basePath + '**/*.js', tasks: [task_html_dev] },
         html: { files: basePath + '**/*.html', tasks: [task_html_dev] },
         res: { files: [basePath + '**/*.jpg', basePath + '**/*.png'], tasks: [task_copy_res] }
@@ -117,13 +120,20 @@ var task_plugin = function ( name ) {
         ;
     });
 
-    // css
-    gulp.task( task_css, function() {
+    // styl
+    gulp.task( task_styl, function() {
         return gulp.src(basePath + '**/*.styl', {base: 'elements'})
         .pipe(stylus({
             compress: true,
             include: 'src'
         }))
+        .pipe(gulp.dest('bin/tmp/'));
+    });
+
+    // css
+    gulp.task( task_css, function() {
+        return gulp.src(basePath + '**/*.css', {base: 'elements'})
+        .pipe(minifyCSS())
         .pipe(gulp.dest('bin/tmp/'));
     });
 
@@ -163,8 +173,8 @@ var task_plugin = function ( name ) {
         };
     };
 
-    gulp.task(task_html, [ task_copy_html, task_copy_res, task_css, task_js ], build_html(true));
-    gulp.task(task_html_dev, [ task_copy_html, task_copy_res, task_css, task_js_dev ], build_html(false));
+    gulp.task(task_html, [ task_copy_html, task_copy_res, task_styl, task_css, task_js ], build_html(true));
+    gulp.task(task_html_dev, [ task_copy_html, task_copy_res, task_styl, task_css, task_js_dev ], build_html(false));
 };
 
 // src-jshint
@@ -222,6 +232,7 @@ gulp.task('watch', function() {
     for ( var i = 0; i < plugin_watchers.length; ++i ) {
         var watcher = plugin_watchers[i];
         gulp.watch( watcher.css.files, watcher.css.tasks ).on ( 'error', gutil.log );
+        gulp.watch( watcher.styl.files, watcher.styl.tasks ).on ( 'error', gutil.log );
         gulp.watch( watcher.js.files, watcher.js.tasks ).on ( 'error', gutil.log );
         gulp.watch( watcher.html.files, watcher.html.tasks ).on ( 'error', gutil.log );
         gulp.watch( watcher.res.files, watcher.res.tasks ).on ( 'error', gutil.log );
@@ -232,6 +243,7 @@ gulp.task('watch-self', function() {
     for ( var i = 0; i < plugin_watchers.length; ++i ) {
         var watcher = plugin_watchers[i];
         gulp.watch( watcher.css.files, watcher.css.tasks ).on ( 'error', gutil.log );
+        gulp.watch( watcher.styl.files, watcher.styl.tasks ).on ( 'error', gutil.log );
         gulp.watch( watcher.js.files, watcher.js.tasks ).on ( 'error', gutil.log );
         gulp.watch( watcher.html.files, watcher.html.tasks ).on ( 'error', gutil.log );
         gulp.watch( watcher.res.files, watcher.res.tasks ).on ( 'error', gutil.log );
