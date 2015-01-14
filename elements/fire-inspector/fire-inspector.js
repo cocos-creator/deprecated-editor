@@ -1,6 +1,7 @@
 ﻿var Remote = require('remote');
 var Menu = Remote.require('menu');
 var Path = require('fire-path');
+var Url = require('fire-url');
 
 Polymer({
     created: function () {
@@ -15,6 +16,8 @@ Polymer({
         // register Ipc
         this.ipc.on('selection:activated', this._onInspect.bind(this) );
         this.ipc.on('asset:changed', this._onAssetChanged.bind(this) );
+        this.ipc.on('asset:moved', this._onAssetMoved.bind(this) );
+        this.ipc.on('asset:saved', this._onAssetSaved.bind(this) );
     },
 
     detached: function () {
@@ -72,6 +75,22 @@ Polymer({
         }
     },
 
+    _onAssetMoved: function ( uuid, destUrl ) {
+        if ( this.target && this.target.uuid === uuid ) {
+            if ( this.$.inspector.asset ) {
+                this.$.inspector.asset.name = Url.basenameNoExt(destUrl);
+            }
+        }
+    },
+
+    _onAssetSaved: function ( url, uuid ) {
+        if ( this.target && this.target.uuid === uuid ) {
+            if ( this.$.inspector.saving !== undefined ) {
+                this.$.inspector.saving = false;
+            }
+        }
+    },
+
     inspect: function ( obj, force ) {
         //
         if ( !force ) {
@@ -99,7 +118,15 @@ Polymer({
             Fire.observe(obj,true);
         }
 
-        if ( this.target instanceof Fire.AssetMeta && obj instanceof Fire.AssetMeta ) {
+        var isTargetCustom = this.target instanceof Fire.CustomAssetMeta;
+        var isObjCustom = obj instanceof Fire.CustomAssetMeta;
+
+        if ( isTargetCustom && isObjCustom ) {
+            this.target = this.$.inspector.meta = obj;
+        }
+        else if ( this.target instanceof Fire.AssetMeta && obj instanceof Fire.AssetMeta &&
+                 !isTargetCustom && !isObjCustom )
+        {
             this.target = this.$.inspector.meta = obj;
         }
         else if ( this.target instanceof Fire.Entity && obj instanceof Fire.Entity ) {
@@ -110,8 +137,14 @@ Polymer({
                 this.removeChild(this.firstElementChild);
             }
             if ( obj instanceof Fire.AssetMeta ) {
-                this.$.inspector = new ImporterInspector();
-                this.target = this.$.inspector.meta = obj;
+                if ( obj instanceof Fire.CustomAssetMeta ) {
+                    this.$.inspector = new CustomAssetInspector();
+                    this.target = this.$.inspector.meta = obj;
+                }
+                else {
+                    this.$.inspector = new ImporterInspector();
+                    this.target = this.$.inspector.meta = obj;
+                }
             }
             else if ( obj instanceof Fire.Entity ) {
                 this.$.inspector = new EntityInspector();

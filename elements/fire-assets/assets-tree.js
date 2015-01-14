@@ -9,15 +9,21 @@ function _isTexture ( extname ) {
 }
 
 function _newAssetsItem ( url, type, id, parent ) {
-    var extname = Url.extname(url);
-    var basename = Url.basename(url, extname);
-    var img;
-
     var newEL = new AssetsItem();
     newEL.isRoot = type === 'root';
     newEL.isFolder = (type === 'folder' || newEL.isRoot);
-    newEL.extname = extname;
 
+    var extname = "";
+    var basename = Url.basename(url);
+
+    if ( !newEL.isFolder ) {
+        extname = Url.extname(url);
+        basename = Url.basename(url, extname);
+    }
+
+    var img;
+
+    newEL.extname = extname;
     type = type || extname;
     switch ( type ) {
     case 'root':
@@ -638,7 +644,7 @@ Polymer({
                 return;
             }
 
-            if ( event.target.extname === '.js' ) {
+            if ( ['.js', '.html', '.css'].indexOf(event.target.extname) !== -1 ) {
                 Fire.sendToCore('window:open', 'code-editor', 'fire://static/code-editor.html', {
                     title: "Code Editor",
                     width: 800,

@@ -1,0 +1,49 @@
+:host {
+    display: flex
+    flex-direction: column
+    flex-wrap: nowrap
+    align-items: stretch
+
+    font-size: 12px
+    margin-top: 2px
+
+    font-family: Helvetica,Arial,sans-serif
+    color: #aaa
+    cursor: default
+    outline: none
+
+    ::-webkit-scrollbar {
+        height: 5px
+        width: 5px
+    }
+    ::-webkit-scrollbar-thumb {
+        background: rgba(255,255,255,0.3)
+    }
+    ::-webkit-scrollbar-track {
+        // background-clip: padding-box
+        background-color: rgba(255,255,255,0.1)
+    }
+    ::-webkit-scrollbar-corner {
+        background-color: #171717
+    }
+    ::-webkit-scrollbar-button {
+        display: none
+    }
+
+    .spinner {
+        width: 10px
+        height: 10px
+        border: 2px solid
+        border-radius: 50%
+        border-color: transparent rgb(0,128,255) rgb(0,128,255)
+        -webkit-animation: spin 600ms infinite linear
+
+        &.hide {
+            display: none
+        }
+    }
+
+    @keyframes spin {
+        100% { transform: rotate(360deg); }
+    }
+}
