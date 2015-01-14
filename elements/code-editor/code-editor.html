@@ -7,14 +7,18 @@
 <template>
 
     <link rel="stylesheet" href="code-editor.css">
-
-    <!-- <fire-ui-toolbar>           -->
-    <!--     Toolbar                 -->
-    <!-- </fire-ui-toolbar>          -->
-
-    <!-- <span class="space"></span> -->
-
-    <code-mirror id="mirror" flex-1></code-mirror>
+    <fire-ui-toolbar>
+        <fire-ui-button on-click="{{testClick}}">复制</fire-ui-button>
+    </fire-ui-toolbar>
+    <div id="codeArea">
+        <code-mirror id="mirror"></code-mirror>
+    </div>
+    <span id="statusBar">
+        <ul>
+            <li>line:3398</li>
+            <li>copu:3398</li>
+        </ul>
+    </span>
 </template>
 
 <script type="text/javascript" src="code-editor.js"></script>

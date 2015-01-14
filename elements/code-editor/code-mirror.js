@@ -5,26 +5,42 @@ Polymer({
     tabSize: 4,
     lineNumbers: true,
 
-    ready: function() {
+    refresh: function() {
+        this.mirror.refresh();
+    },
+
+    ready: function () {
         this.mirror = CodeMirror(this.shadowRoot, {
             value: this.value,
             mode: this.mode,
             theme: this.theme,
+            scroll: false,
             tabSize: this.tabSize,
             lineNumbers: this.lineNumbers,
             foldGutter: true,
             matchBrackets: true,
             styleActiveLine: true,
-            gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"]
+            gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
+        });
+
+
+        this.mirror.on('focus',function () {
+            console.log('focus');
         });
     },
 
-    refresh: function() {
-        this.mirror.refresh();
+    domReady: function () {
+        this.mirror.on('change',function () {
+            this.updateLineCount();
+        }.bind(this));
     },
 
     valueChanged: function() {
         this.mirror.setValue(this.value);
+    },
+
+    updateLineCount: function () {
+        console.log(this.mirror.lineCount());
     },
 
     modeChanged: function() {
@@ -45,5 +61,5 @@ Polymer({
 
     focus: function() {
         this.mirror.focus();
-    }
+    },
 });

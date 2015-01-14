@@ -24,6 +24,23 @@ Polymer({
         Fs.readFile(fspath, 'utf8', function ( err, data ) {
             this.$.mirror.value = data;
         }.bind(this));
+
+    },
+
+    ready: function () {
+        this.updateSize();
+    },
+
+    updateSize: function () {
+        window.requestAnimationFrame ( function () {
+            this.$.codeArea.style.height = this.getBoundingClientRect().height-51 +"px";
+            this.updateSize();
+        }.bind(this) );
+    },
+
+    testClick: function () {
+        this.$.mirror.value="fsdf";
+        console.log('fdsf');
     },
 
 });
