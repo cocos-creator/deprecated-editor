@@ -5,35 +5,37 @@
     constructor="CodeEditor"
     >
 <template>
-
     <link rel="stylesheet" href="code-editor.css">
+
     <fire-ui-toolbar>
-        <fire-ui-button on-click="{{save}}">Save(Cmd+S)</fire-ui-button>
-        <fire-ui-button on-click="{{comment}}">comment</fire-ui-button>
-        <fire-ui-button on-click="{{autoFormat}}">auto format</fire-ui-button>
-        <fire-ui-button on-click="{{keyMap}}">VIM</fire-ui-button>
+        <fire-ui-button on-click="{{saveAction}}">Save</fire-ui-button>
+        <fire-ui-button on-click="{{commentAction}}">Comment</fire-ui-button>
+        <fire-ui-button on-click="{{autoFormatAction}}">Auto Format</fire-ui-button>
     </fire-ui-toolbar>
     <div id="codeArea">
         <code-mirror id="mirror"></code-mirror>
     </div>
-    <span id="statusBar">
+    <span class="status-bar">
         <fire-ui-toolbar style="float:left">
             <div class="space"></div>
+
             <fire-ui-label>{{url}}</fire-ui-label>
             <div class="space"></div>
-            <fire-ui-label>{{cursor.line+1}},{{cursor.ch}}</fire-ui-label>
-            <div class="space3"></div>
-            <fire-ui-label>KeyMap: </fire-ui-label>
+
+            <fire-ui-label>Line {{$.mirror.cursor.ln+1}}, Column {{$.mirror.cursor.ch}}</fire-ui-label>
             <div class="space"></div>
-            <fire-ui-select value="{{keyMapValue}}" id="keymapSelect" ></fire-ui-select>
-            <div class="space"></div>
-            <fire-ui-label>Theme: </fire-ui-label>
-            <div class="space"></div>
-            <fire-ui-select searchable value="{{themeValue}}" id="themeSelect" ></fire-ui-select>
         </fire-ui-toolbar>
 
         <fire-ui-toolbar style="float:right">
-            <fire-ui-label id="tip"></fire-ui-label>
+            <fire-ui-label>Key Map: </fire-ui-label>
+            <div class="space"></div>
+            <fire-ui-select id="keymapSelect" value="{{$.mirror.keyMap}}"></fire-ui-select>
+            <div class="space"></div>
+
+            <fire-ui-label>Theme: </fire-ui-label>
+            <div class="space"></div>
+            <fire-ui-select id="themeSelect" searchable value="{{$.mirror.theme}}"></fire-ui-select>
+            <div class="space"></div>
         </fire-ui-toolbar>
     </span>
 </template>

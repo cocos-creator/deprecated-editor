@@ -6,9 +6,10 @@
         overflow-y: hidden
         overflow-x: hidden
         height: auto
-        font-size: 13px
         line-height: 130%
-        font-weight: 500
+
+        font-family: 'DejaVu Sans Mono', monospace
+        font-size: 15px
     }
 
     .CodeMirror-scroll {
@@ -19,5 +20,17 @@
     .CodeMirror-hscrollbar{
         overflow-x: visible
         overflow-y: visible
+    }
+
+    .CodeMirror-dialog {
+        position: absolute
+        left: 0
+        right: 0
+        z-index: 15
+        padding: .1em .8em
+        overflow: hidden
+
+        color: #aaa
+        background: #333
     }
 }

@@ -3,13 +3,19 @@ var Fs = require("fire-fs");
 Polymer({
     value: '',
     mode: 'javascript',
-    theme: 'zenburn',
+    theme: 'solarized dark',
     tabSize: 4,
     keyMap: 'sublime',
     lineNumbers: true,
-    owner: null,
     filePath: "",
     uuid: "",
+
+    created: function () {
+        this.cursor = {
+            "ln" : 0,
+            "ch" : 0
+        };
+    },
 
     ready: function () {
     },
@@ -22,7 +28,7 @@ Polymer({
     },
 
     valueChanged: function() {
-        if (this.mirror !== undefined){
+        if ( this.mirror ) {
             this.mirror.setValue(this.value);
         }
         else {
@@ -48,13 +54,13 @@ Polymer({
         });
 
         this.mirror.on('focus',function () {
-        });
+        }.bind(this));
 
         this.mirror.on('change',function () {
         }.bind(this));
 
         this.mirror.on('cursorActivity',function () {
-            this.owner.cursor = this.mirror.getCursor();
+            this.cursor = this.mirror.getCursor();
         }.bind(this));
     },
 
@@ -78,36 +84,24 @@ Polymer({
         this.mirror.setOption('lineNumbers', this.lineNumbers);
     },
 
-    //NOTE: 统一修改右下角通知
-    tipToast: function (text) {
-        this.owner.$.tip.innerHTML = text;
-    },
-
-    focus: function() {
-        this.mirror.focus();
-    },
-
-    //NOTE:comment your select line(注释选中行)
     lineComment: function () {
         var range = { from: this.mirror.getCursor(true), to: this.mirror.getCursor(false) };
         this.mirror.lineComment(range.from, range.to);
     },
 
-    //NOTE: auto format
     autoFormat: function () {
         var range = { from: this.mirror.getCursor(true), to: this.mirror.getCursor(false) };
         this.mirror.autoFormatRange(range.from, range.to);
     },
 
-    //NOTE: Save to file
-    saveModifed: function () {
+    save: function () {
         Fs.writeFile(this.filePath, this.mirror.getValue(), 'utf8', function ( err ) {
             if ( err ) {
                 Fire.error( err.message );
                 return;
             }
 
-            this.tipToast("save success!");
+            Fire.log( this.filePath + " saved!");
 
             // TEMP HACK
             Fire.sendToAll('asset:changed', this.uuid);
