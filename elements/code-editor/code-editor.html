@@ -8,16 +8,38 @@
 
     <link rel="stylesheet" href="code-editor.css">
     <fire-ui-toolbar>
-        <fire-ui-button on-click="{{testClick}}">复制</fire-ui-button>
+        <fire-ui-button on-click="{{save}}">Save(Cmd+S)</fire-ui-button>
+        <fire-ui-button on-click="{{comment}}">comment</fire-ui-button>
+        <fire-ui-button on-click="{{autoFormat}}">auto format</fire-ui-button>
+        <fire-ui-button on-click="{{keyMap}}">VIM</fire-ui-button>
     </fire-ui-toolbar>
     <div id="codeArea">
         <code-mirror id="mirror"></code-mirror>
     </div>
     <span id="statusBar">
-        <ul>
-            <li>line:3398</li>
-            <li>copu:3398</li>
+        <!--<ul>
+            <li>{{fileName}}</li>
+            <li>{{Cursor.line+1}},{{Cursor.ch}}</li>
         </ul>
+        <fire-ui-select id="keymapSelect"></fire-ui-select>-->
+
+        <fire-ui-toolbar style="float:left">
+            <div class="space"></div>
+            <fire-ui-label>{{fileName}}</fire-ui-label>
+            <div class="space"></div>
+            <fire-ui-label>{{Cursor.line+1}},{{Cursor.ch}}</fire-ui-label>
+            <div class="space3"></div>
+            <fire-ui-label>KeyMap: </fire-ui-label>
+            <div class="space"></div>
+            <fire-ui-select value="{{keyMapValue}}" id="keymapSelect" ></fire-ui-select>
+            <div class="space"></div>
+            <fire-ui-label>Theme: </fire-ui-label>
+            <div class="space"></div>
+            <fire-ui-select searchable value="{{themeValue}}" id="themeSelect" ></fire-ui-select>
+        </fire-ui-toolbar>
+        <fire-ui-toolbar style="float:right">
+            <fire-ui-label id="tip"></fire-ui-label>
+        </fire-ui-toolbar>
     </span>
 </template>
 
