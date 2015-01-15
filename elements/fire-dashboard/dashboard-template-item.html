@@ -1,0 +1,14 @@
+<polymer-element
+    name="dashboard-template-item"
+    constructor="DashboardTemplateItem"
+    on-mousedown="{{mousedownAction}}"
+    >
+    <template>
+        <link rel="stylesheet" href="dashboard-template-item.css">
+
+        <img class="icon" src="{{item.icon}}"></img>
+        <div class="name">{{item.name}}</div>
+    </template>
+
+    <script type="text/javascript" src="dashboard-template-item.js"></script>
+</polymer-element>

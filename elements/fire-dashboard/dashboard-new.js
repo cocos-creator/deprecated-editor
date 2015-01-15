@@ -11,6 +11,26 @@ Polymer({
     ready: function () {
         this.name = "New Project";
         this.path = _getUserHome();
+
+        this.items = [];
+        this.curSelect = null;
+
+        this._templates = [
+            { name: "Fireball", icon: "img/dashboard/fireball.png" },
+            { name: "Cocos2D", icon: "img/dashboard/cocos-html5.png" },
+        ];
+        this._gamekits = [];
+    },
+
+    select: function ( item ) {
+        if ( this.curSelect )
+            this.curSelect.selected = false;
+
+        this.curSelect = item;
+
+        if ( this.curSelect ) {
+            this.curSelect.selected = true;
+        }
     },
 
     browseAction: function ( event ) {
@@ -39,5 +59,24 @@ Polymer({
             return;
 
         Fire.sendToCore( 'dashboard:create-project', projectPath );
+    },
+
+    templateAction: function ( event ) {
+        event.stopPropagation();
+
+        this.items = this._templates;
+        this.select(this.items.length > 0 ? this.items[0] : null);
+    },
+
+    gamekitsAction: function ( event ) {
+        event.stopPropagation();
+
+        this.items = this._gamekits;
+        this.select(this.items.length > 0 ? this.items[0] : null);
+    },
+
+    selectAction: function ( event ) {
+        event.stopPropagation();
+        this.select(event.target.item);
     },
 });

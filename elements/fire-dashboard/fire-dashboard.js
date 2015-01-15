@@ -49,21 +49,15 @@ Polymer({
         this.selectItem(0);
     },
 
-    newTemplateAction: function ( event ) {
+    newAction: function ( event ) {
         event.stopPropagation();
 
         this.selectItem(1);
     },
 
-    newKitAction: function ( event ) {
-        event.stopPropagation();
-
-        this.selectItem(2);
-    },
-
     helpAction: function ( event ) {
         event.stopPropagation();
 
-        this.selectItem(3);
+        this.selectItem(2);
     },
 });

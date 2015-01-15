@@ -1,5 +1,5 @@
 <link rel="import" href="dashboard-recent.html">
-<link rel="import" href="dashboard-new-template.html">
+<link rel="import" href="dashboard-new.html">
 
 <polymer-element
     name="fire-dashboard"
@@ -12,8 +12,7 @@
         <div class="sidebar" flex-col flex-stretch>
             <div id="menu">
                 <div class="item" on-click="{{recentAction}}">Recent Proejcts</div>
-                <div class="item" on-click="{{newTemplateAction}}">Start with a Template</div>
-                <div class="item" on-click="{{newKitAction}}">Start with a Kit</div>
+                <div class="item" on-click="{{newAction}}">New Project</div>
                 <div class="item" on-click="{{helpAction}}">Help</div>
             </div>
 
@@ -26,8 +25,7 @@
 
         <div id="content" class="content">
             <dashboard-recent></dashboard-recent>
-            <dashboard-new-template></dashboard-new-template>
-            <div></div>
+            <dashboard-new></dashboard-new>
             <dashboard-help></dashboard-help>
         </div>
     </template>

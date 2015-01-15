@@ -1,0 +1,46 @@
+<link rel="import" href="dashboard-template-item.html">
+
+<polymer-element
+    name="dashboard-new"
+    constructor="DashboardNew"
+    >
+    <template>
+        <link rel="stylesheet" href="dashboard-new.css">
+
+        <div class="title">Start A New Project</div>
+
+        <div class="field" flex-row>
+            <fire-ui-label flex-1>Name</fire-ui-label>
+            <fire-ui-text-input flex-10 placeholder="Name" value="{{name}}"></fire-ui-text-input>
+        </div>
+
+        <div class="field" flex-row>
+            <fire-ui-label flex-1>Path</fire-ui-label>
+            <div flex-row flex-10>
+                <fire-ui-text-input flex-1 placeholder="Path" value="{{path}}"></fire-ui-text-input>
+                <span class="space"></span>
+                <fire-ui-button on-click="{{browseAction}}">...</fire-ui-button>
+            </div>
+        </div>
+
+        <div class="field" flex-row>
+            <fire-ui-button on-click="{{createAction}}" disabled="{{curSelect===null}}">Create</fire-ui-button>
+        </div>
+
+        <fire-ui-tabs>
+            <fire-ui-tab on-active="{{templateAction}}">Templates</fire-ui-tab>
+            <fire-ui-tab on-active="{{gamekitsAction}}">Game Kits</fire-ui-tab>
+        </fire-ui-tabs>
+        <div class="border" flex-1>
+            <div id="content" class="content" fit>
+                <template repeat="{{item in items}}">
+                    <dashboard-template-item item="{{item}}" selected="{{item.selected}}" on-select="{{selectAction}}"
+                    >
+                    </dashboard-template-item>
+                </template>
+            </div>
+        </div>
+    </template>
+
+    <script type="text/javascript" src="dashboard-new.js"></script>
+</polymer-element>
