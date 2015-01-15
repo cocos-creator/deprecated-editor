@@ -60,6 +60,9 @@ Polymer({
         var fspath = Fire.AssetDB._fspath(url);
         var uuid = Fire.AssetDB.urlToUuid(url);
         Fs.readFile(fspath, 'utf8', function ( err, data ) {
+            if (data==""){
+                console.log("kong");
+            }
             this.$.mirror.value = data;
             this.$.mirror.filePath = fspath;
             this.$.mirror.uuid = uuid;

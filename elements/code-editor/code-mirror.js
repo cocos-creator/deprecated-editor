@@ -1,7 +1,7 @@
 var Fs = require("fire-fs");
 
 Polymer({
-    value: '',
+    value: null,
     mode: 'javascript',
     theme: 'solarized dark',
     tabSize: 4,
