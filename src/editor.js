@@ -16,7 +16,7 @@ for ( var i = 0; i < queryList.length; ++i ) {
 //
 var Util = require('util');
 var remote = require('remote');
-var ipc = require('ipc');
+var Ipc = require('ipc');
 
 //
 Fire.mixin( Fire, {
@@ -99,7 +99,7 @@ Fire.mixin( Fire, {
         'use strict';
         if ( typeof message === 'string' ) {
             var args = [].slice.call( arguments );
-            ipc.send.apply( ipc, ['send2core@' + fireID].concat( args ) );
+            Ipc.send.apply( Ipc, ['send2core'].concat( args ) );
         }
         else {
             Fire.error('The message must be provided');
@@ -117,7 +117,7 @@ Fire.mixin( Fire, {
         'use strict';
         if ( typeof message === 'string' ) {
             var args = [].slice.call( arguments );
-            ipc.send.apply( ipc, ['send2pages@' + fireID].concat( args ) );
+            Ipc.send.apply( Ipc, ['send2pages'].concat( args ) );
         }
         else {
             Fire.error('The message must be provided');
@@ -134,7 +134,7 @@ Fire.mixin( Fire, {
         'use strict';
         if ( typeof message === 'string' ) {
             var args = [].slice.call( arguments );
-            ipc.send.apply( ipc, ['send2all@' + fireID].concat( args ) );
+            Ipc.send.apply( Ipc, ['send2all'].concat( args ) );
         }
         else {
             Fire.error('The message must be provided');
@@ -145,7 +145,7 @@ Fire.mixin( Fire, {
         'use strict';
         if ( typeof name === 'string' ) {
             var args = [].slice.call( arguments );
-            ipc.send.apply( ipc, ['rpc@' + fireID].concat( args ) );
+            Ipc.send.apply( Ipc, ['rpc'].concat( args ) );
         }
         else {
             Fire.error('The name of rpc must be provided');
@@ -206,5 +206,3 @@ Fire.MainMenu = remote.getGlobal( 'MainMenu@' + fireID );
 Fire.plugins = {}; // TODO: 做成Remote Object，确保全局只有一份?
 Fire.gizmos = {};
 
-// init editor-shares after Fire inited
-Fire.Selection.registerMessages(ipc);
