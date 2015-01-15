@@ -20,7 +20,7 @@ Polymer({
         // }.bind(this);
         // client.send();
 
-        var fspath = Fire.AssetDB.fspath(url);
+        var fspath = Fire.AssetDB._fspath(url);
         Fs.readFile(fspath, 'utf8', function ( err, data ) {
             this.$.mirror.value = data;
         }.bind(this));

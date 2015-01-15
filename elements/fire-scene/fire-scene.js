@@ -96,14 +96,13 @@ Polymer({
     saveCurrentScene: function () {
         var currentScene = Fire.Engine._scene;
         var saveUrl = null;
-        var rootPath = Fire.AssetDB.fspath("assets://");
         var dialog = Remote.require('dialog');
 
         if ( currentScene._uuid ) {
-            savePath = Fire.AssetDB.uuidToFspath(currentScene._uuid);
-            saveUrl = 'assets://' + Path.relative( rootPath, savePath );
+            saveUrl = Fire.AssetDB.uuidToUrl(currentScene._uuid);
         }
         else {
+            var rootPath = Fire.AssetDB._fspath("assets://");
             var savePath = dialog.showSaveDialog( Remote.getCurrentWindow(), {
                 title: "Save Scene",
                 defaultPath: rootPath,
