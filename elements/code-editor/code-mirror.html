@@ -1,13 +1,4 @@
-<script type="text/javascript" src="codemirror-4.11/lib/codemirror.js"></script>
-<script type="text/javascript" src="codemirror-4.11/mode/javascript/javascript.js"></script>
-<script type="text/javascript" src="codemirror-4.11/mode/css/css.js"></script>
-<script type="text/javascript" src="codemirror-4.11/mode/htmlmixed/htmlmixed.js"></script>
-<script type="text/javascript" src="codemirror-4.11/addon/selection/active-line.js"></script>
-<script type="text/javascript" src="codemirror-4.11/addon/fold/foldcode.js"></script>
-<script type="text/javascript" src="codemirror-4.11/addon/fold/foldgutter.js"></script>
-<script type="text/javascript" src="codemirror-4.11/addon/fold/brace-fold.js"></script>
-<script type="text/javascript" src="codemirror-4.11/addon/fold/comment-fold.js"></script>
-<script type="text/javascript" src="codemirror-4.11/addon/edit/matchbrackets.js"></script>
+<link rel="import" href="codemirror-import.html">
 
 <polymer-element
     name="code-mirror"
@@ -15,19 +6,55 @@
     >
 <template>
     <link rel="stylesheet" href="codemirror-4.11/lib/codemirror.css">
+    <link rel="stylesheet" href="codemirror-4.11/addon/fold/foldgutter.css">
+    <link rel="stylesheet" href="codemirror-4.11/addon/dialog/dialog.css">
+    <link rel="stylesheet" href="code-mirror.css">
+    <!--theme css-->
+    <link rel="stylesheet" href="codemirror-4.11/theme/3024-day.css">
+    <link rel="stylesheet" href="codemirror-4.11/theme/3024-night.css">
+    <link rel="stylesheet" href="codemirror-4.11/theme/ambiance.css">
+    <link rel="stylesheet" href="codemirror-4.11/theme/base16-dark.css">
+    <link rel="stylesheet" href="codemirror-4.11/theme/base16-light.css">
+    <link rel="stylesheet" href="codemirror-4.11/theme/blackboard.css">
+    <link rel="stylesheet" href="codemirror-4.11/theme/cobalt.css">
+    <link rel="stylesheet" href="codemirror-4.11/theme/eclipse.css">
+    <link rel="stylesheet" href="codemirror-4.11/theme/elegant.css">
+    <link rel="stylesheet" href="codemirror-4.11/theme/erlang-dark.css">
+    <link rel="stylesheet" href="codemirror-4.11/theme/lesser-dark.css">
+    <link rel="stylesheet" href="codemirror-4.11/theme/mbo.css">
+    <link rel="stylesheet" href="codemirror-4.11/theme/mdn-like.css">
+    <link rel="stylesheet" href="codemirror-4.11/theme/midnight.css">
+    <link rel="stylesheet" href="codemirror-4.11/theme/monokai.css">
+    <link rel="stylesheet" href="codemirror-4.11/theme/neat.css">
+    <link rel="stylesheet" href="codemirror-4.11/theme/neo.css">
+    <link rel="stylesheet" href="codemirror-4.11/theme/night.css">
+    <link rel="stylesheet" href="codemirror-4.11/theme/paraiso-dark.css">
+    <link rel="stylesheet" href="codemirror-4.11/theme/paraiso-light.css">
+    <link rel="stylesheet" href="codemirror-4.11/theme/pastel-on-dark.css">
+    <link rel="stylesheet" href="codemirror-4.11/theme/rubyblue.css">
     <link rel="stylesheet" href="codemirror-4.11/theme/solarized.css">
+    <link rel="stylesheet" href="codemirror-4.11/theme/the-matrix.css">
+    <link rel="stylesheet" href="codemirror-4.11/theme/tomorrow-night-bright.css">
+    <link rel="stylesheet" href="codemirror-4.11/theme/tomorrow-night-eighties.css">
+    <link rel="stylesheet" href="codemirror-4.11/theme/twilight.css">
+    <link rel="stylesheet" href="codemirror-4.11/theme/vibrant-ink.css">
+    <link rel="stylesheet" href="codemirror-4.11/theme/xq-dark.css">
+    <link rel="stylesheet" href="codemirror-4.11/theme/xq-light.css">
+    <link rel="stylesheet" href="codemirror-4.11/theme/zenburn.css">
     <style>
-        :host {
-            display: block;
-            position: relative;
-        }
-        .CodeMirror {
-            height: auto;
-            font-size: 13px;
-            line-height: 130%;
-            font-weight: 500;
-        }
+    .CodeMirror-dialog {
+        position: absolute;
+        left: 0; right: 0;
+        background: black;
+        z-index: 15;
+        padding: .1em .8em;
+        overflow: hidden;
+        color: white;
+    }
+
+
     </style>
+    <span id="code"></span>
 </template>
 <script type="text/javascript" src="code-mirror.js"></script>
 
