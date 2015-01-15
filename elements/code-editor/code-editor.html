@@ -17,17 +17,11 @@
         <code-mirror id="mirror"></code-mirror>
     </div>
     <span id="statusBar">
-        <!--<ul>
-            <li>{{fileName}}</li>
-            <li>{{Cursor.line+1}},{{Cursor.ch}}</li>
-        </ul>
-        <fire-ui-select id="keymapSelect"></fire-ui-select>-->
-
         <fire-ui-toolbar style="float:left">
             <div class="space"></div>
-            <fire-ui-label>{{fileName}}</fire-ui-label>
+            <fire-ui-label>{{url}}</fire-ui-label>
             <div class="space"></div>
-            <fire-ui-label>{{Cursor.line+1}},{{Cursor.ch}}</fire-ui-label>
+            <fire-ui-label>{{cursor.line+1}},{{cursor.ch}}</fire-ui-label>
             <div class="space3"></div>
             <fire-ui-label>KeyMap: </fire-ui-label>
             <div class="space"></div>
@@ -37,6 +31,7 @@
             <div class="space"></div>
             <fire-ui-select searchable value="{{themeValue}}" id="themeSelect" ></fire-ui-select>
         </fire-ui-toolbar>
+
         <fire-ui-toolbar style="float:right">
             <fire-ui-label id="tip"></fire-ui-label>
         </fire-ui-toolbar>

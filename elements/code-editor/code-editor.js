@@ -2,7 +2,7 @@ var Fs = require("fire-fs");
 
 Polymer({
     publish: {
-        Cursor: {"line":0,"ch":0},
+        cursor: {"line":0,"ch":0},
         keyMapValue: 0,
         themeValue: 30,
     },
@@ -27,13 +27,15 @@ Polymer({
         // client.send();
 
         var fspath = Fire.AssetDB._fspath(url);
+        var uuid = Fire.AssetDB.urlToUuid(url);
         Fs.readFile(fspath, 'utf8', function ( err, data ) {
             this.$.mirror.owner = this;
             this.$.mirror.value = data;
             this.$.mirror.filePath = fspath;
+            this.$.mirror.uuid = uuid;
         }.bind(this));
 
-        this.fileName = fspath;
+        this.url = url;
     },
 
     ready: function () {

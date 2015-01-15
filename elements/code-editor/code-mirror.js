@@ -9,15 +9,16 @@ Polymer({
     lineNumbers: true,
     owner: null,
     filePath: "",
-
-    refresh: function() {
-        this.mirror.refresh();
-    },
+    uuid: "",
 
     ready: function () {
     },
 
     domReady: function () {
+    },
+
+    refresh: function() {
+        this.mirror.refresh();
     },
 
     valueChanged: function() {
@@ -53,7 +54,7 @@ Polymer({
         }.bind(this));
 
         this.mirror.on('cursorActivity',function () {
-            this.owner.Cursor = this.mirror.getCursor();
+            this.owner.cursor = this.mirror.getCursor();
         }.bind(this));
     },
 
@@ -69,17 +70,17 @@ Polymer({
         this.mirror.setOption('theme', this.theme);
     },
 
-    //NOTE: 统一修改右下角通知
-    tipToast: function (text) {
-        this.owner.$.tip.innerHTML = text;
-    },
-
     tabSizeChanged: function() {
         this.mirror.setOption('tabSize', this.tabSize);
     },
 
     lineNumbersChanged: function() {
         this.mirror.setOption('lineNumbers', this.lineNumbers);
+    },
+
+    //NOTE: 统一修改右下角通知
+    tipToast: function (text) {
+        this.owner.$.tip.innerHTML = text;
     },
 
     focus: function() {
@@ -100,15 +101,17 @@ Polymer({
 
     //NOTE: Save to file
     saveModifed: function () {
-        Fs.writeFile(this.filePath,this.mirror.getValue(), 'utf8', function ( err ) {
-            if (!err){
-                this.tipToast("save success!");
+        Fs.writeFile(this.filePath, this.mirror.getValue(), 'utf8', function ( err ) {
+            if ( err ) {
+                Fire.error( err.message );
+                return;
             }
+
+            this.tipToast("save success!");
+
+            // TEMP HACK
+            Fire.sendToAll('asset:changed', this.uuid);
+            Fire.sendToAll('asset-db:synced');
         }.bind(this));
     },
-
-    themeChanged: function () {
-        this.mirror.setOption('theme', this.theme);
-    },
-
 });

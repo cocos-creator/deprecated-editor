@@ -28,6 +28,10 @@ Polymer({
         }
 
         Fire.AssetLibrary.loadAsset( this.meta.uuid, function ( asset ) {
+            if ( !asset instanceof Fire.CustomAsset ) {
+                Fire.error( 'The asset is corrupted!' );
+            }
+
             if ( asset && this.meta.uuid === asset._uuid ) {
                 this.asset = asset;
 

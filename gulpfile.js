@@ -84,6 +84,7 @@ var task_plugin = function ( name ) {
     var task_styl = 'plugin-' + name + '-styl';
     var task_js = 'plugin-' + name + '-js';
     var task_js_dev = 'plugin-' + name + '-js-dev';
+    var task_js_ext = 'plugin-' + name + '-js-ext';
     var task_html = 'plugin-' + name + '-html';
     var task_html_dev = 'plugin-' + name + '-html-dev';
     var task_copy_html = 'plugin-' + name + '-copy-html';
@@ -93,10 +94,12 @@ var task_plugin = function ( name ) {
     task_min_deps.push(task_html);
     task_dev_deps.push(task_html_dev);
 
+    var js_files = [basePath + '**/*.js','!' + basePath + 'ext/**/*.js'];
+
     var watcher = {
         css: { files: basePath + '**/*.css', tasks: [task_css, task_html_dev] },
         styl: { files: basePath + '**/*.styl', tasks: [task_styl, task_html_dev] },
-        js: { files: basePath + '**/*.js', tasks: [task_html_dev] },
+        js: { files: js_files, tasks: [task_html_dev] },
         html: { files: basePath + '**/*.html', tasks: [task_html_dev] },
         res: { files: [basePath + '**/*.jpg', basePath + '**/*.png'], tasks: [task_copy_res] }
     };
@@ -138,8 +141,14 @@ var task_plugin = function ( name ) {
     });
 
     // js
-    gulp.task(task_js, function() {
-        return gulp.src(basePath + '**/*.js', {base: 'elements'})
+    gulp.task(task_js_ext, function() {
+        return gulp.src(basePath + 'ext/**/*.js', {base: 'elements'})
+        .pipe(gulp.dest('bin/tmp/'))
+        ;
+    });
+
+    gulp.task(task_js, [task_js_ext], function() {
+        return gulp.src(js_files, {base: 'elements'})
         .pipe(wrapScope())
         .pipe(jshint({
             multistr: true,
@@ -152,9 +161,15 @@ var task_plugin = function ( name ) {
         ;
     });
 
-    gulp.task(task_js_dev, function() {
-        return gulp.src(basePath + '**/*.js', {base: 'elements'})
+    gulp.task(task_js_dev, [task_js_ext], function() {
+        return gulp.src(js_files, {base: 'elements'})
         .pipe(wrapScope())
+        .pipe(jshint({
+            multistr: true,
+            smarttabs: false,
+            loopfunc: true,
+        }))
+        .pipe(jshint.reporter(stylish))
         .pipe(gulp.dest('bin/tmp/'))
         ;
     });
