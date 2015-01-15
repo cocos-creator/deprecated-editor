@@ -75,13 +75,17 @@ Polymer({
             return { name: item, value: item };
         });
 
+        window.addEventListener('resize', function() {
+            this.updateSize();
+        }.bind(this));
+
         this.updateSize();
     },
 
     updateSize: function () {
         window.requestAnimationFrame ( function () {
             this.$.codeArea.style.height = this.getBoundingClientRect().height-51 + "px";
-            this.updateSize();
+            this.$.mirror.refresh();
         }.bind(this) );
     },
 
