@@ -1,31 +1,33 @@
 <link rel="import" href="dashboard-recent.html">
-<link rel="import" href="dashboard-new.html">
+<link rel="import" href="dashboard-new-template.html">
 
-<polymer-element 
-    name="fire-dashboard" 
+<polymer-element
+    name="fire-dashboard"
     constructor="FireDashboard"
+    on-project-added="{{projectAddedAction}}"
     >
     <template>
         <link rel="stylesheet" href="fire-dashboard.css">
 
-        <div class="sidebar">
-            <img class="logo" src="img/dashboard-logo.png"></img>
+        <div class="sidebar" flex-col flex-stretch>
             <div id="menu">
-                <div class="item" on-click="{{recentAction}}">
-                    <i class="fa fa-bars"></i>Recent Proejcts
-                </div>
-                <div class="item" on-click="{{newAction}}">
-                    <i class="fa fa-gear"></i>New Project
-                </div>
-                <div class="item" on-click="{{helpAction}}">
-                    <i class="fa fa-question-circle"></i>Help
-                </div>
+                <div class="item" on-click="{{recentAction}}">Recent Proejcts</div>
+                <div class="item" on-click="{{newTemplateAction}}">Start with a Template</div>
+                <div class="item" on-click="{{newKitAction}}">Start with a Kit</div>
+                <div class="item" on-click="{{helpAction}}">Help</div>
+            </div>
+
+            <span flex-1></span>
+
+            <div class="btn-group">
+                <fire-ui-button on-click="{{openAction}}">Open...</fire-ui-button>
             </div>
         </div>
 
         <div id="content" class="content">
             <dashboard-recent></dashboard-recent>
-            <dashboard-new></dashboard-new>
+            <dashboard-new-template></dashboard-new-template>
+            <div></div>
             <dashboard-help></dashboard-help>
         </div>
     </template>

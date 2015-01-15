@@ -6,21 +6,6 @@ Polymer({
 
     ready: function () {
         this.selectItem(0);
-
-        // init document events
-        document.addEventListener( "dragstart", function (event) {
-            event.preventDefault();
-        } );
-        document.addEventListener( "drop", function (event) {
-            event.preventDefault();
-        } );
-        document.addEventListener( "dragover", function (event) {
-            event.preventDefault();
-        } );
-        document.addEventListener( "contextmenu", function (event) {
-            event.preventDefault();
-            event.stopPropagation();
-        } );
     },
 
     detached: function () {
@@ -39,15 +24,46 @@ Polymer({
         }
     },
 
-    recentAction: function ( event ) {
+    openAction: function ( event ) {
+        var dialog = Remote.require('dialog');
+
+        var result = dialog.showOpenDialog ( {
+            title: "Choose a project",
+            properties: [ 'openDirectory' ]
+        } );
+
+        if ( result ) {
+            Fire.sendToCore( 'dashboard:add-project', result[0], true );
+        }
+    },
+
+    projectAddedAction: function ( event ) {
+        event.stopPropagation();
+
         this.selectItem(0);
     },
 
-    newAction: function ( event ) {
+    recentAction: function ( event ) {
+        event.stopPropagation();
+
+        this.selectItem(0);
+    },
+
+    newTemplateAction: function ( event ) {
+        event.stopPropagation();
+
         this.selectItem(1);
     },
 
-    helpAction: function ( event ) {
+    newKitAction: function ( event ) {
+        event.stopPropagation();
+
         this.selectItem(2);
+    },
+
+    helpAction: function ( event ) {
+        event.stopPropagation();
+
+        this.selectItem(3);
     },
 });

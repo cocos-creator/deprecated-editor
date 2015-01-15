@@ -32,15 +32,25 @@ Polymer({
                 this.recentProjets.push({
                     name: Path.basename(path),
                     path: path,
+                    blink: false,
                 });
             }
         }.bind(this) );
 
-        Ipc.on( 'dashboard:project-added', function ( path ) {
-            this.recentProjets.push({ 
+        Ipc.on( 'dashboard:project-added', function ( path, openWhenAdded ) {
+            this.recentProjets.push({
                 name: Path.basename(path),
                 path: path,
+                blink: true,
             });
+
+            setTimeout( function () {
+                if ( openWhenAdded ) {
+                    Fire.sendToCore('dashboard:open-project', path);
+                }
+            }, 300 );
+
+            this.fire('project-added');
         }.bind(this) );
 
         Ipc.on( 'dashboard:project-removed', function ( path ) {
@@ -61,19 +71,6 @@ Polymer({
         Ipc.removeAllListeners('dashboard:recent-projects');
         Ipc.removeAllListeners('dashboard:project-added');
         Ipc.removeAllListeners('dashboard:project-removed');
-    },
-
-    browseAction: function ( event ) {
-        var dialog = Remote.require('dialog');
-
-        var result = dialog.showOpenDialog ( {
-            title: "Choose a project",
-            properties: [ 'openDirectory' ]
-        } );
-
-        if ( result ) {
-            Fire.sendToCore( 'dashboard:add-project', result[0] );
-        }
     },
 
     dropAction: function ( event ) {

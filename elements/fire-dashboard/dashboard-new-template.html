@@ -1,0 +1,32 @@
+<polymer-element
+    name="dashboard-new-template"
+    constructor="DashboardNewTemplate"
+    >
+    <template>
+        <link rel="stylesheet" href="dashboard-new-template.css">
+
+        <div class="title">Start with a Template</div>
+
+        <div class="field" flex-row>
+            <fire-ui-label flex-1>Name</fire-ui-label>
+            <fire-ui-text-input flex-10 placeholder="Name" value="{{name}}"></fire-ui-text-input>
+        </div>
+
+        <div class="field" flex-row>
+            <fire-ui-label flex-1>Path</fire-ui-label>
+            <div flex-row flex-10>
+                <fire-ui-text-input flex-1 placeholder="Path" value="{{path}}"></fire-ui-text-input>
+                <span class="space"></span>
+                <fire-ui-button on-click="{{browseAction}}">...</fire-ui-button>
+            </div>
+        </div>
+
+        <fire-ui-button on-click="{{createAction}}">Create</fire-ui-button>
+
+        <span class="space"></span>
+        <div class="border" flex-1>
+        </div>
+    </template>
+
+    <script type="text/javascript" src="dashboard-new-template.js"></script>
+</polymer-element>

@@ -1,58 +1,42 @@
 :host {
+    position: absolute
+    top: 0px
+    bottom: 0px
+    left: 0px
+    right: 0px
+
     display: flex
     flex-direction: row
-    flex-wrap: nowrap     
+    flex-wrap: nowrap
     align-items: stretch
-    height: 100%
 
     font-family: Helvetica,Arial,sans-serif
 
-    * {
-        cursor: default     
-        -webkit-user-select: none
-
-        &:focus {
-            outline: 0
-        }
-    }
-
     .sidebar {
         width: 250px
-
-        background-color: #171717
-
-        .logo {
-            -webkit-filter: grayscale(0.5) opacity(0.3)
-        }
+        padding: 10px
 
         #menu {
-            margin-top: 120px
-            padding: 0px
+            margin-top: 20px
 
             .item {
-                padding: 10px
-                padding-left: 20px
+                padding: 4px 8px
                 font-size: 18px
-                list-style-type: none
 
                 color: #aaa
-                border-left: 4px solid #171717
 
                 &:hover {
-                    border-left: 4px solid #222
                     background-color: #222
                 }
 
                 &.active {
-                    border-left: 4px solid #ffba00
-                    background-color: #333
-                }
-
-                i {
-                    width: 20px
-                    margin-right: 10px
+                    background-color: #444
                 }
             }
+        }
+
+        .btn-group {
+            margin-bottom: 10px
         }
     }
 

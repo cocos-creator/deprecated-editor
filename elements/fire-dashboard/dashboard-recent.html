@@ -1,22 +1,23 @@
 <link rel="import" href="dashboard-project-item.html">
 
-<polymer-element 
-    name="dashboard-recent" 
+<polymer-element
+    name="dashboard-recent"
     constructor="DashboardRecent"
     on-drop="{{dropAction}}"
     >
     <template>
         <link rel="stylesheet" href="dashboard-recent.css">
 
-        <div class="flex-col">
-            <div class="title">Recent Projects</div>
-            <div class="btn" on-click="{{browseAction}}">Browse...</div>
-            <div id="border" class="border">
-                <template repeat="{{item in recentProjets}}">
-                    <dashboard-project-item name="{{item.name}}" path="{{item.path}}">
-                    </dashboard-project-item>
-                </template>
-            </div>
+        <div class="title">Recent Projects</div>
+        <div id="border" class="border" flex-1>
+            <template repeat="{{item in recentProjets}}">
+                <dashboard-project-item
+                    name="{{item.name}}"
+                    path="{{item.path}}"
+                    blink="{{item.blink}}"
+                    >
+                </dashboard-project-item>
+            </template>
         </div>
 
     </template>
