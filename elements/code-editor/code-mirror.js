@@ -45,6 +45,7 @@ Polymer({
             mode: this.mode,
             theme: this.theme,
             scroll: false,
+            dragDrop: false,
             tabSize: this.tabSize,
             lineNumbers: this.lineNumbers,
             foldGutter: true,
