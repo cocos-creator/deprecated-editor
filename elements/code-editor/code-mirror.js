@@ -37,6 +37,9 @@ Polymer({
     },
 
     createEditor: function () {
+        CodeMirror.commands.save = function () {
+            this.save();
+        }.bind(this);
         this.mirror = CodeMirror(this.shadowRoot, {
             value: this.value,
             mode: this.mode,
