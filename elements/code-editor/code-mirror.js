@@ -1,7 +1,7 @@
 Polymer({
     value: '',
     mode: 'javascript',
-    theme: 'zenburn',
+    theme: 'solarized dark',
     tabSize: 4,
     lineNumbers: true,
 

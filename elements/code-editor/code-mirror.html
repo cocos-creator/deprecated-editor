@@ -1,13 +1,13 @@
-<script src="codemirror-4.11/lib/codemirror.js"></script>
-<script src="codemirror-4.11/mode/javascript/javascript.js"></script>
-<script src="codemirror-4.11/mode/css/css.js"></script>
-<script src="codemirror-4.11/mode/htmlmixed/htmlmixed.js"></script>
-<script src="codemirror-4.11/addon/selection/active-line.js"></script>
-<script src="codemirror-4.11/addon/fold/foldcode.js"></script>
-<script src="codemirror-4.11/addon/fold/foldgutter.js"></script>
-<script src="codemirror-4.11/addon/fold/brace-fold.js"></script>
-<script src="codemirror-4.11/addon/fold/comment-fold.js"></script>
-<script src="codemirror-4.11/addon/edit/matchbrackets.js"></script>
+<script type="text/javascript" src="codemirror-4.11/lib/codemirror.js"></script>
+<script type="text/javascript" src="codemirror-4.11/mode/javascript/javascript.js"></script>
+<script type="text/javascript" src="codemirror-4.11/mode/css/css.js"></script>
+<script type="text/javascript" src="codemirror-4.11/mode/htmlmixed/htmlmixed.js"></script>
+<script type="text/javascript" src="codemirror-4.11/addon/selection/active-line.js"></script>
+<script type="text/javascript" src="codemirror-4.11/addon/fold/foldcode.js"></script>
+<script type="text/javascript" src="codemirror-4.11/addon/fold/foldgutter.js"></script>
+<script type="text/javascript" src="codemirror-4.11/addon/fold/brace-fold.js"></script>
+<script type="text/javascript" src="codemirror-4.11/addon/fold/comment-fold.js"></script>
+<script type="text/javascript" src="codemirror-4.11/addon/edit/matchbrackets.js"></script>
 
 <polymer-element
     name="code-mirror"
@@ -15,14 +15,20 @@
     >
 <template>
     <link rel="stylesheet" href="codemirror-4.11/lib/codemirror.css">
-    <link rel="stylesheet" href="codemirror-4.11/theme/zenburn.css">
-    <link rel="stylesheet" href="code-mirror.css">
+    <link rel="stylesheet" href="codemirror-4.11/theme/solarized.css">
     <style>
-
+        :host {
+            display: block;
+            position: relative;
+        }
+        .CodeMirror {
+            height: auto;
+            font-size: 13px;
+            line-height: 130%;
+            font-weight: 500;
+        }
     </style>
-
     <span id="code"></span>
-
 </template>
 <script type="text/javascript" src="code-mirror.js"></script>
 

@@ -88,7 +88,8 @@ Polymer({
 
         //
         var el;
-        if ( this.target instanceof Fire.AssetInspector ) {
+        if ( this.target instanceof Fire.AssetInspector ||
+             this.target instanceof Fire.CustomAsset ) {
             el = _fieldSection( "Properties", this.target );
             this.appendChild( el );
         }
