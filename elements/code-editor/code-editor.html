@@ -19,10 +19,13 @@
         <fire-ui-toolbar style="float:left">
             <div class="space"></div>
 
-            <fire-ui-label>{{url}}</fire-ui-label>
+            <fire-ui-label class="label" >{{url}}</fire-ui-label>
             <div class="space"></div>
 
-            <fire-ui-label>Line {{$.mirror.cursor.line+1}}, Column {{$.mirror.cursor.ch}}</fire-ui-label>
+            <fire-ui-label class="label" >Line {{$.mirror.cursor.line+1}}, Column {{$.mirror.cursor.ch}}</fire-ui-label>
+            <div class="space"></div>
+
+            <fire-ui-label class="label" >{{$.mirror.jshintError}}</fire-ui-label>
             <div class="space"></div>
         </fire-ui-toolbar>
 
@@ -35,6 +38,11 @@
             <fire-ui-label>Theme: </fire-ui-label>
             <div class="space"></div>
             <fire-ui-select id="themeSelect" searchable value="{{$.mirror.theme}}"></fire-ui-select>
+            <div class="space"></div>
+
+            <fire-ui-label>Mode: </fire-ui-label>
+            <div class="space"></div>
+            <fire-ui-select id="modeSelect" searchable value="{{$.mirror.mode}}"></fire-ui-select>
             <div class="space"></div>
         </fire-ui-toolbar>
     </span>
