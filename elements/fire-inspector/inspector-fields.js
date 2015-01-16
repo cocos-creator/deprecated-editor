@@ -41,10 +41,14 @@ function _fieldSection ( name, target ) {
 
             //
             propEL.bind( 'value', new Fire._PathObserver( target, propName ) );
+            propEL.type = type;
             propEL.setAttribute( 'value', '{{target.'+propName+'}}' );
-            propEL.setAttribute( 'type', type );
-            if ( type === 'enum' ) {
-                propEL.enumList = attrs.enumList;
+            if ( type ) {
+                propEL.setAttribute( 'type', type );
+
+                if ( type === 'enum' ) {
+                    propEL.enumList = attrs.enumList;
+                }
             }
             propEL.id = propName;
 
