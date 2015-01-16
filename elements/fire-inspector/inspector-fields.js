@@ -94,11 +94,15 @@ Polymer({
             this.appendChild( el );
         }
         else if ( this.target instanceof Fire.Entity ) {
+            var docfrag = document.createDocumentFragment();
+
             for ( var i = 0; i < this.target._components.length; ++i ) {
                 var comp = this.target._components[i];
                 el = _fieldSection( Fire.getClassName(comp), comp );
-                this.appendChild( el );
+                docfrag.appendChild(el);
             }
+
+            this.appendChild( docfrag );
         }
     },
 });
