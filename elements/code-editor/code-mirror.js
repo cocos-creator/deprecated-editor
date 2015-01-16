@@ -24,7 +24,8 @@ Polymer({
     },
 
     refresh: function() {
-        this.mirror.refresh();
+        if ( this.mirror )
+            this.mirror.refresh();
     },
 
     valueChanged: function() {
