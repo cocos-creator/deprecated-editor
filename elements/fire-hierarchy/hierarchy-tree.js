@@ -538,8 +538,8 @@ Polymer({
                     }
                     else {
                         nextSiblingId = null;
-                        targetEL = hoverTarget.parentElement;
                     }
+                    targetEL = hoverTarget.parentElement;
                 }
                 else {
                     nextSiblingId = null;
@@ -564,14 +564,16 @@ Polymer({
                 if ( targetEL )
                     parentEnt = Fire._getInstanceById(targetEL.userId);
 
+                Fire.Selection.clearEntity();
                 var onload = function ( asset ) {
                     if ( asset.createEntity ) {
                         var ent = asset.createEntity();
                         ent.parent = parentEnt;
                         ent.transform.position = new Fire.Vec2(0,0);
-                        Fire.Selection.selectEntity( ent.id, true, true );
+                        Fire.Selection.selectEntity( ent.id, false, true );
                         Fire.sendToPages( 'scene:dirty' );
                         Fire.AssetLibrary.cacheAsset( asset );
+
                     }
                 }.bind(this);
 
