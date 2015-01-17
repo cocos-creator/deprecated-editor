@@ -48,8 +48,9 @@ Polymer({
                     process.nextTick(function (metaJson) {
                         // Only inspect the lastest one
                         if (this.lastUuid === id) {
-                            var meta = Fire.deserialize(metaJson);
-                            this.inspect(meta);
+                            Fire.AssetLibrary.loadMeta(metaJson, function ( meta ) {
+                                this.inspect(meta);
+                            }.bind(this));
                         }
                     }.bind(this, metaJson));
                 }
@@ -70,8 +71,9 @@ Polymer({
 
             //
             var metaJson = Fire.AssetDB.loadMetaJson(uuid);
-            var meta = Fire.deserialize(metaJson);
-            this.inspect(meta,true);
+            Fire.AssetLibrary.loadMeta(metaJson, function ( meta ) {
+                this.inspect(meta,true);
+            }.bind(this));
         }
     },
 
@@ -165,8 +167,9 @@ Polymer({
 
         if ( this.target && this.target instanceof Fire.AssetMeta ) {
             var metaJson = Fire.AssetDB.loadMetaJson(this.target.uuid);
-            var meta = Fire.deserialize(metaJson);
-            this.inspect(meta,true);
+            Fire.AssetLibrary.loadMeta(metaJson, function ( meta ) {
+                this.inspect(meta,true);
+            }.bind(this));
         }
     },
 
