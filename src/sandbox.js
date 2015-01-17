@@ -214,7 +214,7 @@ var userScriptLoader = (function () {
 
     var loader = {
 
-        load: function loadUserScripts () {
+        loadAll: function () {
             // do load
             var src = SRC + '?' + window.performance.now(); // 防止浏览器使用缓存
             var script = document.createElement('script');
@@ -240,7 +240,7 @@ var userScriptLoader = (function () {
             script.onerror = function () {
                 console.timeEnd('reload scripts');
                 if (loadedScriptNodes.length > 0) {
-                    loader.unload();
+                    loader.unloadAll();
                 }
             };
             script.setAttribute('type','text/javascript');
@@ -250,7 +250,7 @@ var userScriptLoader = (function () {
             loadedScriptNodes.push(script);
         },
 
-        unload: function unload () {
+        unloadAll: function () {
             // remove script element
             for (var i = 0; i < loadedScriptNodes.length; i++) {
                 var node = loadedScriptNodes[i];
@@ -266,7 +266,7 @@ var userScriptLoader = (function () {
 })();
 
 var builtinPluginMenuLoader = {
-    load: function () {
+    loadAll: function () {
         for (var key in Fire.plugins) {
             var plugin = Fire.plugins[key];
             if (plugin.mainMenu) {
@@ -274,7 +274,7 @@ var builtinPluginMenuLoader = {
             }
         }
     },
-    unload: function () {},
+    unloadAll: function () {},
     name: 'built-in plugin menu'
 };
 
@@ -327,12 +327,12 @@ Sandbox.reloadScripts = (function () {
         // restore global variables（就算没 play 也可能会在 dev tools 里面添加全局变量）
         Sandbox.globalVarsChecker.restore(Fire.log, 'editing');
 
-        var LoadSequence = [builtinPluginMenuLoader, userScriptLoader, Fire._PluginLoader];
+        var LoadSequence = [builtinPluginMenuLoader, userScriptLoader, Fire._editorPluginLoader];
 
         if (scriptsLoaded) {
             // unload old
             for (var i = 0; i < LoadSequence.length; i++) {
-                LoadSequence[i].unload();
+                LoadSequence[i].unloadAll();
                 Sandbox.globalVarsChecker.restore(Fire.warn, 'unloading ' + LoadSequence[i].name);
             }
 
@@ -342,7 +342,7 @@ Sandbox.reloadScripts = (function () {
 
         // load new
         for (var j = LoadSequence.length - 1; j >= 0; j--) {
-            LoadSequence[j].load();
+            LoadSequence[j].loadAll();
             Sandbox.globalVarsChecker.restore(Fire.warn, 'loading ' + LoadSequence[j].name);
         }
     }

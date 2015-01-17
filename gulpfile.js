@@ -41,7 +41,7 @@ var paths = {
 
         // plugins
         'src/plugins/plugin-context.js',
-        'src/plugins/plugin-loader.js',
+        'src/plugins/editor-plugin-loader.js',
         'src/plugins/hierarchy.js',
 
         // gizmos
