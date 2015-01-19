@@ -281,6 +281,8 @@ var builtinPluginMenuLoader = {
 // 重新加载全部脚本和插件
 Sandbox.reloadScripts = (function () {
 
+    var LoadSequence = [builtinPluginMenuLoader, userScriptLoader, Fire._editorPluginLoader];
+
     var builtinClasses;
     var builtinComponentMenus;
     var builtinCustomAssetMenus;
@@ -288,6 +290,7 @@ Sandbox.reloadScripts = (function () {
     var inited = false;
 
     function init () {
+        inited = true;
         Sandbox.globalVarsChecker = new GlobalVarsChecker().record();
         Sandbox.nodeJsRequire = require;
         builtinClasses = Fire._registeredClasses;
@@ -321,13 +324,10 @@ Sandbox.reloadScripts = (function () {
         var scriptsLoaded = inited;
         if ( !inited ) {
             init();
-            inited = true;
         }
 
         // restore global variables（就算没 play 也可能会在 dev tools 里面添加全局变量）
         Sandbox.globalVarsChecker.restore(Fire.log, 'editing');
-
-        var LoadSequence = [builtinPluginMenuLoader, userScriptLoader, Fire._editorPluginLoader];
 
         if (scriptsLoaded) {
             // unload old
