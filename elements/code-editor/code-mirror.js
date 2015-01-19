@@ -1,9 +1,9 @@
 var Fs = require("fire-fs");
-var Url = require('fire-url');
+var Path = require('fire-path');
 
 Polymer({
     value: null,
-    mode: 'text/html',
+    mode: 'htmlmixed',
     theme: 'solarized dark',
     tabSize: 4,
     keyMap: 'sublime',
@@ -44,6 +44,7 @@ Polymer({
         CodeMirror.commands.save = function () {
             this.save();
         }.bind(this);
+
         this.mirror = CodeMirror(this.shadowRoot, {
             value: this.value,
             mode: this.mode,
@@ -69,12 +70,12 @@ Polymer({
             this.cursor = this.mirror.getCursor();
         }.bind(this));
 
-        switch (Url.extname(this.filePath).toLowerCase()) {
+        switch (Path.extname(this.filePath).toLowerCase()) {
             case ".js" || ".json":
                 this.mode = "javascript";
                 break;
             case ".html" || ".htm":
-                this.mode = "text/html";
+                this.mode = "htmlmixed";
                 break;
             case ".css" || ".styl":
                 this.mode = "css";
@@ -133,15 +134,16 @@ Polymer({
         }.bind(this));
     },
 
-    //NOTE: 需要把jshint.js 放到 ext/util包里
+    //
     updateHints: function() {
         this.mirror.operation(function(){
             JSHINT(this.mirror.getValue());
             if (JSHINT.errors.length > 0) {
-                var errorMsg = "Jshint: [ line "
-                + JSHINT.errors[0].line
-                + " column " + JSHINT.errors[0].character
-                + " " +  JSHINT.errors[0].reason + " ]";
+                var errorMsg = "Jshint: [ line " +
+                               JSHINT.errors[0].line +
+                               " column " + JSHINT.errors[0].character +
+                               " " +  JSHINT.errors[0].reason + " ]"
+                               ;
                 this.jshintError = errorMsg;
                 this.jshint = JSHINT;
             }

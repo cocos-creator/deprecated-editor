@@ -43,7 +43,7 @@ var themes = [
 
 var modes = [
     "javascript",
-    "text/html",
+    "htmlmixed",
     "css",
     "xml",
 ];
