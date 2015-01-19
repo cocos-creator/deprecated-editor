@@ -41,6 +41,13 @@ var themes = [
     "zenburn"                 ,
 ];
 
+var modes = [
+    "javascript",
+    "text/html",
+    "css",
+    "xml",
+];
+
 Polymer({
     created: function () {
         var url = "";
@@ -72,6 +79,10 @@ Polymer({
         });
 
         this.$.themeSelect.options = themes.map(function ( item ) {
+            return { name: item, value: item };
+        });
+
+        this.$.modeSelect.options = modes.map(function ( item ) {
             return { name: item, value: item };
         });
 

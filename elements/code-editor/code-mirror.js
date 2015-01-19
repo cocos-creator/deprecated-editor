@@ -1,23 +1,26 @@
 var Fs = require("fire-fs");
+var Url = require('fire-url');
 
 Polymer({
-    value: '',
-    mode: 'javascript',
+    value: null,
+    mode: 'text/html',
     theme: 'solarized dark',
     tabSize: 4,
     keyMap: 'sublime',
     lineNumbers: true,
     filePath: "",
     uuid: "",
+    jshintError: "",
 
     created: function () {
         this.cursor = {
-            "ln" : 0,
+            "line" : 0,
             "ch" : 0
         };
     },
 
     ready: function () {
+
     },
 
     domReady: function () {
@@ -38,6 +41,9 @@ Polymer({
     },
 
     createEditor: function () {
+        CodeMirror.commands.save = function () {
+            this.save();
+        }.bind(this);
         this.mirror = CodeMirror(this.shadowRoot, {
             value: this.value,
             mode: this.mode,
@@ -46,6 +52,7 @@ Polymer({
             tabSize: this.tabSize,
             lineNumbers: this.lineNumbers,
             foldGutter: true,
+            autoCloseTags: true,
             matchBrackets: true,
             styleActiveLine: true,
             autoCloseBrackets: true,
@@ -54,15 +61,31 @@ Polymer({
             gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
         });
 
-        this.mirror.on('focus',function () {
-        }.bind(this));
-
         this.mirror.on('change',function () {
+            this.updateHints();
         }.bind(this));
 
         this.mirror.on('cursorActivity',function () {
             this.cursor = this.mirror.getCursor();
         }.bind(this));
+
+        switch (Url.extname(this.filePath).toLowerCase()) {
+            case ".js" || ".json":
+                this.mode = "javascript";
+                break;
+            case ".html" || ".htm":
+                this.mode = "text/html";
+                break;
+            case ".css" || ".styl":
+                this.mode = "css";
+                break;
+            case ".xml" || ".xaml":
+                this.mode = "xml";
+                break;
+            default:
+                this.mode = "";
+                break;
+        }
     },
 
     keyMapChanged: function () {
@@ -107,6 +130,24 @@ Polymer({
             // TEMP HACK
             Fire.sendToAll('asset:changed', this.uuid);
             Fire.sendToAll('asset-db:synced');
+        }.bind(this));
+    },
+
+    //NOTE: 需要把jshint.js 放到 ext/util包里
+    updateHints: function() {
+        this.mirror.operation(function(){
+            JSHINT(this.mirror.getValue());
+            if (JSHINT.errors.length > 0) {
+                var errorMsg = "Jshint: [ line "
+                + JSHINT.errors[0].line
+                + " column " + JSHINT.errors[0].character
+                + " " +  JSHINT.errors[0].reason + " ]";
+                this.jshintError = errorMsg;
+                this.jshint = JSHINT;
+            }
+            else {
+                this.jshintError = "";
+            }
         }.bind(this));
     },
 });
