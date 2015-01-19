@@ -1,5 +1,6 @@
 var Fs = require("fire-fs");
 var Path = require('fire-path');
+var Watch = require('node-watch');
 
 Polymer({
     value: null,
@@ -56,14 +57,23 @@ Polymer({
             autoCloseTags: true,
             matchBrackets: true,
             styleActiveLine: true,
+            lint: true,
             autoCloseBrackets: true,
             showCursorWhenSelecting: true,
             keyMap: this.keyMap,
-            gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
+            gutters: ["CodeMirror-linenumbers", "CodeMirror-lint-markers","CodeMirror-foldgutter","breakpoints"],
         });
 
         this.mirror.on('change',function () {
             this.updateHints();
+        }.bind(this));
+
+        this.mirror.on('focus',function () {
+            console.log('focus');
+        }.bind(this));
+
+        this.mirror.on('blur',function () {
+            console.log('blur');
         }.bind(this));
 
         this.mirror.on('cursorActivity',function () {
@@ -87,6 +97,13 @@ Polymer({
                 this.mode = "";
                 break;
         }
+
+        Watch(this.filePath, function(filename) {
+            var result = confirm("'"+Path.basename(filename)+"' was modified,do you want to reload?");
+            if (result) {
+                // NOTE: 这里要发消息给code-editor 实现reload
+            }
+        }.bind(this));
     },
 
     keyMapChanged: function () {
@@ -146,6 +163,14 @@ Polymer({
                                ;
                 this.jshintError = errorMsg;
                 this.jshint = JSHINT;
+
+                // for (var i =0; i<JSHINT.errors.length; i++) {
+                //     var marker = document.createElement("div");
+                //     marker.style.color = "red";
+                //     marker.innerHTML = "✘";
+                //     marker.style.marginLeft = "-10px";
+                //     this.mirror.setGutterMarker(JSHINT.errors[i].line, "breakpoints", marker);
+                // }
             }
             else {
                 this.jshintError = "";

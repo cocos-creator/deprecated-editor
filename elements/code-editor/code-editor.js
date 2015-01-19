@@ -111,4 +111,8 @@ Polymer({
     autoFormatAction: function () {
         this.$.mirror.autoFormat();
     },
+
+    focusedAction: function () {
+        console.log("focused");
+    },
 });
