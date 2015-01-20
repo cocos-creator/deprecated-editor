@@ -178,7 +178,7 @@ Fire.hintObject = function ( target ) {
     }
 };
 
-Fire.browseObject = function ( type ) {
+Fire.browseObject = function ( type, fobjectEL ) {
     if ( Fire.isChildClassOf( type, Fire.Entity ) ) {
         Fire.warn('TODO: ask johnny how to do this.');
     }
@@ -186,15 +186,22 @@ Fire.browseObject = function ( type ) {
         Fire.warn('TODO: ask johnny how to do this.');
     }
     else if ( Fire.isChildClassOf( type, Fire.Asset ) ) {
-        var typename = Fire.getClassName(type);
+        var typeID = Fire.getClassId(type);
         Fire.sendToCore('window:open', 'quick-assets', 'fire://static/quick-assets.html', {
             title: "Quick Assets",
             width: 800,
             height: 600,
             show: true,
             resizable: true,
-            query: { typename: typename },
+            query: { typeID: typeID, id: fobjectEL.value ? fobjectEL.value._uuid : -1 },
+            closeWhenBlur: true,
         } );
+        var ipc = new Fire.IpcListener();
+        ipc.on('quick-asset:selected', function ( uuid ) {
+            fobjectEL.setAsset(uuid);
+        });
+
+        // TODO: ipc.clear one quick-asset:destroyed
     }
 };
 

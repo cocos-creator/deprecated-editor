@@ -1,8 +1,9 @@
-<link rel="import" href="data-view/data-view.html">
+<link rel="import" href="data-detail/data-detail.html">
 
 <polymer-element
     name="quick-assets"
     constructor="QuickAssets"
+    on-selected="{{selectAction}}"
     >
 <template>
 
@@ -27,8 +28,12 @@
 
     <span class="space"></span>
 
-    <div class="view" flex-1>
-        <data-view id="dataView" view="{{viewMode}}" size="{{size}}" searchValue="{{datalist}}" fit></data-view>
+    <div flex-1 flex-col flex-stretch>
+        <fire-ui-resize-wrapper auto-layout min-height="50">
+            <fire-ui-list id="listView" value="{{items|applyFilter(searchText)}}" icon fit></fire-ui-list>
+        </fire-ui-resize-wrapper>
+        <fire-ui-splitter></fire-ui-splitter>
+        <data-detail id="detail" height="100" min-height="50"></data-detail>
     </div>
 </template>
 
