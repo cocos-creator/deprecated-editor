@@ -31,6 +31,14 @@ Polymer({
             this.$.btnGroup.style.display = "none";
         }
         this.$.btnGroup.select(0);
+
+        var remote = require('remote');
+        var browserWindow = remote.getCurrentWindow();
+        if ( browserWindow ) {
+            browserWindow.on ( 'close', function () {
+                Fire.sendToPages('quick-asset:closed');
+            });
+        }
     },
 
     attached: function () {

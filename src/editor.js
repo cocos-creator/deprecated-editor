@@ -178,7 +178,14 @@ Fire.hintObject = function ( target ) {
     }
 };
 
+var _isBrowsing = false;
 Fire.browseObject = function ( type, fobjectEL ) {
+    if ( _isBrowsing )
+        return;
+
+    _isBrowsing = true;
+    var ipc = new Fire.IpcListener();
+
     if ( Fire.isChildClassOf( type, Fire.Entity ) ) {
         Fire.warn('TODO: ask johnny how to do this.');
     }
@@ -196,12 +203,13 @@ Fire.browseObject = function ( type, fobjectEL ) {
             query: { typeID: typeID, id: fobjectEL.value ? fobjectEL.value._uuid : -1 },
             closeWhenBlur: true,
         } );
-        var ipc = new Fire.IpcListener();
         ipc.on('quick-asset:selected', function ( uuid ) {
             fobjectEL.setAsset(uuid);
         });
-
-        // TODO: ipc.clear one quick-asset:destroyed
+        ipc.on('quick-asset:closed', function () {
+            _isBrowsing = false;
+            ipc.clear();
+        });
     }
 };
 
