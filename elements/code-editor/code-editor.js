@@ -49,28 +49,11 @@ var modes = [
 ];
 
 Polymer({
+    blur: true,
+    showSetting: false,
     created: function () {
-        var url = "";
-        var queryString = decodeURIComponent(location.search.substr(1));
-        var queryList = queryString.split('&');
-        for ( var i = 0; i < queryList.length; ++i ) {
-            var pair = queryList[i].split("=");
-            if ( pair[0] === "url" ) {
-                url = pair[1];
-            }
-        }
-
-        //
-        this.url = url;
-
-        //
-        var fspath = Fire.AssetDB._fspath(url);
-        var uuid = Fire.AssetDB.urlToUuid(url);
-        Fs.readFile(fspath, 'utf8', function ( err, data ) {
-            this.$.mirror.value = data;
-            this.$.mirror.filePath = fspath;
-            this.$.mirror.uuid = uuid;
-        }.bind(this));
+        this.loadFile();
+        this.settingpage = null;
     },
 
     ready: function () {
@@ -93,6 +76,31 @@ Polymer({
         this.updateSize();
     },
 
+    loadFile: function (e) {
+        var url = "";
+        var queryString = decodeURIComponent(location.search.substr(1));
+        var queryList = queryString.split('&');
+        for ( var i = 0; i < queryList.length; ++i ) {
+            var pair = queryList[i].split("=");
+            if ( pair[0] === "url" ) {
+                url = pair[1];
+            }
+        }
+
+        this.url = url;
+
+        var fspath = Fire.AssetDB._fspath(url);
+        var uuid = Fire.AssetDB.urlToUuid(url);
+        Fs.readFile(fspath, 'utf8', function ( err, data ) {
+            this.$.mirror.value = data;
+            if (e !== undefined) {
+                this.$.mirror.resetValue();
+            }
+            this.$.mirror.filePath = fspath;
+            this.$.mirror.uuid = uuid;
+        }.bind(this));
+    },
+
     updateSize: function () {
         window.requestAnimationFrame ( function () {
             this.$.codeArea.style.height = this.getBoundingClientRect().height-51 + "px";
@@ -104,15 +112,34 @@ Polymer({
         this.$.mirror.save();
     },
 
-    commentAction: function () {
-        this.$.mirror.lineComment();
+    modifiedSave: function () {
+        if (this.$.mirror.editStatus) {
+            var result = confirm((this.$.mirror.filePath) + " was modified,do you want to save?");
+            if (result) {
+                this.$.mirror.save();
+            }
+        }
     },
 
-    autoFormatAction: function () {
-        this.$.mirror.autoFormat();
+    blurChanged: function () {
+        this.$.mirror.blur = this.blur;
     },
 
-    focusedAction: function () {
-        console.log("focused");
+    settings: function () {
+        if (this.settingpage === null){
+            this.settingpage = new SettingPage()
+            this.settingpage.config = this.$.mirror;
+            document.body.appendChild(this.settingpage);
+        }
+
+        if (!this.showSetting){
+            this.settingpage.hide = false;
+        }
+        else {
+            this.settingpage.hide = true;
+        }
+        this.showSetting = !this.showSetting;
+
     },
+
 });

@@ -5,13 +5,16 @@ var Watch = require('node-watch');
 Polymer({
     value: null,
     mode: 'htmlmixed',
-    theme: 'solarized dark',
+    theme: 'zenburn',
     tabSize: 4,
     keyMap: 'sublime',
     lineNumbers: true,
     filePath: "",
     uuid: "",
     jshintError: "",
+    blur: false,
+    reload: false,
+    editStatus: false,
 
     created: function () {
         this.cursor = {
@@ -42,9 +45,21 @@ Polymer({
     },
 
     createEditor: function () {
+        ChangeEditStatus(Path.basename(this.filePath),this.editStatus);
+
         CodeMirror.commands.save = function () {
             this.save();
         }.bind(this);
+
+        CodeMirror.commands.autoformat = function () {
+            this.autoFormat();
+        }.bind(this);
+
+        var mac = CodeMirror.keyMap.default == CodeMirror.keyMap.macDefault;
+        //autoformat
+        var autoformat = (mac ? "Cmd" : "Ctrl") + "-O";
+        var extraKeys = {};
+        extraKeys[autoformat] = "autoformat";
 
         this.mirror = CodeMirror(this.shadowRoot, {
             value: this.value,
@@ -57,23 +72,18 @@ Polymer({
             autoCloseTags: true,
             matchBrackets: true,
             styleActiveLine: true,
-            lint: true,
             autoCloseBrackets: true,
             showCursorWhenSelecting: true,
             keyMap: this.keyMap,
+            extraKeys: extraKeys,
             gutters: ["CodeMirror-linenumbers", "CodeMirror-lint-markers","CodeMirror-foldgutter","breakpoints"],
         });
 
         this.mirror.on('change',function () {
-            this.updateHints();
-        }.bind(this));
-
-        this.mirror.on('focus',function () {
-            console.log('focus');
-        }.bind(this));
-
-        this.mirror.on('blur',function () {
-            console.log('blur');
+            if (this.mode === "javascript") {
+                this.updateHints();
+            }
+            this.editStatus = true;
         }.bind(this));
 
         this.mirror.on('cursorActivity',function () {
@@ -99,11 +109,28 @@ Polymer({
         }
 
         Watch(this.filePath, function(filename) {
-            var result = confirm("'"+Path.basename(filename)+"' was modified,do you want to reload?");
-            if (result) {
-                // NOTE: 这里要发消息给code-editor 实现reload
+            if (this.blur) {
+                this.reload = true;
             }
         }.bind(this));
+
+        if (this.mode === "javascript") {
+            this.updateHints();
+        }
+        this.mirror.focus();
+    },
+
+    blurChanged: function () {
+        if (!this.blur) {
+            if (this.reload) {
+                var result = confirm(Path.basename(this.filePath) + " was modified,do you want to reload?");
+                if (result) {
+                    this.fire('file-changed');
+                }
+            }
+            this.reload = false;
+            this.blur = false;
+        }
     },
 
     keyMapChanged: function () {
@@ -126,6 +153,10 @@ Polymer({
         this.mirror.setOption('lineNumbers', this.lineNumbers);
     },
 
+    editStatusChanged: function () {
+        ChangeEditStatus(Path.basename(this.filePath),this.editStatus);
+    },
+
     lineComment: function () {
         var range = { from: this.mirror.getCursor(true), to: this.mirror.getCursor(false) };
         this.mirror.lineComment(range.from, range.to);
@@ -144,14 +175,13 @@ Polymer({
             }
 
             Fire.log( this.filePath + " saved!");
-
+            this.editStatus = false;
             // TEMP HACK
             Fire.sendToAll('asset:changed', this.uuid);
             Fire.sendToAll('asset-db:synced');
         }.bind(this));
     },
 
-    //
     updateHints: function() {
         this.mirror.operation(function(){
             JSHINT(this.mirror.getValue());
@@ -163,18 +193,15 @@ Polymer({
                                ;
                 this.jshintError = errorMsg;
                 this.jshint = JSHINT;
-
-                // for (var i =0; i<JSHINT.errors.length; i++) {
-                //     var marker = document.createElement("div");
-                //     marker.style.color = "red";
-                //     marker.innerHTML = "✘";
-                //     marker.style.marginLeft = "-10px";
-                //     this.mirror.setGutterMarker(JSHINT.errors[i].line, "breakpoints", marker);
-                // }
             }
             else {
                 this.jshintError = "";
             }
         }.bind(this));
     },
+
+    resetValue: function () {
+        this.mirror.setValue(this.value);
+    },
+
 });
