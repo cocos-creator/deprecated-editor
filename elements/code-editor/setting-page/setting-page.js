@@ -72,20 +72,18 @@ Polymer({
                 { marginTop: "20px" },
                 { marginTop: "-400px"},
                 ], {
-                    duration: 200
+                    duration: 400
                 });
             this.style.marginTop = "-400px";
             this.span.style.display = "none";
-            this.style.display = "none";
         }
         else {
             this.span.style.display = "block";
-            this.style.display = "block";
             this.animate([
                 { marginTop: "-400px" },
                 { marginTop: "20px"}
                 ], {
-                    duration: 200
+                    duration: 400
                 });
             this.style.marginTop = "20px";
         }
