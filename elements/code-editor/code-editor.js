@@ -50,7 +50,7 @@ var modes = [
 
 Polymer({
     blur: true,
-    
+
     created: function () {
         this.loadFile();
         this.settingpage = null;

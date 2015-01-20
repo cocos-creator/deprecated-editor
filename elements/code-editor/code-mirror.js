@@ -55,11 +55,18 @@ Polymer({
             this.autoFormat();
         }.bind(this);
 
+        CodeMirror.commands.customSearch = function () {
+            // this.autoFormat();
+            alert('serach');
+        }.bind(this);
+
         var mac = CodeMirror.keyMap.default == CodeMirror.keyMap.macDefault;
         //autoformat
         var autoformat = (mac ? "Cmd" : "Ctrl") + "-O";
+        var search = (mac ? "Cmd" : "Ctrl") + "-F";
         var extraKeys = {};
         extraKeys[autoformat] = "autoformat";
+        extraKeys[search] = "customSearch";
 
         this.mirror = CodeMirror(this.shadowRoot, {
             value: this.value,
