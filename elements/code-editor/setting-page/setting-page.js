@@ -53,8 +53,11 @@ Polymer({
         this.span.style.opacity = 0.5;
         this.span.style.marginTop = '20px';
         this.span.style.zIndex = 998;
-        this.span.style.display = "none";
+        // this.span.style.display = "none";
         this.span.style.background = 'black';
+        this.span.addEventListener('click',function (event) {
+            this.hide = true;
+        }.bind(this));
         document.body.appendChild(this.span);
 
         this.$.keymapSelect.options = keymaps.map(function ( item ) {

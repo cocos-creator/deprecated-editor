@@ -50,7 +50,7 @@ var modes = [
 
 Polymer({
     blur: true,
-    showSetting: false,
+    
     created: function () {
         this.loadFile();
         this.settingpage = null;
@@ -132,14 +132,12 @@ Polymer({
             document.body.appendChild(this.settingpage);
         }
 
-        if (!this.showSetting){
+        if (this.settingpage.hide){
             this.settingpage.hide = false;
         }
         else {
             this.settingpage.hide = true;
         }
-        this.showSetting = !this.showSetting;
-
     },
 
 });
