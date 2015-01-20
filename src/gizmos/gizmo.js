@@ -26,7 +26,7 @@ function Gizmo ( svg, target ) {
     this._svg = svg;
     this._root = null;
 }
-Fire.registerClass('Fire.Gizmo', Gizmo);
+Fire.setClassName('Fire.Gizmo', Gizmo);
 
 // used in hitTest
 Object.defineProperty(Gizmo.prototype, 'entity', {
