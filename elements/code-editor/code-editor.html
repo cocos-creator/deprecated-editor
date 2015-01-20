@@ -1,9 +1,9 @@
 <link rel="import" href="code-mirror.html">
-<link rel="import" href="setting-page/setting-page.html">
+<link rel="import" href="settings-page/settings-page.html">
 <polymer-element
     name="code-editor"
     constructor="CodeEditor"
-    on-file-changed="{{loadFile}}"
+    on-dirty-changed="{{updateTitle}}"
     >
 <template>
     <link rel="stylesheet" href="code-editor.css">
@@ -21,7 +21,7 @@
         </fire-ui-button>
         <div class="space"></div>
 
-        <fire-ui-button on-click="{{settings}}">
+        <fire-ui-button on-click="{{settingsAction}}">
             <i class="fa fa-gear"></i>
             Settings
         </fire-ui-button>
@@ -39,34 +39,36 @@
         <code-mirror id="mirror"></code-mirror>
     </div>
     <span class="status-bar">
-        <fire-ui-toolbar style="float:left;position:absolute;z-index:99;background:transparent;">
-            <div class="space"></div>
+        <fire-ui-toolbar justify-between>
+            <div flex-row>
+                <div class="space"></div>
 
-            <fire-ui-label class="label" >{{url}}</fire-ui-label>
-            <div class="space"></div>
+                <fire-ui-label class="label" >{{url}}</fire-ui-label>
+                <div class="space"></div>
 
-            <fire-ui-label class="label" >Line {{$.mirror.cursor.line+1}}, Column {{$.mirror.cursor.ch}}</fire-ui-label>
-            <div class="space"></div>
+                <fire-ui-label class="label" >Line {{$.mirror.cursor.line+1}}, Column {{$.mirror.cursor.ch}}</fire-ui-label>
+                <div class="space"></div>
 
-            <fire-ui-label class="label" >{{$.mirror.jshintError}}</fire-ui-label>
-            <div class="space"></div>
-        </fire-ui-toolbar>
+                <fire-ui-label class="label" >{{$.mirror.jshintError}}</fire-ui-label>
+                <div class="space"></div>
+            </div>
 
-        <fire-ui-toolbar style="float:right">
-            <fire-ui-label>Key Map: </fire-ui-label>
-            <div class="space"></div>
-            <fire-ui-select id="keymapSelect" value="{{$.mirror.keyMap}}"></fire-ui-select>
-            <div class="space"></div>
+            <div flex-row>
+                <fire-ui-label>Key Map: </fire-ui-label>
+                <div class="space"></div>
+                <fire-ui-select id="keymapSelect" value="{{$.mirror.keyMap}}"></fire-ui-select>
+                <div class="space"></div>
 
-            <fire-ui-label>Theme: </fire-ui-label>
-            <div class="space"></div>
-            <fire-ui-select id="themeSelect" searchable value="{{$.mirror.theme}}"></fire-ui-select>
-            <div class="space"></div>
+                <fire-ui-label>Theme: </fire-ui-label>
+                <div class="space"></div>
+                <fire-ui-select id="themeSelect" searchable value="{{$.mirror.theme}}"></fire-ui-select>
+                <div class="space"></div>
 
-            <fire-ui-label>Mode: </fire-ui-label>
-            <div class="space"></div>
-            <fire-ui-select id="modeSelect" searchable value="{{$.mirror.mode}}"></fire-ui-select>
-            <div class="space"></div>
+                <fire-ui-label>Mode: </fire-ui-label>
+                <div class="space"></div>
+                <fire-ui-select id="modeSelect" searchable value="{{$.mirror.mode}}"></fire-ui-select>
+                <div class="space"></div>
+            </div>
         </fire-ui-toolbar>
     </span>
 </template>

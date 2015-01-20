@@ -1,0 +1,24 @@
+<polymer-element
+    name="settings-page"
+    constructor="SettingsPage"
+    >
+<template>
+    <link rel="stylesheet" href="settings-page.css">
+
+    <fire-ui-section name="Editor Settings">
+        <div flex-row class="prop" on-focusin="{{focusedAction}}" on-focusout="{{blurAction}}">
+            <fire-ui-label flex-1>Tab Size:</fire-ui-label>
+            <fire-ui-unit-input flex-2 min="2" max="4" value="{{config.tabSize}}" ></fire-ui-unit-input>
+        </div>
+        <div flex-row class="prop" on-focusin="{{focusedAction}}" on-focusout="{{blurAction}}">
+            <fire-ui-label flex-1>Key Map:</fire-ui-label>
+            <fire-ui-select flex-2 value="{{config.keyMap}}" id="keymapSelect"></fire-ui-select>
+        </div>
+        <div flex-row class="prop" on-focusin="{{focusedAction}}" on-focusout="{{blurAction}}">
+            <fire-ui-label flex-1>Default Theme:</fire-ui-label>
+            <fire-ui-select flex-2 value="{{config.theme}}" id="themeSelect"></fire-ui-select>
+        </div>
+    </fire-ui-section>
+</template>
+<script type="text/javascript" src="settings-page.js"></script>
+</polymer-element>

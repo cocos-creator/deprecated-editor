@@ -1,6 +1,5 @@
 var Fs = require("fire-fs");
 var Path = require('fire-path');
-var Watch = require('node-watch');
 
 Polymer({
     value: null,
@@ -9,12 +8,11 @@ Polymer({
     tabSize: 4,
     keyMap: 'sublime',
     lineNumbers: true,
+    jshintError: "",
+
     filePath: "",
     uuid: "",
-    jshintError: "",
-    blur: false,
-    reload: false,
-    editStatus: false,
+    dirty: false,
 
     created: function () {
         this.cursor = {
@@ -24,7 +22,6 @@ Polymer({
     },
 
     ready: function () {
-
     },
 
     domReady: function () {
@@ -45,8 +42,6 @@ Polymer({
     },
 
     createEditor: function () {
-        ChangeEditStatus(Path.basename(this.filePath),this.editStatus);
-
         CodeMirror.commands.save = function () {
             this.save();
         }.bind(this);
@@ -90,7 +85,7 @@ Polymer({
             if (this.mode === "javascript") {
                 this.updateHints();
             }
-            this.editStatus = true;
+            this.dirty = true;
         }.bind(this));
 
         this.mirror.on('cursorActivity',function () {
@@ -115,29 +110,10 @@ Polymer({
                 break;
         }
 
-        Watch(this.filePath, function(filename) {
-            if (this.blur) {
-                this.reload = true;
-            }
-        }.bind(this));
-
         if (this.mode === "javascript") {
             this.updateHints();
         }
         this.mirror.focus();
-    },
-
-    blurChanged: function () {
-        if (!this.blur) {
-            if (this.reload) {
-                var result = confirm(Path.basename(this.filePath) + " was modified,do you want to reload?");
-                if (result) {
-                    this.fire('file-changed');
-                }
-            }
-            this.reload = false;
-            this.blur = false;
-        }
     },
 
     keyMapChanged: function () {
@@ -160,8 +136,8 @@ Polymer({
         this.mirror.setOption('lineNumbers', this.lineNumbers);
     },
 
-    editStatusChanged: function () {
-        ChangeEditStatus(Path.basename(this.filePath),this.editStatus);
+    dirtyChanged: function () {
+        this.fire('dirty-changed');
     },
 
     lineComment: function () {
@@ -181,10 +157,10 @@ Polymer({
                 return;
             }
 
-            Fire.log( this.filePath + " saved!");
-            this.editStatus = false;
+            this.dirty = false;
+
             // TEMP HACK
-            Fire.sendToAll('asset:changed', this.uuid);
+            Fire.sendToAll('asset:changed', this.uuid, 'code-editor');
             Fire.sendToAll('asset-db:synced');
         }.bind(this));
     },
@@ -206,9 +182,4 @@ Polymer({
             }
         }.bind(this));
     },
-
-    resetValue: function () {
-        this.mirror.setValue(this.value);
-    },
-
 });

@@ -1,4 +1,5 @@
 var Fs = require("fire-fs");
+var Remote = require("remote");
 
 var keymaps = [
     "sublime",
@@ -49,14 +50,46 @@ var modes = [
 ];
 
 Polymer({
-    blur: true,
-
     created: function () {
-        this.loadFile();
-        this.settingpage = null;
+        this.ipc = new Fire.IpcListener();
+        this.settingsPage = null;
+    },
+
+    attached: function () {
+        this.ipc.on('asset:changed', function ( uuid, name ) {
+            // HACK
+            if ( name === 'code-editor' )
+                return;
+
+            if ( this.$.mirror.uuid === uuid ) {
+                var result = window.confirm(this.url + " was modified, do you want to reload?");
+                if (result) {
+                    this.loadFile();
+                }
+            }
+        }.bind(this) );
+    },
+
+    detached: function () {
+        this.ipc.clear();
     },
 
     ready: function () {
+        var url = "";
+        var queryString = decodeURIComponent(location.search.substr(1));
+        var queryList = queryString.split('&');
+        for ( var i = 0; i < queryList.length; ++i ) {
+            var pair = queryList[i].split("=");
+            if ( pair[0] === "url" ) {
+                url = pair[1];
+            }
+        }
+        this.url = url;
+
+        //
+        this.updateSize();
+        this.loadFile();
+
         this.$.keymapSelect.options = keymaps.map(function ( item ) {
             return { name: item, value: item };
         });
@@ -73,32 +106,33 @@ Polymer({
             this.updateSize();
         }.bind(this));
 
-        this.updateSize();
+        window.addEventListener('unload', function () {
+            if (this.$.mirror.dirty) {
+                var result = window.confirm(this.url + " was modified,do you want to save?");
+                if (result) {
+                    this.$.mirror.save();
+                }
+            }
+        }.bind(this));
     },
 
-    loadFile: function (e) {
-        var url = "";
-        var queryString = decodeURIComponent(location.search.substr(1));
-        var queryList = queryString.split('&');
-        for ( var i = 0; i < queryList.length; ++i ) {
-            var pair = queryList[i].split("=");
-            if ( pair[0] === "url" ) {
-                url = pair[1];
-            }
-        }
+    loadFile: function () {
+        this.updateTitle();
 
-        this.url = url;
-
-        var fspath = Fire.AssetDB._fspath(url);
-        var uuid = Fire.AssetDB.urlToUuid(url);
+        var fspath = Fire.AssetDB._fspath(this.url);
+        var uuid = Fire.AssetDB.urlToUuid(this.url);
         Fs.readFile(fspath, 'utf8', function ( err, data ) {
             this.$.mirror.value = data;
-            if (e !== undefined) {
-                this.$.mirror.resetValue();
-            }
             this.$.mirror.filePath = fspath;
             this.$.mirror.uuid = uuid;
         }.bind(this));
+    },
+
+    updateTitle: function () {
+        var browserWindow = Remote.getCurrentWindow();
+        if ( browserWindow ) {
+            browserWindow.setTitle( this.url + (this.$.mirror.dirty ? "*" : "") );
+        }
     },
 
     updateSize: function () {
@@ -112,31 +146,18 @@ Polymer({
         this.$.mirror.save();
     },
 
-    modifiedSave: function () {
-        if (this.$.mirror.editStatus) {
-            var result = confirm((this.$.mirror.filePath) + " was modified,do you want to save?");
-            if (result) {
-                this.$.mirror.save();
-            }
-        }
-    },
-
-    blurChanged: function () {
-        this.$.mirror.blur = this.blur;
-    },
-
-    settings: function () {
-        if (this.settingpage === null){
-            this.settingpage = new SettingPage()
-            this.settingpage.config = this.$.mirror;
-            document.body.appendChild(this.settingpage);
+    settingsAction: function () {
+        if (this.settingsPage === null){
+            this.settingsPage = new SettingsPage();
+            this.settingsPage.config = this.$.mirror;
+            document.body.appendChild(this.settingsPage);
         }
 
-        if (this.settingpage.hide){
-            this.settingpage.hide = false;
+        if (this.settingsPage.hide){
+            this.settingsPage.hide = false;
         }
         else {
-            this.settingpage.hide = true;
+            this.settingsPage.hide = true;
         }
     },
 
