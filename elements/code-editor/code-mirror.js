@@ -1,16 +1,20 @@
 var Fs = require("fire-fs");
 var Path = require('fire-path');
+var Watch = require('node-watch');
 
 Polymer({
     value: null,
     mode: 'htmlmixed',
-    theme: 'solarized dark',
+    theme: 'zenburn',
     tabSize: 4,
     keyMap: 'sublime',
     lineNumbers: true,
     filePath: "",
     uuid: "",
     jshintError: "",
+    blur: false,
+    reload: false,
+    editStatus: false,
 
     created: function () {
         this.cursor = {
@@ -41,9 +45,28 @@ Polymer({
     },
 
     createEditor: function () {
+        ChangeEditStatus(Path.basename(this.filePath),this.editStatus);
+
         CodeMirror.commands.save = function () {
             this.save();
         }.bind(this);
+
+        CodeMirror.commands.autoformat = function () {
+            this.autoFormat();
+        }.bind(this);
+
+        CodeMirror.commands.customSearch = function () {
+            // this.autoFormat();
+            alert('serach');
+        }.bind(this);
+
+        var mac = CodeMirror.keyMap.default == CodeMirror.keyMap.macDefault;
+        //autoformat
+        var autoformat = (mac ? "Cmd" : "Ctrl") + "-O";
+        var search = (mac ? "Cmd" : "Ctrl") + "-F";
+        var extraKeys = {};
+        extraKeys[autoformat] = "autoformat";
+        extraKeys[search] = "customSearch";
 
         this.mirror = CodeMirror(this.shadowRoot, {
             value: this.value,
@@ -59,11 +82,15 @@ Polymer({
             autoCloseBrackets: true,
             showCursorWhenSelecting: true,
             keyMap: this.keyMap,
-            gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
+            extraKeys: extraKeys,
+            gutters: ["CodeMirror-linenumbers", "CodeMirror-lint-markers","CodeMirror-foldgutter","breakpoints"],
         });
 
         this.mirror.on('change',function () {
-            this.updateHints();
+            if (this.mode === "javascript") {
+                this.updateHints();
+            }
+            this.editStatus = true;
         }.bind(this));
 
         this.mirror.on('cursorActivity',function () {
@@ -87,6 +114,30 @@ Polymer({
                 this.mode = "";
                 break;
         }
+
+        Watch(this.filePath, function(filename) {
+            if (this.blur) {
+                this.reload = true;
+            }
+        }.bind(this));
+
+        if (this.mode === "javascript") {
+            this.updateHints();
+        }
+        this.mirror.focus();
+    },
+
+    blurChanged: function () {
+        if (!this.blur) {
+            if (this.reload) {
+                var result = confirm(Path.basename(this.filePath) + " was modified,do you want to reload?");
+                if (result) {
+                    this.fire('file-changed');
+                }
+            }
+            this.reload = false;
+            this.blur = false;
+        }
     },
 
     keyMapChanged: function () {
@@ -109,6 +160,10 @@ Polymer({
         this.mirror.setOption('lineNumbers', this.lineNumbers);
     },
 
+    editStatusChanged: function () {
+        ChangeEditStatus(Path.basename(this.filePath),this.editStatus);
+    },
+
     lineComment: function () {
         var range = { from: this.mirror.getCursor(true), to: this.mirror.getCursor(false) };
         this.mirror.lineComment(range.from, range.to);
@@ -127,14 +182,13 @@ Polymer({
             }
 
             Fire.log( this.filePath + " saved!");
-
+            this.editStatus = false;
             // TEMP HACK
             Fire.sendToAll('asset:changed', this.uuid);
             Fire.sendToAll('asset-db:synced');
         }.bind(this));
     },
 
-    //
     updateHints: function() {
         this.mirror.operation(function(){
             JSHINT(this.mirror.getValue());
@@ -152,4 +206,9 @@ Polymer({
             }
         }.bind(this));
     },
+
+    resetValue: function () {
+        this.mirror.setValue(this.value);
+    },
+
 });

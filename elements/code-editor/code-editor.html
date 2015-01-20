@@ -1,22 +1,45 @@
 <link rel="import" href="code-mirror.html">
-
+<link rel="import" href="setting-page/setting-page.html">
 <polymer-element
     name="code-editor"
     constructor="CodeEditor"
+    on-file-changed="{{loadFile}}"
     >
 <template>
     <link rel="stylesheet" href="code-editor.css">
 
     <fire-ui-toolbar>
-        <fire-ui-button on-click="{{saveAction}}">Save</fire-ui-button>
+        <fire-ui-button on-click="{{saveAction}}">
+            <i class="fa fa-file-o"></i>
+            Save
+        </fire-ui-button>
+        <div class="space"></div>
+
+        <fire-ui-button on-click="{{loadFile}}">
+            <i class="fa fa-rotate-right"></i>
+            Reload
+        </fire-ui-button>
+        <div class="space"></div>
+
+        <fire-ui-button on-click="{{settings}}">
+            <i class="fa fa-gear"></i>
+            Settings
+        </fire-ui-button>
+        <div class="space"></div>
+
         <fire-ui-button on-click="{{commentAction}}">Comment</fire-ui-button>
-        <fire-ui-button on-click="{{autoFormatAction}}">Auto Format</fire-ui-button>
+        <div class="space"></div>
+
+        <fire-ui-button on-click="{{autoFormatAction}}">
+            <i class="fa fa-rotate-right"></i>
+            AutoFormat
+        </fire-ui-button>
     </fire-ui-toolbar>
     <div id="codeArea">
         <code-mirror id="mirror"></code-mirror>
     </div>
     <span class="status-bar">
-        <fire-ui-toolbar style="float:left">
+        <fire-ui-toolbar style="float:left;position:absolute;z-index:99;background:transparent;">
             <div class="space"></div>
 
             <fire-ui-label class="label" >{{url}}</fire-ui-label>
