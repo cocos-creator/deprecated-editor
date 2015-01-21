@@ -55,12 +55,8 @@ Polymer({
         this.span.style.height = '100%';
         this.span.style.position = 'absolute';
         this.span.style.opacity = 0.5;
-        // this.span.style.marginTop = '20px';
         this.span.style.zIndex = 998;
         this.span.style.background = 'black';
-        // this.span.addEventListener('click',function (event) {
-        //     this.hide = true;
-        // }.bind(this));
         document.body.appendChild(this.span);
 
         this.$.keymapSelect.options = keymaps.map(function ( item ) {
@@ -75,7 +71,7 @@ Polymer({
     hideChanged: function () {
         if (this.hide) {
             this.animate([
-            { marginTop: (this.config.getBoundingClientRect().height/2-100)+"px",width: "600px" },
+                { marginTop: (this.config.getBoundingClientRect().height/2-100)+"px",width: "600px" },
                 { marginTop: "-400px",width: "0px"},
                 ], {
                     duration: 400
@@ -86,9 +82,8 @@ Polymer({
         else {
             this.span.style.display = "block";
             this.animate([
-            { marginTop: "-400px", width: "0px" },
-            { marginTop: (this.config.getBoundingClientRect().height/2-100)+"px",width: "600px"},
-
+                { marginTop: "-400px", width: "0px" },
+                { marginTop: (this.config.getBoundingClientRect().height/2-100)+"px",width: "600px"},
                 ], {
                     duration: 400
                 });

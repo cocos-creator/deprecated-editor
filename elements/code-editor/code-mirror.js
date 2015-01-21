@@ -11,6 +11,7 @@ Polymer({
     lineNumbers: true,
     jshintError: "",
     lineCount: 0,
+    fontSize: 12,
     filePath: "",
     uuid: "",
     dirty: false,
@@ -56,7 +57,6 @@ Polymer({
         }.bind(this);
 
         CodeMirror.commands.customSearch = function () {
-            // this.autoFormat();
             alert('serach');
         }.bind(this);
 
@@ -104,6 +104,7 @@ Polymer({
                 this.theme = data.theme;
                 this.keyMap = data.keyMap;
                 this.tabSize = data.tabSize;
+                this.fontSize = data.fontSize;
             }
         }.bind(this));
 
@@ -144,6 +145,8 @@ Polymer({
             this.updateHints();
         }
         this.mirror.focus();
+
+        // console.log(this.mirror.style.fontSize);
     },
 
     optionsChanged: function () {
@@ -156,6 +159,10 @@ Polymer({
 
     modeChanged: function() {
         this.mirror.setOption('mode', this.mode);
+    },
+
+    fontSizeChanged: function () {
+        this.shadowRoot.getElementsByClassName('CodeMirror')[0].style.fontSize = this.fontSize + "px";
     },
 
     themeChanged: function() {
@@ -234,6 +241,7 @@ Polymer({
             theme: this.theme,
             tabSize: this.tabSize,
             keyMap: this.keyMap,
+            fontSize: this.fontSize,
         };
 
         var configValue = JSON.stringify(config, null, 4);
