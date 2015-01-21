@@ -72,17 +72,24 @@ Polymer({
             this.fontSize -- ;
         }.bind(this);
 
+        CodeMirror.commands.resetFontSize = function () {
+                this.fontSize = 12;
+            }.bind(this);
+
         var mac = CodeMirror.keyMap.default == CodeMirror.keyMap.macDefault;
-        //autoformat
+
         var autoformat = (mac ? "Cmd" : "Ctrl") + "-O";
         var search = (mac ? "Cmd" : "Ctrl") + "-F";
         var increaseFontSize = (mac ? "Cmd" : "Ctrl") + "-=";
         var decreaseFontSize = (mac ? "Cmd" : "Ctrl") + "--";
+        var resetFontSize = (mac ? "Cmd" : "Ctrl") + "-0";
         var extraKeys = {};
+        
         extraKeys[autoformat] = "autoformat";
         extraKeys[search] = "customSearch";
         extraKeys[increaseFontSize] = "increaseFontSize";
         extraKeys[decreaseFontSize] = "decreaseFontSize";
+        extraKeys[resetFontSize] = "resetFontSize";
 
         this.getConfig(function(err,result,data){
             if (err !== null) {
@@ -161,12 +168,10 @@ Polymer({
             this.updateHints();
         }
         this.mirror.focus();
-
-        // console.log(this.mirror.style.fontSize);
     },
 
     optionsChanged: function () {
-        console.log('oprion');
+        // console.log('oprion');
     },
 
     keyMapChanged: function () {
