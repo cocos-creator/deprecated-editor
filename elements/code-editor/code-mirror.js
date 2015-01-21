@@ -1,5 +1,6 @@
 var Fs = require("fire-fs");
 var Path = require('fire-path');
+var Remote = require("remote");
 
 Polymer({
     value: null,
@@ -9,10 +10,12 @@ Polymer({
     keyMap: 'sublime',
     lineNumbers: true,
     jshintError: "",
-
+    lineCount: 0,
     filePath: "",
     uuid: "",
     dirty: false,
+
+    setting: null,
 
     created: function () {
         this.cursor = {
@@ -22,6 +25,8 @@ Polymer({
     },
 
     ready: function () {
+        var projectPath = Remote.getGlobal('FIRE_PROJECT_PATH');
+        this.settingPath = Path.join( projectPath, 'settings' ) + "/editorConfig.json";
     },
 
     domReady: function () {
@@ -63,7 +68,16 @@ Polymer({
         extraKeys[autoformat] = "autoformat";
         extraKeys[search] = "customSearch";
 
-        this.mirror = CodeMirror(this.shadowRoot, {
+        this.getConfig(function(err,result,data){
+            if (err !== null) {
+                return;
+            }
+            if (result) {
+                this.theme = data
+            }
+        });
+
+        this.options = {
             value: this.value,
             mode: this.mode,
             theme: this.theme,
@@ -79,30 +93,46 @@ Polymer({
             keyMap: this.keyMap,
             extraKeys: extraKeys,
             gutters: ["CodeMirror-linenumbers", "CodeMirror-lint-markers","CodeMirror-foldgutter","breakpoints"],
-        });
+        };
+        this.getConfig(function (err,exists,data){
+            this.mirror = CodeMirror(this.shadowRoot,this.options);
+            if (err !== null){
+                return;
+            }
 
+            if (exists){
+                this.theme = data.theme;
+                this.keyMap = data.keyMap;
+                this.tabSize = data.tabSize;
+            }
+        }.bind(this));
+
+        this.lineCount = this.mirror.lineCount();
         this.mirror.on('change',function () {
             if (this.mode === "javascript") {
                 this.updateHints();
             }
             this.dirty = true;
+            this.lineCount = this.mirror.lineCount();
         }.bind(this));
 
         this.mirror.on('cursorActivity',function () {
             this.cursor = this.mirror.getCursor();
         }.bind(this));
-
         switch (Path.extname(this.filePath).toLowerCase()) {
-            case ".js" || ".json":
+            case ".js" :
                 this.mode = "javascript";
                 break;
-            case ".html" || ".htm":
+            case ".html" :
                 this.mode = "htmlmixed";
                 break;
-            case ".css" || ".styl":
+            case ".css" :
                 this.mode = "css";
                 break;
-            case ".xml" || ".xaml":
+            case ".json" :
+                this.mode = "css";
+                break;
+            case ".xml",".xaml":
                 this.mode = "xml";
                 break;
             default:
@@ -114,6 +144,10 @@ Polymer({
             this.updateHints();
         }
         this.mirror.focus();
+    },
+
+    optionsChanged: function () {
+        console.log('oprion');
     },
 
     keyMapChanged: function () {
@@ -146,8 +180,20 @@ Polymer({
     },
 
     autoFormat: function () {
-        var range = { from: this.mirror.getCursor(true), to: this.mirror.getCursor(false) };
-        this.mirror.autoFormatRange(range.from, range.to);
+        switch (this.mode) {
+            case "javascript":
+                this.mirror.setValue(js_beautify(this.mirror.getValue(),this.tabSize,''));
+            break;
+            case "css":
+                var options = {
+                    indent: '    ',
+                };
+                this.mirror.setValue(cssbeautify(this.mirror.getValue(),options));
+            break;
+            case "htmlmixed":
+                this.mirror.setValue(style_html(this.mirror.getValue(),this.tabSize,' ',80));
+            break;
+        }
     },
 
     save: function () {
@@ -181,5 +227,39 @@ Polymer({
                 this.jshintError = "";
             }
         }.bind(this));
+    },
+
+    saveConfig: function () {
+        var config = {
+            theme: this.theme,
+            tabSize: this.tabSize,
+            keyMap: this.keyMap,
+        };
+
+        var configValue = JSON.stringify(config, null, 4);
+        Fs.writeFile(this.settingPath, configValue, 'utf8', function ( err ) {
+            if ( err ) {
+                Fire.error( err.message );
+                return;
+            }
+            Fire.log("Save code-editor-config.json");
+        }.bind(this));
+    },
+
+    getConfig: function (callback) {
+        var result = Fs.existsSync(this.settingPath);
+        var data = null;
+        var err = null;
+        if (result) {
+            data = Fs.readFileSync(this.settingPath, 'utf8');
+        }
+        try{
+            data = JSON.parse(data);
+        }
+        catch (e) {
+            data = null;
+            err = e;
+        }
+        callback(err,result,data);
     },
 });

@@ -125,6 +125,7 @@ Polymer({
             this.$.mirror.value = data;
             this.$.mirror.filePath = fspath;
             this.$.mirror.uuid = uuid;
+            this.$.mirror.setting = this.settingsPage;
         }.bind(this));
     },
 
@@ -159,6 +160,10 @@ Polymer({
         else {
             this.settingsPage.hide = true;
         }
+    },
+
+    autoFormatAction: function () {
+        this.$.mirror.autoFormat();
     },
 
 });
