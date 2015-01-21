@@ -60,13 +60,29 @@ Polymer({
             alert('serach');
         }.bind(this);
 
+        CodeMirror.commands.increaseFontSize = function () {
+            if (this.fontSize >= 30)
+                return
+            this.fontSize ++ ;
+        }.bind(this);
+
+        CodeMirror.commands.decreaseFontSize = function () {
+            if (this.fontSize <= 8)
+                return
+            this.fontSize -- ;
+        }.bind(this);
+
         var mac = CodeMirror.keyMap.default == CodeMirror.keyMap.macDefault;
         //autoformat
         var autoformat = (mac ? "Cmd" : "Ctrl") + "-O";
         var search = (mac ? "Cmd" : "Ctrl") + "-F";
+        var increaseFontSize = (mac ? "Cmd" : "Ctrl") + "-=";
+        var decreaseFontSize = (mac ? "Cmd" : "Ctrl") + "--";
         var extraKeys = {};
         extraKeys[autoformat] = "autoformat";
         extraKeys[search] = "customSearch";
+        extraKeys[increaseFontSize] = "increaseFontSize";
+        extraKeys[decreaseFontSize] = "decreaseFontSize";
 
         this.getConfig(function(err,result,data){
             if (err !== null) {
