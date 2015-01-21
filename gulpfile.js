@@ -17,6 +17,7 @@ var paths = {
     src: [
         // asset extends
         'src/assets/sprite.js',
+        'src/assets/bitmap-font.js',
 
         // engine extends
         'src/engine-extends/misc.js',
