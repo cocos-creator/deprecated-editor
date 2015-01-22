@@ -270,7 +270,8 @@ Sandbox.reloadScripts = (function () {
 
     var LoadSequence = [userScriptLoader, Fire._editorPluginLoader];
 
-    var builtinClasses;
+    var builtinClassIds;
+    var builtinClassNames;
     var builtinComponentMenus;
     var builtinCustomAssetMenus;
 
@@ -280,7 +281,8 @@ Sandbox.reloadScripts = (function () {
         inited = true;
         Sandbox.globalVarsChecker = new GlobalVarsChecker().record();
         Sandbox.nodeJsRequire = require;
-        builtinClasses = Fire._registeredClasses;
+        builtinClassIds = Fire._registeredClassIds;
+        builtinClassNames = Fire._registeredClassNames;
         builtinComponentMenus = Fire._componentMenuItems.slice();
         builtinCustomAssetMenus = Fire._customAssetMenuItems.slice();
     }
@@ -292,7 +294,8 @@ Sandbox.reloadScripts = (function () {
         Fire._customAssetMenuItems = builtinCustomAssetMenus.slice();
         Fire.MainMenu.reset();
         // remove user classes
-        Fire._registeredClasses = builtinClasses;
+        Fire._registeredClassIds = builtinClassIds;
+        Fire._registeredClassNames = builtinClassNames;
         // 清除 browserify 声明的 require 后，除非用户另外找地方存了原来的 require，否则之前的脚本都将会被垃圾回收
         require = Sandbox.nodeJsRequire;
         Sandbox.globalVarsChecker.restore(Fire.log, 'purging', 'require');

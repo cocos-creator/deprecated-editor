@@ -22,3 +22,19 @@ Component.prototype._onPreDestroy = function () {
     doOnPreDestroy.call(this);
     delete Fire._idToObject[this._id];
 };
+
+
+// extend defineComponent to register the default component menu
+var doDefine = Fire.defineComponent;
+
+/**
+ * @param {function} [baseOrConstructor]
+ * @param {function} [constructor]
+ */
+Fire.defineComponent = function (baseOrConstructor, constructor) {
+    var comp = doDefine.apply(this, arguments);
+    if (comp) {
+        Fire.addComponentMenu(comp, 'Scripts/' + Fire.getClassName(comp), -1);
+    }
+    return comp;
+};

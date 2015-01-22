@@ -1,23 +1,33 @@
 var Fs = require("fire-fs");
+var Path = require('fire-path');
+var Remote = require("remote");
 
 Polymer({
-    value: '',
-    mode: 'javascript',
-    theme: 'solarized dark',
+    value: null,
+    mode: 'htmlmixed',
+    theme: 'zenburn',
     tabSize: 4,
     keyMap: 'sublime',
     lineNumbers: true,
+    jshintError: "",
+    lineCount: 0,
+    fontSize: 12,
     filePath: "",
     uuid: "",
+    dirty: false,
+    fontFamily: "Arial",
+    setting: null,
 
     created: function () {
         this.cursor = {
-            "ln" : 0,
+            "line" : 0,
             "ch" : 0
         };
     },
 
     ready: function () {
+        var projectPath = Remote.getGlobal('FIRE_PROJECT_PATH');
+        this.settingPath = Path.join( projectPath, 'settings' ) + "/code-editor-settings.json";
     },
 
     domReady: function () {
@@ -38,7 +48,46 @@ Polymer({
     },
 
     createEditor: function () {
-        this.mirror = CodeMirror(this.shadowRoot, {
+        CodeMirror.commands.save = function () {
+            this.save();
+        }.bind(this);
+
+        CodeMirror.commands.autoformat = function () {
+            this.autoFormat();
+        }.bind(this);
+
+        CodeMirror.commands.customSearch = function () {
+            alert('serach');
+        }.bind(this);
+
+        CodeMirror.commands.increaseFontSize = function () {
+            this.fontSize = Math.max( this.fontSize+1, 30 );
+        }.bind(this);
+
+        CodeMirror.commands.decreaseFontSize = function () {
+            this.fontSize = Math.min( this.fontSize-1, 8 );
+        }.bind(this);
+
+        CodeMirror.commands.resetFontSize = function () {
+                this.fontSize = 12;
+            }.bind(this);
+
+        var mac = CodeMirror.keyMap.default == CodeMirror.keyMap.macDefault;
+
+        var autoformat = (mac ? "Cmd" : "Ctrl") + "-O";
+        var search = (mac ? "Cmd" : "Ctrl") + "-F";
+        var increaseFontSize = (mac ? "Cmd" : "Ctrl") + "-=";
+        var decreaseFontSize = (mac ? "Cmd" : "Ctrl") + "--";
+        var resetFontSize = (mac ? "Cmd" : "Ctrl") + "-0";
+        var extraKeys = {};
+
+        extraKeys[autoformat] = "autoformat";
+        extraKeys[search] = "customSearch";
+        extraKeys[increaseFontSize] = "increaseFontSize";
+        extraKeys[decreaseFontSize] = "decreaseFontSize";
+        extraKeys[resetFontSize] = "resetFontSize";
+
+        this.options = {
             value: this.value,
             mode: this.mode,
             theme: this.theme,
@@ -46,23 +95,74 @@ Polymer({
             tabSize: this.tabSize,
             lineNumbers: this.lineNumbers,
             foldGutter: true,
+            autoCloseTags: true,
             matchBrackets: true,
             styleActiveLine: true,
             autoCloseBrackets: true,
             showCursorWhenSelecting: true,
             keyMap: this.keyMap,
-            gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
-        });
+            extraKeys: extraKeys,
+            gutters: ["CodeMirror-linenumbers", "CodeMirror-lint-markers","CodeMirror-foldgutter","breakpoints"],
+        };
 
-        this.mirror.on('focus',function () {
-        }.bind(this));
+        // mirror initialize
+        this.mirror = CodeMirror(this.shadowRoot,this.options);
 
         this.mirror.on('change',function () {
+            if (this.mode === "javascript") {
+                this.updateHints();
+            }
+            this.dirty = true;
+            this.lineCount = this.mirror.lineCount();
         }.bind(this));
 
         this.mirror.on('cursorActivity',function () {
             this.cursor = this.mirror.getCursor();
         }.bind(this));
+
+        // load config
+        this.loadConfig(function (err,settings) {
+            if (err) {
+                Fire.error(err.message);
+                return;
+            }
+
+            if (settings) {
+                Fire.mixin(this,settings);
+            }
+        }.bind(this));
+        this.lineCount = this.mirror.lineCount();
+
+        switch (Path.extname(this.filePath).toLowerCase()) {
+            case ".js" :
+                this.mode = "javascript";
+                break;
+            case ".html" :
+                this.mode = "htmlmixed";
+                break;
+            case ".css" :
+                this.mode = "css";
+                break;
+            case ".json" :
+                this.mode = "css";
+                break;
+            case ".xml",".xaml":
+                this.mode = "xml";
+                break;
+            default:
+                this.mode = "";
+                break;
+        }
+
+        if (this.mode === "javascript") {
+            this.updateHints();
+        }
+
+        this.mirror.focus();
+    },
+
+    fontFamilyChanged: function () {
+        this.shadowRoot.getElementsByClassName('CodeMirror')[0].style.fontFamily = this.fontFamily;
     },
 
     keyMapChanged: function () {
@@ -71,6 +171,10 @@ Polymer({
 
     modeChanged: function() {
         this.mirror.setOption('mode', this.mode);
+    },
+
+    fontSizeChanged: function () {
+        this.shadowRoot.getElementsByClassName('CodeMirror')[0].style.fontSize = this.fontSize + "px";
     },
 
     themeChanged: function() {
@@ -85,14 +189,30 @@ Polymer({
         this.mirror.setOption('lineNumbers', this.lineNumbers);
     },
 
+    dirtyChanged: function () {
+        this.fire('dirty-changed');
+    },
+
     lineComment: function () {
         var range = { from: this.mirror.getCursor(true), to: this.mirror.getCursor(false) };
         this.mirror.lineComment(range.from, range.to);
     },
 
     autoFormat: function () {
-        var range = { from: this.mirror.getCursor(true), to: this.mirror.getCursor(false) };
-        this.mirror.autoFormatRange(range.from, range.to);
+        switch (this.mode) {
+            case "javascript":
+                this.mirror.setValue(js_beautify(this.mirror.getValue(),this.tabSize,''));
+            break;
+            case "css":
+                var options = {
+                    indent: '    ',
+                };
+                this.mirror.setValue(cssbeautify(this.mirror.getValue(),options));
+            break;
+            case "htmlmixed":
+                this.mirror.setValue(style_html(this.mirror.getValue(),this.tabSize,' ',80));
+            break;
+        }
     },
 
     save: function () {
@@ -102,11 +222,68 @@ Polymer({
                 return;
             }
 
-            Fire.log( this.filePath + " saved!");
+            this.dirty = false;
 
             // TEMP HACK
-            Fire.sendToAll('asset:changed', this.uuid);
+            Fire.sendToAll('asset:changed', this.uuid, 'code-editor');
             Fire.sendToAll('asset-db:synced');
         }.bind(this));
+    },
+
+    updateHints: function() {
+        this.mirror.operation(function(){
+            JSHINT(this.mirror.getValue());
+            if (JSHINT.errors.length > 0) {
+                var errorMsg = "Jshint: [ line " +
+                               JSHINT.errors[0].line +
+                               " column " + JSHINT.errors[0].character +
+                               " " +  JSHINT.errors[0].reason + " ]"
+                               ;
+                this.jshintError = errorMsg;
+                this.jshint = JSHINT;
+            }
+            else {
+                this.jshintError = "";
+            }
+        }.bind(this));
+    },
+
+    saveConfig: function () {
+        var config = {
+            theme: this.theme,
+            tabSize: this.tabSize,
+            keyMap: this.keyMap,
+            fontSize: this.fontSize,
+            fontFamily: this.fontFamily,
+        };
+
+        var configValue = JSON.stringify(config, null, 4);
+        Fs.writeFile(this.settingPath, configValue, 'utf8', function ( err ) {
+            if ( err ) {
+                Fire.error( err.message );
+                return;
+            }
+            Fire.log("Save code-editor-config.json");
+        }.bind(this));
+    },
+
+    loadConfig: function (cb) {
+        var exists = Fs.existsSync(this.settingPath);
+        if (!exists) {
+            if (cb) cb();
+            return;
+        }
+
+        Fs.readFile(this.settingPath, 'utf8', function ( err, data ) {
+            try {
+                data = JSON.parse(data);
+                if (cb) cb( null, data );
+            }
+            catch (err) {
+                if (cb) cb(err);
+            }
+
+        });
+
     },
 });

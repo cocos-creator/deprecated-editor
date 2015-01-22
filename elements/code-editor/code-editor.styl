@@ -4,7 +4,7 @@
     right: 0
     bottom: 0
     left: 0
-    min-width: 600px
+    min-width: 800px
 
     display: flex
     flex-direction: column
@@ -14,6 +14,8 @@
     .status-bar {
         width: 100%
         line-height: 20px
+        box-shadow:0 0 5px #000
+        z-index: 997
     }
 
     .space{
@@ -29,5 +31,20 @@
     .space-3{
         width: 30px
         height: 30px
+    }
+
+    .label {
+        color: gray
+    }
+
+    .jshint {
+        color: red
+    }
+
+    .topbar {
+        box-shadow: 0 0 5px #000
+        z-index: 5
+        border-bottom-left-radius: 5px
+        border-bottom-right-radius: 5px
     }
 }
