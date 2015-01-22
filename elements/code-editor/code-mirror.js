@@ -104,22 +104,10 @@ Polymer({
             extraKeys: extraKeys,
             gutters: ["CodeMirror-linenumbers", "CodeMirror-lint-markers","CodeMirror-foldgutter","breakpoints"],
         };
-        this.loadConfig(function (err,exists,data){
-            this.mirror = CodeMirror(this.shadowRoot,this.options);
-            if (err !== null){
-                return;
-            }
 
-            if (exists){
-                this.theme = data.theme;
-                this.keyMap = data.keyMap;
-                this.tabSize = data.tabSize;
-                this.fontSize = data.fontSize;
-                this.fontFamily = data.fontFamily;
-            }
-        }.bind(this));
+        // mirror initialize
+        this.mirror = CodeMirror(this.shadowRoot,this.options);
 
-        this.lineCount = this.mirror.lineCount();
         this.mirror.on('change',function () {
             if (this.mode === "javascript") {
                 this.updateHints();
@@ -131,6 +119,20 @@ Polymer({
         this.mirror.on('cursorActivity',function () {
             this.cursor = this.mirror.getCursor();
         }.bind(this));
+
+        // load config
+        this.loadConfig(function (err,settings) {
+            if (err) {
+                Fire.error(err.message);
+                return;
+            }
+
+            if (settings) {
+                Fire.mixin(this,settings);
+            }
+        }.bind(this));
+        this.lineCount = this.mirror.lineCount();
+
         switch (Path.extname(this.filePath).toLowerCase()) {
             case ".js" :
                 this.mode = "javascript";
@@ -155,6 +157,7 @@ Polymer({
         if (this.mode === "javascript") {
             this.updateHints();
         }
+
         this.mirror.focus();
     },
 
@@ -264,20 +267,23 @@ Polymer({
         }.bind(this));
     },
 
-    loadConfig: function (callback) {
-        var result = Fs.existsSync(this.settingPath);
-        var data = null;
-        var err = null;
-        if (result) {
-            data = Fs.readFileSync(this.settingPath, 'utf8');
+    loadConfig: function (cb) {
+        var exists = Fs.existsSync(this.settingPath);
+        if (!exists) {
+            if (cb) cb();
+            return;
         }
-        try{
-            data = JSON.parse(data);
-        }
-        catch (e) {
-            data = null;
-            err = e;
-        }
-        callback(err,result,data);
+
+        Fs.readFile(this.settingPath, 'utf8', function ( err, data ) {
+            try {
+                data = JSON.parse(data);
+                if (cb) cb( null, data );
+            }
+            catch (err) {
+                if (cb) cb(err);
+            }
+
+        });
+
     },
 });
