@@ -265,23 +265,10 @@ var userScriptLoader = (function () {
     return loader;
 })();
 
-var builtinPluginMenuLoader = {
-    loadAll: function () {
-        for (var key in Fire.plugins) {
-            var plugin = Fire.plugins[key];
-            if (plugin.mainMenu) {
-                Fire.MainMenu.addTemplate(plugin.mainMenu.path, plugin.mainMenu.template);
-            }
-        }
-    },
-    unloadAll: function () {},
-    name: 'built-in plugin menu'
-};
-
 // 重新加载全部脚本和插件
 Sandbox.reloadScripts = (function () {
 
-    var LoadSequence = [builtinPluginMenuLoader, userScriptLoader, Fire._editorPluginLoader];
+    var LoadSequence = [userScriptLoader, Fire._editorPluginLoader];
 
     var builtinClasses;
     var builtinComponentMenus;
