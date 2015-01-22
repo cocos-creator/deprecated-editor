@@ -27,7 +27,7 @@ Polymer({
 
     ready: function () {
         var projectPath = Remote.getGlobal('FIRE_PROJECT_PATH');
-        this.settingPath = Path.join( projectPath, 'settings' ) + "/editorConfig.json";
+        this.settingPath = Path.join( projectPath, 'settings' ) + "/code-editor-settings.json";
     },
 
     domReady: function () {
@@ -61,15 +61,11 @@ Polymer({
         }.bind(this);
 
         CodeMirror.commands.increaseFontSize = function () {
-            if (this.fontSize >= 30)
-                return
-            this.fontSize ++ ;
+            this.fontSize = Math.max( this.fontSize+1, 30 );
         }.bind(this);
 
         CodeMirror.commands.decreaseFontSize = function () {
-            if (this.fontSize <= 8)
-                return
-            this.fontSize -- ;
+            this.fontSize = Math.min( this.fontSize-1, 8 );
         }.bind(this);
 
         CodeMirror.commands.resetFontSize = function () {
@@ -108,7 +104,7 @@ Polymer({
             extraKeys: extraKeys,
             gutters: ["CodeMirror-linenumbers", "CodeMirror-lint-markers","CodeMirror-foldgutter","breakpoints"],
         };
-        this.getConfig(function (err,exists,data){
+        this.loadConfig(function (err,exists,data){
             this.mirror = CodeMirror(this.shadowRoot,this.options);
             if (err !== null){
                 return;
@@ -160,10 +156,6 @@ Polymer({
             this.updateHints();
         }
         this.mirror.focus();
-    },
-
-    optionsChanged: function () {
-        // console.log('oprion');
     },
 
     fontFamilyChanged: function () {
@@ -272,7 +264,7 @@ Polymer({
         }.bind(this));
     },
 
-    getConfig: function (callback) {
+    loadConfig: function (callback) {
         var result = Fs.existsSync(this.settingPath);
         var data = null;
         var err = null;
