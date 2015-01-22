@@ -57,15 +57,18 @@ Polymer({
         }.bind(this);
 
         CodeMirror.commands.customSearch = function () {
-            alert('serach');
+            var search = new EditorSearch();
+            document.body.appendChild(search);
+            this.style.top = "40px";
+
         }.bind(this);
 
         CodeMirror.commands.increaseFontSize = function () {
-            this.fontSize = Math.max( this.fontSize+1, 30 );
+            this.fontSize = Math.min( this.fontSize+1, 30 );
         }.bind(this);
 
         CodeMirror.commands.decreaseFontSize = function () {
-            this.fontSize = Math.min( this.fontSize-1, 8 );
+            this.fontSize = Math.max( this.fontSize-1, 8 );
         }.bind(this);
 
         CodeMirror.commands.resetFontSize = function () {
@@ -82,7 +85,7 @@ Polymer({
         var extraKeys = {};
 
         extraKeys[autoformat] = "autoformat";
-        extraKeys[search] = "customSearch";
+        // extraKeys[search] = "customSearch";
         extraKeys[increaseFontSize] = "increaseFontSize";
         extraKeys[decreaseFontSize] = "decreaseFontSize";
         extraKeys[resetFontSize] = "resetFontSize";
