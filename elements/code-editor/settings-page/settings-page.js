@@ -1,3 +1,5 @@
+var FontManager = require('font-manager');
+
 var keymaps = [
     "sublime",
     "vim",
@@ -43,6 +45,7 @@ Polymer({
     publish: {
         hide: true,
         config: null,
+        fonts: null,
     },
 
     create: function () {
@@ -65,6 +68,11 @@ Polymer({
 
         this.$.themeSelect.options = themes.map(function ( item ) {
             return { name: item, value: item };
+        });
+        
+        this.fonts = this.getFonts();
+        this.$.fontSelect.options = this.fonts.map(function ( item ) {
+            return { name: item.family, value: item.family };
         });
     },
 
@@ -110,6 +118,10 @@ Polymer({
 
     CancelAction: function () {
         this.hide = true;
+    },
+
+    getFonts: function () {
+        return FontManager.getAvailableFontsSync();
     },
 
 });

@@ -23,7 +23,11 @@
             </div>
             <div flex-row class="prop" on-focusin="{{focusedAction}}" on-focusout="{{blurAction}}">
                 <fire-ui-label flex-1>Default Theme:</fire-ui-label>
-                <fire-ui-select flex-2 value="{{config.theme}}" id="themeSelect"></fire-ui-select>
+                <fire-ui-select flex-2 searchable value="{{config.theme}}" id="themeSelect"></fire-ui-select>
+            </div>
+            <div flex-row class="prop" on-focusin="{{focusedAction}}" on-focusout="{{blurAction}}">
+                <fire-ui-label flex-1>Font family:</fire-ui-label>
+                <fire-ui-select flex-2 searchable value="{{config.fontFamily}}" id="fontSelect"></fire-ui-select>
             </div>
             <div flex-row class="prop" on-focusin="{{focusedAction}}" on-focusout="{{blurAction}}">
                 <fire-ui-label flex-1>Font-Size:</fire-ui-label>

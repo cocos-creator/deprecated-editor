@@ -15,7 +15,7 @@ Polymer({
     filePath: "",
     uuid: "",
     dirty: false,
-
+    fontFamily: "Arial",
     setting: null,
 
     created: function () {
@@ -84,21 +84,12 @@ Polymer({
         var decreaseFontSize = (mac ? "Cmd" : "Ctrl") + "--";
         var resetFontSize = (mac ? "Cmd" : "Ctrl") + "-0";
         var extraKeys = {};
-        
+
         extraKeys[autoformat] = "autoformat";
         extraKeys[search] = "customSearch";
         extraKeys[increaseFontSize] = "increaseFontSize";
         extraKeys[decreaseFontSize] = "decreaseFontSize";
         extraKeys[resetFontSize] = "resetFontSize";
-
-        this.getConfig(function(err,result,data){
-            if (err !== null) {
-                return;
-            }
-            if (result) {
-                this.theme = data
-            }
-        });
 
         this.options = {
             value: this.value,
@@ -128,6 +119,7 @@ Polymer({
                 this.keyMap = data.keyMap;
                 this.tabSize = data.tabSize;
                 this.fontSize = data.fontSize;
+                this.fontFamily = data.fontFamily;
             }
         }.bind(this));
 
@@ -172,6 +164,10 @@ Polymer({
 
     optionsChanged: function () {
         // console.log('oprion');
+    },
+
+    fontFamilyChanged: function () {
+        this.shadowRoot.getElementsByClassName('CodeMirror')[0].style.fontFamily = this.fontFamily;
     },
 
     keyMapChanged: function () {
@@ -263,6 +259,7 @@ Polymer({
             tabSize: this.tabSize,
             keyMap: this.keyMap,
             fontSize: this.fontSize,
+            fontFamily: this.fontFamily,
         };
 
         var configValue = JSON.stringify(config, null, 4);
