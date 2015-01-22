@@ -1,3 +1,5 @@
+var FontManager = require('font-manager');
+
 var keymaps = [
     "sublime",
     "vim",
@@ -43,6 +45,11 @@ Polymer({
     publish: {
         hide: true,
         config: null,
+        fonts: null,
+    },
+
+    create: function () {
+
     },
 
     ready: function () {
@@ -51,13 +58,8 @@ Polymer({
         this.span.style.height = '100%';
         this.span.style.position = 'absolute';
         this.span.style.opacity = 0.5;
-        this.span.style.marginTop = '20px';
         this.span.style.zIndex = 998;
-        // this.span.style.display = "none";
         this.span.style.background = 'black';
-        this.span.addEventListener('click',function (event) {
-            this.hide = true;
-        }.bind(this));
         document.body.appendChild(this.span);
 
         this.$.keymapSelect.options = keymaps.map(function ( item ) {
@@ -67,13 +69,18 @@ Polymer({
         this.$.themeSelect.options = themes.map(function ( item ) {
             return { name: item, value: item };
         });
+
+        this.fonts = this.getFonts();
+        this.$.fontSelect.options = this.fonts.map(function ( item ) {
+            return { name: item.family, value: item.postscriptName };
+        });
     },
 
     hideChanged: function () {
         if (this.hide) {
             this.animate([
-                { marginTop: "20px" },
-                { marginTop: "-400px"},
+                { marginTop: (this.config.getBoundingClientRect().height/2-100)+"px",width: "600px" },
+                { marginTop: "-400px",width: "0px"},
                 ], {
                     duration: 400
                 });
@@ -83,12 +90,12 @@ Polymer({
         else {
             this.span.style.display = "block";
             this.animate([
-                { marginTop: "-400px" },
-                { marginTop: "20px"}
+                { marginTop: "-400px", width: "0px" },
+                { marginTop: (this.config.getBoundingClientRect().height/2-100)+"px",width: "600px"},
                 ], {
                     duration: 400
                 });
-            this.style.marginTop = "20px";
+            this.style.marginTop = (this.config.getBoundingClientRect().height/2-100)+"px";
         }
     },
 
@@ -102,6 +109,19 @@ Polymer({
         for (var i=0; i<e.target.parentNode.children.length; i++) {
             e.target.parentNode.children[i].removeAttribute("focused");
         }
+    },
+
+    DoneAction: function () {
+        this.config.saveConfig();
+        this.hide = true;
+    },
+
+    CancelAction: function () {
+        this.hide = true;
+    },
+
+    getFonts: function () {
+        return FontManager.getAvailableFontsSync();
     },
 
 });

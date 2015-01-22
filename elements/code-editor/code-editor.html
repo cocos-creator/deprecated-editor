@@ -8,7 +8,7 @@
 <template>
     <link rel="stylesheet" href="code-editor.css">
 
-    <fire-ui-toolbar>
+    <fire-ui-toolbar class="topbar">
         <fire-ui-button on-click="{{saveAction}}">
             <i class="fa fa-file-o"></i>
             Save
@@ -27,9 +27,6 @@
         </fire-ui-button>
         <div class="space"></div>
 
-        <fire-ui-button on-click="{{commentAction}}">Comment</fire-ui-button>
-        <div class="space"></div>
-
         <fire-ui-button on-click="{{autoFormatAction}}">
             <i class="fa fa-rotate-right"></i>
             AutoFormat
@@ -43,14 +40,15 @@
             <div flex-row>
                 <div class="space"></div>
 
-                <fire-ui-label class="label" >{{url}}</fire-ui-label>
+                <fire-ui-label class="label" >Line {{$.mirror.cursor.line+1}}, Column {{$.mirror.cursor.ch}}</fire-ui-label>
                 <div class="space"></div>
 
-                <fire-ui-label class="label" >Line {{$.mirror.cursor.line+1}}, Column {{$.mirror.cursor.ch}}</fire-ui-label>
+                <fire-ui-label class="label" > {{$.mirror.lineCount}} — lines</fire-ui-label>
                 <div class="space"></div>
 
                 <fire-ui-label class="label" >{{$.mirror.jshintError}}</fire-ui-label>
                 <div class="space"></div>
+
             </div>
 
             <div flex-row>

@@ -644,7 +644,7 @@ Polymer({
                 return;
             }
 
-            if ( ['.js', '.html', '.css'].indexOf(event.target.extname) !== -1 ) {
+            if ( ['.js', '.json', '.xml', '.html', '.css'].indexOf(event.target.extname) !== -1 ) {
                 Fire.sendToCore('window:open', 'code-editor', 'fire://static/code-editor.html', {
                     title: "Code Editor",
                     width: 1200,
