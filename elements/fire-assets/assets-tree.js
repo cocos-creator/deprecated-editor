@@ -407,7 +407,8 @@ Polymer({
     },
 
     browse: function ( url ) {
-        _newAssetsItem.call(this, url, 'root', Fire.UUID.AssetsRoot, this);
+        var rootEL = _newAssetsItem.call(this, url, 'root', Fire.UUID.AssetsRoot, this);
+        rootEL.folded = false;
 
         Fire.sendToCore('asset-db:deep-query', url);
     },
@@ -443,6 +444,12 @@ Polymer({
 
         // insert it
         this.setItemParentById(id, destDirId);
+
+        // expand parent
+        var parentEL = this.idToItem[destDirId];
+        if ( parentEL.isFolder ) {
+            parentEL.folded = false;
+        }
     },
 
     hintItem: function ( id ) {
@@ -583,58 +590,105 @@ Polymer({
         }
     },
 
+    select: function ( element ) {
+        Fire.Selection.selectAsset(element.userId, true, true);
+    },
+
+    clearSelect: function () {
+        Fire.Selection.clearAsset();
+        this.activeElement = null;
+        this.shiftStartElement = null;
+    },
+
     selectingAction: function (event) {
+        event.stopPropagation();
         this.focus();
 
-        if ( event.target instanceof AssetsItem ) {
-            if ( event.detail.shift ) {
-                //if ( !this.lastActive ) {
-                //}
-                //else {
-                //}
+        var shiftStartEL = this.shiftStartElement;
+        this.shiftStartElement = null;
+
+        if ( event.detail.shift ) {
+            if ( shiftStartEL === null ) {
+                shiftStartEL = this.activeElement;
             }
-            else if ( event.detail.toggle ) {
-                if ( event.target.selected ) {
-                    Fire.Selection.unselectAsset(event.target.userId, false);
+
+            this.shiftStartElement = shiftStartEL;
+
+            var el = this.shiftStartElement;
+            var userIds = [];
+
+            if ( shiftStartEL !== event.target ) {
+                if ( this.shiftStartElement.offsetTop < event.target.offsetTop ) {
+                    while ( el !== event.target ) {
+                        userIds.push(el.userId);
+                        el = this.nextItem(el);
+                    }
                 }
                 else {
-                    Fire.Selection.selectAsset(event.target.userId, false, false);
+                    while ( el !== event.target ) {
+                        userIds.push(el.userId);
+                        el = this.prevItem(el);
+                    }
                 }
+            }
+            userIds.push(event.target.userId);
+            Fire.Selection.selectAsset(userIds, true, false);
+        }
+        else if ( event.detail.toggle ) {
+            if ( event.target.selected ) {
+                Fire.Selection.unselectAsset(event.target.userId, false);
             }
             else {
-                // 如果已经选中，不unselect other
-                if ( !event.target.selected ) {
-                    Fire.Selection.selectAsset(event.target.userId, true, false);
-                }
+                Fire.Selection.selectAsset(event.target.userId, false, false);
             }
         }
-        event.stopPropagation();
+        else {
+            // if target already selected, do not unselect others
+            if ( !event.target.selected ) {
+                Fire.Selection.selectAsset(event.target.userId, true, false);
+            }
+        }
     },
 
     selectAction: function (event) {
-        if ( event.target instanceof AssetsItem ) {
-            if ( event.detail.shift ) {
-                // TODO:
-            }
-            else if ( event.detail.toggle ) {
-                // TODO:
-            }
-            else {
-                Fire.Selection.selectAsset(event.target.userId, true);
-            }
+        event.stopPropagation();
+
+        if ( event.detail.shift ) {
             Fire.Selection.confirm();
         }
-        event.stopPropagation();
+        else if ( event.detail.toggle ) {
+            Fire.Selection.confirm();
+        }
+        else {
+            Fire.Selection.selectAsset(event.target.userId, true);
+        }
+
+        var activeId = Fire.Selection.activeAssetUuid;
+        var activeEL = activeId && this.idToItem[activeId];
+        this.activeElement = activeEL;
     },
 
-    namechangedAction: function (event) {
-        if ( event.target instanceof AssetsItem ) {
+    renameConfirmAction: function (event) {
+        event.stopPropagation();
+
+        var renamingEL = this.$.nameInput.renamingEL;
+
+        this.$.nameInput.style.display = 'none';
+        this.$.content.appendChild(this.$.nameInput);
+        this.$.nameInput.renamingEL = null;
+
+        // NOTE: the rename confirm will invoke focusoutAction
+        window.requestAnimationFrame( function () {
             this.focus();
-            var srcUrl = this.getUrl(event.target);
-            var destUrl = Url.join( Url.dirname(srcUrl), event.detail.name + event.target.extname );
+        }.bind(this));
+
+        renamingEL._renaming = false;
+
+        if ( renamingEL.name !== event.target.value ) {
+            var srcUrl = this.getUrl(renamingEL);
+            var destUrl = Url.join( Url.dirname(srcUrl), event.target.value + renamingEL.extname );
             Fire.sendToCore('asset-db:move', srcUrl, destUrl );
         }
-        event.stopPropagation();
     },
 
     openAction: function (event) {
@@ -660,15 +714,6 @@ Polymer({
         event.stopPropagation();
     },
 
-    mousedownAction: function (event) {
-        if (event.which === 1) {
-            // left down
-            Fire.Selection.clearAsset();
-
-            event.stopPropagation();
-        }
-    },
-
     contextmenuAction: function (event) {
         this.resetDragState();
 
@@ -685,13 +730,11 @@ Polymer({
     },
 
     keydownAction: function (event) {
-        var activeId = Fire.Selection.activeAssetUuid;
-        var activeEL = activeId && this.idToItem[activeId];
-
-        this.super([event, activeEL]);
+        this.super([event]);
         if (event.cancelBubble) {
             return;
         }
+
         switch ( event.which ) {
             // delete (Windows)
             case 46:
@@ -703,58 +746,20 @@ Polymer({
             case 8:
                 if ( event.metaKey ) {
                     this.deleteSelection();
-                    event.stopPropagation();
                 }
-                break;
-
-            // up-arrow
-            case 38:
-                if ( activeEL ) {
-                    var prev = this.prevItem(activeEL);
-                    if ( prev ) {
-                        // Todo toggle?
-                        Fire.Selection.selectAsset(prev.userId, true, true);
-
-                        if (prev !== activeEL) {
-                            if ( prev.offsetTop <= this.scrollTop ) {
-                                this.scrollTop = prev.offsetTop;
-                            }
-                        }
-                    }
-                }
-                event.preventDefault();
-                event.stopPropagation();
-            break;
-
-            // down-arrow
-            case 40:
-                if ( activeEL ) {
-                    var next = this.nextItem(activeEL, false);
-                    if ( next ) {
-                        // Todo toggle?
-                        Fire.Selection.selectAsset(next.userId, true, true);
-
-                        if ( next !== activeEL ) {
-                            if ( next.offsetTop + 16 >= this.scrollTop + this.offsetHeight ) {
-                                this.scrollTop = next.offsetTop + 16 - this.offsetHeight;
-                            }
-                        }
-                    }
-                }
-                event.preventDefault();
                 event.stopPropagation();
             break;
         }
     },
 
     dragstartAction: function ( event ) {
+        event.stopPropagation();
+
         EditorUI.DragDrop.start( event.dataTransfer, 'copyMove', 'asset', Fire.Selection.assets.map(function (item) {
             var uuid = item;
             var itemEL = this.idToItem[uuid];
             return { name: itemEL.name, id: item };
         }.bind(this)) );
-
-        event.stopPropagation();
     },
 
     dragendAction: function (event) {
@@ -770,6 +775,10 @@ Polymer({
             EditorUI.DragDrop.allowDrop( event.dataTransfer, false );
             return;
         }
+
+        //
+        event.preventDefault();
+        event.stopPropagation();
 
         //
         if ( event.target ) {
@@ -840,10 +849,6 @@ Polymer({
             dropEffect = "move";
         }
         EditorUI.DragDrop.updateDropEffect(event.dataTransfer, dropEffect);
-
-        //
-        event.preventDefault();
-        event.stopPropagation();
     },
 
     dropAction: function ( event ) {

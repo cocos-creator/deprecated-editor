@@ -4,11 +4,32 @@
     constructor="AssetsItem"
     draggable="true"
     >
-<template>
-    <link rel="stylesheet" href="assets-item.css">
+    <template>
+        <link rel="stylesheet" href="assets-item.css">
 
-    <shadow></shadow>
+        <div id="bar"></div>
+        <div id="header"
+            on-mouseenter="{{mouseenterAction}}"
+            on-mouseleave="{{mouseleaveAction}}"
+            on-mousedown="{{mousedownAction}}"
+            on-mouseup="{{mouseupAction}}"
+            >
+            <div class="inline-block-wrapper">
+                <div class="flex-wrapper">
+                    <i id="foldIcon"
+                       class="fa {{folded ? 'fa-caret-right' : 'fa-caret-down'}}"
+                       on-click="{{foldAction}}"
+                       >
+                    </i>
+                    <i id="typeIcon" hidden></i>
+                    <span id="name" class="{{name === '' ? 'no-name' : ''}}">{{name === '' ? 'No Name' : name}}</span>
+                </div>
+            </div>
+        </div>
+        <div id="content">
+            <content />
+        </div>
 
-</template>
+    </template>
 <script type="text/javascript" src="assets-item.js"></script>
 </polymer-element>

@@ -2,11 +2,7 @@
     name="hierarchy-tree"
     extends="fire-ui-tree"
     constructor="HierarchyTree"
-    on-selecting="{{selectingAction}}"
-    on-select="{{selectAction}}"
-    on-namechanged="{{namechangedAction}}"
     on-open="{{openAction}}"
-    on-mousedown="{{mousedownAction}}"
     on-contextmenu="{{contextmenuAction}}"
     on-dragstart="{{dragstartAction}}"
     on-dragend="{{dragendAction}}"
@@ -15,9 +11,7 @@
     >
     <template>
         <link rel="stylesheet" href="hierarchy-tree.css">
-
         <shadow></shadow>
-
     </template>
     <script type="text/javascript" src="hierarchy-tree.js"></script>
 </polymer-element>

@@ -1,49 +1,100 @@
+:host([hover]) #bar {
+    background-color: #333
+}
+
+:host([conflicted]) #bar {
+    background-color: #900
+}
+
+:host([highlighted]) #header {
+    background-color: #c7722c
+}
+
+:host([invalid]) #header {
+    background-color: #f00
+}
+
+// ==============================================
+
 :host {
+    display: block
 
-	// It will create a new shadow-root instead of import the base element's shadow-root,
-    // so we must use the selector '::shadow' to customize the style of base element
-    // https://groups.google.com/forum/?fromgroups=#!topic/polymer-dev/8MOOwcjZVpw
-    // https://www.polymer-project.org/articles/styling-elements.html
+    font-size: 12px
+    margin-left: 0px // NOTE: will be setup in editor.styl
+}
 
-    &([selected])::shadow {
-        .wrapper {
-            .bar {
-                visibility: visible
-                background: #555
-            }
-        }
+:host([folded]) #content {
+    display: none
+}
+
+#header {
+    position: relative
+    padding-bottom: 1px
+}
+
+#bar {
+    position: absolute
+    left: 0
+    right: 0
+    height: 16px
+}
+
+:host([selected]) #bar {
+    background-color: #555
+}
+
+.inline-block-wrapper {
+    display: inline-block
+}
+
+.flex-wrapper {
+    display: flex
+    flex-direction: row
+    flex-wrap: nowrap
+    align-items: flex-end
+
+    white-space: nowrap
+    height: 16px
+
+    font-family: Helvetica,Arial,sans-serif
+    color: #aaa
+    cursor: default
+}
+
+#foldIcon {
+    font-size: 14px
+    width: 10px
+    margin-right: 2px
+
+    visibility: hidden
+    cursor: pointer
+    text-align: center
+}
+
+:host([foldable]) #foldIcon {
+    visibility: visible
+}
+
+#typeIcon {
+    font-size: 16px
+    width: 16px
+    height: 16px
+    margin-right: 2px
+
+    &[hidden] {
+        display: none
     }
 
-    &([hover])::shadow {
-        .wrapper {
-            .bar {
-                visibility: visible
-                background: #333
-                // border-left: 5px solid #09f
-                // box-sizing: border-box
-            }
-        }
+    img {
+        width: 16px
+        height: 16px
     }
+}
 
-    &([conflicted])::shadow {
-        .wrapper {
-            .bar {
-                visibility: visible
-                background: #900
-            }
-        }
-    }
+#name.no-name {
+    color: #6e6e6e
+}
 
-    &([highlighted])::shadow {
-        // border: 2px solid #c7722c
-        .wrapper {
-            background: #c7722c
-        }
-    }
-
-    &([invalid])::shadow {
-        .wrapper {
-            background: #f00
-        }
-    }
+#content {
+    display: block
 }

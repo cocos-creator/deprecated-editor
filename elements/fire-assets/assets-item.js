@@ -32,10 +32,6 @@ function _binaryInsert( parentEL, el ) {
 
 Polymer({
     publish: {
-        selected: {
-            value: false,
-            reflect: true
-        },
         conflicted: {
             value: false,
             reflect: true
@@ -53,9 +49,6 @@ Polymer({
     created: function () {
         this.super();
 
-        this._isToggle = false;
-        this._isShift = false;
-
         this.extname = '';
         this.isFolder = false;
         this.isRoot = false;
@@ -63,65 +56,6 @@ Polymer({
 
     addChild: function (child) {
         _binaryInsert ( this, child );
-
         this.foldable = true;
-    },
-
-    hint: function () {
-        var computedStyle = window.getComputedStyle(this.$.bar);
-        this.$.bar.animate([
-            { background: "white", transform: "scale(1.2)" },
-            { background: computedStyle.backgroundColor, transform: "scale(1)" }
-        ], {
-            duration: 300
-        });
-    },
-
-    mousedownAction: function ( event ) {
-        this.super([event]);
-        if (event.cancelBubble) {
-            return;
-        }
-
-        // if this is not the mouse-left-button
-        if ( event.which !== 1 )
-            return;
-
-        this._isToggle = false;
-        this._isShift = false;
-
-        if ( event.shiftKey ) {
-            this._isShift = true;
-        }
-        else if ( event.metaKey || event.ctrlKey ) {
-            this._isToggle = true;
-        }
-
-        this.fire('selecting', {
-            toggle: this._isToggle,
-            shift: this._isShift,
-            x: event.x,
-            y: event.y,
-        } );
-
-        event.stopPropagation();
-    },
-
-    mouseupAction: function ( event ) {
-        this.super([event]);
-        if (event.cancelBubble) {
-            return;
-        }
-
-        // if this is not the mouse-left-button
-        if ( event.which !== 1 )
-            return;
-
-        this.fire('select', {
-            toggle: this._isToggle,
-            shift: this._isShift
-        } );
-
-        event.stopPropagation();
     },
 });

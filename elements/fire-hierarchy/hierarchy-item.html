@@ -5,13 +5,29 @@
                  >
     <template>
         <link rel="stylesheet" href="hierarchy-item.css">
-        <!--
-            It will create a new shadow-root instead of import the base element's shadow-root,
-            so we must use the selector '::shadow' to customize the style of base element
-            https://groups.google.com/forum/?fromgroups=#!topic/polymer-dev/8MOOwcjZVpw
-            https://www.polymer-project.org/articles/styling-elements.html
-        -->
-        <shadow></shadow>
+
+        <div id="bar"></div>
+        <div id="header"
+            on-mouseenter="{{mouseenterAction}}"
+            on-mouseleave="{{mouseleaveAction}}"
+            on-mousedown="{{mousedownAction}}"
+            on-mouseup="{{mouseupAction}}"
+            >
+            <div class="inline-block-wrapper">
+                <div class="flex-wrapper">
+                    <i id="foldIcon"
+                       class="fa {{folded ? 'fa-caret-right' : 'fa-caret-down'}}"
+                       on-click="{{foldAction}}"
+                       >
+                    </i>
+                    <i id="typeIcon" hidden></i>
+                    <span id="name" class="{{name === '' ? 'no-name' : ''}}">{{name === '' ? 'No Name' : name}}</span>
+                </div>
+            </div>
+        </div>
+        <div id="content">
+            <content />
+        </div>
     </template>
     <script type="text/javascript" src="hierarchy-item.js"></script>
 </polymer-element>

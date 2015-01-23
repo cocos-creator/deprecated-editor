@@ -20,7 +20,7 @@ Polymer({
     },
 
     ready: function () {
-        this.tabIndex = EditorUI.getParentTabIndex(this) + 1;
+        this.super();
 
         // register events
         this.addEventListener( "dragenter", function (event) {
@@ -114,6 +114,7 @@ Polymer({
     newItem: function ( name, id, parentEL ) {
         var newEL = new HierarchyItem();
         this.initItem(newEL, name, id, parentEL);
+        newEL.folded = false;
         return newEL;
     },
 
@@ -236,77 +237,6 @@ Polymer({
         Fire.sendToPages('engine:moveEntities', entities, targetEL ? targetEL.userId : null, nextSiblingId);
     },
 
-    selectingAction: function (event) {
-        // mouse down
-        this.focus();
-        if ( event.target instanceof HierarchyItem ) {
-            if ( event.detail.shift ) {
-                //if ( !this.lastActive ) {
-                //}
-                //else {
-                //}
-            }
-            else if ( event.detail.toggle ) {
-                if ( event.target.selected ) {
-                    Fire.Selection.unselectEntity(event.target.userId, false);
-                }
-                else {
-                    Fire.Selection.selectEntity(event.target.userId, false, false);
-                }
-            }
-            else {
-                // 如果已经选中，不unselect other
-                if ( !event.target.selected ) {
-                    Fire.Selection.selectEntity(event.target.userId, true, false);
-                }
-            }
-        }
-        event.stopPropagation();
-    },
-
-    selectAction: function (event) {
-        // mouse up
-        if ( event.target instanceof HierarchyItem ) {
-            if ( event.detail.shift ) {
-                // TODO:
-            }
-            else if ( event.detail.toggle ) {
-                // TODO:
-            }
-            else {
-                Fire.Selection.selectEntity(event.target.userId, true);
-            }
-            Fire.Selection.confirm();
-        }
-        event.stopPropagation();
-    },
-
-    namechangedAction: function (event) {
-        // TODO: pull up to view ?
-        var item = event.target;
-        if ( item instanceof FireTreeItem ) {
-            this.focus();
-            Fire.sendToPages('engine:renameEntity', item.userId, event.detail.name);
-        }
-        event.stopPropagation();
-    },
-
-    openAction: function (event) {
-        if ( event.target instanceof HierarchyItem ) {
-            // TODO: align scene view to target
-        }
-        event.stopPropagation();
-    },
-
-    mousedownAction: function (event) {
-        if (event.which === 1) {
-            // left down
-            Fire.Selection.clearEntity();
-
-            event.stopPropagation();
-        }
-    },
-
     createEntity: function () {
         var parentEL = this.contextmenuAt && this.contextmenuAt.parentElement;
         if (parentEL instanceof HierarchyItem) {
@@ -327,6 +257,122 @@ Polymer({
         }
     },
 
+    deleteSelection: function () {
+        Fire.sendToPages('engine:deleteEntities', Fire.Selection.entities);
+    },
+
+    duplicateSelection: function () {
+        var entities = this.getToplevelElements(Fire.Selection.entities).map(function (element) {
+            return element && element.userId;
+        });
+        Fire.sendToPages('engine:duplicateEntities', entities);
+    },
+
+    select: function ( element ) {
+        Fire.Selection.selectEntity(element.userId, true, true);
+    },
+
+    clearSelect: function () {
+        Fire.Selection.clearEntity();
+        this.activeElement = null;
+        this.shiftStartElement = null;
+    },
+
+    selectingAction: function (event) {
+        event.stopPropagation();
+        this.focus();
+
+        var shiftStartEL = this.shiftStartElement;
+        this.shiftStartElement = null;
+
+        if ( event.detail.shift ) {
+            if ( shiftStartEL === null ) {
+                shiftStartEL = this.activeElement;
+            }
+
+            this.shiftStartElement = shiftStartEL;
+
+            var el = this.shiftStartElement;
+            var userIds = [];
+
+            if ( shiftStartEL !== event.target ) {
+                if ( this.shiftStartElement.offsetTop < event.target.offsetTop ) {
+                    while ( el !== event.target ) {
+                        userIds.push(el.userId);
+                        el = this.nextItem(el);
+                    }
+                }
+                else {
+                    while ( el !== event.target ) {
+                        userIds.push(el.userId);
+                        el = this.prevItem(el);
+                    }
+                }
+            }
+            userIds.push(event.target.userId);
+            Fire.Selection.selectEntity(userIds, true, false);
+        }
+        else if ( event.detail.toggle ) {
+            if ( event.target.selected ) {
+                Fire.Selection.unselectEntity(event.target.userId, false);
+            }
+            else {
+                Fire.Selection.selectEntity(event.target.userId, false, false);
+            }
+        }
+        else {
+            // if target already selected, do not unselect others
+            if ( !event.target.selected ) {
+                Fire.Selection.selectEntity(event.target.userId, true, false);
+            }
+        }
+    },
+
+    selectAction: function (event) {
+        event.stopPropagation();
+
+        if ( event.detail.shift ) {
+            Fire.Selection.confirm();
+        }
+        else if ( event.detail.toggle ) {
+            Fire.Selection.confirm();
+        }
+        else {
+            Fire.Selection.selectEntity(event.target.userId, true);
+        }
+
+        var activeId = Fire.Selection.activeEntityId;
+        var activeEL = activeId && this.idToItem[activeId];
+        this.activeElement = activeEL;
+    },
+
+    renameConfirmAction: function (event) {
+        event.stopPropagation();
+
+        var renamingEL = this.$.nameInput.renamingEL;
+
+        this.$.nameInput.style.display = 'none';
+        this.$.content.appendChild(this.$.nameInput);
+        this.$.nameInput.renamingEL = null;
+
+        // NOTE: the rename confirm will invoke focusoutAction
+        window.requestAnimationFrame( function () {
+            this.focus();
+        }.bind(this));
+
+        renamingEL._renaming = false;
+
+        // TODO: pull up to view ?
+        Fire.sendToPages('engine:renameEntity', renamingEL.userId, event.target.value);
+    },
+
+    openAction: function (event) {
+        if ( event.target instanceof HierarchyItem ) {
+            // TODO: align scene view to target
+        }
+        event.stopPropagation();
+    },
+
     contextmenuAction: function (event) {
         this.resetDragState();
 
@@ -342,30 +388,14 @@ Polymer({
         event.stopPropagation();
     },
 
-    deleteSelection: function () {
-        Fire.sendToPages('engine:deleteEntities', Fire.Selection.entities);
-    },
-
-    duplicateSelection: function () {
-        var entities = this.getToplevelElements(Fire.Selection.entities).map(function (element) {
-            return element && element.userId;
-        });
-        Fire.sendToPages('engine:duplicateEntities', entities);
-    },
-
     keydownAction: function (event) {
-        // FIXME: Johnny Said: I found this will swallow some keyaction such as Command+R to refresh the page
-        var activeId = Fire.Selection.activeEntityId;
-        var activeEL = activeId && this.idToItem[activeId];
-
-        this.super([event, activeEL]);
+        this.super([event]);
         if (event.cancelBubble) {
             return;
         }
 
-        // console.log(event.which);
         switch ( event.which ) {
-            // delete
+            // delete (Windows)
             case 46:
                 this.deleteSelection();
                 event.stopPropagation();
@@ -375,57 +405,19 @@ Polymer({
             case 8:
                 if ( event.metaKey ) {
                     this.deleteSelection();
-                    event.stopPropagation();
                 }
-                break;
-
-            // key-up
-            case 38:
-                if ( activeEL ) {
-                    var prev = this.prevItem(activeEL);
-                    if ( prev ) {
-                        // Todo toggle?
-                        Fire.Selection.selectEntity(prev.userId, true, true);
-
-                        if (prev !== activeEL) {
-                            if ( prev.offsetTop <= this.scrollTop ) {
-                                this.scrollTop = prev.offsetTop;
-                            }
-                        }
-                    }
-                }
-                event.preventDefault();
-                event.stopPropagation();
-            break;
-
-            // key-down
-            case 40:
-                if ( activeEL ) {
-                    var next = this.nextItem(activeEL, false);
-                    if ( next ) {
-                        // Todo toggle?
-                        Fire.Selection.selectEntity(next.userId, true, true);
-
-                        if ( next !== activeEL ) {
-                            if ( next.offsetTop + 16 >= this.scrollTop + this.offsetHeight ) {
-                                this.scrollTop = next.offsetTop + 16 - this.offsetHeight;
-                            }
-                        }
-                    }
-                }
-                event.preventDefault();
                 event.stopPropagation();
             break;
         }
     },
 
     dragstartAction: function ( event ) {
+        event.stopPropagation();
+
         EditorUI.DragDrop.start( event.dataTransfer, 'move', 'entity', Fire.Selection.entities.map( function (item) {
             var ent = Fire._getInstanceById(item);
             return { name: ent.name, id: item };
         }) );
-
-        event.stopPropagation();
     },
 
     dragendAction: function (event) {
@@ -441,6 +433,10 @@ Polymer({
             EditorUI.DragDrop.allowDrop( event.dataTransfer, false );
             return;
         }
+
+        //
+        event.preventDefault();
+        event.stopPropagation();
 
         //
         if ( event.target ) {
@@ -492,10 +488,6 @@ Polymer({
             dropEffect = "move";
         }
         EditorUI.DragDrop.updateDropEffect(event.dataTransfer, dropEffect);
-
-        //
-        event.preventDefault();
-        event.stopPropagation();
     },
 
     dropAction: function ( event ) {
