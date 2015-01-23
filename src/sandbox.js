@@ -290,8 +290,8 @@ Sandbox.reloadScripts = (function () {
     function purge () {
         Sandbox._purgeMemory();
         // reset menus
-        Fire._componentMenuItems = builtinComponentMenus.slice();
-        Fire._customAssetMenuItems = builtinCustomAssetMenus.slice();
+        Fire._componentMenuItems = builtinComponentMenus;
+        Fire._customAssetMenuItems = builtinCustomAssetMenus;
         Fire.MainMenu.reset();
         // remove user classes
         Fire._registeredClassIds = builtinClassIds;

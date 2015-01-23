@@ -656,6 +656,7 @@ Polymer({
                 } );
                 return;
             }
+            Fire.sendToCore('asset:open', event.target.extname, this.getUrl(event.target));
         }
         event.stopPropagation();
     },
