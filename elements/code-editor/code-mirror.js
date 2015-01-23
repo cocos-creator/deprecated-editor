@@ -56,13 +56,6 @@ Polymer({
             this.autoFormat();
         }.bind(this);
 
-        CodeMirror.commands.customSearch = function () {
-            var search = new EditorSearch();
-            document.body.appendChild(search);
-            this.style.top = "40px";
-
-        }.bind(this);
-
         CodeMirror.commands.increaseFontSize = function () {
             this.fontSize = Math.min( this.fontSize+1, 30 );
         }.bind(this);
@@ -85,7 +78,6 @@ Polymer({
         var extraKeys = {};
 
         extraKeys[autoformat] = "autoformat";
-        // extraKeys[search] = "customSearch";
         extraKeys[increaseFontSize] = "increaseFontSize";
         extraKeys[decreaseFontSize] = "decreaseFontSize";
         extraKeys[resetFontSize] = "resetFontSize";
