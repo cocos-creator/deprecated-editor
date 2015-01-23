@@ -83,7 +83,7 @@ Polymer({
             }.bind(this));
         }.bind(this) );
 
-        this.ipc.on('reload:user-scripts', Fire._Sandbox.reloadScripts);
+        this.ipc.on('reload:window-scripts', Fire._Sandbox.reloadScripts);
 
         this.ipc.on('asset-library:debugger:query-uuid-asset', function () {
             var results = [];

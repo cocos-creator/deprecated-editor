@@ -16,15 +16,14 @@ var hierarchy = {
     init: function () {
         ipc.on('create:createEntity', createEntity);
         ipc.on('create:createChildEntity', createChildEntity);
+
+        Fire.MainMenu.addTemplate('Entity', this.getMenuTemplate('create'), {
+            type: 'window-static'
+        });
     },
 
     destroy: function () {
         ipc.clear();
-    },
-
-    mainMenu: {
-        path: 'Entity',
-        template: null,
     },
 
     // custom properties
@@ -43,5 +42,4 @@ var hierarchy = {
     },
 };
 
-hierarchy.mainMenu.template = hierarchy.getMenuTemplate('create');
 Fire.plugins.hierarchy = hierarchy;
