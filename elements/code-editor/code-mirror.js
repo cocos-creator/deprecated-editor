@@ -269,7 +269,6 @@ Polymer({
                 Fire.error( err.message );
                 return;
             }
-            Fire.log("Save code-editor-config.json");
         }.bind(this));
     },
 
