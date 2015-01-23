@@ -6,6 +6,7 @@
   "license": "MIT",
   "licenseUrl": "http://opensource.org/licenses/MIT",
   "dependencies": {
+    "font-manager": ""
   },
   "devDependencies": {
     "gulp": "",

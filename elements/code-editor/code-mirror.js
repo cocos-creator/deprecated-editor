@@ -284,8 +284,8 @@ Polymer({
                 data = JSON.parse(data);
                 if (cb) cb( null, data );
             }
-            catch (err) {
-                if (cb) cb(err);
+            catch (e) {
+                if (cb) cb(e);
             }
 
         });
