@@ -97,6 +97,7 @@ Polymer({
             scroll: false,
             tabSize: this.tabSize,
             lineNumbers: this.lineNumbers,
+            autofocus: true,
             foldGutter: true,
             autoCloseTags: true,
             matchBrackets: true,
@@ -143,13 +144,19 @@ Polymer({
             case ".html" :
                 this.mode = "htmlmixed";
                 break;
+            case ".htm" :
+                this.mode = "htmlmixed";
+                break;
             case ".css" :
                 this.mode = "css";
                 break;
             case ".json" :
                 this.mode = "css";
                 break;
-            case ".xml",".xaml":
+            case ".xml" :
+                this.mode = "xml";
+                break;
+            case ".xaml" :
                 this.mode = "xml";
                 break;
             default:
@@ -161,7 +168,7 @@ Polymer({
             this.updateHints();
         }
 
-        this.mirror.focus();
+        // this.mirror.focus();
     },
 
     fontFamilyChanged: function () {
@@ -194,6 +201,10 @@ Polymer({
 
     dirtyChanged: function () {
         this.fire('dirty-changed');
+    },
+
+    reloadAction: function () {
+        this.mirror.setValue(this.value);
     },
 
     lineComment: function () {

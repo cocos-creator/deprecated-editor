@@ -122,7 +122,6 @@ Polymer({
         var fspath = Fire.AssetDB._fspath(this.url);
         var uuid = Fire.AssetDB.urlToUuid(this.url);
         Fs.readFile(fspath, 'utf8', function ( err, data ) {
-            this.$.mirror.value = null;
             this.$.mirror.value = data;
             this.$.mirror.filePath = fspath;
             this.$.mirror.uuid = uuid;
@@ -146,6 +145,11 @@ Polymer({
 
     saveAction: function () {
         this.$.mirror.save();
+    },
+
+    reloadAction: function () {
+        this.loadFile();
+        this.$.mirror.reloadAction();
     },
 
     settingsAction: function () {

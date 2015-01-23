@@ -10,6 +10,7 @@
 
         font-family: 'DejaVu Sans Mono', monospace
         font-size: 12px
+        font-weight: 100
     }
 
     .CodeMirror-scroll {
@@ -27,25 +28,29 @@
         left: 0
         right: 0
         z-index: 15
-        height: 24px
+        // height: 24px
         line-height: 24px
         padding: .1em .8em
         overflow: hidden
         font-size: 14px
         color: gray
-        // background: #333
-        background: #dfe2e2
+        background: #333
+        // background: #dfe2e2
         border-bottom: 1px solid rgba(0,0,0,0.09);
         box-shadow: 0 1px 3px rgba(0,0,0,0.06);
-        input {
-            font-size: 13px
-            border: 1px solid black
-            font-family: 'DejaVu Sans Mono', monospace
-        }
+        // input {
+        //     font-size: 13px
+        //     border: 1px solid black
+        //     font-family: 'DejaVu Sans Mono', monospace
+        // }
     }
 
     .cm-searching {
         background: rgb(245,238,146)
+    }
+
+    .cm-s-mbo div.CodeMirror-selected {
+        background: rgb(247,196,78) !important;
     }
 
     // .lint-error {font-family: arial; font-size: 70%; background: #ffa; color: #a00; padding: 2px 5px 3px; }
