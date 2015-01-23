@@ -56,16 +56,12 @@ Polymer({
             this.autoFormat();
         }.bind(this);
 
-        CodeMirror.commands.customSearch = function () {
-            alert('serach');
-        }.bind(this);
-
         CodeMirror.commands.increaseFontSize = function () {
-            this.fontSize = Math.max( this.fontSize+1, 30 );
+            this.fontSize = Math.min( this.fontSize+1, 30 );
         }.bind(this);
 
         CodeMirror.commands.decreaseFontSize = function () {
-            this.fontSize = Math.min( this.fontSize-1, 8 );
+            this.fontSize = Math.max( this.fontSize-1, 8 );
         }.bind(this);
 
         CodeMirror.commands.resetFontSize = function () {
@@ -82,7 +78,6 @@ Polymer({
         var extraKeys = {};
 
         extraKeys[autoformat] = "autoformat";
-        extraKeys[search] = "customSearch";
         extraKeys[increaseFontSize] = "increaseFontSize";
         extraKeys[decreaseFontSize] = "decreaseFontSize";
         extraKeys[resetFontSize] = "resetFontSize";
@@ -94,6 +89,7 @@ Polymer({
             scroll: false,
             tabSize: this.tabSize,
             lineNumbers: this.lineNumbers,
+            autofocus: true,
             foldGutter: true,
             autoCloseTags: true,
             matchBrackets: true,
@@ -140,13 +136,19 @@ Polymer({
             case ".html" :
                 this.mode = "htmlmixed";
                 break;
+            case ".htm" :
+                this.mode = "htmlmixed";
+                break;
             case ".css" :
                 this.mode = "css";
                 break;
             case ".json" :
                 this.mode = "css";
                 break;
-            case ".xml",".xaml":
+            case ".xml" :
+                this.mode = "xml";
+                break;
+            case ".xaml" :
                 this.mode = "xml";
                 break;
             default:
@@ -158,7 +160,7 @@ Polymer({
             this.updateHints();
         }
 
-        this.mirror.focus();
+        // this.mirror.focus();
     },
 
     fontFamilyChanged: function () {
@@ -191,6 +193,10 @@ Polymer({
 
     dirtyChanged: function () {
         this.fire('dirty-changed');
+    },
+
+    reloadAction: function () {
+        this.mirror.setValue(this.value);
     },
 
     lineComment: function () {
@@ -263,7 +269,6 @@ Polymer({
                 Fire.error( err.message );
                 return;
             }
-            Fire.log("Save code-editor-config.json");
         }.bind(this));
     },
 

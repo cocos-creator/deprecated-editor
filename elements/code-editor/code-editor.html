@@ -1,5 +1,6 @@
 <link rel="import" href="code-mirror.html">
 <link rel="import" href="settings-page/settings-page.html">
+
 <polymer-element
     name="code-editor"
     constructor="CodeEditor"
@@ -15,7 +16,7 @@
         </fire-ui-button>
         <div class="space"></div>
 
-        <fire-ui-button on-click="{{loadFile}}">
+        <fire-ui-button on-click="{{reloadAction}}">
             <i class="fa fa-rotate-right"></i>
             Reload
         </fire-ui-button>

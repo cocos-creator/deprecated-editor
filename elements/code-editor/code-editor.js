@@ -86,7 +86,6 @@ Polymer({
         }
         this.url = url;
 
-        //
         this.updateSize();
         this.loadFile();
 
@@ -106,7 +105,8 @@ Polymer({
             this.updateSize();
         }.bind(this));
 
-        window.addEventListener('unload', function () {
+        window.addEventListener('beforeunload', function () {
+            this.$.mirror.saveConfig();
             if (this.$.mirror.dirty) {
                 var result = window.confirm(this.url + " was modified,do you want to save?");
                 if (result) {
@@ -122,7 +122,6 @@ Polymer({
         var fspath = Fire.AssetDB._fspath(this.url);
         var uuid = Fire.AssetDB.urlToUuid(this.url);
         Fs.readFile(fspath, 'utf8', function ( err, data ) {
-            this.$.mirror.value = null;
             this.$.mirror.value = data;
             this.$.mirror.filePath = fspath;
             this.$.mirror.uuid = uuid;
@@ -146,6 +145,11 @@ Polymer({
 
     saveAction: function () {
         this.$.mirror.save();
+    },
+
+    reloadAction: function () {
+        this.loadFile();
+        this.$.mirror.reloadAction();
     },
 
     settingsAction: function () {

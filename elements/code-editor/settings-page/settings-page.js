@@ -112,11 +112,6 @@ Polymer({
     },
 
     DoneAction: function () {
-        this.config.saveConfig();
-        this.hide = true;
-    },
-
-    CancelAction: function () {
         this.hide = true;
     },
 
