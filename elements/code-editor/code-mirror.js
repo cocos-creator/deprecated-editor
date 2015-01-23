@@ -1,5 +1,6 @@
 var Fs = require("fire-fs");
 var Path = require('fire-path');
+var Remote = require("remote");
 
 Polymer({
     value: null,
@@ -9,10 +10,13 @@ Polymer({
     keyMap: 'sublime',
     lineNumbers: true,
     jshintError: "",
-
+    lineCount: 0,
+    fontSize: 12,
     filePath: "",
     uuid: "",
     dirty: false,
+    fontFamily: "Arial",
+    setting: null,
 
     created: function () {
         this.cursor = {
@@ -22,6 +26,8 @@ Polymer({
     },
 
     ready: function () {
+        var projectPath = Remote.getGlobal('FIRE_PROJECT_PATH');
+        this.settingPath = Path.join( projectPath, 'settings' ) + "/code-editor-settings.json";
     },
 
     domReady: function () {
@@ -51,19 +57,37 @@ Polymer({
         }.bind(this);
 
         CodeMirror.commands.customSearch = function () {
-            // this.autoFormat();
             alert('serach');
         }.bind(this);
 
+        CodeMirror.commands.increaseFontSize = function () {
+            this.fontSize = Math.max( this.fontSize+1, 30 );
+        }.bind(this);
+
+        CodeMirror.commands.decreaseFontSize = function () {
+            this.fontSize = Math.min( this.fontSize-1, 8 );
+        }.bind(this);
+
+        CodeMirror.commands.resetFontSize = function () {
+                this.fontSize = 12;
+            }.bind(this);
+
         var mac = CodeMirror.keyMap.default == CodeMirror.keyMap.macDefault;
-        //autoformat
+
         var autoformat = (mac ? "Cmd" : "Ctrl") + "-O";
         var search = (mac ? "Cmd" : "Ctrl") + "-F";
+        var increaseFontSize = (mac ? "Cmd" : "Ctrl") + "-=";
+        var decreaseFontSize = (mac ? "Cmd" : "Ctrl") + "--";
+        var resetFontSize = (mac ? "Cmd" : "Ctrl") + "-0";
         var extraKeys = {};
+
         extraKeys[autoformat] = "autoformat";
         extraKeys[search] = "customSearch";
+        extraKeys[increaseFontSize] = "increaseFontSize";
+        extraKeys[decreaseFontSize] = "decreaseFontSize";
+        extraKeys[resetFontSize] = "resetFontSize";
 
-        this.mirror = CodeMirror(this.shadowRoot, {
+        this.options = {
             value: this.value,
             mode: this.mode,
             theme: this.theme,
@@ -79,30 +103,50 @@ Polymer({
             keyMap: this.keyMap,
             extraKeys: extraKeys,
             gutters: ["CodeMirror-linenumbers", "CodeMirror-lint-markers","CodeMirror-foldgutter","breakpoints"],
-        });
+        };
+
+        // mirror initialize
+        this.mirror = CodeMirror(this.shadowRoot,this.options);
 
         this.mirror.on('change',function () {
             if (this.mode === "javascript") {
                 this.updateHints();
             }
             this.dirty = true;
+            this.lineCount = this.mirror.lineCount();
         }.bind(this));
 
         this.mirror.on('cursorActivity',function () {
             this.cursor = this.mirror.getCursor();
         }.bind(this));
 
+        // load config
+        this.loadConfig(function (err,settings) {
+            if (err) {
+                Fire.error(err.message);
+                return;
+            }
+
+            if (settings) {
+                Fire.mixin(this,settings);
+            }
+        }.bind(this));
+        this.lineCount = this.mirror.lineCount();
+
         switch (Path.extname(this.filePath).toLowerCase()) {
-            case ".js" || ".json":
+            case ".js" :
                 this.mode = "javascript";
                 break;
-            case ".html" || ".htm":
+            case ".html" :
                 this.mode = "htmlmixed";
                 break;
-            case ".css" || ".styl":
+            case ".css" :
                 this.mode = "css";
                 break;
-            case ".xml" || ".xaml":
+            case ".json" :
+                this.mode = "css";
+                break;
+            case ".xml",".xaml":
                 this.mode = "xml";
                 break;
             default:
@@ -113,7 +157,12 @@ Polymer({
         if (this.mode === "javascript") {
             this.updateHints();
         }
+
         this.mirror.focus();
+    },
+
+    fontFamilyChanged: function () {
+        this.shadowRoot.getElementsByClassName('CodeMirror')[0].style.fontFamily = this.fontFamily;
     },
 
     keyMapChanged: function () {
@@ -122,6 +171,10 @@ Polymer({
 
     modeChanged: function() {
         this.mirror.setOption('mode', this.mode);
+    },
+
+    fontSizeChanged: function () {
+        this.shadowRoot.getElementsByClassName('CodeMirror')[0].style.fontSize = this.fontSize + "px";
     },
 
     themeChanged: function() {
@@ -146,8 +199,20 @@ Polymer({
     },
 
     autoFormat: function () {
-        var range = { from: this.mirror.getCursor(true), to: this.mirror.getCursor(false) };
-        this.mirror.autoFormatRange(range.from, range.to);
+        switch (this.mode) {
+            case "javascript":
+                this.mirror.setValue(js_beautify(this.mirror.getValue(),this.tabSize,''));
+            break;
+            case "css":
+                var options = {
+                    indent: '    ',
+                };
+                this.mirror.setValue(cssbeautify(this.mirror.getValue(),options));
+            break;
+            case "htmlmixed":
+                this.mirror.setValue(style_html(this.mirror.getValue(),this.tabSize,' ',80));
+            break;
+        }
     },
 
     save: function () {
@@ -181,5 +246,44 @@ Polymer({
                 this.jshintError = "";
             }
         }.bind(this));
+    },
+
+    saveConfig: function () {
+        var config = {
+            theme: this.theme,
+            tabSize: this.tabSize,
+            keyMap: this.keyMap,
+            fontSize: this.fontSize,
+            fontFamily: this.fontFamily,
+        };
+
+        var configValue = JSON.stringify(config, null, 4);
+        Fs.writeFile(this.settingPath, configValue, 'utf8', function ( err ) {
+            if ( err ) {
+                Fire.error( err.message );
+                return;
+            }
+            Fire.log("Save code-editor-config.json");
+        }.bind(this));
+    },
+
+    loadConfig: function (cb) {
+        var exists = Fs.existsSync(this.settingPath);
+        if (!exists) {
+            if (cb) cb();
+            return;
+        }
+
+        Fs.readFile(this.settingPath, 'utf8', function ( err, data ) {
+            try {
+                data = JSON.parse(data);
+                if (cb) cb( null, data );
+            }
+            catch (err) {
+                if (cb) cb(err);
+            }
+
+        });
+
     },
 });

@@ -265,21 +265,10 @@ var userScriptLoader = (function () {
     return loader;
 })();
 
-var builtinPluginMenuLoader = {
-    loadAll: function () {
-        for (var key in Fire.plugins) {
-            var plugin = Fire.plugins[key];
-            if (plugin.mainMenu) {
-                Fire.MainMenu.addTemplate(plugin.mainMenu.path, plugin.mainMenu.template);
-            }
-        }
-    },
-    unloadAll: function () {},
-    name: 'built-in plugin menu'
-};
-
 // 重新加载全部脚本和插件
 Sandbox.reloadScripts = (function () {
+
+    var LoadSequence = [userScriptLoader, Fire._editorPluginLoader];
 
     var builtinClassIds;
     var builtinClassNames;
@@ -289,6 +278,7 @@ Sandbox.reloadScripts = (function () {
     var inited = false;
 
     function init () {
+        inited = true;
         Sandbox.globalVarsChecker = new GlobalVarsChecker().record();
         Sandbox.nodeJsRequire = require;
         builtinClassIds = Fire._registeredClassIds;
@@ -300,8 +290,8 @@ Sandbox.reloadScripts = (function () {
     function purge () {
         Sandbox._purgeMemory();
         // reset menus
-        Fire._componentMenuItems = builtinComponentMenus.slice();
-        Fire._customAssetMenuItems = builtinCustomAssetMenus.slice();
+        Fire._componentMenuItems = builtinComponentMenus;
+        Fire._customAssetMenuItems = builtinCustomAssetMenus;
         Fire.MainMenu.reset();
         // remove user classes
         Fire._registeredClassIds = builtinClassIds;
@@ -324,13 +314,10 @@ Sandbox.reloadScripts = (function () {
         var scriptsLoaded = inited;
         if ( !inited ) {
             init();
-            inited = true;
         }
 
         // restore global variables（就算没 play 也可能会在 dev tools 里面添加全局变量）
         Sandbox.globalVarsChecker.restore(Fire.log, 'editing');
-
-        var LoadSequence = [builtinPluginMenuLoader, userScriptLoader, Fire._editorPluginLoader];
 
         if (scriptsLoaded) {
             // unload old

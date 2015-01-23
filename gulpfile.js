@@ -30,6 +30,8 @@ var paths = {
         'src/engine-extends/ipc-receiver.js',
 
         // editor
+        'src/plugin-context.js',
+        'src/editor-plugin-loader.js',
         'src/sandbox.js',
         'src/editor.js',
         'src/menu.js',
@@ -40,8 +42,6 @@ var paths = {
         'src/svg-gizmos.js',
 
         // plugins
-        'src/plugins/plugin-context.js',
-        'src/plugins/editor-plugin-loader.js',
         'src/plugins/hierarchy.js',
 
         // gizmos

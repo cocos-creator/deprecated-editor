@@ -215,7 +215,6 @@ Fire.browseObject = function ( type, fobjectEL ) {
 
 // get remote globals
 Fire.AssetDB = remote.getGlobal( 'AssetDB@' + fireID );
-Fire.MainMenu = remote.getGlobal( 'MainMenu@' + fireID );
 
 //
 Fire.plugins = {}; // TODO: 做成Remote Object，确保全局只有一份?
