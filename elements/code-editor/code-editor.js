@@ -107,6 +107,17 @@ Polymer({
         }.bind(this));
 
         window.addEventListener('unload', function () {
+            this.$.mirror.saveConfig();
+            if (this.$.mirror.dirty) {
+                var result = window.confirm(this.url + " was modified,do you want to save?");
+                if (result) {
+                    this.$.mirror.save();
+                }
+            }
+        }.bind(this));
+
+        window.addEventListener('beforeunload', function () {
+            this.$.mirror.saveConfig();
             if (this.$.mirror.dirty) {
                 var result = window.confirm(this.url + " was modified,do you want to save?");
                 if (result) {
