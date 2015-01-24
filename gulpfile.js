@@ -30,12 +30,10 @@ var paths = {
         'src/engine-extends/ipc-receiver.js',
 
         // editor
-        'src/plugin-context.js',
         'src/editor-plugin-loader.js',
         'src/sandbox.js',
         'src/editor.js',
         'src/menu.js',
-        'src/ipc-utils.js',
         'src/pixi-grids.js',
         'src/svg-grids.js',
         'src/gizmos-utils.js',
