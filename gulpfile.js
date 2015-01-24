@@ -233,8 +233,6 @@ task_plugin ( 'fire-inspector' );
 task_plugin ( 'fire-scene' );
 task_plugin ( 'main-window' );
 task_plugin ( 'quick-assets' );
-task_plugin ( 'asset-db-debugger' );
-task_plugin ( 'code-editor' );
 
 // tasks
 gulp.task('copy', task_copy_deps );

@@ -698,18 +698,6 @@ Polymer({
                 return;
             }
 
-            if ( ['.js', '.json', '.xml', '.html', '.css'].indexOf(event.target.extname) !== -1 ) {
-                Fire.sendToCore('window:open', 'code-editor', 'fire://static/code-editor.html', {
-                    title: "Code Editor",
-                    width: 1200,
-                    height: 600,
-                    "min-Width": "600px",
-                    show: true,
-                    resizable: true,
-                    query: { url: this.getUrl(event.target) },
-                } );
-                return;
-            }
             Fire.sendToCore('asset:open', event.target.extname, this.getUrl(event.target));
         }
         event.stopPropagation();
