@@ -1,57 +1,57 @@
 :host {
     display: flex
     flex-direction: row
-    flex-wrap: nowrap     
+    flex-wrap: nowrap
     align-items: flex-end
 
     position: relative
     box-sizing: border-box
+}
 
-    span.space {
-        width: 10px
-    }
+span.space {
+    width: 10px
+}
 
-    #transform {
-        fire-ui-bi {                         
-            font-size: 14px
+#transform {
+    fire-ui-bi {
+        font-size: 14px
 
-            &::shadow .border {
-                padding: 6px 12px
-            }
+        &::shadow .border {
+            padding: 6px 12px
+        }
 
-            &[active]::shadow .border {
-                color: #00aa00
-            }
+        &[active]::shadow .border {
+            color: #00aa00
         }
     }
+}
 
-    #coordinate {
-        fire-ui-bi {                         
-            font-size: 12px
+#coordinate {
+    fire-ui-bi {
+        font-size: 12px
 
-            &::shadow .border {
-                padding: 0px 10px
-                height: 15px
-            }
+        &::shadow .border {
+            padding: 0px 10px
+            height: 15px
+        }
 
-            &[active]::shadow .border {
-                color: #aa0
-            }
+        &[active]::shadow .border {
+            color: #aa0
         }
     }
+}
 
-    #pivot {
-        fire-ui-bi {                         
-            font-size: 12px
+#pivot {
+    fire-ui-bi {
+        font-size: 12px
 
-            &::shadow .border {
-                padding: 0px 10px
-                height: 15px
-            }
+        &::shadow .border {
+            padding: 0px 10px
+            height: 15px
+        }
 
-            &[active]::shadow .border {
-                color: #a00
-            }
+        &[active]::shadow .border {
+            color: #a00
         }
     }
 }

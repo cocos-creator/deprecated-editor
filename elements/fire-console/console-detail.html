@@ -2,13 +2,12 @@
     name="console-detail"
     constructor="ConsoleDetail"
     >
+    <template>
+        <link rel="stylesheet" href="console-detail.css">
 
-<template>
-<link rel="stylesheet" href="console-detail.css">
+        <i class="fa {{type | toIconClass}}"></i>
+        <p class="text">{{log}}</p>
+    </template>
 
-<i class="fa {{type | toIconClass}}"></i>
-<p class="text">{{log}}</p>
-</template>
-
-<script type="text/javascript" src="console-detail.js"></script>
+    <script type="text/javascript" src="console-detail.js"></script>
 </polymer-element>

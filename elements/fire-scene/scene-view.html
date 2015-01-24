@@ -1,5 +1,5 @@
-<polymer-element 
-    name="scene-view" 
+<polymer-element
+    name="scene-view"
     constructor="SceneView"
     on-mousemove="{{mousemoveAction}}"
     on-mousedown="{{mousedownAction}}"
@@ -10,13 +10,12 @@
     on-dragover="{{dragoverAction}}"
     on-drop="{{dropAction}}"
     >
-<template>
-<link rel="stylesheet" href="scene-view.css">
+    <template>
+        <link rel="stylesheet" href="scene-view.css">
 
-<canvas id="canvas"></canvas>
-<svg id="gizmos"></svg>
+        <canvas id="canvas"></canvas>
+        <svg id="gizmos"></svg>
+    </template>
 
-</template>
-
-<script type="text/javascript" src="scene-view.js"></script>
+    <script type="text/javascript" src="scene-view.js"></script>
 </polymer-element>

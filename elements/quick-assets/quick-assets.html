@@ -5,37 +5,36 @@
     constructor="QuickAssets"
     on-selected="{{selectAction}}"
     >
-<template>
+    <template>
+        <link rel="stylesheet" href="quick-assets.css">
 
-<link rel="stylesheet" href="quick-assets.css">
+        <fire-ui-toolbar>
+            <fire-ui-button-group id="btnGroup" >
+                <fire-ui-bi on-active="{{listViewAction}}">
+                    <i class="fa fa-th-list"></i>
+                </fire-ui-bi>
+                <fire-ui-bi on-active="{{gridViewAction}}">
+                    <i class="fa fa-th"></i>
+                </fire-ui-bi>
+            </fire-ui-button-group>
+            <span class="space"></span>
+            <fire-ui-text-input flex-1 placeholder="Search"
+                inputValue="{{searchText}}"
+                >
+                </fire-ui-text-input>
+            <i class="fa fa-search"></i>
+        </fire-ui-toolbar>
 
-    <fire-ui-toolbar>
-        <fire-ui-button-group id="btnGroup" >
-            <fire-ui-bi on-active="{{listViewAction}}">
-                <i class="fa fa-th-list"></i>
-            </fire-ui-bi>
-            <fire-ui-bi on-active="{{gridViewAction}}">
-                <i class="fa fa-th"></i>
-            </fire-ui-bi>
-        </fire-ui-button-group>
         <span class="space"></span>
-        <fire-ui-text-input flex-1 placeholder="Search"
-            inputValue="{{searchText}}"
-            >
-            </fire-ui-text-input>
-        <i class="fa fa-search"></i>
-    </fire-ui-toolbar>
 
-    <span class="space"></span>
+        <div flex-1 flex-col flex-stretch>
+            <fire-ui-resize-wrapper auto-layout min-height="50">
+                <fire-ui-list id="listView" value="{{items|applyFilter(searchText)}}" icon fit></fire-ui-list>
+            </fire-ui-resize-wrapper>
+            <fire-ui-splitter></fire-ui-splitter>
+            <data-detail id="detail" height="100" min-height="50"></data-detail>
+        </div>
+    </template>
 
-    <div flex-1 flex-col flex-stretch>
-        <fire-ui-resize-wrapper auto-layout min-height="50">
-            <fire-ui-list id="listView" value="{{items|applyFilter(searchText)}}" icon fit></fire-ui-list>
-        </fire-ui-resize-wrapper>
-        <fire-ui-splitter></fire-ui-splitter>
-        <data-detail id="detail" height="100" min-height="50"></data-detail>
-    </div>
-</template>
-
-<script type="text/javascript" src="quick-assets.js"></script>
+    <script type="text/javascript" src="quick-assets.js"></script>
 </polymer-element>

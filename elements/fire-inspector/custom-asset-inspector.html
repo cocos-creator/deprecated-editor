@@ -2,18 +2,17 @@
     name="custom-asset-inspector"
     constructor="CustomAssetInspector"
     >
-<template>
-<link rel="stylesheet" href="custom-asset-inspector.css">
+    <template>
+        <link rel="stylesheet" href="custom-asset-inspector.css">
 
-<fire-ui-toolbar class="toolbar" justify-end>
-    <span class="asset-name" flex-1>{{asset.name}}</span>
-    <div id="spinner" class="spinner {{saving ? '':'hide'}}"></div>
-</fire-ui-toolbar>
+        <fire-ui-toolbar class="toolbar" justify-end>
+            <span class="asset-name" flex-1>{{asset.name}}</span>
+            <div id="spinner" class="spinner {{saving ? '':'hide'}}"></div>
+        </fire-ui-toolbar>
 
-<inspector-fields id="fields" flex-1 on-changed="{{fieldsChangedAction}}">
-</inspector-fields>
+        <inspector-fields id="fields" flex-1 on-changed="{{fieldsChangedAction}}">
+        </inspector-fields>
+    </template>
 
-</template>
-
-<script type="text/javascript" src="custom-asset-inspector.js"></script>
+    <script type="text/javascript" src="custom-asset-inspector.js"></script>
 </polymer-element>

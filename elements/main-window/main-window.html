@@ -5,44 +5,43 @@
     name="main-window"
     constructor="MainWindow"
     >
-<template>
+    <template>
+        <link rel="stylesheet" href="main-window.css">
 
-<link rel="stylesheet" href="main-window.css">
+        <span class="space"></span>
+        <top-bar id="toolbar"
+            on-layout-tools-changed="{{layoutToolsAction}}"
+        ></top-bar>
 
-<span class="space"></span>
-<top-bar id="toolbar"
-    on-layout-tools-changed="{{layoutToolsAction}}"
-></top-bar>
+        <fire-ui-dock id="mainDock" flex-1 row no-collapse>
+            <fire-ui-dock width="200" min-width="200">
+                <fire-ui-panel id="hierarchyPanel" height="300">
+                    <!-- <fire-hierarchy id="hierarchy" name="Hierarchy" fit></fire-hierarchy> -->
+                </fire-ui-panel>
 
-<fire-ui-dock id="mainDock" flex-1 row no-collapse>
-    <fire-ui-dock width="200" min-width="200">
-        <fire-ui-panel id="hierarchyPanel" height="300">
-            <!-- <fire-hierarchy id="hierarchy" name="Hierarchy" fit></fire-hierarchy> -->
-        </fire-ui-panel>
+                <fire-ui-panel id="assetsPanel">
+                    <!-- <fire-assets id="assets" name="Assets" fit></fire-assets> -->
+                </fire-ui-panel>
+            </fire-ui-dock>
 
-        <fire-ui-panel id="assetsPanel">
-            <!-- <fire-assets id="assets" name="Assets" fit></fire-assets> -->
-        </fire-ui-panel>
-    </fire-ui-dock>
+            <fire-ui-panel id="inspectorPanel" width="240" min-width="240">
+                <!-- <fire-inspector id="inspector" name="Inspector" fit></fire-inspector> -->
+            </fire-ui-panel>
 
-    <fire-ui-panel id="inspectorPanel" width="240" min-width="240">
-        <!-- <fire-inspector id="inspector" name="Inspector" fit></fire-inspector> -->
-    </fire-ui-panel>
+            <fire-ui-dock>
+                <fire-ui-panel id="editPanel" auto-layout style="">
+                    <!-- <fire-scene id="scene" name="Scene" fit></fire-scene> -->
+                    <!-- <fire-game id="game" name="Game" fit></fire-game>     -->
+                </fire-ui-panel>
 
-    <fire-ui-dock>
-        <fire-ui-panel id="editPanel" auto-layout style="">
-            <!-- <fire-scene id="scene" name="Scene" fit></fire-scene> -->
-            <!-- <fire-game id="game" name="Game" fit></fire-game>     -->
-        </fire-ui-panel>
+                <fire-ui-panel id="consolePanel" height="200">
+                    <!-- <fire-console id="console" name="Console" fit></fire-console> -->
+                </fire-ui-panel>
+            </fire-ui-dock>
+        </fire-ui-dock>
 
-        <fire-ui-panel id="consolePanel" height="200">
-            <!-- <fire-console id="console" name="Console" fit></fire-console> -->
-        </fire-ui-panel>
-    </fire-ui-dock>
-</fire-ui-dock>
+        <status-bar id="status"></status-bar>
+    </template>
 
-<status-bar id="status"></status-bar>
-</template>
-
-<script type="text/javascript" src="main-window.js"></script>
+    <script type="text/javascript" src="main-window.js"></script>
 </polymer-element>

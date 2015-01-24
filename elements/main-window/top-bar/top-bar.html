@@ -1,28 +1,27 @@
 <link rel="import" href="play-bar/play-bar.html">
 <link rel="import" href="layout-tools/layout-tools.html">
 
-<polymer-element 
-    name="top-bar" 
+<polymer-element
+    name="top-bar"
     constructor="TopBar"
     >
-<template>
-<link rel="stylesheet" href="top-bar.css">
+    <template>
+        <link rel="stylesheet" href="top-bar.css">
 
-<span class="left" flex-1>
-    <layout-tools id="layoutTools"></layout-tools>
-</span> 
+        <span class="left" flex-1>
+            <layout-tools id="layoutTools"></layout-tools>
+        </span>
 
-<span class="center" flex-row flex-1>
-    <span flex-1></span> 
-    <play-bar></play-bar>
-    <span flex-1></span> 
-</span>
+        <span class="center" flex-row flex-1>
+            <span flex-1></span>
+            <play-bar></play-bar>
+            <span flex-1></span>
+        </span>
 
-<span class="right" flex-1>
-    <img src="../img/avatar-placeholder.jpg">
-</span> 
+        <span class="right" flex-1>
+            <img src="../img/avatar-placeholder.jpg">
+        </span>
+    </template>
 
-</template>
-
-<script type="text/javascript" src="top-bar.js"></script>
+    <script type="text/javascript" src="top-bar.js"></script>
 </polymer-element>

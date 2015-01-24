@@ -2,15 +2,14 @@
     name="status-bar"
     constructor="StatusBar"
     >
-<template>
-<link rel="stylesheet" href="status-bar.css">
+    <template>
+        <link rel="stylesheet" href="status-bar.css">
 
-<span class="watch {{watchState.state}}"><i class="fa {{watchState.icon}}"></i></span>
-<span class="db {{dbState.state}}">{{dbState.state}}</span>
-<span flex-1></span>
-<span class="version">Fireball v{{version}}</span>
+        <span class="watch {{watchState.state}}"><i class="fa {{watchState.icon}}"></i></span>
+        <span class="db {{dbState.state}}">{{dbState.state}}</span>
+        <span flex-1></span>
+        <span class="version">Fireball v{{version}}</span>
+    </template>
 
-</template>
-
-<script type="text/javascript" src="status-bar.js"></script>
+    <script type="text/javascript" src="status-bar.js"></script>
 </polymer-element>

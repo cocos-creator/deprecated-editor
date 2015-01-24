@@ -2,38 +2,37 @@
     name="layout-tools"
     constructor="LayoutTools"
     >
-<template>
-<link rel="stylesheet" href="layout-tools.css">
+    <template>
+        <link rel="stylesheet" href="layout-tools.css">
 
-<fire-ui-button-group id="transform">
-    <fire-ui-bi on-active="{{selectMove}}"><i class="fa fa-arrows"></i></fire-ui-bi>
-    <fire-ui-bi on-active="{{selectRotate}}"><i class="fa fa-rotate-left"></i></fire-ui-bi>
-    <fire-ui-bi on-active="{{selectScale}}"><i class="fa fa-expand"></i></fire-ui-bi>
-</fire-ui-button-group>
+        <fire-ui-button-group id="transform">
+            <fire-ui-bi on-active="{{selectMove}}"><i class="fa fa-arrows"></i></fire-ui-bi>
+            <fire-ui-bi on-active="{{selectRotate}}"><i class="fa fa-rotate-left"></i></fire-ui-bi>
+            <fire-ui-bi on-active="{{selectScale}}"><i class="fa fa-expand"></i></fire-ui-bi>
+        </fire-ui-button-group>
 
-<span class="space"></span>
+        <span class="space"></span>
 
-<fire-ui-button-group id="coordinate">
-    <fire-ui-bi on-active="{{selectLocal}}">
-        <img src="../../img/tools-local.png"></img>
-    </fire-ui-bi>
-    <fire-ui-bi on-active="{{selectGlobal}}">
-        <img src="../../img/tools-global.png"></img>
-    </fire-ui-bi>
-</fire-ui-button-group>
+        <fire-ui-button-group id="coordinate">
+            <fire-ui-bi on-active="{{selectLocal}}">
+                <img src="../../img/tools-local.png"></img>
+            </fire-ui-bi>
+            <fire-ui-bi on-active="{{selectGlobal}}">
+                <img src="../../img/tools-global.png"></img>
+            </fire-ui-bi>
+        </fire-ui-button-group>
 
-<span class="space"></span>
+        <span class="space"></span>
 
-<fire-ui-button-group id="pivot">
-    <fire-ui-bi on-active="{{selectPivot}}">
-        <img src="../../img/tools-pivot.png"></img>
-    </fire-ui-bi>
-    <fire-ui-bi on-active="{{selectCenter}}">
-        <img src="../../img/tools-center.png"></img>
-    </fire-ui-bi>
-</fire-ui-button-group>
+        <fire-ui-button-group id="pivot">
+            <fire-ui-bi on-active="{{selectPivot}}">
+                <img src="../../img/tools-pivot.png"></img>
+            </fire-ui-bi>
+            <fire-ui-bi on-active="{{selectCenter}}">
+                <img src="../../img/tools-center.png"></img>
+            </fire-ui-bi>
+        </fire-ui-button-group>
+    </template>
 
-</template>
-
-<script type="text/javascript" src="layout-tools.js"></script>
+    <script type="text/javascript" src="layout-tools.js"></script>
 </polymer-element>

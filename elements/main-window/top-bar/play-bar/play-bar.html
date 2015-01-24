@@ -1,17 +1,16 @@
-<polymer-element 
-    name="play-bar" 
+<polymer-element
+    name="play-bar"
     constructor="PlayBar"
     >
-<template>
-<link rel="stylesheet" href="play-bar.css">
+    <template>
+        <link rel="stylesheet" href="play-bar.css">
 
-<fire-ui-button-group id="group" multiple>
-    <fire-ui-bi id="play" on-click="{{playAction}}"><i class="fa fa-play"></i></fire-ui-bi>
-    <fire-ui-bi id="pause" on-click="{{pauseAction}}"><i class="fa fa-pause"></i></fire-ui-bi>
-    <fire-ui-bi id="step" on-click="{{stepAction}}"><i class="fa fa-step-forward"></i></fire-ui-bi>
-</fire-ui-button-group>
+        <fire-ui-button-group id="group" multiple>
+            <fire-ui-bi id="play" on-click="{{playAction}}"><i class="fa fa-play"></i></fire-ui-bi>
+            <fire-ui-bi id="pause" on-click="{{pauseAction}}"><i class="fa fa-pause"></i></fire-ui-bi>
+            <fire-ui-bi id="step" on-click="{{stepAction}}"><i class="fa fa-step-forward"></i></fire-ui-bi>
+        </fire-ui-button-group>
+    </template>
 
-</template>
-
-<script type="text/javascript" src="play-bar.js"></script>
+    <script type="text/javascript" src="play-bar.js"></script>
 </polymer-element>

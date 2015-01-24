@@ -11,21 +11,21 @@
     color: #aaa
     cursor: default
     outline: none
+}
 
-    .spinner {
-        width: 10px
-        height: 10px
-        border: 2px solid
-        border-radius: 50%
-        border-color: transparent rgb(0,128,255) rgb(0,128,255)
-        -webkit-animation: spin 600ms infinite linear
+.spinner {
+    width: 10px
+    height: 10px
+    border: 2px solid
+    border-radius: 50%
+    border-color: transparent rgb(0,128,255) rgb(0,128,255)
+    -webkit-animation: spin 600ms infinite linear
 
-        &.hide {
-            display: none
-        }
+    &.hide {
+        display: none
     }
+}
 
-    @keyframes spin {
-        100% { transform: rotate(360deg); }
-    }
+@keyframes spin {
+    100% { transform: rotate(360deg); }
 }

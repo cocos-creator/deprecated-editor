@@ -2,21 +2,20 @@
     name="entity-inspector"
     constructor="EntityInspector"
     >
-<template>
-<link rel="stylesheet" href="entity-inspector.css">
+    <template>
+        <link rel="stylesheet" href="entity-inspector.css">
 
-<fire-ui-toolbar class="toolbar">
-    <fire-ui-checkbox value="{{target.active}}"></fire-ui-checkbox>
-    <fire-ui-text-input value="{{target.name}}" flex-1></fire-ui-text-input>
-    <i id="btnAddComp" on-click="{{addComponentAction}}" class="fa fa-plus"></i>
-</fire-ui-toolbar>
+        <fire-ui-toolbar class="toolbar">
+            <fire-ui-checkbox value="{{target.active}}"></fire-ui-checkbox>
+            <fire-ui-text-input value="{{target.name}}" flex-1></fire-ui-text-input>
+            <i id="btnAddComp" on-click="{{addComponentAction}}" class="fa fa-plus"></i>
+        </fire-ui-toolbar>
 
-<inspector-fields id="fields" flex-1
-    on-changed="{{fieldsChangedAction}}"
->
-</inspector-fields>
+        <inspector-fields id="fields" flex-1
+            on-changed="{{fieldsChangedAction}}"
+        >
+        </inspector-fields>
+    </template>
 
-</template>
-
-<script type="text/javascript" src="entity-inspector.js"></script>
+    <script type="text/javascript" src="entity-inspector.js"></script>
 </polymer-element>

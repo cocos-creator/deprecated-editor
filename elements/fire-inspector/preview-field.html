@@ -3,20 +3,19 @@
     constructor="PreviewField"
     on-resize="{{resizeAction}}"
     >
-<template>
-<link rel="stylesheet" href="preview-field.css">
+    <template>
+        <link rel="stylesheet" href="preview-field.css">
 
-<!-- TODO: <fire-ui-toolbar></fire-ui-toolbar> -->
-<div class="view" flex-1>
-    <div id="content" class="content">
-        <canvas id="canvas"></canvas>
-    </div>
-</div>
-<div class="label">
-    <fire-ui-label>{{info}}</fire-ui-label>
-</div>
+        <!-- TODO: <fire-ui-toolbar></fire-ui-toolbar> -->
+        <div class="view" flex-1>
+            <div id="content" class="content">
+                <canvas id="canvas"></canvas>
+            </div>
+        </div>
+        <div class="label">
+            <fire-ui-label>{{info}}</fire-ui-label>
+        </div>
+    </template>
 
-</template>
-
-<script type="text/javascript" src="preview-field.js"></script>
+    <script type="text/javascript" src="preview-field.js"></script>
 </polymer-element>
