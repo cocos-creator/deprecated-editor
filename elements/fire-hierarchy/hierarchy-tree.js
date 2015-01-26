@@ -340,10 +340,6 @@ Polymer({
         else {
             Fire.Selection.selectEntity(event.target.userId, true);
         }
-
-        var activeId = Fire.Selection.activeEntityId;
-        var activeEL = activeId && this.idToItem[activeId];
-        this.activeElement = activeEL;
     },
 
     renameConfirmAction: function (event) {

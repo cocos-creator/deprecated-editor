@@ -8,10 +8,11 @@ function _isTexture ( extname ) {
     return extname === '.png' || extname === '.jpg';
 }
 
-function _newAssetsItem ( url, type, id, parent ) {
+function _newAssetsItem ( url, type, id, parentEL ) {
     var newEL = new AssetsItem();
     newEL.isRoot = type === 'root';
     newEL.isFolder = (type === 'folder' || newEL.isRoot);
+    newEL.isSubAsset = !parentEL.isFolder;
 
     var extname = "";
     var basename = Url.basename(url);
@@ -83,7 +84,7 @@ function _newAssetsItem ( url, type, id, parent ) {
         break;
     }
 
-    this.initItem(newEL, basename, id, parent);
+    this.initItem(newEL, basename, id, parentEL);
     return newEL;
 }
 
@@ -376,13 +377,12 @@ Polymer({
                 }.bind(this)
             },
 
-
             // Rename
             {
                 label: 'Rename',
                 click: function () {
                     if ( this.contextmenuAt instanceof AssetsItem ) {
-                        this.contextmenuAt.rename();
+                        this.rename(this.contextmenuAt);
                     }
                 }.bind(this),
                 //enable: this.contextmenuAt && this.contextmenuAt.isRoot === false && Fire.Selection.assets.length === 1,
@@ -504,7 +504,7 @@ Polymer({
                 break;
             }
             else {
-                url = Url.join( parentEL.name, url );
+                url = Url.join( parentEL.name + parentEL.extname, url );
                 parentEL = parentEL.parentElement;
             }
         }
@@ -680,10 +680,6 @@ Polymer({
         else {
             Fire.Selection.selectAsset(event.target.userId, true);
         }
-
-        var activeId = Fire.Selection.activeAssetUuid;
-        var activeEL = activeId && this.idToItem[activeId];
-        this.activeElement = activeEL;
     },
 
     renameConfirmAction: function (event) {

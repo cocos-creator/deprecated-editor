@@ -31,6 +31,8 @@ Polymer({
         this.ipc.on('selection:entity:unselected', this.select.bind(this, false));
         this.ipc.on('selection:entity:hover', this.hover.bind(this));
         this.ipc.on('selection:entity:hoverout', this.hoverout.bind(this));
+        this.ipc.on('selection:entity:activated', this.active.bind(this, true));
+        this.ipc.on('selection:entity:deactivated', this.active.bind(this, false));
     },
 
     detached: function () {
@@ -45,6 +47,16 @@ Polymer({
             if (el) {
                 el.selected = selected;
             }
+        }
+    },
+
+    active: function (activated, id) {
+        if ( activated ) {
+            var el = this.$.hierarchyTree.idToItem[id];
+            this.$.hierarchyTree.active(el);
+        }
+        else {
+            this.$.hierarchyTree.active(null);
         }
     },
 

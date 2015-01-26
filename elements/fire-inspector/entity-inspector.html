@@ -1,6 +1,7 @@
 <polymer-element
     name="entity-inspector"
     constructor="EntityInspector"
+    on-changed="{{fieldsChangedAction}}"
     >
     <template>
         <link rel="stylesheet" href="entity-inspector.css">
@@ -11,9 +12,7 @@
             <i id="btnAddComp" on-click="{{addComponentAction}}" class="fa fa-plus"></i>
         </fire-ui-toolbar>
 
-        <inspector-fields id="fields" flex-1
-            on-changed="{{fieldsChangedAction}}"
-        >
+        <inspector-fields id="fields" flex-1>
         </inspector-fields>
     </template>
 

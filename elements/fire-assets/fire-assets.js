@@ -9,6 +9,8 @@ Polymer({
     attached: function () {
         this.ipc.on('selection:asset:selected', this.select.bind(this, true));
         this.ipc.on('selection:asset:unselected', this.select.bind(this, false));
+        this.ipc.on('selection:asset:activated', this.active.bind(this, true));
+        this.ipc.on('selection:asset:deactivated', this.active.bind(this, false));
         this.ipc.on('asset:hint', this.hint.bind(this));
     },
 
@@ -23,6 +25,16 @@ Polymer({
             if (el) {
                 el.selected = selected;
             }
+        }
+    },
+
+    active: function (activated, id) {
+        if ( activated ) {
+            var el = this.$.assetsTree.idToItem[id];
+            this.$.assetsTree.active(el);
+        }
+        else {
+            this.$.assetsTree.active(null);
         }
     },
 

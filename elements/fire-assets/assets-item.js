@@ -50,8 +50,9 @@ Polymer({
         this.super();
 
         this.extname = '';
-        this.isFolder = false;
         this.isRoot = false;
+        this.isFolder = false;
+        this.isSubAsset = false;
     },
 
     addChild: function (child) {
