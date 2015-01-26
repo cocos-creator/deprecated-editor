@@ -39,6 +39,8 @@ function _fieldSection ( name, target ) {
                 propEL.name = EditorUI.camelCaseToHuman(propName);
             }
 
+            propEL.textMode = attrs.textMode;
+
             //
             propEL.bind( 'value', new Fire._PathObserver( target, propName ) );
             propEL.type = type;
