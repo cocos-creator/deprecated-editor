@@ -17,6 +17,7 @@ var paths = {
     src: [
         // asset extends
         'src/assets/sprite.js',
+        'src/assets/bitmap-font.js',
 
         // engine extends
         'src/engine-extends/misc.js',
@@ -49,6 +50,7 @@ var paths = {
         'src/gizmos/scale-gizmo.js',
         'src/gizmos/camera-gizmo.js',
         'src/gizmos/sprite-renderer-gizmo.js',
+        'src/gizmos/bitmap-text-gizmo.js',
     ],
 };
 
