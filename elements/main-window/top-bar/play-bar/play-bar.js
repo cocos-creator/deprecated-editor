@@ -71,6 +71,10 @@ Polymer({
     stepAction: function ( event ) {
         event.stopPropagation();
 
+        if ( !Fire.Engine.isPlaying ) {
+            // before play
+            Fire._Sandbox.stashScene();
+        }
         Fire.Engine.step();
     },
 

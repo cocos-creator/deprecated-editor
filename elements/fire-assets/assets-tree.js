@@ -200,6 +200,7 @@ Polymer({
     created: function () {
         this.super();
 
+        this.contextmenu = null;
         this.contextmenuAt = null;
 
         // dragging
@@ -217,7 +218,6 @@ Polymer({
 
     ready: function () {
         this.super();
-        this.initContextMenu();
 
         this.addEventListener( "dragenter", function (event) {
             ++this.dragenterCnt;
@@ -267,13 +267,17 @@ Polymer({
                 this.newItem( info.url, info.uuid, info.parentUuid, info.isDir );
             }
         }.bind(this) );
+        this.ipc.on('asset:refresh-context-menu', function () {
+            // make context menu dirty
+            this.contextmenu = null;
+        }.bind(this) );
     },
 
     detached: function () {
         this.ipc.clear();
     },
 
-    initContextMenu: function () {
+    createContextMenu: function () {
         var template = [
             // New Scene
             {
@@ -728,6 +732,9 @@ Polymer({
             Fire.Selection.selectAsset(event.target.userId, unselectOther, true);
         }
 
+        if (!this.contextmenu) {
+            this.createContextMenu();
+        }
         this.contextmenu.popup(Remote.getCurrentWindow());
         event.stopPropagation();
     },
