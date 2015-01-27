@@ -88,7 +88,9 @@ Polymer({
                 // click callback
                 // jshint ignore:start
                 newMenu.click = (function (component) {
-                    this.addComponent(component);
+                    setImmediate(function () {
+                        this.addComponent(component);
+                    }.bind(this));
                 }).bind(this, item.component);
                 // jshint ignore:end
             }
