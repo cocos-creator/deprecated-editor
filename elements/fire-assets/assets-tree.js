@@ -734,6 +734,9 @@ Polymer({
             var unselectOther = (Fire.Selection.assets.indexOf(event.target.userId) === -1);
             Fire.Selection.selectAsset(event.target.userId, unselectOther, true);
         }
+        else {
+            this.contextmenuAt = this.idToItem[Fire.UUID.AssetsRoot];
+        }
 
         if (!this.contextmenu) {
             this.createContextMenu();
