@@ -23,8 +23,6 @@ BitmapTextGizmo.prototype.update = function () {
     var bounds, v1, v2, v3, v4;
 
     if (this.editing) {
-        var color = "#09f";
-
         bounds = this.target.getWorldOrientedBounds();
         v1 = this._svg.camera.worldToScreen(bounds[0]); // bottom-left
         v2 = this._svg.camera.worldToScreen(bounds[1]); // top-left
@@ -39,7 +37,7 @@ BitmapTextGizmo.prototype.update = function () {
             [Fire.GizmosUtils.snapPixel(v4.x), Fire.GizmosUtils.snapPixel(v4.y)],
         ])
         .fill("none")
-        .stroke({ color: color, width: 1 })
+        .stroke({ color: "#09f", width: 1 })
         ;
     }
     else if (this.selecting) {
@@ -75,7 +73,7 @@ BitmapTextGizmo.prototype.update = function () {
             [Fire.GizmosUtils.snapPixel(v4.x), Fire.GizmosUtils.snapPixel(v4.y)],
         ])
         .fill("none")
-        .stroke({ color: "#ff0", width: 1 })
+        .stroke({ color: "#999", width: 1 })
         ;
     }
     else {
