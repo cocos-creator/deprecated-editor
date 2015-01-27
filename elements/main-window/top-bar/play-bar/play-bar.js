@@ -38,13 +38,13 @@ Polymer({
         event.stopPropagation();
 
         if ( !Fire.Engine.isPlaying ) {
-            Fire._Sandbox.stashScene();
             if (this.$.pause.active) {
                 Fire.Engine.step();
             }
             else {
                 Fire.Engine.play();
             }
+            Fire._Sandbox.stashScene();
         }
         else {
             Fire.Engine.stop();
