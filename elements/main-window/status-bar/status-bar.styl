@@ -33,3 +33,58 @@ span {
     &.syncing { color: #f90 }
     &.normal { color: #555 }
 }
+
+.sk-spinner-wave.sk-spinner {
+    display: none
+    margin: 0 auto
+    height: 30px
+    text-align: center
+    font-size: 10px
+}
+.sk-spinner-wave.sk-spinner.sk-spinner-show {
+    display: block
+}
+.sk-spinner-wave div {
+    background-color: #f90
+    height: 100%
+    width: 2px
+    display: inline-block
+    -webkit-animation: sk-waveStretchDelay 0.8s infinite ease-in-out
+            animation: sk-waveStretchDelay 0.8s infinite ease-in-out
+}
+.sk-spinner-wave .sk-rect2 {
+    -webkit-animation-delay: -0.7s
+            animation-delay: -0.7s
+}
+.sk-spinner-wave .sk-rect3 {
+    -webkit-animation-delay: -0.6s
+            animation-delay: -0.6s
+}
+.sk-spinner-wave .sk-rect4 {
+    -webkit-animation-delay: -0.5s
+            animation-delay: -0.5s
+}
+.sk-spinner-wave .sk-rect5 {
+    -webkit-animation-delay: -0.4s
+            animation-delay: -0.4s
+}
+@-webkit-keyframes sk-waveStretchDelay {
+    0%, 40%, 100% {
+        -webkit-transform: scaleY(0.2)
+                transform: scaleY(0.2)
+    }
+    20% {
+        -webkit-transform: scaleY(0.6)
+                transform: scaleY(0.6)
+    }
+}
+@keyframes sk-waveStretchDelay {
+    0%, 40%, 100% {
+        -webkit-transform: scaleY(0.2)
+              transform: scaleY(0.2)
+    }
+    20% {
+        -webkit-transform: scaleY(0.6)
+                transform: scaleY(0.6)
+    }
+}

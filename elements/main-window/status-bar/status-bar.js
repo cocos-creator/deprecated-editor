@@ -14,6 +14,9 @@ Polymer({
         this.version = remote.getGlobal( 'FIRE_VER' );
         this.watchState = watchStates["watch-off"];
         this.dbState = { state: "normal", task: "none" };
+        this.showSyncingWave = false;
+
+        this._syncingTimeout = null;
     },
 
     attached: function () {
@@ -29,10 +32,22 @@ Polymer({
 
         this.ipc.on('asset-db:syncing', function ( task ) {
             this.dbState = { state: "syncing", task: task };
+
+            if ( this._syncingTimeout === null ) {
+                this._syncingTimeout = setTimeout( function () {
+                    this.showSyncingWave = true;
+                }.bind(this), 500 );
+            }
         }.bind(this) );
 
         this.ipc.on('asset-db:synced', function () {
             this.dbState = { state: "normal", task: "none" };
+            this.showSyncingWave = false;
+
+            if ( this._syncingTimeout ) {
+                clearTimeout(this._syncingTimeout);
+                this._syncingTimeout = null;
+            }
         }.bind(this) );
     },
 
