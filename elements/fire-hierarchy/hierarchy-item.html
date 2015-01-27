@@ -1,17 +1,20 @@
-<polymer-element name="hierarchy-item"
-                 extends="fire-ui-ti"
-                 constructor="HierarchyItem"
-                 draggable="true"
-                 >
+<polymer-element
+    name="hierarchy-item"
+    extends="fire-ui-ti"
+    constructor="HierarchyItem"
+    draggable="true"
+    >
     <template>
         <link rel="stylesheet" href="hierarchy-item.css">
 
-        <div id="bar"></div>
+        <div id="bar"
+            on-mouseenter="{{mouseenterAction}}"
+            on-mouseleave="{{mouseleaveAction}}"
+            >
+        </div>
         <div id="header"
             on-mouseenter="{{mouseenterAction}}"
             on-mouseleave="{{mouseleaveAction}}"
-            on-mousedown="{{mousedownAction}}"
-            on-mouseup="{{mouseupAction}}"
             >
             <div class="inline-block-wrapper">
                 <div class="flex-wrapper">

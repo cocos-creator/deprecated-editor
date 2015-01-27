@@ -722,6 +722,9 @@ Polymer({
     },
 
     contextmenuAction: function (event) {
+        event.stopPropagation();
+
+        //
         this.resetDragState();
 
         //
@@ -736,7 +739,6 @@ Polymer({
             this.createContextMenu();
         }
         this.contextmenu.popup(Remote.getCurrentWindow());
-        event.stopPropagation();
     },
 
     keydownAction: function (event) {
