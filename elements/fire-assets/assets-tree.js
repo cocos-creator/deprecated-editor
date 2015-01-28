@@ -56,6 +56,7 @@ function _newAssetsItem ( url, type, id, parentEL ) {
         break;
 
     case '.html':
+    case '.htm':
     case '.xml':
     case '.json':
         newEL.setIcon('html');
@@ -63,7 +64,6 @@ function _newAssetsItem ( url, type, id, parentEL ) {
 
     case '.css':
     case '.less':
-    case '.css':
     case '.styl':
         newEL.setIcon('css');
         break;
