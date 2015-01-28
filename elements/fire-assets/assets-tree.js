@@ -72,6 +72,14 @@ function _newAssetsItem ( url, type, id, parentEL ) {
         newEL.setIcon('anim');
         break;
 
+    case '.sprite':
+        newEL.setIcon('sprite');
+        break;
+
+    case '.bmfont':
+        newEL.setIcon('bmfont');
+        break;
+
     case '.png':
     case '.jpg':
         img = new Image();
