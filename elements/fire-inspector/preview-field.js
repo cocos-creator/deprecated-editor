@@ -72,17 +72,19 @@ Polymer(EditorUI.mixin({
             var xRatio = this.$.canvas.width / this.asset.width;
             var yRatio = this.$.canvas.height / this.asset.height;
 
-            if ( this.meta.subAssets.length > 0 ) {
-                for ( var subInfo of this.meta.subAssets ) {
-                    if ( subInfo.asset instanceof Fire.Sprite ) {
-                        ctx.beginPath();
-                        ctx.rect( subInfo.asset.x * xRatio,
-                                  subInfo.asset.y * yRatio,
-                                  subInfo.asset.width * xRatio,
-                                  subInfo.asset.height * yRatio );
-                        ctx.lineWidth = 1;
-                        ctx.strokeStyle = '#ff00ff';
-                        ctx.stroke();
+            if ( this.meta.subAssets ) {
+                if ( this.meta.type === Fire.TextureType.Sprite ) {
+                    for ( var subInfo of this.meta.subAssets ) {
+                        if ( subInfo.asset instanceof Fire.Sprite ) {
+                            ctx.beginPath();
+                            ctx.rect( subInfo.asset.x * xRatio,
+                                      subInfo.asset.y * yRatio,
+                                      subInfo.asset.width * xRatio,
+                                      subInfo.asset.height * yRatio );
+                            ctx.lineWidth = 1;
+                            ctx.strokeStyle = '#ff00ff';
+                            ctx.stroke();
+                        }
                     }
                 }
             }
