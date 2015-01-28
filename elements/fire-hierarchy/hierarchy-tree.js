@@ -555,13 +555,13 @@ Polymer({
                 Fire.Selection.clearEntity();
                 var onload = function ( asset ) {
                     if ( asset.createEntity ) {
-                        var ent = asset.createEntity();
-                        ent.parent = parentEnt;
-                        ent.transform.position = new Fire.Vec2(0,0);
-                        Fire.Selection.selectEntity( ent.id, false, true );
-                        Fire.sendToPages( 'scene:dirty' );
-                        Fire.AssetLibrary.cacheAsset( asset );
-
+                        asset.createEntity( function ( ent ) {
+                            ent.parent = parentEnt;
+                            ent.transform.position = new Fire.Vec2(0,0);
+                            Fire.Selection.selectEntity( ent.id, false, true );
+                            Fire.sendToPages( 'scene:dirty' );
+                            Fire.AssetLibrary.cacheAsset( asset );
+                        }.bind(this) );
                     }
                 }.bind(this);
 

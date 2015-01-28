@@ -1,10 +1,12 @@
 ﻿var Sprite = Fire.Sprite;
 
-Sprite.prototype.createEntity = function () {
+Sprite.prototype.createEntity = function ( cb ) {
     var ent = new Fire.Entity(this.name);
 
     var spriteRenderer = ent.addComponent(Fire.SpriteRenderer);
     spriteRenderer.sprite = this;
 
-    return ent;
+    if ( cb ) {
+        cb ( ent );
+    }
 };
