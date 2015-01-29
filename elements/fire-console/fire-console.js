@@ -80,8 +80,12 @@ Polymer({
             filter = filterText.toLowerCase();
         }
 
-        for ( var i = 0; i < logs.length; ++i ) {
-            var log = logs[i];
+        var i = 0;
+        var log = null;
+
+        for ( i = 0; i < logs.length; ++i ) {
+            log = logs[i];
+            log.count = 0;
 
             if ( type !== "" && log.type !== type ) {
                 continue;
@@ -101,35 +105,27 @@ Polymer({
         }
 
 
-        if ( !this.collapse ) {
-            return filterLogs;
-        }
+        if ( this.collapse && filterLogs.length > 0 ) {
+            var collapseLogs = [];
+            var lastLog = filterLogs[0];
 
-        var collapseLogs = [];
-        var count = 0;
-        var index = 0;
-        for (var i = 0; i < filterLogs.length-1; i++) {
-            if ( filterLogs[i+1].text !== filterLogs[i].text) {
-                collapseLogs.push( filterLogs[i] );
-                index++;
-                if ( count !== 1) {
-                    collapseLogs[index-1].count = count;
+            collapseLogs.push( lastLog );
+
+            for ( i = 1; i < filterLogs.length; ++i ) {
+                log = filterLogs[i];
+                if ( lastLog.text === log.text && lastLog.type === log.type ) {
+                    lastLog.count += 1;
                 }
-                count = 0;
-            }
-            else {
-                count ++;
-            }
-
-            if ( i === filterLogs.length-2) {
-                collapseLogs.push( filterLogs[i+1] );
-                if ( filterLogs[i].text == filterLogs[i+1].text) {
-                    collapseLogs[index].count = count;
+                else {
+                    collapseLogs.push( log );
+                    lastLog = log;
                 }
             }
+
+            filterLogs = collapseLogs;
         }
 
-        return collapseLogs;
+        return filterLogs;
     },
 
     itemClickAction: function (event) {
