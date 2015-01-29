@@ -6,6 +6,7 @@ Polymer({
             value: false,
             reflect: true
         },
+        count: 0,
     },
 
     attached: function () {

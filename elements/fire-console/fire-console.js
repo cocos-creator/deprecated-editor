@@ -97,42 +97,42 @@ Polymer({
                 }
             }
             filterLogs.push(log);
-
         }
 
 
-        filterLogs = filterLogs.map(function (item) {
-            return {type:item.type,text:item.text,count:1}
+        filterLogs = filterLogs.map( function (item) {
+            return { type: item.type, text: item.text, count: 1}
         });
 
-        if (!this.collapse) {
+        if ( !this.collapse ) {
             return filterLogs;
         }
 
-        var CollapseLogs = [];
+        var collapseLogs = [];
         var count = 1;
         var index = 0;
-        for (var i = 0 ;i < filterLogs.length-1; i++) {
-            if (filterLogs[i+1].text !== filterLogs[i].text && this.collapse === true) {
-                CollapseLogs.push(filterLogs[i]);
+        for (var i = 0; i < filterLogs.length-1; i++) {
+            if ( filterLogs[i+1].text !== filterLogs[i].text && this.collapse === true) {
+                collapseLogs.push( filterLogs[i] );
                 index++;
-                if (count !== 1) {
-                    CollapseLogs[index-1].count = count;
+                if ( count !== 1) {
+                    collapseLogs[index-1].count = count;
                 }
                 count = 1;
-            }else {
+            }
+            else {
                 count ++;
             }
 
             if (i === filterLogs.length-2 && this.collapse === true) {
-                CollapseLogs.push(filterLogs[i+1]);
-                if (filterLogs[i].text == filterLogs[i+1].text) {
-                    CollapseLogs[index].count = count;
+                collapseLogs.push( filterLogs[i+1] );
+                if ( filterLogs[i].text == filterLogs[i+1].text) {
+                    collapseLogs[index].count = count;
                 }
             }
         }
 
-        return CollapseLogs;
+        return collapseLogs;
     },
 
     itemClickAction: function (event) {

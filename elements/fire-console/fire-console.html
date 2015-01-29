@@ -38,7 +38,8 @@
                 <template repeat="{{log in logs | applyFilter(filterText,option,useRegex,collapse)}}">
                     <console-item
                         type="[[log.type]]"
-                        text="{{collapse == true ? log.count > 1 ? '['+log.count+']' : '' : '' }} [[log.text]]"
+                        text="[[log.text]]"
+                        count="{{collapse == true ? log.count > 1 ? log.count : '' : '' }}"
                         on-click="{{itemClickAction}}"
                         >
                         </console-item>
