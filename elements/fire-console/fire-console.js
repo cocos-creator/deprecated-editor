@@ -48,7 +48,7 @@ Polymer({
             type: type,
             text: text
         });
-        this.logs = this.applyFilter( this.logs, this.filterText, this.option, this.useRegex );
+        this.logs = this.logs.slice();
     },
 
     clear: function () {
