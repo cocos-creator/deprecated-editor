@@ -80,6 +80,12 @@ function _newAssetsItem ( url, type, id, parentEL ) {
         newEL.setIcon('bmfont');
         break;
 
+    case '.mp3':
+    case '.wav':
+    case '.ogg':
+        newEL.setIcon('audio');
+        break;
+
     case '.png':
     case '.jpg':
         img = new Image();

@@ -96,13 +96,18 @@ Polymer(EditorUI.mixin({
                            0, 0, this.$.canvas.width, this.$.canvas.height
                          );
         }
+        else if ( this.asset instanceof Fire.AudioClip ) {
+            // TODO
+        }
     },
 
     assetChanged: function () {
+        if ( !this.hide )
+            this.resize();
+
         if ( this.asset instanceof Fire.Texture ||
              this.asset instanceof Fire.Sprite ) {
             this.info = this.asset.width + " x " + this.asset.height;
-            this.resize();
         }
     },
 
