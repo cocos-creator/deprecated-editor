@@ -47,7 +47,7 @@ Polymer({
         this.logs.push({
             type: type,
             text: text,
-            count: 0,
+            // count: 0,
         });
         this.logs = this.logs.slice();
     },
@@ -100,6 +100,9 @@ Polymer({
             filterLogs.push(log);
         }
 
+        filterLogs = filterLogs.map(function (item) {
+            return {type:item.type,text:item.text,count:0}
+        });
 
         if ( !this.collapse ) {
             return filterLogs;
@@ -109,7 +112,7 @@ Polymer({
         var count = 0;
         var index = 0;
         for (var i = 0; i < filterLogs.length-1; i++) {
-            if ( filterLogs[i+1].text !== filterLogs[i].text) {
+            if ( filterLogs[i+1].text !== filterLogs[i].text && filterLogs[i+1].type === filterLogs[i].type) {
                 collapseLogs.push( filterLogs[i] );
                 index++;
                 if ( count !== 1) {
@@ -123,7 +126,7 @@ Polymer({
 
             if ( i === filterLogs.length-2) {
                 collapseLogs.push( filterLogs[i+1] );
-                if ( filterLogs[i].text == filterLogs[i+1].text) {
+                if ( filterLogs[i].text == filterLogs[i+1].text && filterLogs[i].type === filterLogs[i+1].type) {
                     collapseLogs[index].count = count;
                 }
             }
