@@ -105,7 +105,7 @@ Polymer({
         }
 
         filterLogs = filterLogs.map(function (item) {
-            return {type:item.type,text:item.text,count:0}
+            return {type:item.type,text:item.text,count:0};
         });
 
         if ( this.collapse && filterLogs.length > 0 ) {
