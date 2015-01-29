@@ -79,8 +79,6 @@ Polymer({
             filter = filterText.toLowerCase();
         }
 
-        var lastLog = logs[logs.length-1];
-
         for ( var i = 0; i < logs.length; ++i ) {
             var log = logs[i];
 
