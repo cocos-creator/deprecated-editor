@@ -46,7 +46,8 @@ Polymer({
     add: function ( type, text ) {
         this.logs.push({
             type: type,
-            text: text
+            text: text,
+            count: 0,
         });
         this.logs = this.logs.slice();
     },
@@ -100,31 +101,27 @@ Polymer({
         }
 
 
-        filterLogs = filterLogs.map( function (item) {
-            return { type: item.type, text: item.text, count: 1}
-        });
-
         if ( !this.collapse ) {
             return filterLogs;
         }
 
         var collapseLogs = [];
-        var count = 1;
+        var count = 0;
         var index = 0;
         for (var i = 0; i < filterLogs.length-1; i++) {
-            if ( filterLogs[i+1].text !== filterLogs[i].text && this.collapse === true) {
+            if ( filterLogs[i+1].text !== filterLogs[i].text) {
                 collapseLogs.push( filterLogs[i] );
                 index++;
                 if ( count !== 1) {
                     collapseLogs[index-1].count = count;
                 }
-                count = 1;
+                count = 0;
             }
             else {
                 count ++;
             }
 
-            if (i === filterLogs.length-2 && this.collapse === true) {
+            if ( i === filterLogs.length-2) {
                 collapseLogs.push( filterLogs[i+1] );
                 if ( filterLogs[i].text == filterLogs[i+1].text) {
                     collapseLogs[index].count = count;

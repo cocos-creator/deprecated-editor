@@ -39,7 +39,7 @@
                     <console-item
                         type="[[log.type]]"
                         text="[[log.text]]"
-                        count="{{collapse == true ? log.count > 1 ? log.count : '' : '' }}"
+                        count="{{log.count+1}}"
                         on-click="{{itemClickAction}}"
                         >
                         </console-item>
