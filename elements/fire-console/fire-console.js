@@ -102,8 +102,12 @@ Polymer({
 
 
         filterLogs = filterLogs.map(function (item) {
-            return {type:item.type,text:item.text,count:0}
+            return {type:item.type,text:item.text,count:1}
         });
+
+        if (!this.collapse) {
+            return filterLogs;
+        }
 
         var CollapseLogs = [];
         var count = 1;
@@ -128,11 +132,7 @@ Polymer({
             }
         }
 
-        if (this.collapse) {
-            return CollapseLogs;
-        }else {
-            return filterLogs;
-        }
+        return CollapseLogs;
     },
 
     itemClickAction: function (event) {
