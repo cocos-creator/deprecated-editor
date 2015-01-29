@@ -268,7 +268,7 @@ var userScriptLoader = (function () {
 // 重新加载全部脚本和插件
 Sandbox.reloadScripts = (function () {
 
-    var LoadSequence = [userScriptLoader, Fire._editorPluginLoader];
+    var LoadSequence = [userScriptLoader, Fire._pluginLoader];
 
     var builtinClassIds;
     var builtinClassNames;
