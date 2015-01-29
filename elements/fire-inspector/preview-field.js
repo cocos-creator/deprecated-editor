@@ -6,12 +6,12 @@ Polymer(EditorUI.mixin({
         'min-height': 10,
 
         asset: null,
+        meta: null,
         hide: { value: false, reflect: true },
     },
 
     created: function () {
         this.info = "Unkown";
-        this._previewType = "Unkown";
     },
 
     ready: function () {
@@ -24,7 +24,8 @@ Polymer(EditorUI.mixin({
 
         var contentRect = this.$.content.getBoundingClientRect();
 
-        if ( this._previewType === "texture" ) {
+        if ( this.asset instanceof Fire.Texture ||
+             this.asset instanceof Fire.Sprite ) {
             if ( this.asset.width > contentRect.width &&
                  this.asset.height > contentRect.height )
             {
@@ -62,16 +63,44 @@ Polymer(EditorUI.mixin({
     },
 
     repaint: function () {
-        if ( this._previewType === "texture" ) {
-            var ctx = this.$.canvas.getContext("2d");
+        var ctx = this.$.canvas.getContext("2d");
+
+        if ( this.asset instanceof Fire.Texture ) {
             ctx.imageSmoothingEnabled = false;
             ctx.drawImage( this.asset.image, 0, 0, this.$.canvas.width, this.$.canvas.height );
+
+            var xRatio = this.$.canvas.width / this.asset.width;
+            var yRatio = this.$.canvas.height / this.asset.height;
+
+            if ( this.meta.subAssets ) {
+                if ( this.meta.type === Fire.TextureType.Sprite ) {
+                    for ( var subInfo of this.meta.subAssets ) {
+                        if ( subInfo.asset instanceof Fire.Sprite ) {
+                            ctx.beginPath();
+                            ctx.rect( subInfo.asset.x * xRatio,
+                                      subInfo.asset.y * yRatio,
+                                      subInfo.asset.width * xRatio,
+                                      subInfo.asset.height * yRatio );
+                            ctx.lineWidth = 1;
+                            ctx.strokeStyle = '#ff00ff';
+                            ctx.stroke();
+                        }
+                    }
+                }
+            }
+        }
+        else if ( this.asset instanceof Fire.Sprite ) {
+            ctx.imageSmoothingEnabled = false;
+            ctx.drawImage( this.asset.texture.image,
+                           this.asset.x, this.asset.y, this.asset.width, this.asset.height,
+                           0, 0, this.$.canvas.width, this.$.canvas.height
+                         );
         }
     },
 
     assetChanged: function () {
-        if ( this.asset instanceof Fire.Texture ) {
-            this._previewType = "texture";
+        if ( this.asset instanceof Fire.Texture ||
+             this.asset instanceof Fire.Sprite ) {
             this.info = this.asset.width + " x " + this.asset.height;
             this.resize();
         }
