@@ -43,6 +43,13 @@ function _fieldSection ( name, target ) {
                 propEL.textMode = attrs.textMode;
             }
 
+            // NOTE: min, max can be null
+            if ( attrs.min !== undefined )
+                propEL.min = attrs.min;
+
+            if ( attrs.max !== undefined )
+                propEL.max = attrs.max;
+
             //
             propEL.bind( 'value', new Fire._PathObserver( target, propName ) );
             propEL.type = type;
