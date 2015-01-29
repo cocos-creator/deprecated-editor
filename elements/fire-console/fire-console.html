@@ -28,13 +28,17 @@
 
             <fire-ui-select style="width: 50px;" value="{{option}}" options="[[options]]">
             </fire-ui-select>
+            <span class="space"></span>
+
+            <fire-ui-checkbox value="{{collapse}}">Collapse</fire-ui-checkbox>
+
         </fire-ui-toolbar>
         <div flex-1 flex-col flex-stretch>
             <console-view id="view" auto-layout min-height="50">
-                <template repeat="{{log in logs | applyFilter(filterText,option,useRegex)}}">
+                <template repeat="{{log in logs | applyFilter(filterText,option,useRegex,collapse)}}">
                     <console-item
                         type="[[log.type]]"
-                        text="[[log.text]]"
+                        text="{{collapse == true ? log.count > 1 ? '['+log.count+']' : '' : '' }} [[log.text]]"
                         on-click="{{itemClickAction}}"
                         >
                         </console-item>

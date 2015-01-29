@@ -12,7 +12,7 @@ Polymer({
         this.icon.src = "fire://static/img/plugin-console.png";
 
         this.ipc = new Fire.IpcListener();
-
+        this.collapse = true;
         this.option = 0;
         this.filterText = '';
         this.useRegex = false;
@@ -57,7 +57,6 @@ Polymer({
 
     applyFilter: function ( logs, filterText, option, useRegex ) {
         var filterLogs = [];
-
         var type;
         switch(option) {
             case 0: type = ""; break;
@@ -80,6 +79,8 @@ Polymer({
             filter = filterText.toLowerCase();
         }
 
+        var lastLog = logs[logs.length-1];
+
         for ( var i = 0; i < logs.length; ++i ) {
             var log = logs[i];
 
@@ -97,11 +98,43 @@ Polymer({
                     continue;
                 }
             }
-
             filterLogs.push(log);
+
         }
 
-        return filterLogs;
+
+        filterLogs = filterLogs.map(function (item) {
+            return {type:item.type,text:item.text,count:0}
+        });
+
+        var CollapseLogs = [];
+        var count = 1;
+        var index = 0;
+        for (var i = 0 ;i < filterLogs.length-1; i++) {
+            if (filterLogs[i+1].text !== filterLogs[i].text && this.collapse === true) {
+                CollapseLogs.push(filterLogs[i]);
+                index++;
+                if (count !== 1) {
+                    CollapseLogs[index-1].count = count;
+                }
+                count = 1;
+            }else {
+                count ++;
+            }
+
+            if (i === filterLogs.length-2 && this.collapse === true) {
+                CollapseLogs.push(filterLogs[i+1]);
+                if (filterLogs[i].text == filterLogs[i+1].text) {
+                    CollapseLogs[index].count = count;
+                }
+            }
+        }
+
+        if (this.collapse) {
+            return CollapseLogs;
+        }else {
+            return filterLogs;
+        }
     },
 
     itemClickAction: function (event) {
