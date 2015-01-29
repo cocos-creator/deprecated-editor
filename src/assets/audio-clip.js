@@ -3,9 +3,9 @@
 audioClip.prototype.createEntity = function () {
     var ent = new Fire.Entity(this.name);
 
-    var audioClip = ent.addComponent(Fire.AudioSources);
+    var audioSource = ent.addComponent(Fire.AudioSource);
 
-    audioClip.audioClip = this;
+    audioSource.audioClip = this;
 
     return ent;
 };
