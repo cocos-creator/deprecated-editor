@@ -1,7 +1,8 @@
 ﻿var gulp = require('gulp');
 var gutil = require('gulp-util');
 var jshint = require('gulp-jshint');
-var uglify = require('gulp-uglify');
+var compiler = require('gulp-closure-compiler');
+var tap = require('gulp-tap');
 var concat = require('gulp-concat');
 var stylus = require('gulp-stylus');
 var rename = require('gulp-rename');
@@ -159,9 +160,24 @@ var task_plugin = function ( name ) {
             esnext: true,
         }))
         .pipe(jshint.reporter(stylish))
-        .pipe(uglify())
-        .pipe(gulp.dest('bin/tmp/'))
-        ;
+        .pipe(tap(function (file) {
+            var filename = file.path;
+            var globname = path.relative(__dirname, filename);
+            return gulp.src(globname)
+                        .pipe(compiler({
+                            compilerPath: path.normalize('../../compiler/compiler.jar'),
+                            compilerFlags: {
+                                language_in: 'ECMASCRIPT6',
+                                language_out: 'ECMASCRIPT5',
+                                compilation_level: 'ADVANCED_OPTIMIZATIONS',
+                                jscomp_off: 'globalThis',
+                            },
+                            fileName: path.relative(path.join(__dirname, 'src'), globname),
+                            continueWithWarnings: true
+                        }))
+                        .pipe(gulp.dest('bin/tmp/'));
+
+        }));
     });
 
     gulp.task(task_js_dev, [task_js_ext], function() {
@@ -219,9 +235,24 @@ gulp.task('src-dev', ['src-jshint'], function() {
 gulp.task('src-min', ['src-dev'], function() {
     return gulp.src('bin/editor.dev.js')
     .pipe(rename('editor.min.js'))
-    .pipe(uglify())
-    .pipe(gulp.dest('bin'))
-    ;
+    .pipe(tap(function (file) {
+        var filename = file.path;
+        var globname = path.relative(__dirname, filename);
+        return gulp.src(globname)
+                    .pipe(compiler({
+                        compilerPath: path.normalize('../../compiler/compiler.jar'),
+                        compilerFlags: {
+                            language_in: 'ECMASCRIPT6',
+                            language_out: 'ECMASCRIPT5',
+                            compilation_level: 'ADVANCED_OPTIMIZATIONS',
+                            jscomp_off: 'globalThis',
+                        },
+                        fileName: path.relative(path.join(__dirname, 'src'), globname),
+                        continueWithWarnings: true
+                    }))
+                    .pipe(gulp.dest('bin'));
+
+    }));
 });
 
 /////////////////////////////////////////////////////////////////////////////
