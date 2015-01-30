@@ -4,16 +4,15 @@ var Path = require('fire-path');
 var Fs = require('fire-fs');
 
 function _getUserDoc() {
-    if (!process.env.USERPROFILE) {
-        return '';
-    }
-    var win8 = Path.join(process.env.USERPROFILE, 'Documents');
-    if (Fs.existsSync(win8)) {
-        return win8;
-    }
-    var win7 = Path.join(process.env.USERPROFILE, 'My Documents');
-    if (Fs.existsSync(win7)) {
-        return win7;
+    if (process.env.USERPROFILE) {
+        var win8 = Path.join(process.env.USERPROFILE, 'Documents');
+        if (Fs.existsSync(win8)) {
+            return win8;
+        }
+        var win7 = Path.join(process.env.USERPROFILE, 'My Documents');
+        if (Fs.existsSync(win7)) {
+            return win7;
+        }
     }
     return process.cwd();
 }
