@@ -76,6 +76,8 @@ function _newAssetsItem ( url, type, id, parentEL ) {
         newEL.setIcon('sprite');
         break;
 
+    case '.fnt':
+    case '.bmf':
     case '.bmfont':
         newEL.setIcon('bmfont');
         break;
