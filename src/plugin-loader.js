@@ -39,7 +39,16 @@ PluginLoader.prototype._loadImpl = function (plugin) {
                 return script;
             }
         }
-        load('inspector');
+        function loadToMeta (name) {
+            var script = load(name);
+            if (script) {
+                meta.prototype[name] = script;
+            }
+        }
+        var meta = load('meta');
+        if (meta) {
+            loadToMeta('inspector');
+        }
     });
 };
 
