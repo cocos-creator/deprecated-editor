@@ -2,10 +2,9 @@
 var gutil = require('gulp-util');
 var jshint = require('gulp-jshint');
 var compiler = require('gulp-closure-compiler');
-var tap = require('gulp-tap');
+var map = require('vinyl-map');
 var concat = require('gulp-concat');
 var stylus = require('gulp-stylus');
-var rename = require('gulp-rename');
 var vulcanize = require('gulp-vulcanize');
 var del = require('del');
 var minifyCSS = require('gulp-minify-css');
@@ -160,8 +159,7 @@ var task_plugin = function ( name ) {
             esnext: true,
         }))
         .pipe(jshint.reporter(stylish))
-        .pipe(tap(function (file) {
-            var filename = file.path;
+        .pipe(map(function (content, filename) {
             var globname = path.relative(__dirname, filename);
             return gulp.src(globname)
                         .pipe(compiler({
@@ -169,15 +167,14 @@ var task_plugin = function ( name ) {
                             compilerFlags: {
                                 language_in: 'ECMASCRIPT6',
                                 language_out: 'ECMASCRIPT5',
-                                compilation_level: 'ADVANCED_OPTIMIZATIONS',
+                                compilation_level: 'WHITESPACE_ONLY',
                                 jscomp_off: 'globalThis',
                             },
-                            fileName: path.relative(path.join(__dirname, 'src'), globname),
+                            fileName: path.relative(path.join(__dirname, 'elements'), globname),
                             continueWithWarnings: true
                         }))
-                        .pipe(gulp.dest('bin/tmp/'));
-
-        }));
+            }))
+            .pipe(gulp.dest('bin/tmp/'));
     });
 
     gulp.task(task_js_dev, [task_js_ext], function() {
@@ -234,25 +231,18 @@ gulp.task('src-dev', ['src-jshint'], function() {
 // src-min
 gulp.task('src-min', ['src-dev'], function() {
     return gulp.src('bin/editor.dev.js')
-    .pipe(rename('editor.min.js'))
-    .pipe(tap(function (file) {
-        var filename = file.path;
-        var globname = path.relative(__dirname, filename);
-        return gulp.src(globname)
-                    .pipe(compiler({
-                        compilerPath: path.normalize('../../compiler/compiler.jar'),
-                        compilerFlags: {
-                            language_in: 'ECMASCRIPT6',
-                            language_out: 'ECMASCRIPT5',
-                            compilation_level: 'ADVANCED_OPTIMIZATIONS',
-                            jscomp_off: 'globalThis',
-                        },
-                        fileName: path.relative(path.join(__dirname, 'src'), globname),
-                        continueWithWarnings: true
-                    }))
-                    .pipe(gulp.dest('bin'));
-
-    }));
+        .pipe(compiler({
+            compilerPath: path.normalize('../../compiler/compiler.jar'),
+            compilerFlags: {
+                language_in: 'ECMASCRIPT6',
+                language_out: 'ECMASCRIPT5',
+                compilation_level: 'WHITESPACE_ONLY',
+                jscomp_off: 'globalThis',
+            },
+            fileName: 'editor.min.js',
+            continueWithWarnings: true
+        }))
+        .pipe(gulp.dest('bin'));
 });
 
 /////////////////////////////////////////////////////////////////////////////
