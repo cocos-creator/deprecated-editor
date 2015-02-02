@@ -76,6 +76,8 @@ function _newAssetsItem ( url, type, id, parentEL ) {
         newEL.setIcon('sprite');
         break;
 
+    case '.fnt':
+    case '.bmf':
     case '.bmfont':
         newEL.setIcon('bmfont');
         break;
@@ -360,24 +362,6 @@ Polymer({
                         else {
                             Fire.warn( "Can not create sprite from non-texture element, please select a texture first." );
                         }
-                    }
-                }.bind(this)
-            },
-
-            {
-                label: 'New Bitmap Font',
-                click: function () {
-                    if (this.contextmenuAt instanceof AssetsItem) {
-                        var targetEL = this.contextmenuAt;
-                        if (!this.contextmenuAt.isFolder)
-                            targetEL = this.contextmenuAt.parentElement;
-                        var url = this.getUrl(targetEL);
-                        var newBitmapFont = new Fire.BitmapFont();
-                        var newAssetUrl = Url.join(url, 'New Bitmap Font.bmfont');
-                        this._focusUrl = newAssetUrl;
-                        Fire.sendToCore('asset-db:save',
-                                      newAssetUrl,
-                                      Fire.serialize(newBitmapFont));
                     }
                 }.bind(this)
             },
