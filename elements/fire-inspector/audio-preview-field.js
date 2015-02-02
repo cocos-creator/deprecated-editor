@@ -21,6 +21,7 @@ Polymer({
 
     repaint: function () {
         var ctx = this.$.canvas.getContext("2d");
+        ctx.imageSmoothingEnabled = false;
 
         if ( this.audioSource ) {
             this.allAudioStop();

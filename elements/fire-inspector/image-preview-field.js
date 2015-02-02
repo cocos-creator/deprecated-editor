@@ -45,9 +45,9 @@ Polymer({
 
     repaint: function () {
         var ctx = this.$.canvas.getContext("2d");
+        ctx.imageSmoothingEnabled = false;
 
         if ( this.asset instanceof Fire.Texture ) {
-            ctx.imageSmoothingEnabled = false;
             ctx.drawImage( this.asset.image, 0, 0, this.$.canvas.width, this.$.canvas.height );
 
             var xRatio = this.$.canvas.width / this.asset.width;
@@ -71,7 +71,6 @@ Polymer({
             }
         }
         else if ( this.asset instanceof Fire.Sprite ) {
-            ctx.imageSmoothingEnabled = false;
             ctx.drawImage( this.asset.texture.image,
                            this.asset.x, this.asset.y, this.asset.width, this.asset.height,
                            0, 0, this.$.canvas.width, this.$.canvas.height
