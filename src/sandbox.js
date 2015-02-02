@@ -323,9 +323,9 @@ Sandbox.reloadScripts = (function () {
 
         if (scriptsLoaded) {
             // unload old
-            for (var i = 0; i < LoadSequence.length; i++) {
-                LoadSequence[i].unloadAll();
-                Sandbox.globalVarsChecker.restore(Fire.warn, 'unloading ' + LoadSequence[i].name);
+            for (var j = LoadSequence.length - 1; j >= 0; j--) {
+                LoadSequence[j].unloadAll();
+                Sandbox.globalVarsChecker.restore(Fire.warn, 'unloading ' + LoadSequence[j].name);
             }
 
             // reset
@@ -333,9 +333,9 @@ Sandbox.reloadScripts = (function () {
         }
 
         // load new
-        for (var j = LoadSequence.length - 1; j >= 0; j--) {
-            LoadSequence[j].loadAll();
-            Sandbox.globalVarsChecker.restore(Fire.warn, 'loading ' + LoadSequence[j].name);
+        for (var i = 0; i < LoadSequence.length; i++) {
+            LoadSequence[i].loadAll();
+            Sandbox.globalVarsChecker.restore(Fire.warn, 'loading ' + LoadSequence[i].name);
         }
     }
 
