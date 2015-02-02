@@ -13,6 +13,14 @@ function _makeWatcher ( attrs, target, propEL ) {
     };
 }
 
+function _makeReadonlyChecker ( attrs, propEL ) {
+    return function () {
+        if ( attrs.readOnly || (attrs.hasGetter && !attrs.hasSetter) ) {
+            propEL.disabled = true;
+        }
+    };
+}
+
 function _fieldSection ( name, target ) {
     //
     var fireSectionEL = new FireSection();
@@ -76,6 +84,9 @@ function _fieldSection ( name, target ) {
                     // NOTE: we need to invoke it once to make sure our propEL intialize correctly
                     propEL.onFieldCreated = watcher;
                 }
+            }
+            else {
+                propEL.onFieldCreated = _makeReadonlyChecker( attrs, propEL );
             }
 
             fireSectionEL.$[propName] = propEL;
