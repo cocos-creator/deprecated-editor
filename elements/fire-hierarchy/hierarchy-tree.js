@@ -554,7 +554,7 @@ Polymer({
 
                 Fire.Selection.clearEntity();
                 var onload = function ( asset ) {
-                    if ( asset.createEntity ) {
+                    if ( asset && asset.createEntity ) {
                         asset.createEntity( function ( ent ) {
                             ent.parent = parentEnt;
                             ent.transform.position = new Fire.Vec2(0,0);

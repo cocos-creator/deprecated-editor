@@ -171,6 +171,7 @@ var task_plugin = function ( name ) {
             multistr: true,
             smarttabs: false,
             loopfunc: true,
+            esnext: true,
         }))
         .pipe(jshint.reporter(stylish))
         .pipe(gulp.dest('bin/tmp/'))
@@ -201,6 +202,9 @@ gulp.task('src-jshint', function() {
     .pipe(jshint({
         forin: false,
         multistr: true,
+        smarttabs: false,
+        loopfunc: true,
+        esnext: true,
     }))
     .pipe(jshint.reporter(stylish))
     ;
