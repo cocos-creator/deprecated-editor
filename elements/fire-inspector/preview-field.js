@@ -8,11 +8,11 @@ Polymer(EditorUI.mixin({
         asset: null,
         meta: null,
         hide: { value: false, reflect: true },
-        isAudio: false,
     },
 
     created: function () {
         this.info = "Unkown";
+        this.audioNowPlayTime = 0;
     },
 
     ready: function () {
@@ -67,7 +67,6 @@ Polymer(EditorUI.mixin({
         var ctx = this.$.canvas.getContext("2d");
 
         if ( this.asset instanceof Fire.Texture ) {
-            this.isAudio = false;
             ctx.imageSmoothingEnabled = false;
             ctx.drawImage( this.asset.image, 0, 0, this.$.canvas.width, this.$.canvas.height );
 
@@ -92,7 +91,6 @@ Polymer(EditorUI.mixin({
             }
         }
         else if ( this.asset instanceof Fire.Sprite ) {
-            this.isAudio = false;
             ctx.imageSmoothingEnabled = false;
             ctx.drawImage( this.asset.texture.image,
                            this.asset.x, this.asset.y, this.asset.width, this.asset.height,
@@ -101,13 +99,18 @@ Polymer(EditorUI.mixin({
         }
         else if ( this.asset instanceof Fire.AudioClip ) {
             // TODO
-            this.isAudio = true;
+            if (this.audioSource) {
+                this.allAudioStop();
+            }
+
             this.audioSource = new Fire.AudioSource();
             this.audioSource.clip = this.asset;
-            this.audioSource.play();
+
             var devicePixelRation = window.devicePixelRatio;
+
             this.width = this.$.canvas.getBoundingClientRect().width;
             this.height = this.$.canvas.getBoundingClientRect().height;
+
             this.buffer = this.asset.rawData;
             this.audioLength = this.buffer.duration;
             this.peaks = this.getPeaks(this.width);
@@ -115,8 +118,43 @@ Polymer(EditorUI.mixin({
         }
     },
 
-    getTime: function () {
-        console.log(this.audioSource.time);
+    playAudioAction: function (event) {
+
+        // NOTE: 这里代码要改
+        if(event.target.className === "fa fa-play") {
+            event.target.className = "fa fa-pause";
+        }
+        else if (event.target.className = "fa fa-pause"){
+            event.target.className = "fa fa-play";
+        }
+        if (this.audioSource.isPlaying) {
+            this.audioSource.pause();
+            this.allAudioStop();
+        }
+        else {
+            this.audioSource.play();
+            this.updateProgress();
+        }
+
+    },
+
+    // NOTE: 临时代码
+    updateProgress: function () {
+        this.audioSource.onEnd = function () {
+            this.allAudioStop();
+        }.bind(this);
+        this.audioNowPlayTime = 0;
+        this.timeSpan = setInterval(function () {
+            this.audioNowPlayTime ++;
+        }.bind(this),1000);
+    },
+
+    // NOTE: 临时代码
+    allAudioStop: function () {
+        this.audioSource.stop();
+        this.audioNowPlayTime = 0;
+        clearInterval(this.timeSpan);
+        this.audioSource = null;
     },
 
     drawWave: function (ctx,peaks, max,devicePixelRation) {
@@ -140,20 +178,17 @@ Polymer(EditorUI.mixin({
             }
             cc.lineTo(this.width + $, halfH);
             cc.moveTo($, halfH);
-
             for (var i = 0; i < length; i++) {
                 var h = Math.round(peaks[i] * coef);
                 cc.lineTo(i * scale + $, halfH - h);
             }
-
             cc.lineTo(this.width + $, halfH);
             cc.fill();
-
-            // Always draw a median line
             cc.fillRect(0, halfH - $, this.width, $);
         }.bind(this));
     },
 
+    //这个是根据原peaks 转换成根据canvas宽度同等的小数据，避免绘制冗余
     getPeaks: function (length) {
         var buffer = this.buffer;
         var sampleSize = buffer.length / length;

@@ -7,13 +7,13 @@
         <link rel="stylesheet" href="preview-field.css">
 
         <fire-ui-toolbar>
-            <fire-ui-button on-click="{{getTime}}">
+            <fire-ui-button on-click="{{playAudioAction}}">
                 <li class="fa fa-play"></li>
             </fire-ui-button>
             <fire-ui-button>
                 <li class="fa fa-step-forward"></li>
             </fire-ui-button>
-            <fire-ui-label>0/{{audioLength}}</fire-ui-label>
+            <fire-ui-label>{{audioNowPlayTime}}/{{audioLength}}</fire-ui-label>
         </fire-ui-toolbar>
         <div class="view" flex-1>
             <div id="content" class="content">
@@ -23,10 +23,6 @@
         <div class="label">
             <fire-ui-label>{{info}}</fire-ui-label>
         </div>
-
-        <!-- <template if="{{!isAudio}}">
-            <canvas id="canvas"></canvas>
-        </template> -->
     </template>
     <script type="text/javascript" src="preview-field.js"></script>
 </polymer-element>
