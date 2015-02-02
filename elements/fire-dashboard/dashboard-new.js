@@ -3,7 +3,24 @@ var Ipc = require('ipc');
 var Path = require('fire-path');
 var Fs = require('fire-fs');
 
+function _getUserDoc() {
+    if (process.env.USERPROFILE) {
+        var win8 = Path.join(process.env.USERPROFILE, 'Documents');
+        if (Fs.existsSync(win8)) {
+            return win8;
+        }
+        var win7 = Path.join(process.env.USERPROFILE, 'My Documents');
+        if (Fs.existsSync(win7)) {
+            return win7;
+        }
+    }
+    return process.cwd();
+}
+
 function _getUserHome() {
+    if (Fire.isWin32) {
+        return _getUserDoc();
+    }
     return process.env.HOME || process.env.HOMEPATH || process.env.USERPROFILE;
 }
 
@@ -55,8 +72,10 @@ Polymer({
             return;
 
         var projectPath = Path.join( this.path, this.name );
-        if ( Fs.existsSync(projectPath) && Fs.statSync(projectPath).isDirectory() )
+        if (Fs.existsSync(projectPath) && Fs.statSync(projectPath).isDirectory()) {
+            alert("File already exists!");
             return;
+        }
 
         Fire.sendToCore( 'dashboard:create-project', projectPath );
     },

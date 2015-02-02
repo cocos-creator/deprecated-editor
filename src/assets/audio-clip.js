@@ -3,7 +3,7 @@
 
     var audioSource = ent.addComponent(Fire.AudioSource);
 
-    audioSource.audioClip = this;
+    audioSource.clip = this;
 
     return ent;
 };
