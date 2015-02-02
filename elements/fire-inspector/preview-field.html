@@ -6,8 +6,16 @@
     <template>
         <link rel="stylesheet" href="preview-field.css">
 
-        <!-- TODO: <fire-ui-toolbar></fire-ui-toolbar> -->
-        <div class="view" id="wave" flex-1>
+        <fire-ui-toolbar>
+            <fire-ui-button on-click="{{getTime}}">
+                <li class="fa fa-play"></li>
+            </fire-ui-button>
+            <fire-ui-button>
+                <li class="fa fa-step-forward"></li>
+            </fire-ui-button>
+            <fire-ui-label>0/{{audioLength}}</fire-ui-label>
+        </fire-ui-toolbar>
+        <div class="view" flex-1>
             <div id="content" class="content">
                 <canvas id="canvas"></canvas>
             </div>
@@ -15,7 +23,10 @@
         <div class="label">
             <fire-ui-label>{{info}}</fire-ui-label>
         </div>
+
+        <!-- <template if="{{!isAudio}}">
+            <canvas id="canvas"></canvas>
+        </template> -->
     </template>
     <script type="text/javascript" src="preview-field.js"></script>
-    <script type="text/javascript" src="wavesurfer.min.js"></script>
 </polymer-element>
