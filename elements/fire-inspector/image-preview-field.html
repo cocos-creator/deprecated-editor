@@ -1,0 +1,18 @@
+<polymer-element
+    name="image-preview-field"
+    constructor="ImagePreviewField"
+    >
+    <template>
+        <link rel="stylesheet" href="image-preview-field.css">
+
+        <div class="view" flex-1>
+            <div id="content" class="content">
+                <canvas id="canvas"></canvas>
+            </div>
+            <div class="label">
+                <fire-ui-label>{{info}}</fire-ui-label>
+            </div>
+        </div>
+    </template>
+    <script type="text/javascript" src="image-preview-field.js"></script>
+</polymer-element>
