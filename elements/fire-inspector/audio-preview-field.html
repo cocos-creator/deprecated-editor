@@ -11,29 +11,29 @@
                 <i class="fa fa-step-forward" style="transform:rotate(180deg)"></i>
             </fire-ui-button>
 
-            <fire-ui-button on-click="{{playAudioAction}}">
-                <i class="{{isPlay ? 'fa fa-pause':'fa fa-play'}}"></i>
+            <fire-ui-button on-click="{{playAction}}">
+                <i class="{{isPlaying ? 'fa fa-pause':'fa fa-play'}}"></i>
             </fire-ui-button>
 
-            <fire-ui-button on-click="{{getTime}}">
+            <fire-ui-button on-click="{{forwardAction}}">
                 <i class="fa fa-step-forward"></i>
             </fire-ui-button>
 
-            <fire-ui-button on-click="{{stop}}">
+            <fire-ui-button on-click="{{stopAction}}">
                 <i class="fa fa-stop"></i>
             </fire-ui-button>
         </fire-ui-toolbar>
 
         <div class="view" flex-1>
             <div id="content" class="content">
-                <canvas id="canvas" on-mousemove="{{mouseMoveAction}}" on-mousedown="{{mouseDownAction}}" on-mouseup="{{mouseUpAction}}"></canvas>
-                <span id="progress"  on-mouseup="{{mouseUpAction}}"></span>
+                <canvas id="canvas"></canvas>
+                <canvas id="canvas2" on-mousedown="{{mousedownAction}}"></canvas>
             </div>
             <div class="info">
                 <fire-ui-label>{{info}}</fire-ui-label>
             </div>
             <div class="label">
-                <fire-ui-label>{{audioNowPlayTime}}/{{audioLength | convertTime}} (ms)</fire-ui-label>
+                <fire-ui-label>{{currentTime}}/{{audioLength | convertTime}} (ms)</fire-ui-label>
             </div>
         </div>
     </template>

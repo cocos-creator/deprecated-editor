@@ -2,20 +2,19 @@ Polymer({
     publish: {
         asset: null,
         meta: null,
-        isPlay: false,
     },
 
     info: "",
-    audioNowPlayTime: 0,
     isRetina: false,
-    isautoStop: true,
+    isPlaying: false,
+    currentTime: 0,
+    audioSource: null,
 
     created: function () {
-        this.audioSource = new Fire.AudioSource();
         this.isRetina = window.devicePixelRatio === 1 ? false : true;
     },
 
-    resize: function (isChanged) {
+    resize: function () {
         if ( !this.asset)
             return;
 
@@ -23,184 +22,100 @@ Polymer({
         if (this.isRetina) {
             this.$.canvas.width = contentRect.width * 2;
             this.$.canvas.height = contentRect.height * 2;
+
+            this.$.canvas2.width = contentRect.width * 2;
+            this.$.canvas2.height = contentRect.height * 2;
         }
         else {
             this.$.canvas.width = contentRect.width;
             this.$.canvas.height = contentRect.height;
-        }
 
+            this.$.canvas2.width = contentRect.width;
+            this.$.canvas2.height = contentRect.height;
+        }
 
         this.$.canvas.style.width = contentRect.width + "px";
         this.$.canvas.style.height = contentRect.height + "px";
 
-        this.$.progress.height = contentRect.height;
-        this.repaint(isChanged);
+        this.$.canvas2.style.width = contentRect.width + "px";
+        this.$.canvas2.style.height = contentRect.height + "px";
+
+        this.repaint();
+        this.drawProgress(0);
     },
 
-
-    repaint: function (isChanged) {
+    repaint: function () {
         var ctx = this.$.canvas.getContext("2d");
         ctx.imageSmoothingEnabled = false;
 
-        if ( isChanged ) {
-            this.stop();
-            this.audioSource = new Fire.AudioSource();
-            this.audioSource.clip = this.asset;
-        }
+        var canvasRect = this.$.canvas.getBoundingClientRect();
 
         if (this.isRetina) {
-            this.width = this.$.canvas.getBoundingClientRect().width *2;
-            this.height = this.$.canvas.getBoundingClientRect().height *2;
+            this.width = canvasRect.width *2;
+            this.height = canvasRect.height *2;
         }
         else {
-            this.width = this.$.canvas.getBoundingClientRect().width;
-            this.height = this.$.canvas.getBoundingClientRect().height;
+            this.width = canvasRect.width;
+            this.height = canvasRect.height;
         }
 
-
         this.buffer = this.asset.rawData;
-        this.info = "ch:" + this.buffer.numberOfChannels +","+ this.buffer.sampleRate + "Hz,"+ this.asset._rawext;
+        this.info = "ch:" + this.buffer.numberOfChannels + ", " + this.buffer.sampleRate + "Hz, " + this.asset._rawext;
         this.audioLength = this.buffer.duration * 1000;
         this.peaks = this.getPeaks(this.width);
         this.drawWave(ctx,this.peaks,this.buffer.numberOfChannels,this.isRetina);
     },
 
-    playAudioAction: function () {
-        // if (!this.isautoStop) {
-        //     this.isPlay = false;
-        //     this.audioSource.pause();
-        //     this.isautoStop = true;
-        //     return;
-        // }
+    assetChanged: function () {
+        this.stop();
+        this.audioSource = new Fire.AudioSource();
+        this.audioSource.clip = this.asset;
+        this.audioSource.onEnd = function () {
+            this.isPlaying = false;
+            this.stop();
+            this.audioSource.time = 0;
+        }.bind(this);
 
-        if (this.audioSource.isPlaying) {
-            this.isPlay = false;
-            this.audioSource.pause();
-            clearInterval(this.timeSpan);
-        }
-        else {
-            this.isPlay = true;
-            this.audioSource.play();
-            this.updateProgress();
-        }
-
+        this.resize();
     },
 
     // NOTE: wait @knox fixed obj.time bug
-    goTimeline: function () {
-        this.isautoStop = false;
-        this.isPlay = true;
-        this.audioSource.stop();
+    play: function () {
+        this.isPlaying = true;
         this.audioSource.play();
-        this.updateProgress();
-    },
 
-    updateProgress: function () {
-        this.audioSource.onEnd = function () {
-            if (this.isautoStop) {
-                this.isPlay = false;
-                this.isautoStop = true;
-                this.stop();
-                this.audioSource.time = 0;
-            }
-        }.bind(this);
-        this.audioNowPlayTime = 0;
-        this.timeSpan = setInterval(function () {
-            this.audioNowPlayTime = this.convertTime(this.audioSource.time * 1000);
-            var contentRect = this.$.content.getBoundingClientRect();
-            this.$.progress.style.left = (this.audioSource.time * 1000 / this.audioLength) * contentRect.width -2 ;
-        }.bind(this),1);
+        //
+        this.tickProgress();
     },
 
     stop: function () {
-        this.audioSource.stop();
-        this.audioNowPlayTime = 0;
-        this.isPlay = false;
-        clearInterval(this.timeSpan);
-        this.$.progress.style.left = "-2px";
+        if ( this.audioSource )
+            this.audioSource.stop();
+        this.currentTime = 0;
+        this.isPlaying = false;
     },
 
-    mouseDownAction: function (event) {
-        this.drag = true;
-        if ( this.drag ) {
-            this.$.progress.style.left = event.offsetX + "px";
-            this.audioSource.time = (event.offsetX / this.$.content.getBoundingClientRect().width) * (this.audioLength / 1000);
-            this.goTimeline();
-        }
-    },
+    tickProgress: function () {
+        if ( !this.isPlaying )
+            return;
 
-    mouseMoveAction: function (event) {
-        if ( this.drag ) {
-            this.$.progress.style.left = event.offsetX + "px";
-            this.audioSource.time = (event.offsetX / this.$.content.getBoundingClientRect().width) * (this.audioLength / 1000);
-            this.goTimeline();
-        }
-    },
+        var contentRect = this.$.content.getBoundingClientRect();
 
-    mouseUpAction: function () {
-        this.drag = false;
-    },
+        window.requestAnimationFrame ( function () {
+            this.currentTime = this.convertTime(this.audioSource.time * 1000);
+            var x = (this.audioSource.time*1000/this.audioLength) * this.width;
 
-    convertTime: function (audioLength) {
-        var f_x = parseFloat(audioLength);
-        if (isNaN(f_x)) {
-            return false;
-        }
+            this.drawProgress(x);
 
-        f_x = Math.round(audioLength * 100) / 100;
-        var s_x = f_x.toString();
-        var pos_decimal = s_x.indexOf('.');
-        if (pos_decimal < 0) {
-            pos_decimal = s_x.length;
-            s_x += '.';
-        }
-        while (s_x.length <= pos_decimal + 2) {
-            s_x += '0';
-        }
-        return s_x;
-    },
-
-    drawWave: function (ctx,peaks,max,isRetina) {
-        var $ = 0;
-        if (isRetina) {
-            $ = 0.25;
-        }
-        else {
-            $ = 0.5 ;
-        }
-        var halfH = this.height / 4;
-        var coef = halfH / max;
-        var length = peaks[0].length;
-        var scale = 1;
-        ctx.fillStyle = "#ff8e00";
-        if (this.width !== length) {
-            scale = this.width / length;
-        }
-        [ctx].forEach(function (cc) {
-            if (!cc) { return; }
-            cc.beginPath();
-            cc.moveTo($, halfH);
-            var i, h;
-            for (i = 0; i < length; i++) {
-                h = Math.round(peaks[0][i] * coef);
-                cc.lineTo(i * scale + $, halfH + h);
-            }
-            cc.lineTo(this.width + $, halfH);
-            cc.moveTo($, halfH);
-
-            for ( i = 0; i < length; i++ ) {
-                h = Math.round(peaks[0][i] * coef);
-                cc.lineTo(i * scale + $, halfH - h);
-            }
-            cc.lineTo(this.width + $, halfH);
-            cc.fill();
-            cc.fillRect(0, halfH - $, this.width, $*2);
-
-            // cc.moveTo($, halfH*20);
+            this.tickProgress();
         }.bind(this));
     },
 
-    // 这个是根据原peaks 转换成根据canvas宽度同等的小数据，避免绘制冗余
+    convertTime: function (time) {
+        return parseFloat(time).toFixed(2);
+    },
+
+    // get peaks depends on canvas width, to avoid wasted drawing
     getPeaks: function (length) {
         var buffer = this.buffer;
         var sampleSize = buffer.length / length;
@@ -240,11 +155,115 @@ Polymer({
         return allPeaks;
     },
 
-    assetChanged: function () {
-        this.resize(true);
+    drawProgress: function ( x ) {
+        var ctx = this.$.canvas2.getContext("2d");
+
+        ctx.clearRect( 0, 0, this.width, this.height );
+        ctx.strokeStyle = "#aaa";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo( x, 0 );
+        ctx.lineTo( x, this.height );
+        ctx.stroke();
     },
 
-    getTime: function () {
-        console.log(this.audioSource.time);
-    }
+    drawWave: function (ctx,peaks,max,isRetina) {
+        var $ = 0;
+        if (isRetina) {
+            $ = 0.25;
+        }
+        else {
+            $ = 0.5 ;
+        }
+        var halfH = this.height / 4;
+        var coef = halfH / max;
+        var length = peaks[0].length;
+        var scale = 1;
+        ctx.fillStyle = "#ff8e00";
+        if (this.width !== length) {
+            scale = this.width / length;
+        }
+
+        ctx.beginPath();
+        ctx.moveTo($, halfH);
+        var i, h;
+        for (i = 0; i < length; i++) {
+            h = Math.round(peaks[0][i] * coef);
+            ctx.lineTo(i * scale + $, halfH + h);
+        }
+        ctx.lineTo(this.width + $, halfH);
+        ctx.moveTo($, halfH);
+
+        for ( i = 0; i < length; i++ ) {
+            h = Math.round(peaks[0][i] * coef);
+            ctx.lineTo(i * scale + $, halfH - h);
+        }
+        ctx.lineTo(this.width + $, halfH);
+        ctx.fill();
+        ctx.fillRect(0, halfH - $, this.width, $*2);
+    },
+
+    playAction: function ( event ) {
+        event.stopPropagation();
+
+        if ( this.audioSource.isPlaying ) {
+            this.isPlaying = false;
+            this.audioSource.pause();
+        }
+        else {
+            this.play();
+        }
+    },
+
+    stopAction: function ( event ) {
+        event.stopPropagation();
+
+        this.stop();
+    },
+
+    forwardAction: function ( event ) {
+        event.stopPropagation();
+
+        // TODO
+    },
+
+    mousedownAction: function (event) {
+        event.stopPropagation();
+
+        if ( event.which === 1 ) {
+            var rect = this.$.content.getBoundingClientRect();
+            var startX = rect.left;
+            var width = rect.width;
+
+            //
+            var mousemoveHandle = function(event) {
+                event.stopPropagation();
+
+                var dx = event.clientX - startX;
+                dx = Math.clamp( dx, 0, width );
+
+                this.drawProgress(dx);
+            }.bind(this);
+
+            var mouseupHandle = function(event) {
+                event.stopPropagation();
+
+                var dx = event.clientX - startX;
+                dx = Math.clamp( dx, 0, width );
+
+                this.drawProgress(dx);
+
+                this.audioSource.time = (dx/width) * (this.audioLength / 1000);
+                this.play();
+
+                document.removeEventListener('mousemove', mousemoveHandle);
+                document.removeEventListener('mouseup', mouseupHandle);
+                EditorUI.removeDragGhost();
+            }.bind(this);
+
+            EditorUI.addDragGhost( 'ew-resize' );
+            document.addEventListener ( 'mousemove', mousemoveHandle );
+            document.addEventListener ( 'mouseup', mouseupHandle );
+        }
+    },
 });
