@@ -1,5 +1,4 @@
-﻿// @ifdef EDITOR
-/**
+﻿/**
  * @param {object} meta
  */
 Fire.AssetLibrary.loadMeta = function (meta, callback) {
@@ -19,9 +18,6 @@ Fire.AssetLibrary.loadMeta = function (meta, callback) {
         callback(meta, error);
     }, true);
 };
-// @endif
-
-// @ifdef EDITOR
 
 /**
  * Kill all references to assets so they can be garbage collected.
@@ -31,7 +27,7 @@ Fire.AssetLibrary.loadMeta = function (meta, callback) {
  * @private
  */
 Fire.AssetLibrary.clearAllCache = function () {
-    _uuidToAsset = {};
+    this._uuidToAsset = {};
 };
 
 /**
@@ -41,7 +37,7 @@ Fire.AssetLibrary.clearAllCache = function () {
 Fire.AssetLibrary.replaceAsset = function (newAsset, uuid) {
     uuid = uuid || newAsset._uuid;
     if (uuid) {
-        _uuidToAsset[uuid] = newAsset;
+        this._uuidToAsset[uuid] = newAsset;
     }
     else {
         Fire.error('[AssetLibrary] Not supplied uuid of asset to replace');
@@ -62,7 +58,7 @@ Fire.AssetLibrary._onAssetChanged = function (uuid, asset) {
  * @param {Fire.Asset} newAsset
  */
 Fire.AssetLibrary._updateAsset = function (uuid, newAsset) {
-    var asset = _uuidToAsset[uuid];
+    var asset = this._uuidToAsset[uuid];
     if (!asset || !newAsset) {
         return;
     }
@@ -96,7 +92,7 @@ Fire.AssetLibrary._updateAsset = function (uuid, newAsset) {
 Fire.AssetLibrary.cacheAsset = function (asset) {
     if (asset) {
         if (asset._uuid) {
-            _uuidToAsset[asset._uuid] = asset;
+            this._uuidToAsset[asset._uuid] = asset;
         }
         else {
             Fire.error('[AssetLibrary] Not defined uuid of the asset to cache');
@@ -112,7 +108,7 @@ Fire.AssetLibrary.cacheAsset = function (asset) {
  * @param {string} uuid
  */
 Fire.AssetLibrary.onAssetReimported = function (uuid) {
-    var loaded = _uuidToAsset[uuid];
+    var loaded = this._uuidToAsset[uuid];
     if (!loaded) {
         return;
     }
@@ -121,13 +117,11 @@ Fire.AssetLibrary.onAssetReimported = function (uuid) {
 
     // 删除旧的引用，所有用到 asset 的地方必须通过 assetListener 监听资源的更新
     // 否则资源将出现新旧两份引用。
-    delete _uuidToAsset[uuid];  // force reload
+    delete this._uuidToAsset[uuid];  // force reload
     this._loadAssetByUuid(uuid, function (asset) {
-        var notUnloaded = uuid in _uuidToAsset;
+        var notUnloaded = uuid in this._uuidToAsset;
         if (asset && notUnloaded) {
             this._updateAsset(uuid, asset);
         }
     }.bind(this));
 };
-
-// @endif // EDITOR
