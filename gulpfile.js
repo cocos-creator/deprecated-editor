@@ -1,16 +1,17 @@
 ﻿var gulp = require('gulp');
 var gutil = require('gulp-util');
 var jshint = require('gulp-jshint');
-var uglify = require('gulp-uglify');
+var compiler = require('gulp-closure-compiler');
+//var map = require('vinyl-map');
 var concat = require('gulp-concat');
 var stylus = require('gulp-stylus');
-var rename = require('gulp-rename');
 var vulcanize = require('gulp-vulcanize');
 var del = require('del');
 var minifyCSS = require('gulp-minify-css');
 
 var path = require('path');
 var es = require('event-stream');
+var gulpSrcFiles = require('gulp-src-files');
 var stylish = require('jshint-stylish');
 
 var paths = {
@@ -79,8 +80,8 @@ function wrapScope () {
 }
 
 var task_copy_deps = [];
-var task_min_deps = [ 'copy', 'src-min' ];
-var task_dev_deps = [ 'copy', 'src-dev' ];
+var task_min_deps = [ 'src-min' ];
+var task_dev_deps = [ 'src-dev' ];
 var plugin_watchers = [];
 
 var task_plugin = function ( name ) {
@@ -153,19 +154,42 @@ var task_plugin = function ( name ) {
         ;
     });
 
-    gulp.task(task_js, [task_js_ext], function() {
-        return gulp.src(js_files, {base: 'elements'})
-        .pipe(wrapScope())
-        .pipe(jshint({
-            multistr: true,
-            smarttabs: false,
-            loopfunc: true,
-            esnext: true,
-        }))
-        .pipe(jshint.reporter(stylish))
-        .pipe(uglify())
-        .pipe(gulp.dest('bin/tmp/'))
-        ;
+    gulp.task(task_js, [task_js_ext], function(callback) {
+        var files = gulpSrcFiles(js_files, {base: 'elements'});
+        var count = files.length;
+        var streams = files.map(function(file){
+            var globpath = path.relative(__dirname, file);
+            var destfile = path.relative(path.join(__dirname, 'elements'), file);
+            var stream = gulp.src(globpath)
+                .pipe(wrapScope())
+                .pipe(jshint({
+                    multistr: true,
+                    smarttabs: false,
+                    loopfunc: true,
+                    esnext: true,
+                }))
+                .pipe(jshint.reporter(stylish))
+                .pipe(compiler({
+                    compilerPath: path.normalize('../../compiler/compiler.jar'),
+                    compilerFlags: {
+                        language_in: 'ECMASCRIPT6',
+                        language_out: 'ECMASCRIPT5',
+                        transpile_only: null,
+                        compilation_level: 'SIMPLE',
+                        jscomp_off: 'globalThis',
+                    },
+                    fileName: destfile,
+                    continueWithWarnings: true
+                }))
+                .pipe(gulp.dest('bin/tmp/'));
+            stream.on('end', function() {
+                count--;
+                if (count <= 0) {
+                    callback();
+                }
+            });
+            return stream;
+        });
     });
 
     gulp.task(task_js_dev, [task_js_ext], function() {
@@ -226,10 +250,18 @@ gulp.task('src-dev', ['src-jshint'], function() {
 // src-min
 gulp.task('src-min', ['src-dev'], function() {
     return gulp.src('bin/editor.dev.js')
-    .pipe(rename('editor.min.js'))
-    .pipe(uglify())
-    .pipe(gulp.dest('bin'))
-    ;
+        .pipe(compiler({
+            compilerPath: path.normalize('../../compiler/compiler.jar'),
+            compilerFlags: {
+                language_in: 'ECMASCRIPT6',
+                language_out: 'ECMASCRIPT5',
+                compilation_level: 'WHITESPACE_ONLY',
+                jscomp_off: 'globalThis',
+            },
+            fileName: 'editor.min.js',
+            continueWithWarnings: true
+        }))
+        .pipe(gulp.dest('bin'));
 });
 
 /////////////////////////////////////////////////////////////////////////////
