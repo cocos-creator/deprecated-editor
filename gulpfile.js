@@ -17,10 +17,10 @@ var stylish = require('jshint-stylish');
 var paths = {
     src: [
         // asset extends
+        'src/engine-extends/asset-library.js',
         'src/assets/bitmap-font.js',
         'src/assets/sprite.js',
         'src/assets/texture.js',
-        'src/assets/audio-clip.js',
 
         // engine extends
         'src/engine-extends/utils.js',
@@ -199,6 +199,7 @@ var task_plugin = function ( name ) {
             multistr: true,
             smarttabs: false,
             loopfunc: true,
+            esnext: true,
         }))
         .pipe(jshint.reporter(stylish))
         .pipe(gulp.dest('bin/tmp/'))
@@ -229,6 +230,9 @@ gulp.task('src-jshint', function() {
     .pipe(jshint({
         forin: false,
         multistr: true,
+        smarttabs: false,
+        loopfunc: true,
+        esnext: true,
     }))
     .pipe(jshint.reporter(stylish))
     ;

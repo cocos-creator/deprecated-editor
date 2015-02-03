@@ -39,7 +39,16 @@ PluginLoader.prototype._loadImpl = function (plugin) {
                 return script;
             }
         }
-        load('inspector');
+        function loadToMeta (name) {
+            var script = load(name);
+            if (script) {
+                meta.prototype[name] = script;
+            }
+        }
+        var meta = load('meta');
+        if (meta) {
+            loadToMeta('inspector');
+        }
     });
 };
 
@@ -48,14 +57,15 @@ PluginLoader.prototype._unloadImpl = function (plugin) {
 
     // unload meta
     PluginLoader.parseMeta(plugin, function (asset) {
-        var name = 'inspector';
-        if (asset[name]) {
-            var scriptPath = Path.resolve(plugin.path, asset[name]);
-            var module = cache[scriptPath];
-            if ( !module ) {
-                Fire.error('Module not found');
+        for (var name of ['inspector', 'meta']) {
+            if (asset[name]) {
+                var scriptPath = Path.resolve(plugin.path, asset[name]);
+                var module = cache[scriptPath];
+                if ( !module ) {
+                    Fire.error('Module not found');
+                }
+                delete cache[scriptPath];
             }
-            delete cache[scriptPath];
         }
     });
 };
