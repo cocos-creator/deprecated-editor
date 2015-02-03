@@ -3,7 +3,7 @@
     flex-direction: column
     flex-wrap: nowrap
     align-items: stretch
-
+    min-height: 100px
     overflow: hidden
 }
 
@@ -30,10 +30,27 @@ canvas {
     display: block
 }
 
+#Progress {
+    margin: 0;
+    position: absolute;
+    left: -2px;
+    display: block
+    background: gray;
+    width: 2px;
+    border-radius: 2px
+    height: 100%;
+}
+
 .label {
     position: absolute
     width: 100%
     bottom: 10px
 
     text-align: center
+}
+
+.info {
+    position: absolute
+    right: 5px
+    top: 4px
 }
