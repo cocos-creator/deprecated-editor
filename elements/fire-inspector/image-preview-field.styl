@@ -1,0 +1,42 @@
+:host {
+    display: flex
+    flex-direction: column
+    flex-wrap: nowrap
+    align-items: stretch
+
+    overflow: hidden
+}
+
+.view {
+    position: relative
+    box-shadow: inset 0 0 15px 5px rgba(0,0,0,0.5)
+    background: #292929
+}
+
+.content {
+    position: absolute
+    top: 15px
+    right: 15px
+    bottom: 15px
+    left: 15px
+}
+
+canvas {
+    // center it
+    margin: auto;
+    position: absolute;
+    top: 0; left: 0; bottom: 0; right: 0;
+
+    display: block
+    background-image: url('img/checkerboard-32x32.png')
+    background-size: 32px 32px
+    background-position: center center
+}
+
+.label {
+    position: absolute
+    width: 100%
+    bottom: 10px
+
+    text-align: center
+}

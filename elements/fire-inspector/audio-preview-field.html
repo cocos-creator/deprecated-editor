@@ -1,0 +1,28 @@
+<polymer-element
+    name="audio-preview-field"
+    constructor="AudioPreviewField"
+    >
+    <template>
+        <link rel="stylesheet" href="audio-preview-field.css">
+
+        <fire-ui-toolbar>
+            <fire-ui-button on-click="{{playAudioAction}}">
+                <li class="fa fa-play"></li>
+            </fire-ui-button>
+            <fire-ui-button>
+                <li class="fa fa-step-forward"></li>
+            </fire-ui-button>
+            <fire-ui-label>{{audioNowPlayTime}}/{{audioLength}}</fire-ui-label>
+        </fire-ui-toolbar>
+
+        <div class="view" flex-1>
+            <div id="content" class="content">
+                <canvas id="canvas"></canvas>
+            </div>
+            <div class="label">
+                <fire-ui-label>{{info}}</fire-ui-label>
+            </div>
+        </div>
+    </template>
+    <script type="text/javascript" src="audio-preview-field.js"></script>
+</polymer-element>

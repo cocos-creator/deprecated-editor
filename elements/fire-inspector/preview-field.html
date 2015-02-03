@@ -1,3 +1,6 @@
+<link rel="import" href="image-preview-field.html">
+<link rel="import" href="audio-preview-field.html">
+
 <polymer-element
     name="preview-field"
     constructor="PreviewField"
@@ -5,17 +8,6 @@
     >
     <template>
         <link rel="stylesheet" href="preview-field.css">
-
-        <!-- TODO: <fire-ui-toolbar></fire-ui-toolbar> -->
-        <div class="view" flex-1>
-            <div id="content" class="content">
-                <canvas id="canvas"></canvas>
-            </div>
-        </div>
-        <div class="label">
-            <fire-ui-label>{{info}}</fire-ui-label>
-        </div>
     </template>
-
     <script type="text/javascript" src="preview-field.js"></script>
 </polymer-element>
