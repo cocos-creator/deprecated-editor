@@ -59,11 +59,19 @@ Polymer({
             this.height = canvasRect.height;
         }
 
-        this.buffer = this.asset.rawData;
-        this.info = "ch:" + this.buffer.numberOfChannels + ", " + this.buffer.sampleRate + "Hz, " + this.asset._rawext;
-        this.audioLength = this.buffer.duration * 1000;
-        this.peaks = this.getPeaks(this.width);
-        this.drawWave(ctx,this.peaks,this.buffer.numberOfChannels,this.isRetina);
+        var buffer = this.asset.rawData;
+        this.info = "ch:" + buffer.numberOfChannels + ", " + buffer.sampleRate + "Hz, " + this.asset._rawext;
+        this.audioLength = buffer.duration * 1000;
+
+        var peaks = null;
+        var height = this.height/buffer.numberOfChannels;
+        var yoffset = 0;
+
+        for ( var c = 0; c < buffer.numberOfChannels; ++c ) {
+            peaks = this.getPeaks( buffer, c, this.width );
+            this.drawWave( ctx, peaks, 0, yoffset, this.width, height, this.isRetina );
+            yoffset += height;
+        }
     },
 
     assetChanged: function () {
@@ -116,43 +124,29 @@ Polymer({
     },
 
     // get peaks depends on canvas width, to avoid wasted drawing
-    getPeaks: function (length) {
-        var buffer = this.buffer;
-        var sampleSize = buffer.length / length;
+    getPeaks: function ( buffer, ch, width ) {
+        var sampleSize = buffer.length / width;
         var sampleStep = ~~(sampleSize / 10) || 1;
-        var channels = buffer.numberOfChannels;
-        var peaks = new Float32Array(length);
-        var peaks2 = new Float32Array(length);
-        for (var c = 0; c < channels; c++) {
-            var chan = buffer.getChannelData(c);
-            for (var i = 0; i < length; i++) {
-                var start = ~~(i * sampleSize);
-                var end = ~~(start + sampleSize);
-                var max = 0;
-                for (var j = start; j < end; j += sampleStep) {
-                    var value = chan[j];
-                    if (value > max) {
-                        max = value;
-                    }
-                     else if (-value > max) {
-                        max = -value;
-                    }
+        var peaks = new Float32Array(width);
+
+        var chan = buffer.getChannelData(ch);
+        for (var i = 0; i < width; i++) {
+            var start = ~~(i * sampleSize);
+            var end = ~~(start + sampleSize);
+            var max = 0;
+            for (var j = start; j < end; j += sampleStep) {
+                var value = chan[j];
+                if (value > max) {
+                    max = value;
                 }
-                if (c === 0 || max > peaks[i]) {
-                    peaks[i] = max;
-                }
-                else if(c === 1 || max > peaks[i]){
-                    peaks2[i] = max;
+                 else if (-value > max) {
+                    max = -value;
                 }
             }
+            peaks[i] = max;
         }
 
-        var allPeaks = [];
-        allPeaks.push(peaks);
-        if (channels === 2) {
-            allPeaks.push(peaks2);
-        }
-        return allPeaks;
+        return peaks;
     },
 
     drawProgress: function ( x ) {
@@ -167,40 +161,42 @@ Polymer({
         ctx.stroke();
     },
 
-    drawWave: function (ctx,peaks,max,isRetina) {
+    drawWave: function ( ctx, peaks, x, y, width, height, isRetina ) {
         var $ = 0;
         if (isRetina) {
             $ = 0.25;
         }
         else {
-            $ = 0.5 ;
+            $ = 0.5;
         }
-        var halfH = this.height / 4;
-        var coef = halfH / max;
-        var length = peaks[0].length;
+        var halfH = height / 2;
+        var offsetY = y + halfH;
+        var length = peaks.length;
         var scale = 1;
         ctx.fillStyle = "#ff8e00";
-        if (this.width !== length) {
-            scale = this.width / length;
+        if (width !== length) {
+            scale = width / length;
         }
+
+        var i, h;
 
         ctx.beginPath();
-        ctx.moveTo($, halfH);
-        var i, h;
+        ctx.moveTo($, offsetY);
+
         for (i = 0; i < length; i++) {
-            h = Math.round(peaks[0][i] * coef);
-            ctx.lineTo(i * scale + $, halfH + h);
+            h = Math.round(peaks[i] * halfH);
+            ctx.lineTo(i * scale + $, offsetY + h);
         }
-        ctx.lineTo(this.width + $, halfH);
-        ctx.moveTo($, halfH);
+        ctx.lineTo(width + $, offsetY);
+        ctx.moveTo($, offsetY);
 
         for ( i = 0; i < length; i++ ) {
-            h = Math.round(peaks[0][i] * coef);
-            ctx.lineTo(i * scale + $, halfH - h);
+            h = Math.round(peaks[i] * halfH);
+            ctx.lineTo(i * scale + $, offsetY - h);
         }
-        ctx.lineTo(this.width + $, halfH);
+        ctx.lineTo(width + $, offsetY);
         ctx.fill();
-        ctx.fillRect(0, halfH - $, this.width, $*2);
+        ctx.fillRect(0, offsetY - $, width, $*2);
     },
 
     playAction: function ( event ) {
