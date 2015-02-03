@@ -1,8 +1,7 @@
 ﻿var gulp = require('gulp');
 var gutil = require('gulp-util');
 var jshint = require('gulp-jshint');
-var compiler = require('gulp-closure-compiler');
-//var map = require('vinyl-map');
+
 var concat = require('gulp-concat');
 var stylus = require('gulp-stylus');
 var vulcanize = require('gulp-vulcanize');
@@ -11,7 +10,6 @@ var minifyCSS = require('gulp-minify-css');
 
 var path = require('path');
 var es = require('event-stream');
-var gulpSrcFiles = require('gulp-src-files');
 var stylish = require('jshint-stylish');
 
 var paths = {
@@ -155,6 +153,8 @@ var task_plugin = function ( name ) {
     });
 
     gulp.task(task_js, [task_js_ext], function(callback) {
+        var compiler = require('gulp-closure-compiler');
+        var gulpSrcFiles = require('gulp-src-files');
         var files = gulpSrcFiles(js_files, {base: 'elements'});
         var count = files.length;
         var streams = files.map(function(file){
@@ -249,6 +249,7 @@ gulp.task('src-dev', ['src-jshint'], function() {
 
 // src-min
 gulp.task('src-min', ['src-dev'], function() {
+    var compiler = require('gulp-closure-compiler');
     return gulp.src('bin/editor.dev.js')
         .pipe(compiler({
             compilerPath: path.normalize('../../compiler/compiler.jar'),
