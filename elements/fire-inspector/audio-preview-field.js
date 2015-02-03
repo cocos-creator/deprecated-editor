@@ -33,7 +33,7 @@ Polymer({
         this.$.canvas.style.width = contentRect.width + "px";
         this.$.canvas.style.height = contentRect.height + "px";
 
-        this.$.Progress.height = contentRect.height;
+        this.$.progress.height = contentRect.height;
         this.repaint(isChanged);
     },
 
@@ -59,9 +59,7 @@ Polymer({
 
 
         this.buffer = this.asset.rawData;
-        this.info = "ch:" + this.buffer.numberOfChannels +","
-                + this.buffer.sampleRate + "Hz,"
-                + this.asset._rawext;
+        this.info = "ch:" + this.buffer.numberOfChannels +","+ this.buffer.sampleRate + "Hz,"+ this.asset._rawext;
         this.audioLength = this.buffer.duration * 1000;
         this.peaks = this.getPeaks(this.width);
         this.drawWave(ctx,this.peaks,this.buffer.numberOfChannels,this.isRetina);
@@ -110,7 +108,7 @@ Polymer({
         this.timeSpan = setInterval(function () {
             this.audioNowPlayTime = this.convertTime(this.audioSource.time * 1000);
             var contentRect = this.$.content.getBoundingClientRect();
-            this.$.Progress.style.left = (this.audioSource.time * 1000 / this.audioLength) * contentRect.width -2 ;
+            this.$.progress.style.left = (this.audioSource.time * 1000 / this.audioLength) * contentRect.width -2 ;
         }.bind(this),1);
     },
 
@@ -119,13 +117,13 @@ Polymer({
         this.audioNowPlayTime = 0;
         this.isPlay = false;
         clearInterval(this.timeSpan);
-        this.$.Progress.style.left = "-2px";
+        this.$.progress.style.left = "-2px";
     },
 
     mouseDownAction: function (event) {
         this.drag = true;
         if ( this.drag ) {
-            this.$.Progress.style.left = event.offsetX + "px";
+            this.$.progress.style.left = event.offsetX + "px";
             this.audioSource.time = (event.offsetX / this.$.content.getBoundingClientRect().width) * (this.audioLength / 1000);
             this.goTimeline();
         }
@@ -133,7 +131,7 @@ Polymer({
 
     mouseMoveAction: function (event) {
         if ( this.drag ) {
-            this.$.Progress.style.left = event.offsetX + "px";
+            this.$.progress.style.left = event.offsetX + "px";
             this.audioSource.time = (event.offsetX / this.$.content.getBoundingClientRect().width) * (this.audioLength / 1000);
             this.goTimeline();
         }
@@ -148,7 +146,8 @@ Polymer({
         if (isNaN(f_x)) {
             return false;
         }
-        var f_x = Math.round(audioLength * 100) / 100;
+
+        f_x = Math.round(audioLength * 100) / 100;
         var s_x = f_x.toString();
         var pos_decimal = s_x.indexOf('.');
         if (pos_decimal < 0) {
@@ -161,12 +160,13 @@ Polymer({
         return s_x;
     },
 
-    drawWave: function (ctx,peaks, max,isRetina) {
+    drawWave: function (ctx,peaks,max,isRetina) {
+        var $ = 0;
         if (isRetina) {
-            var $ = 0.25;
+            $ = 0.25;
         }
         else {
-            var $ = 0.5 ;
+            $ = 0.5 ;
         }
         var halfH = this.height / 4;
         var coef = halfH / max;
@@ -218,13 +218,15 @@ Polymer({
                     var value = chan[j];
                     if (value > max) {
                         max = value;
-                    } else if (-value > max) {
+                    }
+                     else if (-value > max) {
                         max = -value;
                     }
                 }
                 if (c === 0 || max > peaks[i]) {
                     peaks[i] = max;
-                }else if(c === 1 || max > peaks[i]){
+                }
+                else if(c === 1 || max > peaks[i]){
                     peaks2[i] = max;
                 }
             }

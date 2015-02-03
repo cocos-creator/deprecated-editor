@@ -8,26 +8,26 @@
         <fire-ui-toolbar>
 
             <fire-ui-button>
-                <li class="fa fa-step-forward" style="transform:rotate(180deg)"></li>
+                <i class="fa fa-step-forward" style="transform:rotate(180deg)"></i>
             </fire-ui-button>
 
             <fire-ui-button on-click="{{playAudioAction}}">
-                <li class="{{isPlay ? 'fa fa-pause':'fa fa-play'}}"></li>
+                <i class="{{isPlay ? 'fa fa-pause':'fa fa-play'}}"></i>
             </fire-ui-button>
 
             <fire-ui-button on-click="{{getTime}}">
-                <li class="fa fa-step-forward"></li>
+                <i class="fa fa-step-forward"></i>
             </fire-ui-button>
 
             <fire-ui-button on-click="{{stop}}">
-                ▇
+                <i class="fa fa-stop"></i>
             </fire-ui-button>
         </fire-ui-toolbar>
 
         <div class="view" flex-1>
             <div id="content" class="content">
                 <canvas id="canvas" on-mousemove="{{mouseMoveAction}}" on-mousedown="{{mouseDownAction}}" on-mouseup="{{mouseUpAction}}"></canvas>
-                <span id="Progress"  on-mouseup="{{mouseUpAction}}"></span>
+                <span id="progress"  on-mouseup="{{mouseUpAction}}"></span>
             </div>
             <div class="info">
                 <fire-ui-label>{{info}}</fire-ui-label>
