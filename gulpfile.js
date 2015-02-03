@@ -15,6 +15,7 @@ var stylish = require('jshint-stylish');
 
 var paths = {
     src: [
+        'src/engine-extends/asset-library.js',
         // asset extends
         'src/assets/bitmap-font.js',
         'src/assets/sprite.js',
