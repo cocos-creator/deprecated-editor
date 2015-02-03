@@ -1,30 +1,7 @@
-function _getTypeName ( target, propName, attrs ) {
-    var type = attrs.type;
-    if ( type === 'object' ) {
-        type = Fire.getClassName( attrs.objectType );
-    }
-    type = type || '';
-    return type;
-}
-
-function _makeWatcher ( attrs, target, propEL ) {
-    return function () {
-        attrs.watchCallback( target, propEL );
-    };
-}
-
-function _makeReadonlyChecker ( attrs, propEL ) {
-    return function () {
-        if ( attrs.readOnly || (attrs.hasGetter && !attrs.hasSetter) ) {
-            propEL.disabled = true;
-        }
-    };
-}
-
 function _fieldSection ( name, target ) {
     //
     var fireSectionEL = new FireSection();
-    fireSectionEL.setAttribute('name', name );
+    fireSectionEL.name = name;
     fireSectionEL.$ = {};
 
     var klass = target.constructor;
@@ -38,56 +15,8 @@ function _fieldSection ( name, target ) {
                 continue;
             }
 
-            var type = _getTypeName(target, propName, attrs);
             var propEL = new FireProp();
-            if ( attrs.displayName ) {
-                propEL.name = attrs.displayName;
-            }
-            else {
-                propEL.name = EditorUI.camelCaseToHuman(propName);
-            }
-
-            if ( attrs.textMode ) {
-                propEL.textMode = attrs.textMode;
-            }
-
-            // NOTE: min, max can be null
-            if ( attrs.min !== undefined )
-                propEL.min = attrs.min;
-
-            if ( attrs.max !== undefined )
-                propEL.max = attrs.max;
-
-            //
-            propEL.bind( 'value', new Fire._PathObserver( target, propName ) );
-            propEL.type = type;
-            propEL.setAttribute( 'value', '{{target.'+propName+'}}' );
-            if ( type ) {
-                propEL.setAttribute( 'type', type );
-
-                if ( type === 'enum' ) {
-                    propEL.enumList = attrs.enumList;
-                }
-            }
-            propEL.id = propName;
-
-            //
-            if ( attrs.watch && attrs.watchCallback ) {
-                if ( attrs.watch.length > 0 ) {
-                    var observer = new CompoundObserver();
-                    for ( var i = 0; i < attrs.watch.length; ++i ) {
-                        observer.addObserver( new Fire._PathObserver( target, attrs.watch[i] ) );
-                    }
-                    var watcher = _makeWatcher( attrs, target, propEL );
-                    observer.open(watcher);
-
-                    // NOTE: we need to invoke it once to make sure our propEL intialize correctly
-                    propEL.onFieldCreated = watcher;
-                }
-            }
-            else {
-                propEL.onFieldCreated = _makeReadonlyChecker( attrs, propEL );
-            }
+            propEL.initWithAttrs(target, propName, attrs);
 
             fireSectionEL.$[propName] = propEL;
             fireSectionEL.appendChild( propEL );

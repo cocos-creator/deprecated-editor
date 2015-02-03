@@ -22,7 +22,7 @@ Polymer({
         // update preview
         if ( this.meta instanceof Fire.TextureMeta ||
              this.meta instanceof Fire.SpriteMeta ||
-             this.meta instanceof Fire.AudioClip )
+             this.meta instanceof Fire.AudioClipMeta )
         {
             this.$.preview.hide = false;
             this.$.splitter.hide = false;
