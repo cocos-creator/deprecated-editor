@@ -57,7 +57,9 @@ PluginLoader.prototype._unloadImpl = function (plugin) {
 
     // unload meta
     PluginLoader.parseMeta(plugin, function (asset) {
-        for (var name of ['inspector', 'meta']) {
+        var metaType = ['inspector', 'meta'];
+        for (var index in metaType ) {
+            var name = metaType[index];
             if (asset[name]) {
                 var scriptPath = Path.resolve(plugin.path, asset[name]);
                 var module = cache[scriptPath];
