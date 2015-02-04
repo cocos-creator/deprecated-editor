@@ -295,75 +295,90 @@ Polymer({
 
     createContextMenu: function () {
         var template = [
-            // New Scene
+            // Create
             {
-                label: 'New Scene',
-                click: function () {
-                    if ( this.contextmenuAt instanceof AssetsItem ) {
-                        var targetEL = this.contextmenuAt;
-                        if ( !this.contextmenuAt.isFolder )
-                            targetEL = this.contextmenuAt.parentElement;
-                        var url = this.getUrl(targetEL);
-                        var newScene = new Fire._Scene();
-                        var newAssetUrl = Url.join( url, 'New Scene.fire' );
-                        this._focusUrl = newAssetUrl;
-                        Fire.sendToCore( 'asset-db:save',
-                                      newAssetUrl,
-                                      Fire.serialize(newScene) );
-                    }
-                }.bind(this)
-            },
-
-            // New Folder
-            {
-                label: 'New Folder',
-                click: function () {
-                    if ( this.contextmenuAt instanceof AssetsItem ) {
-                        var targetEL = this.contextmenuAt;
-                        if ( !this.contextmenuAt.isFolder )
-                            targetEL = this.contextmenuAt.parentElement;
-                        var url = this.getUrl(targetEL);
-                        var newAssetUrl = Url.join( url, 'New Folder' );
-                        this._focusUrl = newAssetUrl;
-                        Fire.rpc( 'asset-db:makedirs', newAssetUrl );
-                    }
-                }.bind(this)
-            },
-
-            // New Sprite From Texture
-            {
-                label: 'New Sprite From Texture',
-                click: function () {
-                    if ( this.contextmenuAt instanceof AssetsItem ) {
-                        var targetEL = this.contextmenuAt;
-
-                        if ( _isTexture(targetEL.extname) ) {
-                            var textureEL = this.contextmenuAt;
-                            var textureName = targetEL.name;
-
-                            if ( !this.contextmenuAt.isFolder )
-                                targetEL = this.contextmenuAt.parentElement;
-                            var url = this.getUrl(targetEL);
-
-                            Fire.AssetLibrary.loadAsset ( textureEL.userId, function ( asset, error ) {
-                                var newSprite = new Fire.Sprite();
-                                newSprite.name = textureName;
-                                newSprite.texture = asset;
-                                newSprite.width = asset.width;
-                                newSprite.height = asset.height;
-
-                                var newAssetUrl = Url.join( url, textureName + '.sprite' );
+                label: 'Create',
+                submenu: [
+                    // New Scene
+                    {
+                        label: 'New Scene',
+                        click: function () {
+                            if ( this.contextmenuAt instanceof AssetsItem ) {
+                                var targetEL = this.contextmenuAt;
+                                if ( !this.contextmenuAt.isFolder )
+                                    targetEL = this.contextmenuAt.parentElement;
+                                var url = this.getUrl(targetEL);
+                                var newScene = new Fire._Scene();
+                                var newAssetUrl = Url.join( url, 'New Scene.fire' );
                                 this._focusUrl = newAssetUrl;
                                 Fire.sendToCore( 'asset-db:save',
                                               newAssetUrl,
-                                              Fire.serialize(newSprite) );
-                            }.bind(this) );
-                        }
-                        else {
-                            Fire.warn( "Can not create sprite from non-texture element, please select a texture first." );
-                        }
-                    }
-                }.bind(this)
+                                              Fire.serialize(newScene) );
+                            }
+                        }.bind(this)
+                    },
+
+                    // New Folder
+                    {
+                        label: 'New Folder',
+                        click: function () {
+                            if ( this.contextmenuAt instanceof AssetsItem ) {
+                                var targetEL = this.contextmenuAt;
+                                if ( !this.contextmenuAt.isFolder )
+                                    targetEL = this.contextmenuAt.parentElement;
+                                var url = this.getUrl(targetEL);
+                                var newAssetUrl = Url.join( url, 'New Folder' );
+                                this._focusUrl = newAssetUrl;
+                                Fire.rpc( 'asset-db:makedirs', newAssetUrl );
+                            }
+                        }.bind(this)
+                    },
+
+                    // New Sprite (Standalone)
+                    {
+                        label: 'New Sprite (Standalone)',
+                        click: function () {
+                            if ( this.contextmenuAt instanceof AssetsItem ) {
+                                var targetEL = this.contextmenuAt;
+
+                                if ( _isTexture(targetEL.extname) ) {
+                                    var textureEL = this.contextmenuAt;
+                                    var textureName = targetEL.name;
+
+                                    if ( !this.contextmenuAt.isFolder )
+                                        targetEL = this.contextmenuAt.parentElement;
+                                    var url = this.getUrl(targetEL);
+
+                                    Fire.AssetLibrary.loadAsset ( textureEL.userId, function ( asset, error ) {
+                                        var newSprite = new Fire.Sprite();
+                                        newSprite.name = textureName;
+                                        newSprite.texture = asset;
+                                        newSprite.width = asset.width;
+                                        newSprite.height = asset.height;
+
+                                        var newAssetUrl = Url.join( url, textureName + '.sprite' );
+                                        this._focusUrl = newAssetUrl;
+                                        Fire.sendToCore( 'asset-db:save',
+                                                      newAssetUrl,
+                                                      Fire.serialize(newSprite) );
+                                    }.bind(this) );
+                                }
+                                else {
+                                    Fire.warn( "Can not create sprite from non-texture element, please select a texture first." );
+                                }
+                            }
+                        }.bind(this)
+                    },
+
+                    // New Atlas
+                    {
+                        label: 'New Atlas',
+                        click: function () {
+                            // if ( this.contextmenuAt instanceof AssetsItem ) {
+                            // }
+                        }.bind(this)
+                    },
+                ]
             },
 
             // =====================
