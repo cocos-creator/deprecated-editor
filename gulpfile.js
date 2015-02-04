@@ -58,6 +58,7 @@ var paths = {
         'src/gizmos/camera-gizmo.js',
         'src/gizmos/sprite-renderer-gizmo.js',
         'src/gizmos/bitmap-text-gizmo.js',
+        'src/gizmos/audio-source-gizmo.js',
     ],
 };
 
