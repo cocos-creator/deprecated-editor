@@ -7,11 +7,20 @@ Polymer({
     info: "",
     _isRetina: false,
     isPlaying: false,
-    currentTime: 0,
+    mute: false,
+    currentTime: {
+        min: 0,
+        secs: 0,
+        fulltime: 0,
+    },
     audioSource: null,
 
     created: function () {
         this._isRetina = window.devicePixelRatio === 1 ? false : true;
+    },
+
+    detached: function () {
+        this.stop();
     },
 
     resize: function () {
@@ -72,6 +81,10 @@ Polymer({
             this.drawWave( ctx, peaks, 0, yoffset, this.width, height, this._isRetina );
             yoffset += height;
         }
+
+        if ( buffer.numberOfChannels === 2) {
+            this.drawChannelTip(ctx);
+        }
     },
 
     assetChanged: function () {
@@ -83,11 +96,18 @@ Polymer({
             this.stop();
             this.audioSource.time = 0;
         }.bind(this);
-
         this.resize();
     },
 
-    // NOTE: wait @knox fixed obj.time bug
+    muteAction: function () {
+        if (this.audioSource.mute){
+            this.audioSource.mute = false;
+        }
+        else {
+            this.audioSource.mute = true;
+        }
+    },
+
     play: function () {
         this.isPlaying = true;
         this.audioSource.play();
@@ -98,7 +118,8 @@ Polymer({
     stop: function () {
         if ( this.audioSource )
             this.audioSource.stop();
-        this.currentTime = 0;
+        this.currentTime.min = 0;
+        this.currentTime.secs = 0;
         this.isPlaying = false;
     },
 
@@ -117,7 +138,32 @@ Polymer({
     },
 
     convertTime: function (time) {
-        return isNaN(time) ? 0 : parseFloat(time).toFixed(2);
+        if (isNaN(time)) {
+            return  {
+                min: 0,
+                secs: 0,
+                fulltime: 0,
+            };
+        }
+        var min = parseInt( (time/1000) / 60);
+        var secs =parseFloat( time/1000 - (parseInt((time/1000) / 60)) * 60).toFixed(3);
+        var times = {
+            min: min,
+            secs: secs,
+            fulltime: time,
+        };
+        return times;
+    },
+
+    drawChannelTip: function (ctx) {
+        ctx.fillStyle = "white";
+        if (this._isRetina) {
+            ctx.font = '24px Arial';
+        }else {
+            ctx.font = '12px Arial';
+        }
+        ctx.fillText('ch1',4,this.height * (1/8));
+        ctx.fillText('ch2',4,this.height * (5/8));
     },
 
     // get peaks depends on canvas width, to avoid wasted drawing
@@ -218,13 +264,34 @@ Polymer({
 
     forwardAction: function ( event ) {
         event.stopPropagation();
+        if (!this.isPlaying) {
+            return;
+        }
+        var wardTime = this.audioSource.time + this.audioLength/1000 * (0.2);
+        if (wardTime >= this.audioLength/1000) {
+            this.stop();
+            return;
+        }
+        this.audioSource.time = wardTime;
+        this.play();
+    },
 
-        // TODO
+    backwardAction: function ( event ) {
+        event.stopPropagation();
+        if (!this.isPlaying) {
+            return;
+        }
+        var wardTime = this.audioSource.time - this.audioLength/1000 * (0.2);
+        if (wardTime <= 0) {
+            wardTime = 0;
+        }
+        this.audioSource.time = wardTime;
+        this.play();
     },
 
     mousedownAction: function (event) {
         event.stopPropagation();
-        
+
         this.isPlaying = false;
         if ( event.which === 1 ) {
             var rect = this.$.content.getBoundingClientRect();
@@ -239,6 +306,7 @@ Polymer({
                 if (this._isRetina)
                     dx *= 2;
 
+                this.currentTime = this.convertTime(dx/this.width * this.audioLength);
                 this.drawProgress(dx);
             }.bind(this);
 
