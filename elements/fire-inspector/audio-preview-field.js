@@ -5,13 +5,13 @@ Polymer({
     },
 
     info: "",
-    isRetina: false,
+    _isRetina: false,
     isPlaying: false,
     currentTime: 0,
     audioSource: null,
 
     created: function () {
-        this.isRetina = window.devicePixelRatio === 1 ? false : true;
+        this._isRetina = window.devicePixelRatio === 1 ? false : true;
     },
 
     resize: function () {
@@ -19,7 +19,7 @@ Polymer({
             return;
 
         var contentRect = this.$.content.getBoundingClientRect();
-        if (this.isRetina) {
+        if (this._isRetina) {
             this.$.canvas.width = contentRect.width * 2;
             this.$.canvas.height = contentRect.height * 2;
 
@@ -50,7 +50,7 @@ Polymer({
 
         var canvasRect = this.$.canvas.getBoundingClientRect();
 
-        if (this.isRetina) {
+        if (this._isRetina) {
             this.width = canvasRect.width *2;
             this.height = canvasRect.height *2;
         }
@@ -69,7 +69,7 @@ Polymer({
 
         for ( var c = 0; c < buffer.numberOfChannels; ++c ) {
             peaks = this.getPeaks( buffer, c, this.width );
-            this.drawWave( ctx, peaks, 0, yoffset, this.width, height, this.isRetina );
+            this.drawWave( ctx, peaks, 0, yoffset, this.width, height, this._isRetina );
             yoffset += height;
         }
     },
@@ -92,7 +92,6 @@ Polymer({
         this.isPlaying = true;
         this.audioSource.play();
 
-        //
         this.tickProgress();
     },
 
@@ -118,7 +117,7 @@ Polymer({
     },
 
     convertTime: function (time) {
-        return parseFloat(time).toFixed(2);
+        return isNaN(time) ? 0 : parseFloat(time).toFixed(2);
     },
 
     // get peaks depends on canvas width, to avoid wasted drawing
@@ -149,7 +148,9 @@ Polymer({
 
     drawProgress: function ( x ) {
         var ctx = this.$.canvas2.getContext("2d");
-
+        if (isNaN(x)) {
+            x = 0;
+        }
         ctx.clearRect( 0, 0, this.width, this.height );
         ctx.strokeStyle = "#aaa";
         ctx.lineWidth = 2;
@@ -159,9 +160,9 @@ Polymer({
         ctx.stroke();
     },
 
-    drawWave: function ( ctx, peaks, x, y, width, height, isRetina ) {
+    drawWave: function ( ctx, peaks, x, y, width, height, _isRetina ) {
         var $ = 0;
-        if (isRetina) {
+        if (_isRetina) {
             $ = 0.25;
         }
         else {
@@ -223,18 +224,20 @@ Polymer({
 
     mousedownAction: function (event) {
         event.stopPropagation();
-
+        
+        this.isPlaying = false;
         if ( event.which === 1 ) {
             var rect = this.$.content.getBoundingClientRect();
             var startX = rect.left;
             var width = rect.width;
 
-            //
             var mousemoveHandle = function(event) {
                 event.stopPropagation();
 
                 var dx = event.clientX - startX;
                 dx = Math.clamp( dx, 0, width );
+                if (this._isRetina)
+                    dx *= 2;
 
                 this.drawProgress(dx);
             }.bind(this);
