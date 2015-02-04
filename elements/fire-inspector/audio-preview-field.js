@@ -1,3 +1,12 @@
+function zeroFill( number, width ) {
+    width -= number.toString().length;
+    if ( width > 0 )
+        {
+            return new Array( width + (/\./.test( number ) ? 2 : 1) ).join( '0' ) + number;
+        }
+        return number + ""; // always return a string
+}
+
 Polymer({
     publish: {
         asset: null,
@@ -5,19 +14,9 @@ Polymer({
     },
 
     info: "",
-    _isRetina: false,
     isPlaying: false,
     mute: false,
-    currentTime: {
-        min: 0,
-        secs: 0,
-        fulltime: 0,
-    },
     audioSource: null,
-
-    created: function () {
-        this._isRetina = window.devicePixelRatio === 1 ? false : true;
-    },
 
     detached: function () {
         this.stop();
@@ -28,7 +27,7 @@ Polymer({
             return;
 
         var contentRect = this.$.content.getBoundingClientRect();
-        if (this._isRetina) {
+        if ( Fire.isRetina() ) {
             this.$.canvas.width = contentRect.width * 2;
             this.$.canvas.height = contentRect.height * 2;
 
@@ -59,7 +58,7 @@ Polymer({
 
         var canvasRect = this.$.canvas.getBoundingClientRect();
 
-        if (this._isRetina) {
+        if ( Fire.isRetina() ) {
             this.width = canvasRect.width *2;
             this.height = canvasRect.height *2;
         }
@@ -69,8 +68,6 @@ Polymer({
         }
 
         var buffer = this.asset.rawData;
-        this.info = "ch:" + buffer.numberOfChannels + ", " + buffer.sampleRate + "Hz, " + this.asset._rawext;
-        this.audioLength = buffer.duration * 1000;
 
         var peaks = null;
         var height = this.height/buffer.numberOfChannels;
@@ -78,12 +75,11 @@ Polymer({
 
         for ( var c = 0; c < buffer.numberOfChannels; ++c ) {
             peaks = this.getPeaks( buffer, c, this.width );
-            this.drawWave( ctx, peaks, 0, yoffset, this.width, height, this._isRetina );
+            this.drawWave( ctx, peaks, 0, yoffset, this.width, height );
+            if ( buffer.numberOfChannels > 1 ) {
+                this.drawChannelTip(ctx, c, yoffset );
+            }
             yoffset += height;
-        }
-
-        if ( buffer.numberOfChannels === 2) {
-            this.drawChannelTip(ctx);
         }
     },
 
@@ -96,16 +92,11 @@ Polymer({
             this.stop();
             this.audioSource.time = 0;
         }.bind(this);
-        this.resize();
-    },
 
-    muteAction: function () {
-        if (this.audioSource.mute){
-            this.audioSource.mute = false;
-        }
-        else {
-            this.audioSource.mute = true;
-        }
+        var buffer = this.asset.rawData;
+        this.info = "ch:" + buffer.numberOfChannels + ", " + buffer.sampleRate + "Hz, " + this.asset._rawext;
+
+        this.resize();
     },
 
     play: function () {
@@ -118,8 +109,6 @@ Polymer({
     stop: function () {
         if ( this.audioSource )
             this.audioSource.stop();
-        this.currentTime.min = 0;
-        this.currentTime.secs = 0;
         this.isPlaying = false;
     },
 
@@ -128,8 +117,8 @@ Polymer({
             return;
 
         window.requestAnimationFrame ( function () {
-            this.currentTime = this.convertTime(this.audioSource.time * 1000);
-            var x = (this.audioSource.time*1000/this.audioLength) * this.width;
+            var audioLength = this.audioSource.clip.length;
+            var x = (this.audioSource.time/audioLength) * this.width;
 
             this.drawProgress(x);
 
@@ -137,33 +126,17 @@ Polymer({
         }.bind(this));
     },
 
-    convertTime: function (time) {
-        if (isNaN(time)) {
-            return  {
-                min: 0,
-                secs: 0,
-                fulltime: 0,
-            };
-        }
-        var min = parseInt( (time/1000) / 60);
-        var secs =parseFloat( time/1000 - (parseInt((time/1000) / 60)) * 60).toFixed(3);
-        var times = {
-            min: min,
-            secs: secs,
-            fulltime: time,
-        };
-        return times;
-    },
-
-    drawChannelTip: function (ctx) {
+    drawChannelTip: function ( ctx, channel, yOffset ) {
+        var offset = 0;
         ctx.fillStyle = "white";
-        if (this._isRetina) {
+        if ( Fire.isRetina() ) {
             ctx.font = '24px Arial';
+            offset = 24;
         }else {
             ctx.font = '12px Arial';
+            offset = 12;
         }
-        ctx.fillText('ch1',4,this.height * (1/8));
-        ctx.fillText('ch2',4,this.height * (5/8));
+        ctx.fillText( 'ch' + (channel+1), 4, yOffset + offset );
     },
 
     // get peaks depends on canvas width, to avoid wasted drawing
@@ -204,11 +177,26 @@ Polymer({
         ctx.moveTo( x, 0 );
         ctx.lineTo( x, this.height );
         ctx.stroke();
+
+        ctx.fillStyle = "white";
+        if ( Fire.isRetina() ) {
+            ctx.font = '24px Arial';
+        }else {
+            ctx.font = '12px Arial';
+        }
+
+        var audioLength = this.audioSource.clip.length;
+        var date = new Date( x / this.width * audioLength * 1000 );
+        var text = zeroFill( date.getMinutes(), 2 ) +
+            ":" + zeroFill( date.getSeconds(), 2 ) +
+            "." + zeroFill(date.getMilliseconds(), 3 );
+        ctx.textAlign="center";
+        ctx.fillText( text, this.width * 0.5, this.height - 5 );
     },
 
-    drawWave: function ( ctx, peaks, x, y, width, height, _isRetina ) {
+    drawWave: function ( ctx, peaks, x, y, width, height ) {
         var $ = 0;
-        if (_isRetina) {
+        if ( Fire.isRetina() ) {
             $ = 0.25;
         }
         else {
@@ -262,13 +250,23 @@ Polymer({
         this.stop();
     },
 
+    muteAction: function () {
+        if (this.audioSource.mute) {
+            this.audioSource.mute = false;
+        }
+        else {
+            this.audioSource.mute = true;
+        }
+    },
+
     forwardAction: function ( event ) {
         event.stopPropagation();
         if (!this.isPlaying) {
             return;
         }
-        var wardTime = this.audioSource.time + this.audioLength/1000 * (0.2);
-        if (wardTime >= this.audioLength/1000) {
+        var audioLength = this.audioSource.clip.length;
+        var wardTime = this.audioSource.time + audioLength * (0.2);
+        if (wardTime >= audioLength) {
             this.stop();
             return;
         }
@@ -281,7 +279,8 @@ Polymer({
         if (!this.isPlaying) {
             return;
         }
-        var wardTime = this.audioSource.time - this.audioLength/1000 * (0.2);
+        var audioLength = this.audioSource.clip.length;
+        var wardTime = this.audioSource.time - audioLength * (0.2);
         if (wardTime <= 0) {
             wardTime = 0;
         }
@@ -303,10 +302,9 @@ Polymer({
 
                 var dx = event.clientX - startX;
                 dx = Math.clamp( dx, 0, width );
-                if (this._isRetina)
+                if ( Fire.isRetina() )
                     dx *= 2;
 
-                this.currentTime = this.convertTime(dx/this.width * this.audioLength);
                 this.drawProgress(dx);
             }.bind(this);
 
@@ -318,7 +316,8 @@ Polymer({
 
                 this.drawProgress(dx);
 
-                this.audioSource.time = (dx/width) * (this.audioLength / 1000);
+                var audioLength = this.audioSource.clip.length;
+                this.audioSource.time = (dx/width) * audioLength;
                 this.play();
 
                 document.removeEventListener('mousemove', mousemoveHandle);
