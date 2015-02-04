@@ -107,8 +107,6 @@ Polymer({
         if ( !this.isPlaying )
             return;
 
-        var contentRect = this.$.content.getBoundingClientRect();
-
         window.requestAnimationFrame ( function () {
             this.currentTime = this.convertTime(this.audioSource.time * 1000);
             var x = (this.audioSource.time*1000/this.audioLength) * this.width;
