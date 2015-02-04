@@ -16,6 +16,7 @@ var paths = {
     src: [
         // asset extends
         'src/engine-extends/asset-library.js',
+        'src/engine-extends/asset-watcher.js',
         'src/assets/bitmap-font.js',
         'src/assets/sprite.js',
         'src/assets/texture.js',
@@ -56,6 +57,7 @@ var paths = {
         'src/gizmos/camera-gizmo.js',
         'src/gizmos/sprite-renderer-gizmo.js',
         'src/gizmos/bitmap-text-gizmo.js',
+        'src/gizmos/audio-source-gizmo.js',
     ],
 };
 
