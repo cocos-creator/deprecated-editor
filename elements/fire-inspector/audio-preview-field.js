@@ -14,7 +14,6 @@ Polymer({
     },
 
     info: "",
-    isPlaying: false,
     audioSource: null,
 
     detached: function () {
@@ -86,11 +85,6 @@ Polymer({
         this.stop();
         this.audioSource = new Fire.AudioSource();
         this.audioSource.clip = this.asset;
-        this.audioSource.onEnd = function () {
-            this.isPlaying = false;
-            this.stop();
-            this.audioSource.time = 0;
-        }.bind(this);
 
         var buffer = this.asset.rawData;
         this.info = "ch:" + buffer.numberOfChannels + ", " + buffer.sampleRate + "Hz, " + this.asset._rawext;
@@ -99,25 +93,30 @@ Polymer({
     },
 
     play: function () {
-        this.isPlaying = true;
-        this.audioSource.play();
+        if ( !this.audioSource )
+            return;
 
+        this.audioSource.play();
         this.tickProgress();
     },
 
     stop: function () {
-        if ( this.audioSource )
-            this.audioSource.stop();
-        this.isPlaying = false;
+        if ( !this.audioSource )
+            return;
+
+        this.audioSource.stop();
+        this.drawProgress(0);
     },
 
     tickProgress: function () {
-        if ( !this.isPlaying )
+        if ( !this.audioSource.isPlaying ) {
             return;
+        }
 
         window.requestAnimationFrame ( function () {
             var audioLength = this.audioSource.clip.length;
-            var x = (this.audioSource.time/audioLength) * this.width;
+            var time = this.audioSource.time%audioLength;
+            var x = time / audioLength * this.width;
 
             this.drawProgress(x);
 
@@ -235,7 +234,6 @@ Polymer({
         event.stopPropagation();
 
         if ( this.audioSource.isPlaying ) {
-            this.isPlaying = false;
             this.audioSource.pause();
         }
         else {
@@ -249,12 +247,16 @@ Polymer({
         this.stop();
     },
 
+    loopAction: function ( event ) {
+        event.stopPropagation();
+
+        this.audioSource.loop = !this.audioSource.loop;
+    },
+
     mousedownAction: function (event) {
         event.stopPropagation();
 
         if ( event.which === 1 ) {
-            this.isPlaying = false;
-
             var rect = this.$.content.getBoundingClientRect();
             var startX = rect.left;
             var width = rect.width;
@@ -265,8 +267,8 @@ Polymer({
             if ( Fire.isRetina() )
                 dx *= 2;
 
-            this.audioSource.time = (dx/width) * audioLength;
             this.audioSource.pause();
+            this.audioSource.time = (dx/width) * audioLength;
             this.drawProgress(dx);
 
             var mousemoveHandle = function(event) {

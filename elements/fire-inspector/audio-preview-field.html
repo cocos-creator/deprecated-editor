@@ -8,11 +8,15 @@
         <fire-ui-toolbar style="float:right">
 
             <fire-ui-button on-click="{{playAction}}">
-                <i class="{{isPlaying ? 'fa fa-pause':'fa fa-play'}}"></i>
+                <i class="fa {{audioSource.isPlaying ? 'fa-pause':'fa-play'}}"></i>
             </fire-ui-button>
 
             <fire-ui-button on-click="{{stopAction}}">
                 <i class="fa fa-stop"></i>
+            </fire-ui-button>
+
+            <fire-ui-button on-click="{{loopAction}}">
+                <i class="fa fa-refresh {{audioSource.loop ? 'active':''}}"></i>
             </fire-ui-button>
 
         </fire-ui-toolbar>
