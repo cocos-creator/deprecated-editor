@@ -15,7 +15,6 @@ Polymer({
 
     info: "",
     isPlaying: false,
-    mute: false,
     audioSource: null,
 
     detached: function () {
@@ -250,49 +249,12 @@ Polymer({
         this.stop();
     },
 
-    muteAction: function () {
-        if (this.audioSource.mute) {
-            this.audioSource.mute = false;
-        }
-        else {
-            this.audioSource.mute = true;
-        }
-    },
-
-    forwardAction: function ( event ) {
-        event.stopPropagation();
-        if (!this.isPlaying) {
-            return;
-        }
-        var audioLength = this.audioSource.clip.length;
-        var wardTime = this.audioSource.time + audioLength * (0.2);
-        if (wardTime >= audioLength) {
-            this.stop();
-            return;
-        }
-        this.audioSource.time = wardTime;
-        this.play();
-    },
-
-    backwardAction: function ( event ) {
-        event.stopPropagation();
-        if (!this.isPlaying) {
-            return;
-        }
-        var audioLength = this.audioSource.clip.length;
-        var wardTime = this.audioSource.time - audioLength * (0.2);
-        if (wardTime <= 0) {
-            wardTime = 0;
-        }
-        this.audioSource.time = wardTime;
-        this.play();
-    },
-
     mousedownAction: function (event) {
         event.stopPropagation();
 
-        this.isPlaying = false;
         if ( event.which === 1 ) {
+            this.isPlaying = false;
+
             var rect = this.$.content.getBoundingClientRect();
             var startX = rect.left;
             var width = rect.width;
@@ -323,8 +285,6 @@ Polymer({
 
                 var dx = event.clientX - startX;
                 dx = Math.clamp( dx, 0, width );
-
-                this.drawProgress(dx);
 
                 this.audioSource.time = (dx/width) * audioLength;
                 this.play();
