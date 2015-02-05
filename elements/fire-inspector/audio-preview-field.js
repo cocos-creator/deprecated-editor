@@ -1,19 +1,11 @@
-function zeroFill( number, width ) {
-    width -= number.toString().length;
-    if ( width > 0 )
-        {
-            return new Array( width + (/\./.test( number ) ? 2 : 1) ).join( '0' ) + number;
-        }
-        return number + ""; // always return a string
-}
-
 Polymer({
     publish: {
         asset: null,
         meta: null,
     },
 
-    info: "",
+    audioInfo: "",
+    timeInfo: "",
     audioSource: null,
 
     detached: function () {
@@ -28,26 +20,17 @@ Polymer({
         if ( Fire.isRetina() ) {
             this.$.canvas.width = contentRect.width * 2;
             this.$.canvas.height = contentRect.height * 2;
-
-            this.$.canvas2.width = contentRect.width * 2;
-            this.$.canvas2.height = contentRect.height * 2;
         }
         else {
             this.$.canvas.width = contentRect.width;
             this.$.canvas.height = contentRect.height;
-
-            this.$.canvas2.width = contentRect.width;
-            this.$.canvas2.height = contentRect.height;
         }
 
         this.$.canvas.style.width = contentRect.width + "px";
         this.$.canvas.style.height = contentRect.height + "px";
 
-        this.$.canvas2.style.width = contentRect.width + "px";
-        this.$.canvas2.style.height = contentRect.height + "px";
-
         this.repaint();
-        this.drawProgress(0);
+        this.setProgress(0);
     },
 
     repaint: function () {
@@ -87,7 +70,7 @@ Polymer({
         this.audioSource.clip = this.asset;
 
         var buffer = this.asset.rawData;
-        this.info = "ch:" + buffer.numberOfChannels + ", " + buffer.sampleRate + "Hz, " + this.asset._rawext;
+        this.audioInfo = "ch:" + buffer.numberOfChannels + ", " + buffer.sampleRate + "Hz, " + this.asset._rawext;
 
         this.resize();
     },
@@ -105,7 +88,7 @@ Polymer({
             return;
 
         this.audioSource.stop();
-        this.drawProgress(0);
+        this.setProgress(0);
     },
 
     tickProgress: function () {
@@ -118,8 +101,7 @@ Polymer({
             var time = this.audioSource.time%audioLength;
             var x = time / audioLength * this.width;
 
-            this.drawProgress(x);
-
+            this.setProgress(x);
             this.tickProgress();
         }.bind(this));
     },
@@ -163,33 +145,16 @@ Polymer({
         return peaks;
     },
 
-    drawProgress: function ( x ) {
-        var ctx = this.$.canvas2.getContext("2d");
-        if (isNaN(x)) {
-            x = 0;
-        }
-        ctx.clearRect( 0, 0, this.width, this.height );
-        ctx.strokeStyle = "#aaa";
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.moveTo( x, 0 );
-        ctx.lineTo( x, this.height );
-        ctx.stroke();
+    setProgress: function ( x ) {
+        //
+        this.$.progressBar.style.transform = "translateX(" + x + "px)";
 
-        ctx.fillStyle = "white";
-        if ( Fire.isRetina() ) {
-            ctx.font = '24px Arial';
-        }else {
-            ctx.font = '12px Arial';
-        }
-
+        //
         var audioLength = this.audioSource.clip.length;
         var date = new Date( x / this.width * audioLength * 1000 );
-        var text = zeroFill( date.getMinutes(), 2 ) +
-            ":" + zeroFill( date.getSeconds(), 2 ) +
-            "." + zeroFill(date.getMilliseconds(), 3 );
-        ctx.textAlign="center";
-        ctx.fillText( text, this.width * 0.5, this.height - 5 );
+        this.timeInfo = Fire.padLeft( date.getMinutes(), 2, '0' ) +
+            ":" + Fire.padLeft( date.getSeconds(), 2, '0' ) +
+            "." + Fire.padLeft(date.getMilliseconds(), 3, '0' );
     },
 
     drawWave: function ( ctx, peaks, x, y, width, height ) {
@@ -269,7 +234,7 @@ Polymer({
 
             this.audioSource.pause();
             this.audioSource.time = (dx/width) * audioLength;
-            this.drawProgress(dx);
+            this.setProgress(dx);
 
             var mousemoveHandle = function(event) {
                 event.stopPropagation();
@@ -279,7 +244,7 @@ Polymer({
                 if ( Fire.isRetina() )
                     dx *= 2;
 
-                this.drawProgress(dx);
+                this.setProgress(dx);
             }.bind(this);
 
             var mouseupHandle = function(event) {

@@ -23,12 +23,11 @@
 
         <div class="view" flex-1>
             <div id="content" class="content">
-                <canvas id="canvas"></canvas>
-                <canvas id="canvas2" on-mousedown="{{mousedownAction}}"></canvas>
+                <canvas id="canvas" on-mousedown="{{mousedownAction}}"></canvas>
+                <span id="progressBar"></span>
             </div>
-            <div class="info">
-                <fire-ui-label>{{info}}</fire-ui-label>
-            </div>
+            <fire-ui-label class="audio-info">{{audioInfo}}</fire-ui-label>
+            <fire-ui-label class="time-info">{{timeInfo}}</fire-ui-label>
         </div>
     </template>
     <script type="text/javascript" src="audio-preview-field.js"></script>
