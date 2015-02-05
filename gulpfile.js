@@ -1,7 +1,6 @@
 ﻿var gulp = require('gulp');
 var gutil = require('gulp-util');
 var jshint = require('gulp-jshint');
-
 var concat = require('gulp-concat');
 var stylus = require('gulp-stylus');
 var vulcanize = require('gulp-vulcanize');
@@ -155,7 +154,8 @@ var task_plugin = function ( name ) {
     });
 
     gulp.task(task_js, [task_js_ext], function(callback) {
-        var compiler = require('gulp-closure-compiler');
+        //var compiler = require('gulp-closure-compiler');
+        var uglify = require('gulp-uglifyjs');
         var gulpSrcFiles = require('gulp-src-files');
         var files = gulpSrcFiles(js_files, {base: 'elements'});
         var count = files.length;
@@ -171,17 +171,23 @@ var task_plugin = function ( name ) {
                     esnext: true,
                 }))
                 .pipe(jshint.reporter(stylish))
-                .pipe(compiler({
-                    compilerPath: path.normalize('../../compiler/compiler.jar'),
-                    compilerFlags: {
-                        language_in: 'ECMASCRIPT6',
-                        language_out: 'ECMASCRIPT5',
-                        transpile_only: null,
-                        compilation_level: 'SIMPLE',
-                        jscomp_off: 'globalThis',
-                    },
-                    fileName: destfile,
-                    continueWithWarnings: true
+                //.pipe(compiler({
+                //    compilerPath: path.normalize('../../compiler/compiler.jar'),
+                //    compilerFlags: {
+                //        language_in: 'ECMASCRIPT6',
+                //        language_out: 'ECMASCRIPT5',
+                //        transpile_only: null,
+                //        compilation_level: 'SIMPLE',
+                //        jscomp_off: 'globalThis',
+                //    },
+                //    fileName: destfile,
+                //    continueWithWarnings: true
+                //}))
+                .pipe(uglify(destfile, {
+                    compress: {
+                        dead_code: false,
+                        unused: false
+                    }
                 }))
                 .pipe(gulp.dest('bin/tmp/'));
             stream.on('end', function() {
@@ -251,18 +257,25 @@ gulp.task('src-dev', ['src-jshint'], function() {
 
 // src-min
 gulp.task('src-min', ['src-dev'], function() {
-    var compiler = require('gulp-closure-compiler');
+    //var compiler = require('gulp-closure-compiler');
+    var uglify = require('gulp-uglifyjs');
     return gulp.src('bin/editor.dev.js')
-        .pipe(compiler({
-            compilerPath: path.normalize('../../compiler/compiler.jar'),
-            compilerFlags: {
-                language_in: 'ECMASCRIPT6',
-                language_out: 'ECMASCRIPT5',
-                compilation_level: 'WHITESPACE_ONLY',
-                jscomp_off: 'globalThis',
-            },
-            fileName: 'editor.min.js',
-            continueWithWarnings: true
+        //.pipe(compiler({
+        //    compilerPath: path.normalize('../../compiler/compiler.jar'),
+        //    compilerFlags: {
+        //        language_in: 'ECMASCRIPT6',
+        //        language_out: 'ECMASCRIPT5',
+        //        compilation_level: 'WHITESPACE_ONLY',
+        //        jscomp_off: 'globalThis',
+        //    },
+        //    fileName: 'editor.min.js',
+        //    continueWithWarnings: true
+        //}))
+        .pipe(uglify('editor.min.js', {
+            compress: {
+                dead_code: false,
+                unused: false
+            }
         }))
         .pipe(gulp.dest('bin'));
 });
