@@ -1,4 +1,6 @@
-﻿var GlobalVarsChecker = (function () {
+﻿var FireUrl = require('fire-url');
+
+var GlobalVarsChecker = (function () {
 
     var DefaultIgnoreGlobalVars = [
         'webkitIndexedDB',      // deprecated warning
@@ -182,7 +184,8 @@ var Sandbox = (function () {
 // 加载项目里的普通脚本
 var userScriptLoader = (function () {
 
-    var SRC = 'library://bundle.js';
+    var SRC_BUILTIN = 'library://bundle.builtin.js';
+    var SRC_PROJECT = 'library://bundle.project.js';
 
     var loadedScriptNodes = [];
     //var gVarsCheckerBetweenReload = new GlobalVarsChecker();
@@ -212,42 +215,47 @@ var userScriptLoader = (function () {
         return newScene;
     }
 
+    function doLoad (src, onload) {
+        var script = document.createElement('script');
+        script.onload = function () {
+            console.timeEnd('load ' + src);
+            onload();
+        };
+        script.onerror = function () {
+            console.timeEnd('load ' + src);
+            if (loadedScriptNodes.length > 0) {
+                loader.unloadAll();
+            }
+            Fire.error('Failed to load %s', src);
+        };
+        script.setAttribute('type','text/javascript');
+        script.setAttribute('src', FireUrl.addRandomQuery(src));
+        console.time('load ' + src);
+        document.head.appendChild(script);
+        loadedScriptNodes.push(script);
+    }
+
     var loader = {
 
         loadAll: function () {
-            // do load
-            var src = SRC + '?' + window.performance.now(); // 防止浏览器使用缓存
-            var script = document.createElement('script');
-            script.onload = function () {
-                console.timeEnd('reload scripts');
+            doLoad(SRC_BUILTIN, function () {
+                Sandbox.globalVarsChecker.restore(Fire.log, 'loading builtin plugin runtime', 'require');
 
-                // after loaded
+                doLoad(SRC_PROJECT, function () {
+                    Sandbox.globalVarsChecker.restore(Fire.log, 'loading new scripts', 'require');
 
-                //gVarsCheckerDuringLoading.restore();
-                Sandbox.globalVarsChecker.restore(Fire.log, 'loading new scripts', 'require');
-
-                // reload scene
-                if (Fire.Engine._scene) {
-                    console.time('reload scene');
-                    var newScene = recreateScene();
-                    Sandbox._launchScene(newScene, function () {
-                        Sandbox.globalVarsChecker.restore(Fire.log, 'destroying last scene');
-                    });
-                    Sandbox.globalVarsChecker.restore(Fire.warn, 'launching scene by new scripts');
-                    console.timeEnd('reload scene');
-                }
-            };
-            script.onerror = function () {
-                console.timeEnd('reload scripts');
-                if (loadedScriptNodes.length > 0) {
-                    loader.unloadAll();
-                }
-            };
-            script.setAttribute('type','text/javascript');
-            script.setAttribute('src', src);
-            console.time('reload scripts');
-            document.head.appendChild(script);
-            loadedScriptNodes.push(script);
+                    // reload scene
+                    if (Fire.Engine._scene) {
+                        console.time('reload scene');
+                        var newScene = recreateScene();
+                        Sandbox._launchScene(newScene, function () {
+                            Sandbox.globalVarsChecker.restore(Fire.log, 'destroying last scene');
+                        });
+                        Sandbox.globalVarsChecker.restore(Fire.warn, 'launching scene by new scripts');
+                        console.timeEnd('reload scene');
+                    }
+                });
+            });
         },
 
         unloadAll: function () {
