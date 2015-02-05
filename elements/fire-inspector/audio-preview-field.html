@@ -5,31 +5,16 @@
     <template>
         <link rel="stylesheet" href="audio-preview-field.css">
 
-        <fire-ui-toolbar>
-
-            <fire-ui-button>
-                <i class="fa fa-step-forward" style="transform:rotate(180deg)"></i>
-            </fire-ui-button>
+        <fire-ui-toolbar style="float:right">
 
             <fire-ui-button on-click="{{playAction}}">
                 <i class="{{isPlaying ? 'fa fa-pause':'fa fa-play'}}"></i>
-            </fire-ui-button>
-
-            <fire-ui-button on-click="{{forwardAction}}">
-                <i class="fa fa-step-forward"></i>
             </fire-ui-button>
 
             <fire-ui-button on-click="{{stopAction}}">
                 <i class="fa fa-stop"></i>
             </fire-ui-button>
 
-            <fire-ui-button>
-                <i class="fa fa-volume-off"></i>
-            </fire-ui-button>
-
-            <fire-ui-button>
-                <i class="fa fa-volume-up"></i>
-            </fire-ui-button>
         </fire-ui-toolbar>
 
         <div class="view" flex-1>
@@ -39,9 +24,6 @@
             </div>
             <div class="info">
                 <fire-ui-label>{{info}}</fire-ui-label>
-            </div>
-            <div class="label">
-                <fire-ui-label>{{currentTime}}/{{audioLength | convertTime}} (ms)</fire-ui-label>
             </div>
         </div>
     </template>

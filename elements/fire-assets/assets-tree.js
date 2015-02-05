@@ -303,10 +303,10 @@ Polymer({
                     {
                         label: 'New Scene',
                         click: function () {
-                            if ( this.contextmenuAt instanceof AssetsItem ) {
-                                var targetEL = this.contextmenuAt;
-                                if ( !this.contextmenuAt.isFolder )
-                                    targetEL = this.contextmenuAt.parentElement;
+                            var targetEL = this.contextmenuAt;
+                            if ( targetEL instanceof AssetsItem ) {
+                                if ( !targetEL.isFolder )
+                                    targetEL = targetEL.parentElement;
                                 var url = this.getUrl(targetEL);
                                 var newScene = new Fire._Scene();
                                 var newAssetUrl = Url.join( url, 'New Scene.fire' );
@@ -322,10 +322,10 @@ Polymer({
                     {
                         label: 'New Folder',
                         click: function () {
-                            if ( this.contextmenuAt instanceof AssetsItem ) {
-                                var targetEL = this.contextmenuAt;
-                                if ( !this.contextmenuAt.isFolder )
-                                    targetEL = this.contextmenuAt.parentElement;
+                            var targetEL = this.contextmenuAt;
+                            if ( targetEL instanceof AssetsItem ) {
+                                if ( !targetEL.isFolder )
+                                    targetEL = targetEL.parentElement;
                                 var url = this.getUrl(targetEL);
                                 var newAssetUrl = Url.join( url, 'New Folder' );
                                 this._focusUrl = newAssetUrl;
@@ -338,34 +338,26 @@ Polymer({
                     {
                         label: 'New Sprite (Standalone)',
                         click: function () {
-                            if ( this.contextmenuAt instanceof AssetsItem ) {
-                                var targetEL = this.contextmenuAt;
+                            var targetEL = this.contextmenuAt;
+                            if ( targetEL instanceof AssetsItem && _isTexture(targetEL.extname) ) {
+                                var textureName = targetEL.name;
 
-                                if ( _isTexture(targetEL.extname) ) {
-                                    var textureEL = this.contextmenuAt;
-                                    var textureName = targetEL.name;
+                                Fire.AssetLibrary.loadAsset ( targetEL.userId, function ( asset, error ) {
+                                    var newSprite = new Fire.Sprite();
+                                    newSprite.texture = asset;
+                                    newSprite.width = asset.width;
+                                    newSprite.height = asset.height;
 
-                                    if ( !this.contextmenuAt.isFolder )
-                                        targetEL = this.contextmenuAt.parentElement;
-                                    var url = this.getUrl(targetEL);
-
-                                    Fire.AssetLibrary.loadAsset ( textureEL.userId, function ( asset, error ) {
-                                        var newSprite = new Fire.Sprite();
-                                        newSprite.name = textureName;
-                                        newSprite.texture = asset;
-                                        newSprite.width = asset.width;
-                                        newSprite.height = asset.height;
-
-                                        var newAssetUrl = Url.join( url, textureName + '.sprite' );
-                                        this._focusUrl = newAssetUrl;
-                                        Fire.sendToCore( 'asset-db:save',
-                                                      newAssetUrl,
-                                                      Fire.serialize(newSprite) );
-                                    }.bind(this) );
-                                }
-                                else {
-                                    Fire.warn( "Can not create sprite from non-texture element, please select a texture first." );
-                                }
+                                    var url = this.getUrl(targetEL.parentElement);
+                                    var newAssetUrl = Url.join( url, textureName + '.sprite' );
+                                    this._focusUrl = newAssetUrl;
+                                    Fire.sendToCore( 'asset-db:save',
+                                                  newAssetUrl,
+                                                  Fire.serialize(newSprite) );
+                                }.bind(this) );
+                            }
+                            else {
+                                Fire.warn( "Can not create sprite from non-texture element, please select a texture first." );
                             }
                         }.bind(this)
                     },
@@ -374,8 +366,24 @@ Polymer({
                     {
                         label: 'New Atlas',
                         click: function () {
-                            // if ( this.contextmenuAt instanceof AssetsItem ) {
-                            // }
+                            var targetEL = this.contextmenuAt;
+                            if ( targetEL instanceof AssetsItem ) {
+                                if ( !targetEL.isFolder )
+                                    targetEL = targetEL.parentElement;
+
+                                var newAtlas = new Fire.Atlas();
+                                // newAtlas.name = textureName;
+                                // newAtlas.texture = asset;
+                                // newAtlas.width = asset.width;
+                                // newAtlas.height = asset.height;
+
+                                var url = this.getUrl(targetEL);
+                                var newAssetUrl = Url.join( url, 'New Atlas.atlas' );
+                                this._focusUrl = newAssetUrl;
+                                Fire.sendToCore( 'asset-db:save',
+                                                newAssetUrl,
+                                                Fire.serialize(newAtlas) );
+                            }
                         }.bind(this)
                     },
                 ]
