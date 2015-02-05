@@ -214,6 +214,7 @@ var task_plugin = function ( name ) {
 
     // html
     var build_html = function (strip) {
+        var htmlmin = require('gulp-htmlmin');
         return function () {
             return gulp.src('bin/tmp/' + name + '/' + name + '.html')
             .pipe(vulcanize({
@@ -221,6 +222,10 @@ var task_plugin = function ( name ) {
                 inline: true,
                 strip: strip,
             }))
+            .pipe(htmlmin({
+                    removeComments: true,
+                    collapseWhitespace: true
+                }))
             .pipe(gulp.dest('bin/' + name))
             ;
         };
