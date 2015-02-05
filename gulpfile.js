@@ -21,8 +21,6 @@ var paths = {
         'src/assets/texture.js',
 
         // engine extends
-        'src/engine-extends/utils.js',
-        'src/engine-extends/platform.js',
         'src/engine-extends/dom.js',
         'src/engine-extends/file-utils.js',
         'src/engine-extends/misc.js',
