@@ -296,6 +296,16 @@ Polymer({
             var rect = this.$.content.getBoundingClientRect();
             var startX = rect.left;
             var width = rect.width;
+            var audioLength = this.audioSource.clip.length;
+
+            var dx = event.clientX - startX;
+            dx = Math.clamp( dx, 0, width );
+            if ( Fire.isRetina() )
+                dx *= 2;
+
+            this.audioSource.time = (dx/width) * audioLength;
+            this.audioSource.pause();
+            this.drawProgress(dx);
 
             var mousemoveHandle = function(event) {
                 event.stopPropagation();
@@ -316,7 +326,6 @@ Polymer({
 
                 this.drawProgress(dx);
 
-                var audioLength = this.audioSource.clip.length;
                 this.audioSource.time = (dx/width) * audioLength;
                 this.play();
 
