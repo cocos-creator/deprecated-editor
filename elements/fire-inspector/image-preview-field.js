@@ -55,7 +55,8 @@ Polymer({
 
             if ( this.meta.subAssets ) {
                 if ( this.meta.type === Fire.TextureType.Sprite ) {
-                    for ( var subInfo of this.meta.subAssets ) {
+                    //for ( var subInfo of this.meta.subAssets ) {
+                    this.meta.subAssets.forEach(function(subInfo) {
                         if ( subInfo.asset instanceof Fire.Sprite ) {
                             ctx.beginPath();
                             ctx.rect( subInfo.asset.x * xRatio,
@@ -66,7 +67,7 @@ Polymer({
                             ctx.strokeStyle = '#ff00ff';
                             ctx.stroke();
                         }
-                    }
+                    });
                 }
             }
         }
