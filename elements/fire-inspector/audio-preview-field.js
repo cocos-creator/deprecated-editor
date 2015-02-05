@@ -147,7 +147,13 @@ Polymer({
 
     setProgress: function ( x ) {
         //
-        this.$.progressBar.style.transform = "translateX(" + x + "px)";
+        if ( Fire.isRetina() ) {
+            this.$.progressBar.style.transform = "translateX(" + x/2 + "px)";
+        }
+        else {
+            this.$.progressBar.style.transform = "translateX(" + x + "px)";
+        }
+
 
         //
         var audioLength = this.audioSource.clip.length;
