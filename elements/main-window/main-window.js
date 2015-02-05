@@ -48,7 +48,7 @@ Polymer({
                 }
 
                 // load scripts
-                Fire._Sandbox.reloadScripts();
+                Fire.sendToCore('compiler:compile-and-reload');
 
                 // init engine
                 Fire.info('fire-engine initializing...');
