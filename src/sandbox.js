@@ -216,6 +216,7 @@ var userScriptLoader = (function () {
     }
 
     function doLoad (src, onload) {
+        // 这里用 require 实现会更简单，但是为了和运行时保持尽量一致，还是改用 web 方式加载。
         var script = document.createElement('script');
         script.onload = function () {
             console.timeEnd('load ' + src);
