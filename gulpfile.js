@@ -152,7 +152,6 @@ var task_plugin = function ( name ) {
     });
 
     gulp.task(task_js, [task_js_ext], function(callback) {
-        //var compiler = require('gulp-closure-compiler');
         var uglify = require('gulp-uglifyjs');
         var gulpSrcFiles = require('gulp-src-files');
         var files = gulpSrcFiles(js_files, {base: 'elements'});
