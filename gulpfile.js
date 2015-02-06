@@ -152,7 +152,6 @@ var task_plugin = function ( name ) {
     });
 
     gulp.task(task_js, [task_js_ext], function(callback) {
-        //var compiler = require('gulp-closure-compiler');
         var uglify = require('gulp-uglifyjs');
         var gulpSrcFiles = require('gulp-src-files');
         var files = gulpSrcFiles(js_files, {base: 'elements'});
@@ -169,18 +168,6 @@ var task_plugin = function ( name ) {
                     esnext: true,
                 }))
                 .pipe(jshint.reporter(stylish))
-                //.pipe(compiler({
-                //    compilerPath: path.normalize('../../compiler/compiler.jar'),
-                //    compilerFlags: {
-                //        language_in: 'ECMASCRIPT6',
-                //        language_out: 'ECMASCRIPT5',
-                //        transpile_only: null,
-                //        compilation_level: 'SIMPLE',
-                //        jscomp_off: 'globalThis',
-                //    },
-                //    fileName: destfile,
-                //    continueWithWarnings: true
-                //}))
                 .pipe(uglify(destfile, {
                     compress: {
                         dead_code: false,
@@ -213,14 +200,14 @@ var task_plugin = function ( name ) {
     });
 
     // html
-    var build_html = function (strip) {
+    var build_html = function () {
         var htmlmin = require('gulp-htmlmin');
         return function () {
             return gulp.src('bin/tmp/' + name + '/' + name + '.html')
             .pipe(vulcanize({
                 dest: 'bin/tmp/' + name,
                 inline: true,
-                strip: strip,
+                strip: true
             }))
             .pipe(htmlmin({
                     removeComments: true,
@@ -231,8 +218,21 @@ var task_plugin = function ( name ) {
         };
     };
 
-    gulp.task(task_html, [ task_copy_html, task_copy_res, task_styl, task_css, task_js ], build_html(true));
-    gulp.task(task_html_dev, [ task_copy_html, task_copy_res, task_styl, task_css, task_js_dev ], build_html(false));
+    var build_html_dev = function () {
+        return function () {
+            return gulp.src('bin/tmp/' + name + '/' + name + '.html')
+                .pipe(vulcanize({
+                    dest: 'bin/tmp/' + name,
+                    inline: true,
+                    strip: false
+                }))
+                .pipe(gulp.dest('bin/' + name))
+                ;
+        };
+    };
+
+    gulp.task(task_html, [ task_copy_html, task_copy_res, task_styl, task_css, task_js ], build_html());
+    gulp.task(task_html_dev, [ task_copy_html, task_copy_res, task_styl, task_css, task_js_dev ], build_html_dev());
 };
 
 // src-jshint
@@ -243,7 +243,7 @@ gulp.task('src-jshint', function() {
         multistr: true,
         smarttabs: false,
         loopfunc: true,
-        esnext: true,
+        esnext: true
     }))
     .pipe(jshint.reporter(stylish))
     ;
@@ -263,18 +263,7 @@ gulp.task('src-min', ['src-dev'], function() {
     //var compiler = require('gulp-closure-compiler');
     var uglify = require('gulp-uglifyjs');
     return gulp.src('bin/editor.dev.js')
-        //.pipe(compiler({
-        //    compilerPath: path.normalize('../../compiler/compiler.jar'),
-        //    compilerFlags: {
-        //        language_in: 'ECMASCRIPT6',
-        //        language_out: 'ECMASCRIPT5',
-        //        compilation_level: 'WHITESPACE_ONLY',
-        //        jscomp_off: 'globalThis',
-        //    },
-        //    fileName: 'editor.min.js',
-        //    continueWithWarnings: true
-        //}))
-        .pipe(uglify('editor.min.js', {
+        .pipe(uglify('editor.dev.js', {
             compress: {
                 dead_code: false,
                 unused: false
