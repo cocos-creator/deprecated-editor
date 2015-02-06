@@ -82,6 +82,10 @@ function _newAssetsItem ( url, type, id, parentEL ) {
         newEL.setIcon('bmfont');
         break;
 
+    case '.atlas':
+        newEL.setIcon('atlas');
+        break;
+
     case '.mp3':
     case '.wav':
     case '.ogg':
