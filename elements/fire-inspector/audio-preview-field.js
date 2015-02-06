@@ -7,6 +7,7 @@ Polymer({
     audioInfo: "",
     timeInfo: "",
     audioSource: null,
+    contentRectWidth: -1,
 
     detached: function () {
         this.stop();
@@ -29,6 +30,8 @@ Polymer({
         this.$.canvas.style.width = contentRect.width + "px";
         this.$.canvas.style.height = contentRect.height + "px";
 
+        this.contentRectWidth = contentRect.width;
+
         this.repaint();
         this.setProgress(0);
     },
@@ -37,26 +40,15 @@ Polymer({
         var ctx = this.$.canvas.getContext("2d");
         ctx.imageSmoothingEnabled = false;
 
-        var canvasRect = this.$.canvas.getBoundingClientRect();
-
-        if ( Fire.isRetina() ) {
-            this.width = canvasRect.width *2;
-            this.height = canvasRect.height *2;
-        }
-        else {
-            this.width = canvasRect.width;
-            this.height = canvasRect.height;
-        }
-
         var buffer = this.asset.rawData;
 
         var peaks = null;
-        var height = this.height/buffer.numberOfChannels;
+        var height = this.$.canvas.height/buffer.numberOfChannels;
         var yoffset = 0;
 
         for ( var c = 0; c < buffer.numberOfChannels; ++c ) {
-            peaks = this.getPeaks( buffer, c, this.width );
-            this.drawWave( ctx, peaks, 0, yoffset, this.width, height );
+            peaks = this.getPeaks( buffer, c, this.$.canvas.width );
+            this.drawWave( ctx, peaks, 0, yoffset, this.$.canvas.width, height );
             if ( buffer.numberOfChannels > 1 ) {
                 this.drawChannelTip(ctx, c, yoffset );
             }
@@ -99,7 +91,7 @@ Polymer({
         window.requestAnimationFrame ( function () {
             var audioLength = this.audioSource.clip.length;
             var time = this.audioSource.time%audioLength;
-            var x = time / audioLength * this.width;
+            var x = time / audioLength * this.contentRectWidth;
 
             this.setProgress(x);
             this.tickProgress();
@@ -146,18 +138,11 @@ Polymer({
     },
 
     setProgress: function ( x ) {
-        //
-        if ( Fire.isRetina() ) {
-            this.$.progressBar.style.transform = "translateX(" + x/2 + "px)";
-        }
-        else {
-            this.$.progressBar.style.transform = "translateX(" + x + "px)";
-        }
-
+        this.$.progressBar.style.transform = "translateX(" + x + "px)";
 
         //
         var audioLength = this.audioSource.clip.length;
-        var date = new Date( x / this.width * audioLength * 1000 );
+        var date = new Date( x / this.contentRectWidth * audioLength * 1000 );
         this.timeInfo = Fire.padLeft( date.getMinutes(), 2, '0' ) +
             ":" + Fire.padLeft( date.getSeconds(), 2, '0' ) +
             "." + Fire.padLeft(date.getMilliseconds(), 3, '0' );
@@ -235,8 +220,6 @@ Polymer({
 
             var dx = event.clientX - startX;
             dx = Math.clamp( dx, 0, width );
-            if ( Fire.isRetina() )
-                dx *= 2;
 
             this.audioSource.pause();
             this.audioSource.time = (dx/width) * audioLength;
@@ -247,8 +230,6 @@ Polymer({
 
                 var dx = event.clientX - startX;
                 dx = Math.clamp( dx, 0, width );
-                if ( Fire.isRetina() )
-                    dx *= 2;
 
                 this.setProgress(dx);
             }.bind(this);

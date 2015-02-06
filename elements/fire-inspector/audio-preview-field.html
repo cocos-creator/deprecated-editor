@@ -22,9 +22,11 @@
         </fire-ui-toolbar>
 
         <div class="view" flex-1>
-            <div id="content" class="content">
-                <canvas id="canvas" on-mousedown="{{mousedownAction}}"></canvas>
-                <span id="progressBar"></span>
+            <div id="content" class="content" on-mousedown="{{mousedownAction}}">
+                <canvas id="canvas"></canvas>
+                <div id="progressBar">
+                    <div class="bar"></div>
+                </div>
             </div>
             <fire-ui-label class="audio-info">{{audioInfo}}</fire-ui-label>
             <fire-ui-label class="time-info">{{timeInfo}}</fire-ui-label>

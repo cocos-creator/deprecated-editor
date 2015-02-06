@@ -23,9 +23,12 @@
 
 canvas {
     // center it
-    margin: auto;
-    position: absolute;
-    top: 0; left: 0; bottom: 0; right: 0;
+    margin: auto
+    position: absolute
+    top: 0
+    left: 0
+    bottom: 0
+    right: 0
 
     display: block
 }
@@ -39,14 +42,25 @@ canvas {
 }
 
 #progressBar {
-    position: absolute;
-    display: block
+    position: absolute
 
-    margin: 0;
-    border: 1px solid gray;
+    margin-left: -4px
+    margin-right: -4px
 
-    width: 0px;
-    height: 100%;
+    width: 10px
+    height: 100%
+
+    .bar {
+        position: absolute
+        left: 4px
+        width: 2px
+        height: 100%
+
+        background-color: #09f
+        cursor: ew-resize
+    }
+
+    cursor: ew-resize
 }
 
 .audio-info {
