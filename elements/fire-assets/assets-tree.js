@@ -95,8 +95,12 @@ function _newAssetsItem ( url, type, id, parentEL ) {
         newEL.setIcon(img);
         break;
 
-    default:
+    case '.asset':
         newEL.setIcon('fa fa-cube');
+        break;
+
+    default:
+        newEL.setIcon('fa fa-question-circle');
         break;
     }
 
