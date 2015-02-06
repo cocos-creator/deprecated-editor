@@ -293,18 +293,19 @@ gulp.task('dev', task_dev_deps );
 gulp.task('default', task_min_deps );
 
 // watch
+//gulp.task('watch', function() {
+//    for ( var i = 0; i < plugin_watchers.length; ++i ) {
+//        var watcher = plugin_watchers[i];
+//        gulp.watch( watcher.css.files, watcher.css.tasks ).on ( 'error', gutil.log );
+//        gulp.watch( watcher.styl.files, watcher.styl.tasks ).on ( 'error', gutil.log );
+//        gulp.watch( watcher.js.files, watcher.js.tasks ).on ( 'error', gutil.log );
+//        gulp.watch( watcher.html.files, watcher.html.tasks ).on ( 'error', gutil.log );
+//        gulp.watch( watcher.res.files, watcher.res.tasks ).on ( 'error', gutil.log );
+//    }
+//    gulp.watch(paths.src, ['src-dev']).on ( 'error', gutil.log );
+//});
+
 gulp.task('watch', function() {
-    for ( var i = 0; i < plugin_watchers.length; ++i ) {
-        var watcher = plugin_watchers[i];
-        gulp.watch( watcher.css.files, watcher.css.tasks ).on ( 'error', gutil.log );
-        gulp.watch( watcher.styl.files, watcher.styl.tasks ).on ( 'error', gutil.log );
-        gulp.watch( watcher.js.files, watcher.js.tasks ).on ( 'error', gutil.log );
-        gulp.watch( watcher.html.files, watcher.html.tasks ).on ( 'error', gutil.log );
-        gulp.watch( watcher.res.files, watcher.res.tasks ).on ( 'error', gutil.log );
-    }
-    gulp.watch(paths.src, ['src-dev']).on ( 'error', gutil.log );
-});
-gulp.task('watch-self', function() {
     for ( var i = 0; i < plugin_watchers.length; ++i ) {
         var watcher = plugin_watchers[i];
         gulp.watch( watcher.css.files, watcher.css.tasks ).on ( 'error', gutil.log );
