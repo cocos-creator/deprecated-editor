@@ -45,7 +45,7 @@ Polymer({
                 // This may occurred after ipc sync invocation such as AssetDB.xxx
                 if (metaJson && this.lastUuid === id) {
                     // one frame dely to make sure mouse right click event (contextmenu popup) will not suspend the rendering
-                    process.nextTick(function (metaJson) {
+                    setImmediate(function (metaJson) {
                         // Only inspect the lastest one
                         if (this.lastUuid === id) {
                             Fire.AssetLibrary.loadMeta(metaJson, function ( meta ) {

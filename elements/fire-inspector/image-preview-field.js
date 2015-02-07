@@ -73,7 +73,7 @@ Polymer({
         }
         else if ( this.asset instanceof Fire.Sprite ) {
             ctx.drawImage( this.asset.texture.image,
-                           this.asset.x, this.asset.y, this.asset.width, this.asset.height,
+                           this.asset.trimX, this.asset.trimY, this.asset.width, this.asset.height,
                            0, 0, this.$.canvas.width, this.$.canvas.height
                          );
         }
