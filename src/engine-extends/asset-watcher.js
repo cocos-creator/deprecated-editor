@@ -80,8 +80,8 @@
     };
 
     AssetsWatcher.stop = function (component) {
-        console.assert(component._watcherHandler, 'watcher should initialized when start');
-        if (component._watcherHandler !== EmptyWatcher) {
+        // if active, stop it
+        if (component._watcherHandler && component._watcherHandler !== EmptyWatcher) {
             component._watcherHandler.stop();
         }
     };

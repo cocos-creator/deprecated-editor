@@ -140,9 +140,6 @@ var Sandbox = (function () {
             if (ent) {
                 selection.push(ent.id);
             }
-            else {
-                Fire.error('Can not find entity: ' + indices);
-            }
         }
         Fire.Selection.selectEntity(selection, false, true);
     };
