@@ -230,6 +230,26 @@ Fire.browseObject = function ( type, fobjectEL ) {
     }
 };
 
+Fire.serializeMeta = function ( meta ) {
+    if ( !meta.subAssets ) {
+        return Fire.serialize(meta);
+    }
+
+    var subUuids = meta.subAssets.map ( function ( item ) {
+        var uuid = item.asset._uuid;
+        item.asset._uuid = null;
+        return uuid;
+    });
+
+    var json = Fire.serialize(meta);
+
+    for ( var i = 0; i < meta.subAssets.length; ++i ) {
+        meta.subAssets[i].asset._uuid = subUuids[i];
+    }
+
+    return json;
+};
+
 // get remote globals
 Fire.AssetDB = remote.getGlobal( 'AssetDB@' + fireID );
 

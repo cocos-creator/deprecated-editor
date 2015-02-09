@@ -745,7 +745,7 @@ Polymer({
                 return;
             }
 
-            Fire.sendToCore('asset:open', event.target.extname, this.getUrl(event.target));
+            Fire.sendToCore('asset:open', event.target.userId);
         }
         event.stopPropagation();
     },

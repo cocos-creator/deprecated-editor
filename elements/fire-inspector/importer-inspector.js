@@ -7,6 +7,8 @@ Polymer({
         this.inspector = null;
     },
 
+    lastUuid: "",
+
     resize: function () {
         if ( !this.$.preview.hide ) {
             this.$.preview.resize();
@@ -19,6 +21,12 @@ Polymer({
     },
 
     metaChanged: function () {
+        var inspectorDirty = false;
+        if ( this.meta.uuid === this.lastUuid ) {
+            inspectorDirty = true;
+        }
+        this.lastUuid = this.meta.uuid;
+
         // update preview
         if ( this.meta instanceof Fire.TextureMeta ||
              this.meta instanceof Fire.SpriteMeta ||
@@ -53,6 +61,10 @@ Polymer({
 
                     this.$.fields.target = this.inspector;
                     this.$.fields.refresh();
+
+                    if ( inspectorDirty && this.inspector ) {
+                        Fire.sendToPages( 'inspector:dirty', this.meta.uuid, Fire.serialize(this.inspector) );
+                    }
                 }
             }.bind(this) );
         }
@@ -61,15 +73,17 @@ Polymer({
     fieldsChangedAction: function ( event ) {
         event.stopPropagation();
 
-        if ( this.inspector )
+        if ( this.inspector ) {
             this.inspector.dirty = true;
+            Fire.sendToPages( 'inspector:dirty', this.meta.uuid, Fire.serialize(this.inspector) );
+        }
     },
 
     applyAction: function ( event ) {
         event.stopPropagation();
         Fire.sendToCore('asset-db:apply',
                         Fire.serialize(this.asset),
-                        Fire.serialize(this.meta),
+                        Fire.serializeMeta(this.meta),
                         Fire.serialize(this.inspector)
                        );
     },

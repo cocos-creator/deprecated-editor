@@ -18,6 +18,7 @@ Polymer({
         this.ipc.on('asset:changed', this._onAssetChanged.bind(this) );
         this.ipc.on('asset:moved', this._onAssetMoved.bind(this) );
         this.ipc.on('asset:saved', this._onAssetSaved.bind(this) );
+        this.ipc.on('asset:dirty', this._onAssetDirty.bind(this) );
     },
 
     detached: function () {
@@ -90,6 +91,12 @@ Polymer({
             if ( this.$.inspector.saving !== undefined ) {
                 this.$.inspector.saving = false;
             }
+        }
+    },
+
+    _onAssetDirty: function ( uuid, assetJson ) {
+        if ( this.target && this.target.uuid === uuid ) {
+            Fire.warn("TODO, waiting for @Jare's asset.deserialize()");
         }
     },
 
