@@ -104,7 +104,8 @@ Polymer({
         if ( Fire.isRetina ) {
             ctx.font = '24px Arial';
             offset = 24;
-        }else {
+        }
+        else {
             ctx.font = '12px Arial';
             offset = 12;
         }
