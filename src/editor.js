@@ -125,6 +125,23 @@ Fire.mixin( Fire, {
     },
 
     /**
+     * Broadcast message to main page.
+     * The page is so called as atom shell's web side. Each application window is an independent page and has its own JavaScript context.
+     * @param {string} message - the message to send
+     * @param {...*} [arg] - whatever arguments the message needs
+     */
+    sendToMainPage: function ( message ) {
+        'use strict';
+        if ( typeof message === 'string' ) {
+            var args = [].slice.call( arguments );
+            Ipc.send.apply( Ipc, ['send2mainpage'].concat( args ) );
+        }
+        else {
+            Fire.error('The message must be provided');
+        }
+    },
+
+    /**
      * Broadcast message to all pages and editor-core
      * @param {string} message - the message to send
      * @param {...*} [arg] - whatever arguments the message needs

@@ -1,10 +1,10 @@
 ﻿function createEntity() {
-    Fire.sendToPages('engine:createEntity');
+    Fire.sendToMainPage('engine:createEntity');
 }
 
 function createChildEntity() {
     var activeId = Fire.Selection.activeEntityId;
-    Fire.sendToPages('engine:createEntity', activeId);
+    Fire.sendToMainPage('engine:createEntity', activeId);
 }
 
 var ipc = new Fire.IpcListener();

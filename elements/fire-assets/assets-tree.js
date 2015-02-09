@@ -741,7 +741,7 @@ Polymer({
     openAction: function (event) {
         if ( event.target instanceof AssetsItem ) {
             if ( event.target.extname === '.fire' ) {
-                Fire.sendToPages('engine:openScene', event.target.userId);
+                Fire.sendToMainPage('engine:openScene', event.target.userId);
                 return;
             }
 

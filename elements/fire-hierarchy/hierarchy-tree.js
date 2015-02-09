@@ -234,38 +234,38 @@ Polymer({
 
     moveEntities: function ( targetEL, entities, nextSiblingId ) {
         // TODO: Fire.Selection.filter(entities,'sorted');
-        Fire.sendToPages('engine:moveEntities', entities, targetEL ? targetEL.userId : null, nextSiblingId);
+        Fire.sendToMainPage('engine:moveEntities', entities, targetEL ? targetEL.userId : null, nextSiblingId);
     },
 
     createEntity: function () {
         var parentEL = this.contextmenuAt && this.contextmenuAt.parentElement;
         if (parentEL instanceof HierarchyItem) {
-            Fire.sendToPages('engine:createEntity', parentEL.userId);
+            Fire.sendToMainPage('engine:createEntity', parentEL.userId);
         }
         else {
-            Fire.sendToPages('engine:createEntity');
+            Fire.sendToMainPage('engine:createEntity');
         }
     },
 
     createChildEntity: function () {
         if (this.contextmenuAt) {
-            Fire.sendToPages('engine:createEntity', this.contextmenuAt.userId);
+            Fire.sendToMainPage('engine:createEntity', this.contextmenuAt.userId);
         }
         else {
             var activeId = Fire.Selection.activeEntityId;
-            Fire.sendToPages('engine:createEntity', activeId);
+            Fire.sendToMainPage('engine:createEntity', activeId);
         }
     },
 
     deleteSelection: function () {
-        Fire.sendToPages('engine:deleteEntities', Fire.Selection.entities);
+        Fire.sendToMainPage('engine:deleteEntities', Fire.Selection.entities);
     },
 
     duplicateSelection: function () {
         var entities = this.getToplevelElements(Fire.Selection.entities).map(function (element) {
             return element && element.userId;
         });
-        Fire.sendToPages('engine:duplicateEntities', entities);
+        Fire.sendToMainPage('engine:duplicateEntities', entities);
     },
 
     select: function ( element ) {
@@ -359,7 +359,7 @@ Polymer({
         renamingEL._renaming = false;
 
         // TODO: pull up to view ?
-        Fire.sendToPages('engine:renameEntity', renamingEL.userId, event.target.value);
+        Fire.sendToMainPage('engine:renameEntity', renamingEL.userId, event.target.value);
     },
 
     openAction: function (event) {
