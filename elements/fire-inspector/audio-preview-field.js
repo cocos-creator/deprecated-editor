@@ -18,7 +18,7 @@ Polymer({
             return;
 
         var contentRect = this.$.content.getBoundingClientRect();
-        if ( Fire.isRetina() ) {
+        if ( Fire.isRetina ) {
             this.$.canvas.width = contentRect.width * 2;
             this.$.canvas.height = contentRect.height * 2;
         }
@@ -101,7 +101,7 @@ Polymer({
     drawChannelTip: function ( ctx, channel, yOffset ) {
         var offset = 0;
         ctx.fillStyle = "white";
-        if ( Fire.isRetina() ) {
+        if ( Fire.isRetina ) {
             ctx.font = '24px Arial';
             offset = 24;
         }else {
@@ -150,7 +150,7 @@ Polymer({
 
     drawWave: function ( ctx, peaks, x, y, width, height ) {
         var $ = 0;
-        if ( Fire.isRetina() ) {
+        if ( Fire.isRetina ) {
             $ = 0.25;
         }
         else {
