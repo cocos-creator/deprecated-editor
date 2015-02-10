@@ -2,18 +2,18 @@
  * @param {object} meta
  */
 Fire.AssetLibrary.loadMeta = function (meta, callback) {
-    function readSubAssetsUuid(subAssets) {
-        for (var i = 0; i < subAssets.length; i++) {
-            var item = subAssets[i];
+    function readSubAssetsUuid(subRawData) {
+        for (var i = 0; i < subRawData.length; i++) {
+            var item = subRawData[i];
             item.asset._uuid = item.meta.uuid;
-            if (item.meta.subAssets) {
-                readSubAssetsUuid(item.meta.subAssets);
+            if (item.meta.subRawData) {
+                readSubAssetsUuid(item.meta.subRawData);
             }
         }
     }
     this._deserializeWithDepends(meta, '', function (meta, error) {
-        if (meta && meta.subAssets) {
-            readSubAssetsUuid(meta.subAssets);
+        if (meta && meta.subRawData) {
+            readSubAssetsUuid(meta.subRawData);
         }
         callback(meta, error);
     }, true);

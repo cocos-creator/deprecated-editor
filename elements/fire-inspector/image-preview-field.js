@@ -53,10 +53,10 @@ Polymer({
             var xRatio = this.$.canvas.width / this.asset.width;
             var yRatio = this.$.canvas.height / this.asset.height;
 
-            if ( this.meta.subAssets ) {
+            if ( this.meta.subRawData ) {
                 if ( this.meta.type === Fire.TextureType.Sprite ) {
-                    //for ( var subInfo of this.meta.subAssets ) {
-                    this.meta.subAssets.forEach(function(subInfo) {
+                    //for ( var subInfo of this.meta.subRawData ) {
+                    this.meta.subRawData.forEach(function(subInfo) {
                         if ( subInfo.asset instanceof Fire.Sprite ) {
                             ctx.beginPath();
                             ctx.rect( subInfo.asset.x * xRatio,
