@@ -59,8 +59,8 @@ Polymer({
                     this.meta.subRawData.forEach(function(subInfo) {
                         if ( subInfo.asset instanceof Fire.Sprite ) {
                             ctx.beginPath();
-                            ctx.rect( subInfo.asset.x * xRatio,
-                                      subInfo.asset.y * yRatio,
+                            ctx.rect( subInfo.asset.trimX * xRatio,
+                                      subInfo.asset.trimY * yRatio,
                                       subInfo.asset.width * xRatio,
                                       subInfo.asset.height * yRatio );
                             ctx.lineWidth = 1;
@@ -73,7 +73,7 @@ Polymer({
         }
         else if ( this.asset instanceof Fire.Sprite ) {
             ctx.drawImage( this.asset.texture.image,
-                           this.asset.trimX, this.asset.trimY, this.asset.width, this.asset.height,
+                           this.asset.x, this.asset.y, this.asset.width, this.asset.height,
                            0, 0, this.$.canvas.width, this.$.canvas.height
                          );
         }

@@ -1,7 +1,16 @@
 ﻿/**
  * @param {object} meta
  */
-Fire.AssetLibrary.loadMeta = function (meta, callback) {
+Fire.AssetLibrary.loadMeta = function (metaJson, callback) {
+    var metaJsonObj = JSON.parse(metaJson);
+
+    if ( metaJsonObj.subRawData ) {
+        metaJsonObj.subRawData = metaJsonObj.subRawData.map(function ( item ) {
+            item.asset = { __uuid__: item.meta.uuid };
+            return item;
+        });
+    }
+
     function readSubAssetsUuid(subRawData) {
         for (var i = 0; i < subRawData.length; i++) {
             var item = subRawData[i];
@@ -11,10 +20,12 @@ Fire.AssetLibrary.loadMeta = function (meta, callback) {
             }
         }
     }
-    this._deserializeWithDepends(meta, '', function (meta, error) {
+    this._deserializeWithDepends(metaJsonObj, '', function (meta, error) {
         if (meta && meta.subRawData) {
             readSubAssetsUuid(meta.subRawData);
         }
+
+        //
         callback(meta, error);
     }, true);
 };
