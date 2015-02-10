@@ -195,7 +195,7 @@ var userScriptLoader = (function () {
         var info = new Fire._DeserializeInfo();
         Fire.Engine._canModifyCurrentScene = false;
         var newScene = Fire.deserialize(sceneSnapshot, info, {
-            classFinder: Fire._MissingScript.safeFindClass,
+            classFinder: Fire._MissingScript.safeFindClass
         });
         Fire.Engine._canModifyCurrentScene = true;
         //
@@ -318,10 +318,14 @@ Sandbox.reloadScripts = (function () {
     //    return reloadPluginScripts;
     //})();
 
-    function reloadScripts () {
+    function reloadScripts (compileSucceeded) {
         var scriptsLoaded = inited;
         if ( !inited ) {
             init();
+        }
+
+        if ( !compileSucceeded ) {
+            return;
         }
 
         // restore global variables（就算没 play 也可能会在 dev tools 里面添加全局变量）
