@@ -33,6 +33,8 @@ Polymer({
         this.ipc.on('selection:entity:hoverout', this.hoverout.bind(this));
         this.ipc.on('selection:entity:activated', this.active.bind(this, true));
         this.ipc.on('selection:entity:deactivated', this.active.bind(this, false));
+
+        this.ipc.on('entity:hint', this.hint.bind(this));
     },
 
     detached: function () {
@@ -72,6 +74,10 @@ Polymer({
         if (el) {
             el.hover = false;
         }
+    },
+
+    hint: function ( entityID ) {
+        this.$.hierarchyTree.hintItem(entityID);
     },
 
     createAction: function () {

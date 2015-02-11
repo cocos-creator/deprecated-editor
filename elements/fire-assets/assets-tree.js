@@ -503,20 +503,6 @@ Polymer({
         }
     },
 
-    hintItem: function ( id ) {
-        var itemEL = this.idToItem[id];
-        if (itemEL) {
-            this.scrollToItem(itemEL);
-            itemEL.hint();
-        }
-    },
-
-    scrollToItem: function ( el ) {
-        window.requestAnimationFrame( function () {
-            this.scrollTop = el.offsetTop + 16 - this.offsetHeight/2;
-        }.bind(this));
-    },
-
     deleteSelection: function () {
         var elements = this.getToplevelElements(Fire.Selection.assets);
         for (var i = 0; i < elements.length; i++) {
