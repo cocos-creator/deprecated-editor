@@ -19,9 +19,9 @@
     "gulp-vulcanize": "",
     "jshint-stylish": "",
     "event-stream": "",
-    "q": "",
+    "q": "1.1.2",
     "express": "",
     "del": "",
-    "gulp-minify-css": ""
+    "gulp-minify-css": "0.4.5"
   }
 }
