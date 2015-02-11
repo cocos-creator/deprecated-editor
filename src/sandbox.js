@@ -274,8 +274,6 @@ var userScriptLoader = (function () {
 // 重新加载全部脚本和插件
 Sandbox.reloadScripts = (function () {
 
-    var LoadSequence = [userScriptLoader, Fire._pluginLoader];
-
     var builtinClassIds;
     var builtinClassNames;
     var builtinComponentMenus;
@@ -319,34 +317,32 @@ Sandbox.reloadScripts = (function () {
     //})();
 
     function reloadScripts (compileSucceeded) {
+
         var scriptsLoaded = inited;
         if ( !inited ) {
             init();
         }
 
-        if ( !compileSucceeded ) {
-            return;
-        }
-
         // restore global variables（就算没 play 也可能会在 dev tools 里面添加全局变量）
         Sandbox.globalVarsChecker.restore(Fire.log, 'editing');
-
         if (scriptsLoaded) {
             // unload old
+            var LoadSequence = [userScriptLoader, Fire._pluginLoader];
             for (var j = LoadSequence.length - 1; j >= 0; j--) {
                 LoadSequence[j].unloadAll();
                 Sandbox.globalVarsChecker.restore(Fire.warn, 'unloading ' + LoadSequence[j].name);
             }
-
             // reset
             purge();
         }
 
         // load new
-        for (var i = 0; i < LoadSequence.length; i++) {
-            LoadSequence[i].loadAll();
-            Sandbox.globalVarsChecker.restore(Fire.warn, 'loading ' + LoadSequence[i].name);
+        if ( compileSucceeded ) {
+            userScriptLoader.loadAll();
+            Sandbox.globalVarsChecker.restore(Fire.warn, 'loading ' + userScriptLoader.name);
         }
+        Fire._pluginLoader.loadAll();
+        Sandbox.globalVarsChecker.restore(Fire.warn, 'loading ' + userScriptLoader.name);
     }
 
     return reloadScripts;
