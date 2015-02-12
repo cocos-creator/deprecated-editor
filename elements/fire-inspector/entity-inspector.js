@@ -106,8 +106,12 @@ Polymer({
         this.$.fields.refresh();
     },
 
-    fieldsChangedAction: function ( event ) {
+    fieldsChangedAction: function ( event, detail ) {
         event.stopPropagation();
+
+        if ( detail instanceof Fire.Asset ) {
+            Fire.AssetLibrary.cacheAsset(detail);
+        }
         Fire.sendToPages( 'scene:dirty' );
     },
 
