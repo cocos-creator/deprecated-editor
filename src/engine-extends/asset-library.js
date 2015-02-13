@@ -20,7 +20,7 @@ Fire.AssetLibrary.loadMeta = function (metaJson, callback) {
             }
         }
     }
-    this._deserializeWithDepends(metaJsonObj, '', function (meta, error) {
+    this.loadJson(metaJsonObj, '', function (meta, error) {
         if (meta && meta.subRawData) {
             readSubAssetsUuid(meta.subRawData);
         }
