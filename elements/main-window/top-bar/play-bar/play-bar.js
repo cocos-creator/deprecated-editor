@@ -38,17 +38,19 @@ Polymer({
         event.stopPropagation();
 
         if ( !Fire.Engine.isPlaying ) {
-            if (this.$.pause.active) {
-                Fire.Engine.step();
-            }
-            else {
-                Fire.Engine.play();
-            }
-            Fire._Sandbox.stashScene();
+            Fire._Sandbox.stashScene(function () {
+                if (this.$.pause.active) {
+                    Fire.Engine.step();
+                }
+                else {
+                    Fire.Engine.play();
+                }
+            }.bind(this));
         }
         else {
-            Fire.Engine.stop();
-            Fire._Sandbox.rewindScene();
+            Fire._Sandbox.rewindScene(function () {
+                Fire.Engine.stop();
+            });
         }
     },
 
@@ -73,9 +75,13 @@ Polymer({
 
         if ( !Fire.Engine.isPlaying ) {
             // before play
-            Fire._Sandbox.stashScene();
+            Fire._Sandbox.stashScene(function () {
+                Fire.Engine.step();
+            });
         }
-        Fire.Engine.step();
-    },
+        else {
+            Fire.Engine.step();
+        }
+    }
 
 });

@@ -111,7 +111,7 @@ var Sandbox = (function () {
 
     Sandbox.globalVarsChecker = null;
 
-    Sandbox._launchScene = function (scene, onUnloaded) {
+    Sandbox._launchScene = function (scene, onPreSceneLoad) {
         // save selection
         var selection = Fire.Selection.entities;
         var paths = [];
@@ -125,7 +125,7 @@ var Sandbox = (function () {
 
         // launch
         //var checkerUnloadingGV = new GlobalVarsChecker().record();
-        Fire.Engine._setCurrentScene(scene, onUnloaded/*function () {
+        Fire.Engine._setCurrentScene(scene, onPreSceneLoad/*function () {
             checkerUnloadingGV.restore(Fire.error);
             if (onUnloaded) {
                 onUnloaded();
@@ -145,7 +145,7 @@ var Sandbox = (function () {
     };
 
     // 保存当前场景
-    Sandbox.stashScene = function () {
+    Sandbox.stashScene = function (onPreSceneLoad) {
         purgeMemory();
         //gVarsCheckerForPlaying.record();
         Sandbox.globalVarsChecker.restore(Fire.log, 'editing');
@@ -157,18 +157,24 @@ var Sandbox = (function () {
         // switch scene
         this._launchScene(shadowScene, function () {
             Sandbox.globalVarsChecker.restore(Fire.warn, 'destroying editing scene');
+            if (onPreSceneLoad) {
+                onPreSceneLoad();
+            }
         });
         Sandbox.globalVarsChecker.restore(Fire.warn, 'launching playing scene');
     };
 
-    // 销毁当前场景，将之前保存的场景还原
-    Sandbox.rewindScene = function () {
+    // 销毁当前场景，然后将之前保存的场景还原
+    Sandbox.rewindScene = function (onPreSceneLoad) {
         purgeMemory();
         Sandbox.globalVarsChecker.restore(Fire.warn, 'playing');
 
         this._launchScene(stashedScene, function () {
             //gVarsCheckerForPlaying.restore(Fire.warn);
             Sandbox.globalVarsChecker.restore(Fire.warn, 'destroying playing scene');
+            if (onPreSceneLoad) {
+                onPreSceneLoad();
+            }
         });
         Sandbox.globalVarsChecker.restore(Fire.warn, 'launching editing scene');
         stashedScene = null;
