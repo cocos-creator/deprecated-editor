@@ -400,16 +400,6 @@ Polymer({
             // =====================
             { type: 'separator' },
 
-            // Show in finder
-            {
-                label: 'Show in ' + (Fire.isWin32 ? 'Explorer' : 'finder'),
-                click: function () {
-                    if ( this.contextmenuAt instanceof AssetsItem ) {
-                        Fire.sendToCore( 'asset-db:explore', this.getUrl(this.contextmenuAt) );
-                    }
-                }.bind(this)
-            },
-
             // Rename
             {
                 label: 'Rename',
@@ -428,9 +418,6 @@ Polymer({
                 //enable: this.contextmenuAt && this.contextmenuAt.isRoot === false,
             },
 
-            // =====================
-            { type: 'separator' },
-
             // Reimport
             {
                 label: 'Reimport',
@@ -447,6 +434,39 @@ Polymer({
                             selectedItemEl.foldable = false;
                         }
                         Fire.sendToCore( 'asset-db:reimport', url );
+                    }
+                }.bind(this)
+            },
+
+            // =====================
+            { type: 'separator' },
+
+            // Show in finder
+            {
+                label: 'Show in ' + (Fire.isWin32 ? 'Explorer' : 'finder'),
+                click: function () {
+                    if ( this.contextmenuAt instanceof AssetsItem ) {
+                        Fire.sendToCore( 'asset-db:explore', this.getUrl(this.contextmenuAt) );
+                    }
+                }.bind(this)
+            },
+
+            // Show in library
+            {
+                label: 'Show in library',
+                click: function () {
+                    if ( this.contextmenuAt instanceof AssetsItem ) {
+                        Fire.sendToCore( 'asset-db:explore-lib', this.getUrl(this.contextmenuAt) );
+                    }
+                }.bind(this)
+            },
+
+            // Print uuid
+            {
+                label: 'Show uuid',
+                click: function () {
+                    if ( this.contextmenuAt instanceof AssetsItem ) {
+                        Fire.log( this.contextmenuAt.userId );
                     }
                 }.bind(this)
             },
