@@ -380,11 +380,6 @@ Polymer({
                                     targetEL = targetEL.parentElement;
 
                                 var newAtlas = new Fire.Atlas();
-                                // newAtlas.name = textureName;
-                                // newAtlas.texture = asset;
-                                // newAtlas.width = asset.width;
-                                // newAtlas.height = asset.height;
-
                                 var url = this.getUrl(targetEL);
                                 var newAssetUrl = Url.join( url, 'New Atlas.atlas' );
                                 this._focusUrl = newAssetUrl;
