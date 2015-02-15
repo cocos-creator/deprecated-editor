@@ -11,7 +11,7 @@ Fire.extend(PluginLoader, Fire._PluginLoaderBase);
 
 PluginLoader.prototype.onAfterUnload = function () {
     // reload to ensure context clear and menu unloaded
-    Fire._Sandbox.reloadScripts();
+    Fire._Sandbox.reloadScripts(true);
 };
 //PluginLoader.prototype._addMenuImpl = function (path, msg) {
 //    Fire.MainMenu.addCommandItem(path, msg);
