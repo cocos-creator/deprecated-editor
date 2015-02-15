@@ -1,7 +1,8 @@
-function _fieldSection ( name, target ) {
+function _fieldSection ( name, target, closable ) {
     //
     var fireSectionEL = new FireSection();
     fireSectionEL.name = name;
+    fireSectionEL.closable = closable;
     fireSectionEL.$ = {};
 
     var klass = target.constructor;
@@ -21,6 +22,13 @@ function _fieldSection ( name, target ) {
             fireSectionEL.$[propName] = propEL;
             fireSectionEL.appendChild( propEL );
         }
+    }
+
+    if ( fireSectionEL.closable ) {
+        fireSectionEL.addEventListener('close', function ( event ) {
+            event.stopPropagation();
+            Fire.sendToMainPage('engine:removeComment', target.id);
+        });
     }
 
     return fireSectionEL;
@@ -45,7 +53,7 @@ Polymer({
         var el;
         if ( this.target instanceof Fire.AssetInspector ||
              this.target instanceof Fire.CustomAsset ) {
-            el = _fieldSection( "Properties", this.target );
+            el = _fieldSection( "Properties", this.target, false );
             this.appendChild( el );
         }
         else if ( this.target instanceof Fire.Entity ) {
@@ -53,7 +61,7 @@ Polymer({
 
             for ( var i = 0; i < this.target._components.length; ++i ) {
                 var comp = this.target._components[i];
-                el = _fieldSection( Fire.getClassName(comp), comp );
+                el = _fieldSection( Fire.getClassName(comp), comp, true );
                 docfrag.appendChild(el);
             }
 
