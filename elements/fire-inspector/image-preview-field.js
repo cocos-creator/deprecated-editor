@@ -5,6 +5,7 @@ Polymer({
     },
 
     info: "Unkown",
+    rawTexture: null,
 
     resize: function () {
         if ( !this.asset)
@@ -72,15 +73,27 @@ Polymer({
             }
         }
         else if ( this.asset instanceof Fire.Sprite ) {
-            ctx.drawImage( this.asset.texture.image,
-                           this.asset.x, this.asset.y, this.asset.width, this.asset.height,
-                           0, 0, this.$.canvas.width, this.$.canvas.height
-                         );
+            if ( this.rawTexture ) {
+                ctx.drawImage( this.rawTexture.image,
+                              this.asset.trimX, this.asset.trimY, this.asset.width, this.asset.height,
+                              0, 0, this.$.canvas.width, this.$.canvas.height
+                             );
+            }
         }
     },
 
     assetChanged: function () {
-        this.resize();
         this.info = this.asset.width + " x " + this.asset.height;
+        this.rawTexture = null;
+        this.resize();
+
+        if ( this.asset instanceof Fire.Sprite ) {
+            Fire.AssetLibrary.loadAsset( this.meta.rawTextureUuid, function ( rawTexture ) {
+                this.rawTexture = rawTexture;
+                this.repaint();
+            }.bind(this) );
+
+            return;
+        }
     },
 });
