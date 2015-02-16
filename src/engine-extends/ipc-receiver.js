@@ -101,6 +101,16 @@ Ipc.on('engine:duplicateEntities', function (idList) {
     }
 });
 
+Ipc.on('engine:removeComponent', function (componentId) {
+    var comp = Fire._getInstanceById(componentId);
+    if (comp) {
+        comp.destroy();
+    }
+    if ( !Engine.isPlaying ) {
+        FObject._deferredDestroy();
+    }
+});
+
 Ipc.on('engine:openScene', function (uuid) {
     Fire.Engine.stop();
     Fire.AssetLibrary.clearAllCache();

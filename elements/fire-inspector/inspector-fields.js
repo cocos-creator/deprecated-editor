@@ -27,7 +27,7 @@ function _fieldSection ( name, target, closable ) {
     if ( fireSectionEL.closable ) {
         fireSectionEL.addEventListener('close', function ( event ) {
             event.stopPropagation();
-            Fire.sendToMainPage('engine:removeComment', target.id);
+            Fire.sendToMainPage('engine:removeComponent', target.id);
         });
     }
 
