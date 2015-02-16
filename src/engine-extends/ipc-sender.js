@@ -117,10 +117,10 @@ editorCallback.onComponentDisabled = function (component) {
     Fire.sendToPages('component:disabled', component.id);
 };
 
-editorCallback.onComponentAdded = function (component) {
-    Fire.sendToPages('component:added', component.id);
+editorCallback.onComponentAdded = function (entity, component) {
+    Fire.sendToPages('component:added', entity.id, component.id);
 };
 
-editorCallback.onComponentRemoved = function (component, entity) {
-    Fire.sendToPages('component:removed', component.id, entity.id);
+editorCallback.onComponentRemoved = function (entity, component) {
+    Fire.sendToPages('component:removed', entity.id, component.id);
 };
