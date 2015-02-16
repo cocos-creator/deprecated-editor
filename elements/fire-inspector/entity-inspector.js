@@ -6,9 +6,13 @@ Polymer({
         this.target = null;
     },
 
+    refresh: function () {
+        this.$.fields.refresh();
+    },
+
     targetChanged: function () {
         this.$.fields.target = this.target;
-        this.$.fields.refresh();
+        this.refresh();
     },
 
     getAddCompMenuTemplate: function () {
@@ -101,9 +105,8 @@ Polymer({
         return template;
     },
 
-    addComponent: function (component) {
-        this.target.addComponent(component);
-        this.$.fields.refresh();
+    addComponent: function (componentCtor) {
+        Fire.sendToMainPage('engine:addComponent', this.target.id, Fire._getClassId(componentCtor) );
     },
 
     fieldsChangedAction: function ( event, detail ) {
