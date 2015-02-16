@@ -1,6 +1,6 @@
 # Intro
 
-Fireball-x Editor
+Fireball Editor
 
 ## Install
 

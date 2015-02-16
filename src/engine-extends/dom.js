@@ -1,6 +1,3 @@
-if (typeof window !== 'undefined') {
-
-// TODO: move these functions to fireball-x/editor/utils
 
 var _doGetTrimRect = function (pixelBuffer, w, h, trimThreshold) {
     // A B C
@@ -199,5 +196,3 @@ Fire.downloadCanvas = function (canvas, filename) {
 Fire.imgDataUrlToBase64 = function (dataUrl) {
     return dataUrl.replace(/^data:image\/\w+;base64,/, "");
 };
-
-}

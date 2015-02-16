@@ -116,7 +116,7 @@ Polymer({
         if ( !sceneName ) {
             sceneName = 'Untitled';
         }
-        Remote.getCurrentWindow().setTitle( sceneName + " - Fireball-x Editor" );
+        Remote.getCurrentWindow().setTitle( sceneName + " - Fireball Editor" );
     },
 
     addPlugin: function ( panel, plugin, id, name ) {
