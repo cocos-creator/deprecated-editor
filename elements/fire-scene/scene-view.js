@@ -589,7 +589,7 @@ Polymer({
         var items = EditorUI.DragDrop.drop(event.dataTransfer);
         var clientRect = this.getBoundingClientRect();
 
-        var onload = function ( asset ) {
+        var onload = function ( err, asset ) {
             if ( asset.createEntity ) {
                 asset.createEntity( function ( ent ) {
                     var mousePos = new Fire.Vec2(event.clientX - clientRect.left, event.clientY - clientRect.top);

@@ -553,7 +553,7 @@ Polymer({
                     parentEnt = Fire._getInstanceById(targetEL.userId);
 
                 Fire.Selection.clearEntity();
-                var onload = function ( asset ) {
+                var onload = function ( err, asset ) {
                     if ( asset && asset.createEntity ) {
                         asset.createEntity( function ( ent ) {
                             ent.parent = parentEnt;
