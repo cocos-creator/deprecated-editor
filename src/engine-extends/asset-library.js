@@ -20,13 +20,13 @@ Fire.AssetLibrary.loadMeta = function (metaJson, callback) {
             }
         }
     }
-    this.loadJson(metaJsonObj, '', function (meta, error) {
+    this.loadJson(metaJsonObj, '', function (error, meta) {
         if (meta && meta.subRawData) {
             readSubAssetsUuid(meta.subRawData);
         }
 
         //
-        callback(meta, error);
+        callback(error, meta);
     }, true);
 };
 
@@ -129,7 +129,7 @@ Fire.AssetLibrary.onAssetReimported = function (uuid) {
     // 删除旧的引用，所有用到 asset 的地方必须通过 assetListener 监听资源的更新
     // 否则资源将出现新旧两份引用。
     delete this._uuidToAsset[uuid];  // force reload
-    this._loadAssetByUuid(uuid, function (asset) {
+    this._loadAssetByUuid(uuid, function (err, asset) {
         var notUnloaded = uuid in this._uuidToAsset;
         if (asset && notUnloaded) {
             this._updateAsset(uuid, asset);

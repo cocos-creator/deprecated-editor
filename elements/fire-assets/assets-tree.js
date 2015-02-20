@@ -350,7 +350,7 @@ Polymer({
                             if ( targetEL instanceof AssetsItem && _isTexture(targetEL.extname) ) {
                                 var textureName = targetEL.name;
 
-                                Fire.AssetLibrary.loadAsset ( targetEL.userId, function ( asset, error ) {
+                                Fire.AssetLibrary.loadAsset ( targetEL.userId, function ( error, asset ) {
                                     var newSprite = new Fire.Sprite();
                                     newSprite.texture = asset;
                                     newSprite.width = asset.width;
