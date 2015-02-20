@@ -51,7 +51,7 @@ Polymer({
                     setImmediate(function (metaJson) {
                         // Only inspect the lastest one
                         if (this.lastUuid === id) {
-                            Fire.AssetLibrary.loadMeta(metaJson, function ( meta ) {
+                            Fire.AssetLibrary.loadMeta(metaJson, function ( err, meta ) {
                                 this.inspect(meta);
                             }.bind(this));
                         }
@@ -74,7 +74,7 @@ Polymer({
 
             //
             var metaJson = Fire.AssetDB.loadMetaJson(uuid);
-            Fire.AssetLibrary.loadMeta(metaJson, function ( meta ) {
+            Fire.AssetLibrary.loadMeta(metaJson, function ( err, meta ) {
                 this.inspect(meta,true);
             }.bind(this));
         }
@@ -185,7 +185,7 @@ Polymer({
 
         if ( this.target && this.target instanceof Fire.AssetMeta ) {
             var metaJson = Fire.AssetDB.loadMetaJson(this.target.uuid);
-            Fire.AssetLibrary.loadMeta(metaJson, function ( meta ) {
+            Fire.AssetLibrary.loadMeta(metaJson, function ( err, meta ) {
                 this.inspect(meta,true);
             }.bind(this));
         }
