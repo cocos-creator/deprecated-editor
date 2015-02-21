@@ -27,7 +27,7 @@ Polymer({
 
         Fire.sendToCore('asset-db:query', "assets://", typeID);
 
-        if ( typeID !== Fire._getClassId(Fire.Texture) ) {
+        if ( typeID !== Fire.JS._getClassId(Fire.Texture) ) {
             this.$.btnGroup.style.display = "none";
         }
         this.$.btnGroup.select(0);
@@ -46,7 +46,7 @@ Polymer({
             var quickAssets = this;
             this.items = results.map ( function ( item ) {
                 var icon = '';
-                if ( typeID === Fire._getClassId(Fire.Texture) ) {
+                if ( typeID === Fire.JS._getClassId(Fire.Texture) ) {
                     icon = "uuid://" + item.uuid + "?thumb";
                 }
 

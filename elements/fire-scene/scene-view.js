@@ -171,7 +171,7 @@ Polymer({
                 return;
             }
 
-            var classname = Fire.getClassName(comp);
+            var classname = Fire.JS.getClassName(comp);
             var gizmosDef = Fire.gizmos[classname];
             if ( gizmosDef ) {
                 gizmo = new gizmosDef( this.svgGizmos, comp );
@@ -193,7 +193,7 @@ Polymer({
             if ( component.isValid ) {
                 var gizmo = this.svgGizmos.gizmosTable[component.id];
                 if ( gizmo ) {
-                    Fire.mixin( gizmo, options );
+                    Fire.JS.mixin( gizmo, options );
                     gizmo.update();
                 }
             }

@@ -7,7 +7,7 @@ var Path = require('path');
 function PluginLoader () {
     Fire._PluginLoaderBase.apply(this, arguments);
 }
-Fire.extend(PluginLoader, Fire._PluginLoaderBase);
+Fire.JS.extend(PluginLoader, Fire._PluginLoaderBase);
 
 PluginLoader.prototype.onAfterUnload = function () {
     // reload to ensure context clear and menu unloaded

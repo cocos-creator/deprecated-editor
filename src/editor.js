@@ -86,7 +86,7 @@ Fire.info = function ( text ) {
     Fire.sendToCore('console:info', text);
 };
 
-Fire.mixin( Fire, {
+Fire.JS.mixin( Fire, {
 
     // messages
 
@@ -210,7 +210,7 @@ Fire.browseObject = function ( type, fobjectEL ) {
         Fire.warn('TODO: ask johnny how to do this.');
     }
     else if ( Fire.isChildClassOf( type, Fire.Asset ) ) {
-        var typeID = Fire._getClassId(type);
+        var typeID = Fire.JS._getClassId(type);
         Fire.sendToCore('window:open', 'quick-assets', 'fire://static/quick-assets.html', {
             title: "Quick Assets",
             width: 800,

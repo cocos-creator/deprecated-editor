@@ -61,7 +61,7 @@ Polymer({
 
             for ( var i = 0; i < this.target._components.length; ++i ) {
                 var comp = this.target._components[i];
-                el = _fieldSection( Fire.getClassName(comp), comp, true );
+                el = _fieldSection( Fire.JS.getClassName(comp), comp, true );
                 docfrag.appendChild(el);
             }
 

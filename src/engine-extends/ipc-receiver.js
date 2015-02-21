@@ -104,7 +104,7 @@ Ipc.on('engine:duplicateEntities', function (idList) {
 Ipc.on('engine:addComponent', function (entityId, compClassId) {
     var entity = Fire._getInstanceById(entityId);
     if (entity) {
-        var CompCtor = Fire._getClassById(compClassId);
+        var CompCtor = Fire.JS._getClassById(compClassId);
         if (CompCtor) {
             entity.addComponent(CompCtor);
         }

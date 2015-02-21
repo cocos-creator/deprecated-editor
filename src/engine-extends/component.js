@@ -34,7 +34,7 @@ var doDefine = Fire.defineComponent;
 Fire.defineComponent = function (baseOrConstructor, constructor) {
     var comp = doDefine.apply(this, arguments);
     if (comp) {
-        Fire.addComponentMenu(comp, 'Scripts/' + Fire.getClassName(comp), -1);
+        Fire.addComponentMenu(comp, 'Scripts/' + Fire.JS.getClassName(comp), -1);
     }
     return comp;
 };
