@@ -18,75 +18,75 @@ var Util = require('util');
 var remote = require('remote');
 var Ipc = require('ipc');
 
-//
+// console
+Fire.log = function ( text ) {
+    'use strict';
+    if (arguments.length <= 1) {
+        text = "" + text;
+    }
+    else {
+        text = Util.format.apply(Util, arguments);
+    }
+    console.log(text);
+    Fire.sendToCore('console:log', text);
+};
+Fire.warn = function ( text ) {
+    'use strict';
+    if (arguments.length <= 1) {
+        text = "" + text;
+    }
+    else {
+        text = Util.format.apply(Util, arguments);
+    }
+    console.warn(text);
+    Fire.sendToCore('console:warn', text);
+};
+Fire.error = function ( text ) {
+    'use strict';
+    if (arguments.length <= 1) {
+        text = "" + text;
+    }
+    else {
+        text = Util.format.apply(Util, arguments);
+    }
+    console.error(text);
+    Fire.sendToCore('console:error', text);
+};
+Fire.success = function ( text ) {
+    'use strict';
+    if (arguments.length <= 1) {
+        text = "" + text;
+    }
+    else {
+        text = Util.format.apply(Util, arguments);
+    }
+    console.log('%c' + text, "color: green");
+    Fire.sendToCore('console:success', text);
+};
+Fire.failed = function ( text ) {
+    'use strict';
+    if (arguments.length <= 1) {
+        text = "" + text;
+    }
+    else {
+        text = Util.format.apply(Util, arguments);
+    }
+    console.log('%c' + text, "color: red");
+    Fire.sendToCore('console:failed', text);
+};
+Fire.info = function ( text ) {
+    'use strict';
+    if (arguments.length <= 1) {
+        text = "" + text;
+    }
+    else {
+        text = Util.format.apply(Util, arguments);
+    }
+    console.info(text);
+    Fire.sendToCore('console:info', text);
+};
+
 Fire.mixin( Fire, {
-    // console
-    log: function ( text ) {
-        'use strict';
-        if (arguments.length <= 1) {
-            text = "" + text;
-        }
-        else {
-            text = Util.format.apply(Util, arguments);
-        }
-        console.log(text);
-        Fire.sendToCore('console:log', text);
-    },
-    warn: function ( text ) {
-        'use strict';
-        if (arguments.length <= 1) {
-            text = "" + text;
-        }
-        else {
-            text = Util.format.apply(Util, arguments);
-        }
-        console.warn(text);
-        Fire.sendToCore('console:warn', text);
-    },
-    error: function ( text ) {
-        'use strict';
-        if (arguments.length <= 1) {
-            text = "" + text;
-        }
-        else {
-            text = Util.format.apply(Util, arguments);
-        }
-        console.error(text);
-        Fire.sendToCore('console:error', text);
-    },
-    success: function ( text ) {
-        'use strict';
-        if (arguments.length <= 1) {
-            text = "" + text;
-        }
-        else {
-            text = Util.format.apply(Util, arguments);
-        }
-        console.log('%c' + text, "color: green");
-        Fire.sendToCore('console:success', text);
-    },
-    failed: function ( text ) {
-        'use strict';
-        if (arguments.length <= 1) {
-            text = "" + text;
-        }
-        else {
-            text = Util.format.apply(Util, arguments);
-        }
-        console.log('%c' + text, "color: red");
-        Fire.sendToCore('console:failed', text);
-    },
-    info: function ( text ) {
-        'use strict';
-        if (arguments.length <= 1) {
-            text = "" + text;
-        }
-        else {
-            text = Util.format.apply(Util, arguments);
-        }
-        console.info(text);
-        Fire.sendToCore('console:info', text);
-    },
 
     // messages
 
@@ -167,7 +167,7 @@ Fire.mixin( Fire, {
         else {
             Fire.error('The name of rpc must be provided');
         }
-    },
+    }
 });
 
 Fire.observe = function ( target, enabled ) {
