@@ -1,4 +1,4 @@
-﻿var BitmapTextGizmo = Fire.define("Fire.BitmapTextGizmo", Fire.Gizmo, function () {
+﻿var BitmapTextGizmo = Fire.extend("Fire.BitmapTextGizmo", Fire.Gizmo, function () {
 
     var svg = arguments[0];
     var target = arguments[1];

@@ -1,4 +1,4 @@
-var PositionGizmo = Fire.define("Fire.PositionGizmo",
+var PositionGizmo = Fire.extend("Fire.PositionGizmo",
                                 Fire.Gizmo,
                                 function () {
     

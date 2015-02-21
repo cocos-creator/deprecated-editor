@@ -1,6 +1,6 @@
-var SpriteRendererGizmo = Fire.define("Fire.SpriteRendererGizmo",
-                              Fire.Gizmo,
-                              function () {
+var SpriteRendererGizmo = Fire.extend("Fire.SpriteRendererGizmo",
+                                      Fire.Gizmo,
+                                      function () {
 
     var svg = arguments[0];
     var target = arguments[1];

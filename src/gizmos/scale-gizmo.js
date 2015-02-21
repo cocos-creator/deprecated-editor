@@ -1,6 +1,6 @@
-var ScaleGizmo = Fire.define("Fire.ScaleGizmo",
-                                Fire.Gizmo,
-                                function () {
+var ScaleGizmo = Fire.extend("Fire.ScaleGizmo",
+                              Fire.Gizmo,
+                              function () {
 
     var svg = arguments[0];
     var target = arguments[1];

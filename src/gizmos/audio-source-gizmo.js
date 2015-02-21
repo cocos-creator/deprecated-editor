@@ -1,6 +1,6 @@
-﻿var AudioSourceGizmo = Fire.define("Fire.AudioSourceGizmo",
-                              Fire.Gizmo,
-                              function () {
+﻿var AudioSourceGizmo = Fire.extend("Fire.AudioSourceGizmo",
+                            Fire.Gizmo,
+                            function () {
 
     var svg = arguments[0];
     var target = arguments[1];

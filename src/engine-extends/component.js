@@ -26,13 +26,29 @@ Component.prototype._onPreDestroy = function () {
 
 // extend defineComponent to register the default component menu
 var doDefine = Fire.defineComponent;
+var doExtend = Fire.extendComponent;
 
 /**
- * @param {function} [baseOrConstructor]
+ * @method defineComponent
+ * @static
  * @param {function} [constructor]
  */
-Fire.defineComponent = function (baseOrConstructor, constructor) {
-    var comp = doDefine.apply(this, arguments);
+Fire.defineComponent = function (constructor) {
+    var comp = doDefine(constructor);
+    if (comp) {
+        Fire.addComponentMenu(comp, 'Scripts/' + Fire.JS.getClassName(comp), -1);
+    }
+    return comp;
+};
+
+/**
+ * @method extendComponent
+ * @static
+ * @param {function} baseClass
+ * @param {function} [constructor]
+ */
+Fire.extendComponent = function (baseClass, constructor) {
+    var comp = doExtend(baseClass, constructor);
     if (comp) {
         Fire.addComponentMenu(comp, 'Scripts/' + Fire.JS.getClassName(comp), -1);
     }

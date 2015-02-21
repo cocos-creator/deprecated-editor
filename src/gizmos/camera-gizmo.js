@@ -1,4 +1,4 @@
-﻿var CameraGizmo = Fire.define("Fire.CameraGizmo",
+﻿var CameraGizmo = Fire.extend("Fire.CameraGizmo",
                               Fire.Gizmo,
                               function () {
 
