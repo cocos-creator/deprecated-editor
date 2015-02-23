@@ -1,14 +1,15 @@
-﻿var gulp = require('gulp');
+﻿var path = require('path');
+
+var gulp = require('gulp');
 var gutil = require('gulp-util');
 var jshint = require('gulp-jshint');
 var concat = require('gulp-concat');
 var stylus = require('gulp-stylus');
 var vulcanize = require('gulp-vulcanize');
-var del = require('del');
 var minifyCSS = require('gulp-minify-css');
+var fb = require('gulp-fb');
 
-var path = require('path');
-var es = require('event-stream');
+var del = require('del');
 var stylish = require('jshint-stylish');
 
 var paths = {
@@ -66,15 +67,6 @@ gulp.task('clean', function() {
 /////////////////////////////////////////////////////////////////////////////
 // build
 /////////////////////////////////////////////////////////////////////////////
-
-function wrapScope () {
-    var header = new Buffer("(function () {\n");
-    var footer = new Buffer("})();\n");
-    return es.through(function (file) {
-        file.contents = Buffer.concat([header, file.contents, footer]);
-        this.emit('data', file);
-    });
-}
 
 var task_copy_deps = [];
 var task_min_deps = [ 'src-min' ];
@@ -160,7 +152,7 @@ var task_plugin = function ( name ) {
             var globpath = path.relative(__dirname, file);
             var destfile = path.relative(path.join(__dirname, 'elements'), file);
             var stream = gulp.src(globpath)
-                .pipe(wrapScope())
+                .pipe(fb.wrapScope())
                 .pipe(jshint({
                     multistr: true,
                     smarttabs: false,
@@ -187,7 +179,7 @@ var task_plugin = function ( name ) {
 
     gulp.task(task_js_dev, [task_js_ext], function() {
         return gulp.src(js_files, {base: 'elements'})
-        .pipe(wrapScope())
+        .pipe(fb.wrapScope())
         .pipe(jshint({
             multistr: true,
             smarttabs: false,
@@ -252,7 +244,7 @@ gulp.task('src-jshint', function() {
 // src-dev
 gulp.task('src-dev', ['src-jshint'], function() {
     return gulp.src(paths.src)
-    .pipe(wrapScope())
+    .pipe(fb.wrapScope())
     .pipe(concat('editor.js'))
     .pipe(gulp.dest('bin'))
     ;

@@ -10,6 +10,7 @@
   "devDependencies": {
     "gulp": "",
     "gulp-concat": "",
+    "gulp-fb": "",
     "gulp-jshint": "",
     "gulp-stylus": "",
     "gulp-util": "",
@@ -18,7 +19,6 @@
     "gulp-htmlmin": "",
     "gulp-vulcanize": "",
     "jshint-stylish": "",
-    "event-stream": "",
     "q": "1.1.2",
     "express": "",
     "del": "",
