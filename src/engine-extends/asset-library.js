@@ -63,38 +63,38 @@ Fire.AssetLibrary._onAssetChanged = function (uuid, asset) {
     this.assetListener.invoke(uuid, asset);
 };
 
-/**
- * Shadow copy all serializable properties from supplied asset to another indicated by uuid.
- * @param {string} uuid
- * @param {Fire.Asset} newAsset
- */
-Fire.AssetLibrary._updateAsset = function (uuid, newAsset) {
-    var asset = this._uuidToAsset[uuid];
-    if (!asset || !newAsset) {
-        return;
-    }
-    var cls = asset.constructor;
-    if (cls !== newAsset.constructor) {
-        Fire.error('Not the same type');
-        return;
-    }
-    if (asset.shadowCopyFrom) {
-        asset.shadowCopyFrom(newAsset);
-    }
-    else {
-        var props = cls.__props__;
-        if (props) {
-            for (var p = 0; p < props.length; p++) {
-                var propName = props[p];
-                var attrs = Fire.attr(cls, propName);
-                if (attrs.serializable !== false) {
-                    asset[propName] = newAsset[propName];
-                }
-            }
-        }
-    }
-    this._onAssetChanged(uuid, asset);
-};
+///**
+// * Shadow copy all serializable properties from supplied asset to another indicated by uuid.
+// * @param {string} uuid
+// * @param {Fire.Asset} newAsset
+// */
+//Fire.AssetLibrary._updateAsset = function (uuid, newAsset) {
+//    var asset = this._uuidToAsset[uuid];
+//    if (!asset || !newAsset) {
+//        return;
+//    }
+//    var cls = asset.constructor;
+//    if (cls !== newAsset.constructor) {
+//        Fire.error('Not the same type');
+//        return;
+//    }
+//    if (asset.shadowCopyFrom) {
+//        asset.shadowCopyFrom(newAsset);
+//    }
+//    else {
+//        var props = cls.__props__;
+//        if (props) {
+//            for (var p = 0; p < props.length; p++) {
+//                var propName = props[p];
+//                var attrs = Fire.attr(cls, propName);
+//                if (attrs.serializable !== false) {
+//                    asset[propName] = newAsset[propName];
+//                }
+//            }
+//        }
+//    }
+//    this._onAssetChanged(uuid, asset);
+//};
 
 /**
  * In editor, if you load an asset from loadAsset, and then use the asset in the scene,
@@ -119,20 +119,28 @@ Fire.AssetLibrary.cacheAsset = function (asset) {
  * @param {string} uuid
  */
 Fire.AssetLibrary.onAssetReimported = function (uuid) {
-    var loaded = this._uuidToAsset[uuid];
-    if (!loaded) {
+    var exists = this._uuidToAsset[uuid];
+    if ( !exists ) {
         return;
     }
 
-    // reload
-
-    // 删除旧的引用，所有用到 asset 的地方必须通过 assetListener 监听资源的更新
-    // 否则资源将出现新旧两份引用。
-    delete this._uuidToAsset[uuid];  // force reload
+    // 重新读取 asset 并将数据覆盖到已有 asset，如果 asset 引用到的其它 asset uuid 不变，
+    // 则其它 asset 不会重新读取。
     this._loadAssetByUuid(uuid, function (err, asset) {
         var notUnloaded = uuid in this._uuidToAsset;
         if (asset && notUnloaded) {
-            this._updateAsset(uuid, asset);
+            console.assert(asset === exists);
+            this._onAssetChanged(uuid, asset);
         }
-    }.bind(this));
+    }.bind(this), false, null, exists);
+
+    //// 删除旧的引用，所有用到 asset 的地方必须通过 assetListener 监听资源的更新
+    //// 否则资源将出现新旧两份引用。
+    //delete this._uuidToAsset[uuid];  // force reload
+    //this._loadAssetByUuid(uuid, function (err, asset) {
+    //    var notUnloaded = uuid in this._uuidToAsset;
+    //    if (asset && notUnloaded) {
+    //        this._updateAsset(uuid, asset);
+    //    }
+    //}.bind(this));
 };
