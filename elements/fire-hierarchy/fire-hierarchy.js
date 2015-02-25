@@ -98,12 +98,12 @@ Polymer({
 
     newEntity: function ( name, flags, id, parentEL ) {
         var tree = this.$.hierarchyTree;
-        if (typeof name !== 'object') {
+        if (typeof name === 'string') {
             if ( !(flags & Fire._ObjectFlags.HideInEditor) ) {
                 return tree.newItem(name, id, parentEL);
             }
         }
-        else {
+        else if (name){
             var snapshot = name;
             createEntityFromSnapshot(tree, null, snapshot);
         }

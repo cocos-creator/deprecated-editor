@@ -590,7 +590,7 @@ Polymer({
         var clientRect = this.getBoundingClientRect();
 
         var onload = function ( err, asset ) {
-            if ( asset.createEntity ) {
+            if ( asset && asset.createEntity ) {
                 asset.createEntity( function ( ent ) {
                     var mousePos = new Fire.Vec2(event.clientX - clientRect.left, event.clientY - clientRect.top);
                     var worldMousePos = this.renderContext.camera.screenToWorld(mousePos);
