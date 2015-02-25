@@ -106,7 +106,7 @@
                 Fire.AssetLibrary.assetListener.add(prop._uuid, onDirty);
                 this.watchingInfos[propName] = {
                     uuid: prop._uuid,
-                    callback: onDirty,
+                    callback: onDirty
                 };
             }
         }
@@ -124,7 +124,7 @@
         // deregister old
         var info = this.watchingInfos[propName];
         if (info) {
-            if (info.uuid === newAsset._uuid) {
+            if (newAsset && info.uuid === newAsset._uuid) {
                 return;
             }
             // if watching, remove
@@ -141,7 +141,7 @@
                 Fire.AssetLibrary.assetListener.add(newUuid, onDirty);
                 this.watchingInfos[propName] = {
                     uuid: newUuid,
-                    callback: onDirty,
+                    callback: onDirty
                 };
                 return;
             }
