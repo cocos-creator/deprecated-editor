@@ -6,7 +6,6 @@ var ScaleGizmo = Fire.extend("Fire.ScaleGizmo",
     var target = arguments[1];
     var options = arguments[2];
 
-    ScaleGizmo.$super.call(this, svg, target, options);
     this.allowMultiTarget = true;
 
     var localscaleList = [], offsetList = [],

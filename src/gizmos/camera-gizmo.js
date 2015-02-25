@@ -1,11 +1,9 @@
 ﻿var CameraGizmo = Fire.extend("Fire.CameraGizmo",
                               Fire.Gizmo,
                               function () {
-
     var svg = arguments[0];
     var target = arguments[1];
 
-    CameraGizmo.$super.call(this, svg, target );
     this.hitTest = true;
 
     this._icon = svg.icon( "fire://static/img/gizmos-camera.png", 40, 40, target.entity );

@@ -1,9 +1,7 @@
 ﻿var BitmapTextGizmo = Fire.extend("Fire.BitmapTextGizmo", Fire.Gizmo, function () {
-
     var svg = arguments[0];
     var target = arguments[1];
 
-    BitmapTextGizmo.$super.call(this, svg, target);
     this.hitTest = false;
     this._root = svg.scene.group();
 

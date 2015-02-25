@@ -5,7 +5,6 @@ var SpriteRendererGizmo = Fire.extend("Fire.SpriteRendererGizmo",
     var svg = arguments[0];
     var target = arguments[1];
 
-    SpriteRendererGizmo.$super.call(this, svg, target );
     this.hitTest = false;
     this._root = svg.scene.group();
 

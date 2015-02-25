@@ -1,11 +1,9 @@
 var PositionGizmo = Fire.extend("Fire.PositionGizmo",
                                 Fire.Gizmo,
                                 function () {
-    
     var svg = arguments[0];
     var target = arguments[1];
 
-    PositionGizmo.$super.call(this, svg, target );
     this.allowMultiTarget = true;
 
     var worldposList = [];
