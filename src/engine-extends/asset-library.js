@@ -148,14 +148,21 @@ Fire.AssetLibrary.onAssetReimported = function (uuid) {
 var doUnload = Fire.AssetLibrary.unloadAsset.bind(Fire.AssetLibrary);
 Fire.AssetLibrary.unloadAsset = function (assetOrUuid, destroyAsset) {
     var uuid;
+    var asset;
     if (typeof assetOrUuid === 'string') {
         uuid = assetOrUuid;
     }
     else {
-        uuid = assetOrUuid && assetOrUuid._uuid;
+        asset = assetOrUuid;
+        uuid = asset && asset._uuid;
     }
     if (uuid) {
         this._onAssetChanged(uuid, null);
         doUnload(assetOrUuid, destroyAsset);
+    }
+    else if (asset) {
+        asset.destroy();
+        // simulate destroy immediate
+        FObject._deferredDestroy();
     }
 };
