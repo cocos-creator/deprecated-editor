@@ -101,9 +101,24 @@ Fire.AssetLibrary._onAssetChanged = function (uuid, asset) {
  * you should call cacheAsset manually to ensure the asset's reference is unique.
  */
 Fire.AssetLibrary.cacheAsset = function (asset) {
+    var _uuidToAsset = this._uuidToAsset;
+    function cacheDependsAssets (asset) {
+        for (var key in asset) {
+            if (asset.hasOwnProperty(key)) {
+                var val = asset[key];
+                if (val instanceof Fire.Asset && val._uuid && !(val._uuid in _uuidToAsset)) {
+                    _uuidToAsset[val._uuid] = val;
+                    cacheDependsAssets(val);
+                }
+            }
+        }
+    }
     if (asset) {
         if (asset._uuid) {
-            this._uuidToAsset[asset._uuid] = asset;
+            if ( !_uuidToAsset[asset._uuid] ) {
+                _uuidToAsset[asset._uuid] = asset;
+                cacheDependsAssets(asset);
+            }
         }
         else {
             Fire.error('[AssetLibrary] Not defined uuid of the asset to cache');
