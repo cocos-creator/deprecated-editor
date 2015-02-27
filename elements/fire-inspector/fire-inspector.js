@@ -34,6 +34,9 @@ Polymer({
                 if (entity) {
                     this.inspect(entity);
                 }
+                else {
+                    this.inspect(null);
+                }
             }
             else if (this.target instanceof Fire.Entity) {
                 // uninspect

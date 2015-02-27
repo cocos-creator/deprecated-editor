@@ -273,6 +273,9 @@ Polymer({
             }
         }
 
+        if ( entities.length <= 0 )
+            return;
+
         switch ( Fire.mainWindow.settings.handle ) {
             case "move":
                 gizmo = new Fire.PositionGizmo( this.svgGizmos, entities );
