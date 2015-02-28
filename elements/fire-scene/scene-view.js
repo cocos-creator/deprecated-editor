@@ -460,11 +460,24 @@ Polymer({
 
         // process rect-selection
         if ( event.which === 1 ) {
+            var toggleMode = false;
+            var lastSelection = Fire.Selection.entities;
+            if ( event.metaKey || event.ctrlKey ) {
+                toggleMode = true;
+            }
+
+            //
             var selectmoveHandle = function(event) {
                 var x = this._rectSelectStartX - this.view.left;
                 var y = this._rectSelectStartY - this.view.top;
                 var w = event.clientX - this._rectSelectStartX;
                 var h = event.clientY - this._rectSelectStartY;
+
+                var magSqr = w*w + h*h;
+                if ( magSqr < 2.0 * 2.0 ) {
+                    return;
+                }
+
                 if ( w < 0.0 ) {
                     x += w;
                     w = -w;
@@ -475,19 +488,26 @@ Polymer({
                 }
 
                 this.svgGizmos.updateSelection( x, y, w, h);
-
-                //
+                var i, ids;
                 var entities = this.rectHitTest( new Fire.Rect( x, y, w, h ) );
-                if ( entities.length > 0 ) {
-                    var ids = [];
-                    for ( var i = 0; i < entities.length; ++i ) {
-                        ids.push( entities[i].id );
+
+                // toggle mode will always act added behaviour when we in rect-select-state
+                if ( toggleMode ) {
+                    ids = lastSelection.slice();
+
+                    for ( i = 0; i < entities.length; ++i ) {
+                        if ( ids.indexOf(entities[i].id) === -1 )
+                            ids.push( entities[i].id );
                     }
-                    Fire.Selection.selectEntity ( ids, true, false );
                 }
                 else {
-                    Fire.Selection.clearEntity ();
+                    ids = [];
+
+                    for ( i = 0; i < entities.length; ++i ) {
+                        ids.push( entities[i].id );
+                    }
                 }
+                Fire.Selection.selectEntity ( ids, true, false );
 
                 //
                 event.stopPropagation();
@@ -512,11 +532,24 @@ Polymer({
                 }
                 else {
                     var entity = this.hitTest( x, y );
-                    if ( entity ) {
-                        Fire.Selection.selectEntity ( entity.id, true );
+
+                    if ( toggleMode ) {
+                        if ( entity ) {
+                            if ( lastSelection.indexOf(entity.id) === -1 ) {
+                                Fire.Selection.selectEntity ( entity.id, false, true );
+                            }
+                            else {
+                                Fire.Selection.unselectEntity ( entity.id, true );
+                            }
+                        }
                     }
                     else {
-                        Fire.Selection.clearEntity ();
+                        if ( entity ) {
+                            Fire.Selection.selectEntity ( entity.id, true, true );
+                        }
+                        else {
+                            Fire.Selection.clearEntity ();
+                        }
                     }
                 }
             }.bind(this);
