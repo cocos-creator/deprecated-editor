@@ -200,6 +200,10 @@ Polymer({
         }
     },
 
+    deleteSelection: function () {
+        Fire.sendToMainPage('engine:deleteEntities', Fire.Selection.entities);
+    },
+
     hover: function ( entityID ) {
         var entity = Fire._getInstanceById(entityID);
         // NOTE: entity might be destroyed
@@ -580,6 +584,24 @@ Polymer({
     mouseleaveAction: function ( event ) {
         Fire.Selection.hoverEntity(null);
         event.stopPropagation();
+    },
+
+    keydownAction: function (event) {
+        switch ( event.which ) {
+            // delete (Windows)
+            case 46:
+                this.deleteSelection();
+                event.stopPropagation();
+            break;
+
+            // command + delete (Mac)
+            case 8:
+                if ( event.metaKey ) {
+                    this.deleteSelection();
+                }
+                event.stopPropagation();
+            break;
+        }
     },
 
     gizmoshoverAction: function ( event ) {
