@@ -25,7 +25,7 @@ function _newAssetsItem ( url, type, id, parentEL ) {
     var img;
 
     newEL.extname = extname;
-    type = type || extname;
+    type = type || extname.toLowerCase();
     switch ( type ) {
     case 'root':
         newEL.setIcon('db');
