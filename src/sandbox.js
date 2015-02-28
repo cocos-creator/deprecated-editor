@@ -245,19 +245,19 @@ var userScriptLoader = (function () {
 
         loadAll: function (callback) {
             Async.series([
-                function loadBuiltin (cb) {
+                function loadBuiltin (next) {
                     doLoad(SRC_BUILTIN, function (err) {
                         Sandbox.globalVarsChecker.restore(Fire.log, 'loading builtin plugin runtime', 'require');
-                        cb(err);
+                        next(err);
                     });
                 },
-                function loadProject (cb) {
+                function loadProject (next) {
                     doLoad(SRC_PROJECT, function (err) {
                         Sandbox.globalVarsChecker.restore(Fire.log, 'loading new scripts', 'require');
-                        cb(err);
+                        next(err);
                     });
                 },
-                function reloadScene(cb) {
+                function reloadScene(next) {
                     if (Fire.Engine._scene) {
                         console.time('reload scene');
                         var newScene = recreateScene();
@@ -267,7 +267,7 @@ var userScriptLoader = (function () {
                         Sandbox.globalVarsChecker.restore(Fire.warn, 'launching scene by new scripts');
                         console.timeEnd('reload scene');
                     }
-                    cb();
+                    next();
                 }
             ], callback);
         },
@@ -355,19 +355,19 @@ Sandbox.reloadScripts = (function () {
         var loadTasks = [];
         if ( compileSucceeded ) {
             loadTasks.push(
-                function loadRuntime (cb) {
+                function loadRuntime (next) {
                     userScriptLoader.loadAll(function (err) {
                         Sandbox.globalVarsChecker.restore(Fire.warn, 'loading ' + userScriptLoader.name);
-                        cb(err);
+                        next(err);
                     });
                 }
             );
         }
         loadTasks.push(
-            function loadEditPlugin (cb) {
+            function loadEditPlugin (next) {
                 Fire._pluginLoader.loadAll(function (err) {
                     Sandbox.globalVarsChecker.restore(Fire.warn, 'loading ' + Fire._pluginLoader.name);
-                    cb(err);
+                    next(err);
                 });
             }
         );
