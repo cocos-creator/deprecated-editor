@@ -103,7 +103,7 @@ Polymer({
                 Fire.info('asset-library initializing...');
                 Fire.AssetLibrary.init("library://");
 
-                // init scenes
+                // query scenes
                 var SCENE_ID = Fire.JS._getClassId(Fire._Scene);
                 self.ipc.once('asset-db:query-results', function ( url, typeID, results ) {
                     console.timeEnd('query scenes');
@@ -112,6 +112,7 @@ Polymer({
                             var result = results[i];
                             var name = Url.basenameNoExt(result.url);
                             self.sceneInfo[result.uuid] = result.url;
+                            Fire.Engine._sceneInfos[name] = result.uuid;
                         }
                         next();
                     }

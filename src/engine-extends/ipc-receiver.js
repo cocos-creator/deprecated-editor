@@ -3,6 +3,7 @@
 }
 
 var Ipc = require('ipc');
+var Url = require('fire-url');
 
 var Engine = Fire.Engine;
 var Entity = Fire.Entity;
@@ -124,22 +125,38 @@ Ipc.on('engine:removeComponent', function (componentId) {
 Ipc.on('engine:openScene', function (uuid) {
     Fire.Engine.stop();
     Fire.AssetLibrary.clearAllCache();
-    Fire.Engine.loadScene(uuid);
+    Fire.Engine._loadSceneByUuid(uuid);
 });
 
 Ipc.on('asset:moved', function (uuid, destUrl) {
     // rename asset
-    var asset = Fire.AssetLibrary.getAssetByUuid(uuid);
+    var newName, asset = Fire.AssetLibrary.getAssetByUuid(uuid);
     if (asset) {
-        var Url = require('fire-url');
-        var name = Url.basename(destUrl, Url.extname(destUrl));
-        asset.name = name;
+        newName = Url.basenameNoExt(destUrl);
+        asset.name = newName;
+    }
+
+    // rename scene
+    if (Url.extname(destUrl) === '.fire') {
+        for (var key in Fire.Engine._sceneInfos) {
+            if (Fire.Engine._sceneInfos[key] === uuid) {
+                delete Fire.Engine._sceneInfos[key];
+                newName = Url.basenameNoExt(destUrl);
+                Fire.Engine._sceneInfos[newName] = uuid;
+                break;
+            }
+        }
     }
 });
 
 Ipc.on('assets:deleted', function (results) {
     for ( var i = 0; i < results.length; ++i ) {
         Fire.AssetLibrary.unloadAsset(results[i].uuid, true);
+        // unregister scene
+        if (Url.extname(results[i].url) === '.fire') {
+            var name = Url.basenameNoExt(results[i].url);
+            delete Fire.Engine._sceneInfos[name];
+        }
     }
 });
 
@@ -147,4 +164,23 @@ Ipc.on('asset:changed', function (uuid) {
     // 虽然在 applyAsset 时已经修改过内存中的 asset 了，但某些 Importer 会依据修改后的 meta 重新 import 一次，
     // 对它们来说 asset 需要重新导入才能得到真正结果。
     Fire.AssetLibrary.onAssetReimported(uuid);
+});
+
+Ipc.on('asset:created', function ( url, id, parentId ) {
+    // register scene
+    if (Url.extname(url) === '.fire') {
+        var name = Url.basenameNoExt(url);
+        Fire.Engine._sceneInfos[name] = id;
+    }
+});
+
+Ipc.on('assets:created', function ( results ) {
+    for ( var i = 0; i < results.length; ++i ) {
+        var info = results[i];
+        // register scene
+        if (Url.extname(info.url) === '.fire') {
+            var name = Url.basenameNoExt(info.url);
+            Fire.Engine._sceneInfos[name] = info.uuid;
+        }
+    }
 });
