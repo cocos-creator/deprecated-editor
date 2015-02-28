@@ -1,4 +1,5 @@
 ﻿var FireUrl = require('fire-url');
+var Async = require('async');
 
 var GlobalVarsChecker = (function () {
 
@@ -218,12 +219,12 @@ var userScriptLoader = (function () {
         return newScene;
     }
 
-    function doLoad (src, onload) {
+    function doLoad (src, cb) {
         // 这里用 require 实现会更简单，但是为了和运行时保持尽量一致，还是改用 web 方式加载。
         var script = document.createElement('script');
         script.onload = function () {
             console.timeEnd('load ' + src);
-            onload();
+            cb();
         };
         script.onerror = function () {
             console.timeEnd('load ' + src);
@@ -231,6 +232,7 @@ var userScriptLoader = (function () {
                 loader.unloadAll();
             }
             Fire.error('Failed to load %s', src);
+            cb('Failed to load ' + src);
         };
         script.setAttribute('type','text/javascript');
         script.setAttribute('src', FireUrl.addRandomQuery(src));
@@ -241,14 +243,21 @@ var userScriptLoader = (function () {
 
     var loader = {
 
-        loadAll: function () {
-            doLoad(SRC_BUILTIN, function () {
-                Sandbox.globalVarsChecker.restore(Fire.log, 'loading builtin plugin runtime', 'require');
-
-                doLoad(SRC_PROJECT, function () {
-                    Sandbox.globalVarsChecker.restore(Fire.log, 'loading new scripts', 'require');
-
-                    // reload scene
+        loadAll: function (callback) {
+            Async.series([
+                function loadBuiltin (cb) {
+                    doLoad(SRC_BUILTIN, function (err) {
+                        Sandbox.globalVarsChecker.restore(Fire.log, 'loading builtin plugin runtime', 'require');
+                        cb(err);
+                    });
+                },
+                function loadProject (cb) {
+                    doLoad(SRC_PROJECT, function (err) {
+                        Sandbox.globalVarsChecker.restore(Fire.log, 'loading new scripts', 'require');
+                        cb(err);
+                    });
+                },
+                function reloadScene(cb) {
                     if (Fire.Engine._scene) {
                         console.time('reload scene');
                         var newScene = recreateScene();
@@ -258,8 +267,9 @@ var userScriptLoader = (function () {
                         Sandbox.globalVarsChecker.restore(Fire.warn, 'launching scene by new scripts');
                         console.timeEnd('reload scene');
                     }
-                });
-            });
+                    cb();
+                }
+            ], callback);
         },
 
         unloadAll: function () {
@@ -322,8 +332,7 @@ Sandbox.reloadScripts = (function () {
     //    return reloadPluginScripts;
     //})();
 
-    function reloadScripts (compileSucceeded) {
-
+    function reloadScripts (compileSucceeded, callback) {
         var scriptsLoaded = inited;
         if ( !inited ) {
             init();
@@ -343,12 +352,26 @@ Sandbox.reloadScripts = (function () {
         }
 
         // load new
+        var loadTasks = [];
         if ( compileSucceeded ) {
-            userScriptLoader.loadAll();
-            Sandbox.globalVarsChecker.restore(Fire.warn, 'loading ' + userScriptLoader.name);
+            loadTasks.push(
+                function loadRuntime (cb) {
+                    userScriptLoader.loadAll(function (err) {
+                        Sandbox.globalVarsChecker.restore(Fire.warn, 'loading ' + userScriptLoader.name);
+                        cb(err);
+                    });
+                }
+            );
         }
-        Fire._pluginLoader.loadAll();
-        Sandbox.globalVarsChecker.restore(Fire.warn, 'loading ' + userScriptLoader.name);
+        loadTasks.push(
+            function loadEditPlugin (cb) {
+                Fire._pluginLoader.loadAll(function (err) {
+                    Sandbox.globalVarsChecker.restore(Fire.warn, 'loading ' + Fire._pluginLoader.name);
+                    cb(err);
+                });
+            }
+        );
+        Async.series(loadTasks, callback);
     }
 
     return reloadScripts;
