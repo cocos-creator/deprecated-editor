@@ -438,7 +438,7 @@ Polymer({
 
             // Show in finder
             {
-                label: 'Show in ' + (Fire.isWin32 ? 'explorer' : 'finder'),
+                label: 'Show in ' + (Fire.isWin32 ? 'Explorer' : 'Finder'),
                 click: function () {
                     if ( this.contextmenuAt instanceof AssetsItem ) {
                         Fire.sendToCore( 'asset-db:explore', this.getUrl(this.contextmenuAt) );
@@ -448,7 +448,7 @@ Polymer({
 
             // Show in library
             {
-                label: 'Show in library',
+                label: 'Show in Library',
                 click: function () {
                     if ( this.contextmenuAt instanceof AssetsItem ) {
                         Fire.sendToCore( 'asset-db:explore-lib', this.getUrl(this.contextmenuAt) );
@@ -458,7 +458,7 @@ Polymer({
 
             // Print uuid
             {
-                label: 'Show uuid',
+                label: 'Show Uuid',
                 click: function () {
                     if ( this.contextmenuAt instanceof AssetsItem ) {
                         Fire.log( this.contextmenuAt.userId );
