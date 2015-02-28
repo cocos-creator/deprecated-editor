@@ -4,7 +4,6 @@ var Url = require('fire-url');
 
 Polymer({
     _scriptCompiled: false,
-    _sceneQueried: false,
 
     created: function () {
         Fire.mainWindow = this;
@@ -42,16 +41,6 @@ Polymer({
                 results.push( { uuid: p, name: asset.name, type: Fire.JS.getClassName(asset) } );
             }
             Fire.sendToAll('asset-library:debugger:uuid-asset-results', results);
-        }.bind(this));
-
-        this.ipc.on('asset-db:query-results', function ( url, typeID, results ) {
-            if ( typeID === Fire.JS._getClassId(Fire._Scene) ) {
-                this._sceneQueried = true;
-                for ( var i = 0; i < results.length; ++i ) {
-                    var result = results[i];
-                    this.sceneInfo[result.uuid] = result.url;
-                }
-            }
         }.bind(this));
     },
 
@@ -109,26 +98,26 @@ Polymer({
                 }, 100 );
             },
 
-            // init AssetLibrary
             function ( next ) {
+                // init AssetLibrary
                 Fire.info('asset-library initializing...');
                 Fire.AssetLibrary.init("library://");
 
-                Fire.sendToCore('asset-db:query', "assets://", Fire.JS._getClassId(Fire._Scene));
-                var id = setInterval( function () {
-                    if ( self._sceneQueried ) {
-                        for ( var uuid in self.sceneInfo ) {
-                            var url = self.sceneInfo[uuid];
-                            var name = Url.basenameNoExt(url);
-
-                            // TODO: @jare
-                            Fire.log('TODO: @jare please call AssetLibrary.addScene(%s, %s) here', name, uuid);
+                // init scenes
+                var SCENE_ID = Fire.JS._getClassId(Fire._Scene);
+                self.ipc.once('asset-db:query-results', function ( url, typeID, results ) {
+                    console.timeEnd('query scenes');
+                    if ( typeID === SCENE_ID ) {
+                        for ( var i = 0; i < results.length; ++i ) {
+                            var result = results[i];
+                            var name = Url.basenameNoExt(result.url);
+                            self.sceneInfo[result.uuid] = result.url;
                         }
-
-                        clearInterval(id);
                         next();
                     }
-                }, 100 );
+                });
+                console.time('query scenes');
+                Fire.sendToCore('asset-db:query', "assets://", SCENE_ID);
             },
 
             function ( next ) {
