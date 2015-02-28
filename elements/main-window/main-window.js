@@ -30,8 +30,9 @@ Polymer({
         this.ipc.on('project:ready', this.init.bind(this));
 
         this.ipc.on('reload:window-scripts', function ( compiled ) {
-            this._scriptCompiled = true;
-            Fire._Sandbox.reloadScripts(compiled);
+            Fire._Sandbox.reloadScripts(compiled, function () {
+                this._scriptCompiled = true;
+            }.bind(this) );
         }.bind(this));
 
         this.ipc.on('asset-library:debugger:query-uuid-asset', function () {
