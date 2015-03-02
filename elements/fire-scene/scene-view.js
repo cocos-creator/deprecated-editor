@@ -14,6 +14,7 @@ Polymer({
 
         this.ipc = new Fire.IpcListener();
 
+        this._inited = false;
         this._editTool = null;
         this._editingEdityIds = [];
     },
@@ -53,19 +54,23 @@ Polymer({
         this.renderContext = Fire.Engine.createSceneView( this.view.width,
                                                           this.view.height,
                                                           this.$.canvas );
-        if ( this.renderContext !== null ) {
+        if ( this.renderContext ) {
             var graphics = new PIXI.Graphics();
             this.renderContext.getBackgroundNode().addChild(graphics);
             this.pixiGrids.setGraphics(graphics);
 
             this.initSceneCamera();
+            this._inited = true;
+
             this.resize(); // make sure we apply the size to all canvas
         }
     },
 
     initSceneCamera: function () {
-        if ( !Fire.Engine._scene )
+        if ( !Fire.Engine._scene ) {
+            Fire.error( "Failed to init camera, can not find current scene in Fire.Engine." );
             return;
+        }
 
         var camera = null;
         var cameraEnt = Fire.Engine._scene.findEntityWithFlag('/Scene Camera',
@@ -93,7 +98,7 @@ Polymer({
     },
 
     resize: function () {
-        if ( this.renderContext !== null ) {
+        if ( this.renderContext ) {
             var clientRect = this.getBoundingClientRect();
             this.view = {
                 left: clientRect.left,
@@ -116,10 +121,7 @@ Polymer({
     },
 
     updateCamera: function () {
-        if ( !Fire.Engine._scene )
-            return;
-
-        if ( !this.renderContext )
+        if ( !this._inited )
             return;
 
         this.renderContext.camera.size = this.view.height / this.sceneCamera.scale;
@@ -129,10 +131,7 @@ Polymer({
     },
 
     updateScene: function () {
-        if ( !Fire.Engine._scene )
-            return;
-
-        if ( !this.renderContext )
+        if ( !this._inited )
             return;
 
         this.pixiGrids.update();
@@ -141,10 +140,7 @@ Polymer({
     },
 
     updateGizmos: function () {
-        if ( !Fire.Engine._scene )
-            return;
-
-        if ( !this.renderContext )
+        if ( !this._inited )
             return;
 
         this.svgGizmos.update();
@@ -338,9 +334,6 @@ Polymer({
     },
 
     hitTest: function ( x, y ) {
-        if ( !this.renderContext )
-            return null;
-
         // check if we hit gizmos
         var gizmos = this.svgGizmos.hitTest ( x, y, 1, 1 );
         if ( gizmos.length > 0 ) {
@@ -404,6 +397,9 @@ Polymer({
     },
 
     mousemoveAction: function ( event ) {
+        if ( !this._inited )
+            return;
+
         //
         var hoverEntity = this.hitTest(event.offsetX, event.offsetY);
         Fire.Selection.hoverEntity(hoverEntity && hoverEntity.id);
@@ -412,6 +408,9 @@ Polymer({
     },
 
     mousedownAction: function ( event ) {
+        if ( !this._inited )
+            return;
+
         // process camera panning
         if ( event.which === 1 && event.shiftKey ) {
             var mousemoveHandle = function(event) {
@@ -571,6 +570,9 @@ Polymer({
     },
 
     mousewheelAction: function ( event ) {
+        if ( !this._inited )
+            return;
+
         var scale = this.sceneCamera.scale;
         scale = Math.pow( 2, event.wheelDelta * 0.002) * scale;
         scale = Math.max( 0.01, Math.min( scale, 1000 ) );
@@ -582,11 +584,17 @@ Polymer({
     },
 
     mouseleaveAction: function ( event ) {
+        if ( !this._inited )
+            return;
+
         Fire.Selection.hoverEntity(null);
         event.stopPropagation();
     },
 
     keydownAction: function (event) {
+        if ( !this._inited )
+            return;
+
         switch ( event.which ) {
             // delete (Windows)
             case 46:
@@ -605,6 +613,9 @@ Polymer({
     },
 
     gizmoshoverAction: function ( event ) {
+        if ( !this._inited )
+            return;
+
         var entity = event.detail.entity;
         if ( entity )
             Fire.Selection.hoverEntity(entity.id);
@@ -615,11 +626,17 @@ Polymer({
     },
 
     gizmosdirtyAction: function ( event ) {
+        if ( !this._inited )
+            return;
+
         this.repaint();
         event.stopPropagation();
     },
 
     dragoverAction: function ( event ) {
+        if ( !this._inited )
+            return;
+
         var dragType = EditorUI.DragDrop.type(event.dataTransfer);
         if ( dragType !== "asset" ) {
             EditorUI.DragDrop.allowDrop( event.dataTransfer, false );
@@ -634,6 +651,9 @@ Polymer({
     },
 
     dropAction: function ( event ) {
+        if ( !this._inited )
+            return;
+
         var dragType = EditorUI.DragDrop.type(event.dataTransfer);
 
         if ( dragType !== 'asset' && dragType !== 'entity' )

@@ -129,9 +129,6 @@ Polymer({
                 // init game view
                 self.$.game.setRenderContext(renderContext);
 
-                // init scene view
-                self.$.scene.initRenderContext();
-
                 // TODO: load last-open scene or init new
                 var lastEditScene = null;
                 if ( lastEditScene === null ) {
@@ -140,6 +137,9 @@ Polymer({
                     var camera = new Fire.Entity('Main Camera');
                     camera.addComponent(Fire.Camera);
                 }
+
+                // init scene view after Fire.Engine._setCurrentScene
+                self.$.scene.initRenderContext();
 
                 // observe the current scene name
                 self.updateTitle();
