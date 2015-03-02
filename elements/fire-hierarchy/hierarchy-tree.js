@@ -67,7 +67,6 @@ Polymer({
             //    label: 'Copy',
             //    click: function () {
             //        if ( this.contextmenuAt instanceof HierarchyItem ) {
-            //            // TODO
             //        }
             //    }.bind(this)
             //},
@@ -76,7 +75,6 @@ Polymer({
             //{
             //    label: 'Paste',
             //    click: function () {
-            //        // TODO
             //    }.bind(this)
             //},
 

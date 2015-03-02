@@ -30,7 +30,12 @@ function takeSceneSnapshot (scene) {
     };
 }
 
+editorCallback.onStartUnloadScene = function (scene) {
+    Fire.log('@jwu: pause scene loop');
+};
+
 editorCallback.onSceneLaunched = function (scene) {
+    Fire.log('@jwu: activate scene loop');
     Fire.sendToPages('scene:launched', takeSceneSnapshot(scene));
     Fire.sendToPages('scene:dirty');
 };
