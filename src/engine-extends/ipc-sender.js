@@ -30,12 +30,16 @@ function takeSceneSnapshot (scene) {
     };
 }
 
+var EventEmitter = require('events');
+Fire._editorEvents = new EventEmitter();
+
 editorCallback.onStartUnloadScene = function (scene) {
-    Fire.log('@jwu: pause scene loop');
+    Fire._editorEvents.emit('start-unload-scene', scene);
 };
 
 editorCallback.onSceneLaunched = function (scene) {
-    Fire.log('@jwu: activate scene loop');
+    Fire._editorEvents.emit('scene-launched', scene);
+
     Fire.sendToPages('scene:launched', takeSceneSnapshot(scene));
     Fire.sendToPages('scene:dirty');
 };
