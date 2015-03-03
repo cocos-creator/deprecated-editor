@@ -123,9 +123,10 @@ Ipc.on('engine:removeComponent', function (componentId) {
 });
 
 Ipc.on('engine:openScene', function (uuid) {
-    Fire.Engine.stop();
     Fire.AssetLibrary.clearAllCache();
-    Fire.Engine._loadSceneByUuid(uuid);
+    Fire.Engine._loadSceneByUuid(uuid, null, function () {
+        Fire.Engine.stop();
+    });
 });
 
 Ipc.on('asset:moved', function (uuid, destUrl) {
