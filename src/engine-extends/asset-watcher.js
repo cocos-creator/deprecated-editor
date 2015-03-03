@@ -42,32 +42,40 @@
         });
     }
 
-    AssetsWatcher.initHandler = function (component) {
-        var handler = null;
-        // parse props
-        var props = component.constructor.__props__;
-        for (var i = 0; i < props.length; i++) {
+    function parseComponentProps (component) {
+        var ctor = component.constructor;
+        var assetPropsAttr = Fire.attr(ctor, 'A$$ETprops', {
+            parsed: true,
+            assetProps: null
+        });
+        for (var i = 0, props = ctor.__props__; i < props.length; i++) {
             var propName = props[i];
-            var attrs = Fire.attr(component.constructor, propName);
+            var attrs = Fire.attr(ctor, propName);
             if (attrs.hasSetter && attrs.hasGetter) {
                 var prop = component[propName];
+
                 var isAssetType = (prop instanceof Fire.Asset || Fire.isChildClassOf(attrs.ctor, Fire.Asset));
-                if (isAssetType) {
-                    forceSetterNotify(component.constructor, propName, attrs.originalSetter);
-                    var assetPropsAttr = Fire.attr(component.constructor, 'A$$ETprops', {});
-                    if (assetPropsAttr.assetProps) {
+                var maybeAsset = prop === null || typeof prop === 'undefined';
+                if (isAssetType || maybeAsset) {
+                    forceSetterNotify(ctor, propName, attrs.originalSetter);
+                    if ( assetPropsAttr.assetProps ) {
                         assetPropsAttr.assetProps.push(propName);
                     }
                     else {
                         assetPropsAttr.assetProps = [propName];
                     }
-                    if (!handler) {
-                        handler = new AssetsWatcher(component);
-                    }
                 }
             }
         }
-        component._watcherHandler = handler || EmptyWatcher;
+        return assetPropsAttr;
+    }
+
+    AssetsWatcher.initHandler = function (component) {
+        var attrs = Fire.attr(component.constructor, 'A$$ETprops');
+        if ( !(attrs && attrs.parsed) ) {
+            attrs = parseComponentProps(component);
+        }
+        component._watcherHandler = attrs.assetProps ? (new AssetsWatcher(component)) : EmptyWatcher;
     };
 
     AssetsWatcher.start = function (component) {
@@ -115,7 +123,9 @@
     AssetsWatcher.prototype.stop = function () {
         for (var key in this.watchingInfos) {
             var info = this.watchingInfos[key];
-            Fire.AssetLibrary.assetListener.remove(info.uuid, info.callback);
+            if (info) {
+                Fire.AssetLibrary.assetListener.remove(info.uuid, info.callback);
+            }
         }
         this.watchingInfos = {};
     };
@@ -128,6 +138,7 @@
                 return;
             }
             // if watching, remove
+            this.watchingInfos[propName] = null;
             Fire.AssetLibrary.assetListener.remove(info.uuid, info.callback);
         }
         // register new
@@ -143,10 +154,8 @@
                     uuid: newUuid,
                     callback: onDirty
                 };
-                return;
             }
         }
-        delete this.watchingInfos[propName];
     };
 
     return AssetsWatcher;
