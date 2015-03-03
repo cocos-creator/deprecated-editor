@@ -23,7 +23,6 @@ Polymer({
         this.ipc.on('selection:entity:hoverout', this.hoverout.bind(this) );
         this.ipc.on('scene:dirty', this.delayRepaintScene.bind(this) );
         this.ipc.on('scene:save', this.saveCurrentScene.bind(this) );
-        this.ipc.on('scene:launched', this.sceneLaunched.bind(this));
         this.ipc.on('asset:saved', function ( url, uuid ) {
             // update the uuid of current scene, if we first time save it
             if ( this._newsceneUrl === url ) {
@@ -34,13 +33,9 @@ Polymer({
                 Fire.log(url + ' saved');
             }
         }.bind(this) );
-
-        this._repaintID = setInterval ( this.repaintScene.bind(this), 500 );
     },
 
     detached: function () {
-        clearInterval (this._repaintID);
-
         this.ipc.clear();
     },
 
@@ -93,6 +88,10 @@ Polymer({
         this.$.view.repaint();
     },
 
+    initSceneCamera: function () {
+        this.$.view.initSceneCamera();
+    },
+
     saveCurrentScene: function () {
         var currentScene = Fire.Engine._scene;
         var saveUrl = null;
@@ -136,10 +135,6 @@ Polymer({
                           this._newsceneUrl,
                           Fire.serialize(currentScene) );
         }
-    },
-
-    sceneLaunched: function () {
-        this.$.view.initSceneCamera();
     },
 
     layoutToolsAction: function ( event ) {

@@ -115,6 +115,7 @@ Polymer({
         if ( detail instanceof Fire.Asset ) {
             Fire.AssetLibrary.cacheAsset(detail);
         }
+
         Fire.sendToPages( 'scene:dirty' );
     },
 

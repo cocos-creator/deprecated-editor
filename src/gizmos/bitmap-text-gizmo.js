@@ -19,7 +19,6 @@ BitmapTextGizmo.prototype.update = function () {
         return;
 
     var bounds, v1, v2, v3, v4;
-
     if (this.editing) {
         bounds = this.target.getWorldOrientedBounds();
         v1 = this._svg.camera.worldToScreen(bounds[0]); // bottom-left

@@ -17,11 +17,31 @@ Polymer({
 
         this.sceneNameObserver = null;
         this.ipc = new Fire.IpcListener();
+
+        this._updateSceneIntervalID = null;
+        this._updateSceneAnimFrameID = null;
     },
 
     ready: function () {
         window.addEventListener('resize', function() {
             this.$.mainDock._notifyResize();
+        }.bind(this));
+
+        // NOTE: the start-unload-scene and engine-stopped must be dom event because we want to stop repaint immediately
+
+        window.addEventListener('start-unload-scene', function ( event ) {
+            // do nothing if engine is playing
+            if ( Fire.Engine.isPlaying ) {
+                return;
+            }
+
+            //
+            this._stopSceneInterval();
+        }.bind(this));
+
+        window.addEventListener('engine-stopped', function ( event ) {
+            // stop anim frame update
+            this._stopSceneInAnimationFrame();
         }.bind(this));
     },
 
@@ -41,6 +61,41 @@ Polymer({
                 results.push( { uuid: p, name: asset.name, type: Fire.JS.getClassName(asset) } );
             }
             Fire.sendToAll('asset-library:debugger:uuid-asset-results', results);
+        }.bind(this));
+
+        // NOTE: the scene:launched and engine:played must be ipc event to make sure component:disabled been called before it.
+
+        this.ipc.on('scene:launched', function ( event ) {
+            // TEMP HACK: waiting for jare's new scene-camera, that will make scene camera only initialize once
+            this.$.scene.initSceneCamera();
+
+            // do nothing if engine is playing
+            if ( Fire.Engine.isPlaying ) {
+                return;
+            }
+
+            //
+            if ( this._updateSceneIntervalID ) {
+                Fire.warn( 'The _updateSceneInterval still ON' );
+                return;
+            }
+
+            this._updateSceneInterval();
+        }.bind(this));
+
+        this.ipc.on('engine:played', function ( continued ) {
+            // if this is resume from paused, do nothing
+            if ( continued ) {
+                return;
+            }
+
+            // check if we have invalid anim frame request
+            if ( this._updateSceneAnimFrameID ) {
+                Fire.warn( 'The _updateSceneInAnimationFrame still ON' );
+                return;
+            }
+
+            this._updateSceneInAnimationFrame();
         }.bind(this));
     },
 
@@ -129,6 +184,9 @@ Polymer({
                 // init game view
                 self.$.game.setRenderContext(renderContext);
 
+                // init scene view
+                self.$.scene.initRenderContext();
+
                 // TODO: load last-open scene or init new
                 var lastEditScene = null;
                 if ( lastEditScene === null ) {
@@ -137,9 +195,6 @@ Polymer({
                     var camera = new Fire.Entity('Main Camera');
                     camera.addComponent(Fire.Camera);
                 }
-
-                // init scene view after Fire.Engine._setCurrentScene
-                self.$.scene.initRenderContext();
 
                 // observe the current scene name
                 self.updateTitle();
@@ -175,6 +230,34 @@ Polymer({
             sceneName = 'Untitled';
         }
         Remote.getCurrentWindow().setTitle( sceneName + " - Fireball Editor" );
+    },
+
+    _updateSceneInterval: function () {
+        this._updateSceneIntervalID = setInterval ( function () {
+            this.$.scene.repaintScene();
+        }.bind(this), 500 );
+    },
+
+    _stopSceneInterval: function () {
+        if ( this._updateSceneIntervalID ) {
+            clearInterval (this._updateSceneIntervalID);
+            this._updateSceneIntervalID = null;
+        }
+    },
+
+    _updateSceneInAnimationFrame: function () {
+        this._updateSceneAnimFrameID = window.requestAnimationFrame( function () {
+            this.$.scene.repaintScene();
+            this._updateSceneInAnimationFrame();
+        }.bind(this) );
+    },
+
+    _stopSceneInAnimationFrame: function () {
+        // stop anim frame update
+        if ( this._updateSceneAnimFrameID ) {
+            window.cancelAnimationFrame(this._updateSceneAnimFrameID);
+            this._updateSceneAnimFrameID = null;
+        }
     },
 
     addPlugin: function ( panel, plugin, id, name ) {

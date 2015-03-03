@@ -7,9 +7,20 @@ var editorCallback = Fire.Engine._editorCallback;
 Fire.sendToPages = function () {};
 
 editorCallback.onEnginePlayed = function (continued) {
+    window.dispatchEvent( new CustomEvent ('engine-played', {
+        detail: { continued: continued },
+        bubbles: false,
+        cancelable: false,
+    }) );
+
     Fire.sendToPages('engine:played', continued);
 };
 editorCallback.onEngineStopped = function () {
+    window.dispatchEvent( new CustomEvent ('engine-stopped', {
+        bubbles: false,
+        cancelable: false,
+    }) );
+
     Fire.sendToPages('engine:stopped');
 };
 editorCallback.onEnginePaused = function () {
@@ -31,14 +42,21 @@ function takeSceneSnapshot (scene) {
 }
 
 var EventEmitter = require('events');
-Fire._editorEvents = new EventEmitter();
 
 editorCallback.onStartUnloadScene = function (scene) {
-    Fire._editorEvents.emit('start-unload-scene', scene);
+    window.dispatchEvent( new CustomEvent ('start-unload-scene', {
+        detail: { scene: scene },
+        bubbles: false,
+        cancelable: false,
+    }) );
 };
 
 editorCallback.onSceneLaunched = function (scene) {
-    Fire._editorEvents.emit('scene-launched', scene);
+    window.dispatchEvent( new CustomEvent ('scene-launched', {
+        detail: { scene: scene },
+        bubbles: false,
+        cancelable: false,
+    }) );
 
     Fire.sendToPages('scene:launched', takeSceneSnapshot(scene));
     Fire.sendToPages('scene:dirty');

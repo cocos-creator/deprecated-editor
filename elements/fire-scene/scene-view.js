@@ -14,7 +14,6 @@ Polymer({
 
         this.ipc = new Fire.IpcListener();
 
-        this._inited = false;
         this._editTool = null;
         this._editingEdityIds = [];
     },
@@ -59,10 +58,8 @@ Polymer({
             this.renderContext.getBackgroundNode().addChild(graphics);
             this.pixiGrids.setGraphics(graphics);
 
-            this.initSceneCamera();
-            this._inited = true;
-
-            this.resize(); // make sure we apply the size to all canvas
+            // make sure we apply the size to all canvas
+            this.resize();
         }
     },
 
@@ -73,8 +70,8 @@ Polymer({
         }
 
         var camera = null;
-        var cameraEnt = Fire.Engine._scene.findEntityWithFlag('/Scene Camera',
-                                                           Fire._ObjectFlags.Hide | Fire._ObjectFlags.EditorOnly);
+        var cameraEnt = Fire.Engine._scene.findEntityWithFlag('/Scene Camera', Fire._ObjectFlags.Hide | Fire._ObjectFlags.EditorOnly);
+
         // create editor camera
         if ( cameraEnt === null ) {
             // TODO: add this code to EditorUtils
@@ -93,8 +90,11 @@ Polymer({
         //
         camera.size = this.view.height;
         this.renderContext.camera = camera;
-        this.svgGizmos.setCamera(camera);
         this.pixiGrids.setCamera(camera);
+        this.svgGizmos.setCamera(camera);
+
+        //
+        this.repaint();
     },
 
     resize: function () {
@@ -121,7 +121,7 @@ Polymer({
     },
 
     updateCamera: function () {
-        if ( !this._inited )
+        if ( !this.renderContext || !this.renderContext.camera )
             return;
 
         this.renderContext.camera.size = this.view.height / this.sceneCamera.scale;
@@ -131,7 +131,7 @@ Polymer({
     },
 
     updateScene: function () {
-        if ( !this._inited )
+        if ( !this.renderContext || !this.renderContext.camera )
             return;
 
         this.pixiGrids.update();
@@ -140,7 +140,7 @@ Polymer({
     },
 
     updateGizmos: function () {
-        if ( !this._inited )
+        if ( !this.renderContext || !this.renderContext.camera )
             return;
 
         this.svgGizmos.update();
@@ -397,7 +397,7 @@ Polymer({
     },
 
     mousemoveAction: function ( event ) {
-        if ( !this._inited )
+        if ( !this.renderContext || !this.renderContext.camera )
             return;
 
         //
@@ -408,7 +408,7 @@ Polymer({
     },
 
     mousedownAction: function ( event ) {
-        if ( !this._inited )
+        if ( !this.renderContext || !this.renderContext.camera )
             return;
 
         // process camera panning
@@ -570,7 +570,7 @@ Polymer({
     },
 
     mousewheelAction: function ( event ) {
-        if ( !this._inited )
+        if ( !this.renderContext || !this.renderContext.camera )
             return;
 
         var scale = this.sceneCamera.scale;
@@ -584,7 +584,7 @@ Polymer({
     },
 
     mouseleaveAction: function ( event ) {
-        if ( !this._inited )
+        if ( !this.renderContext || !this.renderContext.camera )
             return;
 
         Fire.Selection.hoverEntity(null);
@@ -592,7 +592,7 @@ Polymer({
     },
 
     keydownAction: function (event) {
-        if ( !this._inited )
+        if ( !this.renderContext || !this.renderContext.camera )
             return;
 
         switch ( event.which ) {
@@ -613,7 +613,7 @@ Polymer({
     },
 
     gizmoshoverAction: function ( event ) {
-        if ( !this._inited )
+        if ( !this.renderContext || !this.renderContext.camera )
             return;
 
         var entity = event.detail.entity;
@@ -626,7 +626,7 @@ Polymer({
     },
 
     gizmosdirtyAction: function ( event ) {
-        if ( !this._inited )
+        if ( !this.renderContext || !this.renderContext.camera )
             return;
 
         this.repaint();
@@ -634,7 +634,7 @@ Polymer({
     },
 
     dragoverAction: function ( event ) {
-        if ( !this._inited )
+        if ( !this.renderContext || !this.renderContext.camera )
             return;
 
         var dragType = EditorUI.DragDrop.type(event.dataTransfer);
@@ -651,7 +651,7 @@ Polymer({
     },
 
     dropAction: function ( event ) {
-        if ( !this._inited )
+        if ( !this.renderContext || !this.renderContext.camera )
             return;
 
         var dragType = EditorUI.DragDrop.type(event.dataTransfer);
