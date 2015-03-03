@@ -68,6 +68,7 @@ Polymer({
         this.ipc.on('scene:launched', function ( event ) {
             // TEMP HACK: waiting for jare's new scene-camera, that will make scene camera only initialize once
             this.$.scene.initSceneCamera();
+            this.$.game.resize();
 
             // do nothing if engine is playing
             if ( Fire.Engine.isPlaying ) {
@@ -178,9 +179,9 @@ Polymer({
 
             function ( next ) {
                 Fire.info('fire-engine initializing...');
+
                 var renderContext = Fire.Engine.init( self.$.game.$.view.clientWidth,
                                                       self.$.game.$.view.clientHeight );
-
                 // init game view
                 self.$.game.setRenderContext(renderContext);
 
