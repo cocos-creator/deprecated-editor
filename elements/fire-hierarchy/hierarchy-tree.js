@@ -112,7 +112,6 @@ Polymer({
     newItem: function ( name, id, parentEL ) {
         var newEL = new HierarchyItem();
         this.initItem(newEL, name, id, parentEL);
-        newEL.folded = false;
         return newEL;
     },
 
