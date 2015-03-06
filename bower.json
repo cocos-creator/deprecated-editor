@@ -1,6 +1,6 @@
 {
   "name": "fireball-editor",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "homepage": "https://github.com/fireball-x/editor",
   "authors": [
     "Johnny Wu <KarasAya@gmail.com>"
@@ -27,6 +27,5 @@
     "polymer": "Polymer/polymer#~0.5.5",
     "web-animations-js": "web-animations/web-animations-js#master"
   },
-  "devDependencies": {
-  }
+  "devDependencies": {}
 }

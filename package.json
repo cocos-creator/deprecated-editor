@@ -1,12 +1,11 @@
 {
   "name": "fireball-editor",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Fireball Editor",
   "homepage": "http://github.com/fireball-x/editor",
   "license": "MIT",
   "licenseUrl": "http://opensource.org/licenses/MIT",
-  "dependencies": {
-  },
+  "dependencies": {},
   "devDependencies": {
     "gulp": "",
     "gulp-concat": "",
