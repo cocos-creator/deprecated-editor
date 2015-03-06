@@ -24,33 +24,17 @@ Component.prototype._onPreDestroy = function () {
 };
 
 
-// extend defineComponent to register the default component menu
-var doDefine = Fire.defineComponent;
-var doExtend = Fire.extendComponent;
+// extend Fire._doDefine to register the default component menu
 
-/**
- * @method defineComponent
- * @static
- * @param {function} [constructor]
- */
-Fire.defineComponent = function (constructor) {
-    var comp = doDefine(constructor);
-    if (comp) {
-        Fire.addComponentMenu(comp, 'Scripts/' + Fire.JS.getClassName(comp), -1);
-    }
-    return comp;
-};
-
-/**
- * @method extendComponent
- * @static
- * @param {function} baseClass
- * @param {function} [constructor]
- */
-Fire.extendComponent = function (baseClass, constructor) {
-    var comp = doExtend(baseClass, constructor);
-    if (comp) {
-        Fire.addComponentMenu(comp, 'Scripts/' + Fire.JS.getClassName(comp), -1);
+var doDefine = Fire._doDefine;
+Fire._doDefine = function (className, baseClass, constructor) {
+    var comp = doDefine(className, baseClass, constructor);
+    if (comp && Fire.isChildClassOf(baseClass, Fire.Component)) {
+        var frame = Fire._RFget();
+        var isProjectScript = frame.uuid;
+        if (isProjectScript) {
+            Fire.addComponentMenu(comp, 'Scripts/' + Fire.JS.getClassName(comp), -1);
+        }
     }
     return comp;
 };
