@@ -1,23 +1,18 @@
-﻿function createEntity() {
-    Fire.sendToMainPage('engine:createEntity');
-}
-
-function createChildEntity() {
-    var activeId = Fire.Selection.activeEntityId;
-    Fire.sendToMainPage('engine:createEntity', activeId);
-}
-
-var ipc = new Fire.IpcListener();
-
+﻿var ipc = new Fire.IpcListener();
 var hierarchy = {
 
     // built-in properties
 
     init: function () {
-        ipc.on('create:createEntity', createEntity);
-        ipc.on('create:createChildEntity', createChildEntity);
+        ipc.on('main-menu:create-entity', function () {
+            Fire.sendToMainPage('engine:createEntity');
+        });
+        ipc.on('main-menu:create-child-entity', function () {
+            var activeId = Fire.Selection.activeEntityId;
+            Fire.sendToMainPage('engine:createEntity', activeId);
+        });
 
-        Fire.MainMenu.addTemplate('Entity', this.getMenuTemplate('create'), {
+        Fire.MainMenu.addTemplate('Entity', this.getMenuTemplate('main-menu'), {
             type: 'window-static'
         });
     },
@@ -28,15 +23,15 @@ var hierarchy = {
 
     // custom properties
 
-    getMenuTemplate: function (type) {
+    getMenuTemplate: function ( menuType ) {
         return [
             {
                 label: 'Create Empty',
-                message: type + ':createEntity',
+                message: menuType + ':create-entity',
             },
             {
                 label: 'Create Empty Child',
-                message: type + ':createChildEntity',
+                message: menuType + ':create-child-entity',
             },
         ];
     },

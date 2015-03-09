@@ -18,6 +18,11 @@ Polymer({
         this.ipc.clear();
     },
 
+    domReady: function () {
+        Fire.info("browse assets://");
+        this.$.assetsTree.browse("assets://");
+    },
+
     select: function (selected, ids) {
         for (var i = 0; i < ids.length; ++i) {
             var id = ids[i];
@@ -42,9 +47,9 @@ Polymer({
         this.$.assetsTree.hintItem(uuid);
     },
 
-    domReady: function () {
-        Fire.info("browse assets://");
-        this.$.assetsTree.browse("assets://");
+    createAction: function () {
+        var type = 'create';
+        // TODO: Menu.popup(this.$.assetsTree.getCreateMenuTemplate());
     },
 
 });

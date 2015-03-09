@@ -150,10 +150,10 @@ function _addCustomAssetMenu(target, template) {
     }
 
     function onclick() {
-        if (target.contextmenuAt instanceof AssetsItem) {
-            var targetEL = target.contextmenuAt;
-            if (!target.contextmenuAt.isFolder) {
-                targetEL = target.contextmenuAt.parentElement;
+        if (target.contextSelection.length > 0) {
+            var targetEL = target.idToItem[target.contextSelection[0]];
+            if (!targetEL.isFolder) {
+                targetEL = targetEL.parentElement;
             }
             var url = target.getUrl(targetEL);
             var newCustomAsset = new item.customAsset();
@@ -225,7 +225,7 @@ Polymer({
         this.super();
 
         this.contextmenu = null;
-        this.contextmenuAt = null;
+        this.contextSelection = [];
 
         // dragging
         this.curDragoverEL = null;
@@ -301,95 +301,107 @@ Polymer({
         this.ipc.clear();
     },
 
+    getCreateMenuTemplate: function () {
+        return [
+            // New Scene
+            {
+                label: 'New Scene',
+                click: function () {
+                    var url = "assets://";
+                    if ( this.contextSelection.length > 0 ) {
+                        var targetEL = this.idToItem[this.contextSelection[0]];
+                        if ( !targetEL.isFolder )
+                            targetEL = targetEL.parentElement;
+                        url = this.getUrl(targetEL);
+                    }
+
+                    var newScene = new Fire._Scene();
+                    var newAssetUrl = Url.join( url, 'New Scene.fire' );
+                    this._focusUrl = newAssetUrl;
+                    Fire.sendToCore( 'asset-db:save',
+                                  newAssetUrl,
+                                  Fire.serialize(newScene) );
+                }.bind(this)
+            },
+
+            // New Folder
+            {
+                label: 'New Folder',
+                click: function () {
+                    var url = "assets://";
+                    if ( this.contextSelection.length > 0 ) {
+                        var targetEL = this.idToItem[this.contextSelection[0]];
+                        if ( !targetEL.isFolder )
+                            targetEL = targetEL.parentElement;
+                        url = this.getUrl(targetEL);
+                    }
+
+                    var newAssetUrl = Url.join( url, 'New Folder' );
+                    this._focusUrl = newAssetUrl;
+                    Fire.rpc( 'asset-db:makedirs', newAssetUrl );
+                }.bind(this)
+            },
+
+            // New Sprite (Standalone)
+            {
+                label: 'New Sprite (Standalone)',
+                click: function () {
+                    var targetEL = null;
+                    if ( this.contextSelection.length > 0 ) {
+                        targetEL = this.idToItem[this.contextSelection[0]];
+                    }
+
+                    if ( targetEL && _isTexture(targetEL.extname) ) {
+                        var textureName = targetEL.name;
+
+                        Fire.AssetLibrary.loadAsset ( targetEL.userId, function ( error, asset ) {
+                            var newSprite = new Fire.Sprite();
+                            newSprite.texture = asset;
+                            newSprite.width = asset.width;
+                            newSprite.height = asset.height;
+
+                            var url = this.getUrl(targetEL.parentElement);
+                            var newAssetUrl = Url.join( url, textureName + '.sprite' );
+                            this._focusUrl = newAssetUrl;
+                            Fire.sendToCore( 'asset-db:save',
+                                          newAssetUrl,
+                                          Fire.serialize(newSprite) );
+                        }.bind(this) );
+                    }
+                    else {
+                        Fire.warn( "Can not create sprite from non-texture element, please select a texture first." );
+                    }
+                }.bind(this)
+            },
+
+            // New Atlas
+            {
+                label: 'New Atlas',
+                click: function () {
+                    if ( this.contextSelection.length > 0 ) {
+                        var targetEL = this.idToItem[this.contextSelection[0]];
+                        if ( !targetEL.isFolder )
+                            targetEL = targetEL.parentElement;
+
+                        var newAtlas = new Fire.Atlas();
+                        var url = this.getUrl(targetEL);
+                        var newAssetUrl = Url.join( url, 'New Atlas.atlas' );
+                        this._focusUrl = newAssetUrl;
+                        Fire.sendToCore( 'asset-db:save',
+                                        newAssetUrl,
+                                        Fire.serialize(newAtlas) );
+                    }
+                }.bind(this)
+            },
+        ];
+    },
+
     createContextMenu: function () {
         var template = [
             // Create
             {
                 label: 'Create',
-                submenu: [
-                    // New Scene
-                    {
-                        label: 'New Scene',
-                        click: function () {
-                            var targetEL = this.contextmenuAt;
-                            if ( targetEL instanceof AssetsItem ) {
-                                if ( !targetEL.isFolder )
-                                    targetEL = targetEL.parentElement;
-                                var url = this.getUrl(targetEL);
-                                var newScene = new Fire._Scene();
-                                var newAssetUrl = Url.join( url, 'New Scene.fire' );
-                                this._focusUrl = newAssetUrl;
-                                Fire.sendToCore( 'asset-db:save',
-                                              newAssetUrl,
-                                              Fire.serialize(newScene) );
-                            }
-                        }.bind(this)
-                    },
-
-                    // New Folder
-                    {
-                        label: 'New Folder',
-                        click: function () {
-                            var targetEL = this.contextmenuAt;
-                            if ( targetEL instanceof AssetsItem ) {
-                                if ( !targetEL.isFolder )
-                                    targetEL = targetEL.parentElement;
-                                var url = this.getUrl(targetEL);
-                                var newAssetUrl = Url.join( url, 'New Folder' );
-                                this._focusUrl = newAssetUrl;
-                                Fire.rpc( 'asset-db:makedirs', newAssetUrl );
-                            }
-                        }.bind(this)
-                    },
-
-                    // New Sprite (Standalone)
-                    {
-                        label: 'New Sprite (Standalone)',
-                        click: function () {
-                            var targetEL = this.contextmenuAt;
-                            if ( targetEL instanceof AssetsItem && _isTexture(targetEL.extname) ) {
-                                var textureName = targetEL.name;
-
-                                Fire.AssetLibrary.loadAsset ( targetEL.userId, function ( error, asset ) {
-                                    var newSprite = new Fire.Sprite();
-                                    newSprite.texture = asset;
-                                    newSprite.width = asset.width;
-                                    newSprite.height = asset.height;
-
-                                    var url = this.getUrl(targetEL.parentElement);
-                                    var newAssetUrl = Url.join( url, textureName + '.sprite' );
-                                    this._focusUrl = newAssetUrl;
-                                    Fire.sendToCore( 'asset-db:save',
-                                                  newAssetUrl,
-                                                  Fire.serialize(newSprite) );
-                                }.bind(this) );
-                            }
-                            else {
-                                Fire.warn( "Can not create sprite from non-texture element, please select a texture first." );
-                            }
-                        }.bind(this)
-                    },
-
-                    // New Atlas
-                    {
-                        label: 'New Atlas',
-                        click: function () {
-                            var targetEL = this.contextmenuAt;
-                            if ( targetEL instanceof AssetsItem ) {
-                                if ( !targetEL.isFolder )
-                                    targetEL = targetEL.parentElement;
-
-                                var newAtlas = new Fire.Atlas();
-                                var url = this.getUrl(targetEL);
-                                var newAssetUrl = Url.join( url, 'New Atlas.atlas' );
-                                this._focusUrl = newAssetUrl;
-                                Fire.sendToCore( 'asset-db:save',
-                                                newAssetUrl,
-                                                Fire.serialize(newAtlas) );
-                            }
-                        }.bind(this)
-                    },
-                ]
+                submenu: this.getCreateMenuTemplate(),
             },
 
             // =====================
@@ -399,26 +411,30 @@ Polymer({
             {
                 label: 'Rename',
                 click: function () {
-                    if ( this.contextmenuAt instanceof AssetsItem ) {
-                        this.rename(this.contextmenuAt);
+                    if ( this.contextSelection.length > 0 ) {
+                        var targetEL = this.idToItem[this.contextSelection[0]];
+                        this.rename(targetEL);
                     }
                 }.bind(this),
-                //enable: this.contextmenuAt && this.contextmenuAt.isRoot === false && Fire.Selection.assets.length === 1,
             },
 
             // Delete
             {
                 label: 'Delete',
-                click: this.deleteSelection.bind(this),
-                //enable: this.contextmenuAt && this.contextmenuAt.isRoot === false,
+                click: function () {
+                    var elements = this.getToplevelElements(this.contextSelection);
+                    for (var i = 0; i < elements.length; i++) {
+                        Fire.sendToCore( 'asset-db:delete', this.getUrl(elements[i]) );
+                    }
+                }.bind(this),
             },
 
             // Reimport
             {
                 label: 'Reimport',
                 click: function () {
-                    if ( this.contextmenuAt instanceof AssetsItem ) {
-                        var selectedItemEl = this.contextmenuAt;
+                    if ( this.contextSelection.length > 0 ) {
+                        var selectedItemEl = this.idToItem[this.contextSelection[0]];
                         var url = this.getUrl(selectedItemEl);
 
                         // remove childnodes
@@ -440,8 +456,9 @@ Polymer({
             {
                 label: 'Show in ' + (Fire.isWin32 ? 'Explorer' : 'Finder'),
                 click: function () {
-                    if ( this.contextmenuAt instanceof AssetsItem ) {
-                        Fire.sendToCore( 'asset-db:explore', this.getUrl(this.contextmenuAt) );
+                    if ( this.contextSelection.length > 0 ) {
+                        var targetEL = this.idToItem[this.contextSelection[0]];
+                        Fire.sendToCore( 'asset-db:explore', this.getUrl(targetEL) );
                     }
                 }.bind(this)
             },
@@ -450,8 +467,9 @@ Polymer({
             {
                 label: 'Show in Library',
                 click: function () {
-                    if ( this.contextmenuAt instanceof AssetsItem ) {
-                        Fire.sendToCore( 'asset-db:explore-lib', this.getUrl(this.contextmenuAt) );
+                    if ( this.contextSelection.length > 0 ) {
+                        var targetEL = this.idToItem[this.contextSelection[0]];
+                        Fire.sendToCore( 'asset-db:explore-lib', this.getUrl(targetEL) );
                     }
                 }.bind(this)
             },
@@ -460,8 +478,9 @@ Polymer({
             {
                 label: 'Show Uuid',
                 click: function () {
-                    if ( this.contextmenuAt instanceof AssetsItem ) {
-                        Fire.log( this.contextmenuAt.userId );
+                    for ( var i = 0; i < this.contextSelection.length; ++i ) {
+                        var targetEL = this.idToItem[this.contextSelection[i]];
+                        Fire.log( targetEL.userId );
                     }
                 }.bind(this)
             },
@@ -490,6 +509,7 @@ Polymer({
 
         if ( this._focusUrl === url ) {
             this._focusUrl = null;
+            this.expand(newEL.userId);
             this.scrollToItem(newEL);
             Fire.Selection.selectAsset(newEL.userId, true, true);
         }
@@ -752,25 +772,27 @@ Polymer({
     },
 
     contextmenuAction: function (event) {
+        event.preventDefault();
         event.stopPropagation();
 
         //
         this.resetDragState();
 
         //
-        this.contextmenuAt = null;
+        var curContextID = Fire.UUID.AssetsRoot;
         if ( event.target instanceof AssetsItem ) {
-            this.contextmenuAt = event.target;
-            var unselectOther = (Fire.Selection.assets.indexOf(event.target.userId) === -1);
-            Fire.Selection.selectAsset(event.target.userId, unselectOther, true);
+            curContextID = event.target.userId;
         }
-        else {
-            this.contextmenuAt = this.idToItem[Fire.UUID.AssetsRoot];
+
+        this.contextSelection = Fire.Selection.assets.reverse();
+        if ( this.contextSelection.indexOf(curContextID) === -1 ) {
+            this.contextSelection = [curContextID];
         }
 
         if (!this.contextmenu) {
             this.createContextMenu();
         }
+
         this.contextmenu.popup(Remote.getCurrentWindow());
     },
 
