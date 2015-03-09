@@ -22,7 +22,7 @@ Polymer({
         this.tabIndex = EditorUI.getParentTabIndex(this)+1;
 
         // init pixi grids
-        this.pixiGrids = new Fire.PixiGrids();
+        //this.pixiGrids = new Fire.PixiGrids();
 
         // init gizmos
         this.svgGizmos = new Fire.SvgGizmos( this.$.gizmos );
@@ -54,11 +54,10 @@ Polymer({
                                                           this.view.height,
                                                           this.$.canvas );
         if ( this.renderContext !== null ) {
-            var graphics = new PIXI.Graphics();
-            this.renderContext.getBackgroundNode().addChild(graphics);
-            this.pixiGrids.setGraphics(graphics);
+            this.pixiGrids = new cc.Sprite();
+            this.renderContext.getBackgroundNode().addChild(this.pixiGrids);
 
-            this.initSceneCamera();
+            //this.initSceneCamera();
             this.resize(); // make sure we apply the size to all canvas
         }
     },
@@ -89,7 +88,7 @@ Polymer({
         camera.size = this.view.height;
         this.renderContext.camera = camera;
         this.svgGizmos.setCamera(camera);
-        this.pixiGrids.setCamera(camera);
+        //this.pixiGrids.setCamera(camera);
     },
 
     resize: function () {
@@ -101,8 +100,9 @@ Polymer({
                 width: clientRect.width,
                 height: clientRect.height,
             };
-            this.renderContext.size = new Fire.Vec2( this.view.width, this.view.height );
-            this.pixiGrids.resize( this.view.width, this.view.height );
+            //this.renderContext.size = new Fire.Vec2( this.view.width, this.view.height );
+            this.renderContext.view.setFrame(this.renderContext.game.container);
+            this.renderContext.view.setDesignResolutionSize( this.view.width, this.view.height, cc.ResolutionPolicy.SHOW_ALL );
             this.svgGizmos.resize( this.view.width, this.view.height );
 
             this.repaint();
@@ -116,6 +116,8 @@ Polymer({
     },
 
     updateCamera: function () {
+        return;
+
         if ( !Fire.Engine._scene )
             return;
 
@@ -135,9 +137,9 @@ Polymer({
         if ( !this.renderContext )
             return;
 
-        this.pixiGrids.update();
-        Fire.Engine._scene.render(this.renderContext);
-        this.interactionContext.update(Fire.Engine._scene.entities);
+        // this.pixiGrids.update();
+        // Fire.Engine._scene.render(this.renderContext);
+        // this.interactionContext.update(Fire.Engine._scene.entities);
     },
 
     updateGizmos: function () {
@@ -331,7 +333,7 @@ Polymer({
     },
 
     hitTest: function ( x, y ) {
-        if ( !this.renderContext )
+        if ( this.renderContext )
             return null;
 
         // check if we hit gizmos

@@ -6,13 +6,18 @@ var Engine = Fire.Engine;
 RenderContext.createSceneRenderCtx = function (width, height, canvas, transparent) {
     var sceneCtx = new RenderContext (width, height, canvas, transparent);
 
-    var foreground = new PIXI.DisplayObjectContainer();
-    var gameRoot = new PIXI.DisplayObjectContainer();
-    var background = new PIXI.DisplayObjectContainer();
-    sceneCtx.stage.addChild(background);
-    sceneCtx.stage.addChild(gameRoot);
-    sceneCtx.stage.addChild(foreground);
+    var foreground = new cc.Layer();
+    var gameRoot = new cc.Layer();
+    var background = new cc.Layer();
+    sceneCtx.stage.addChild(background, 0, 0);
+    sceneCtx.stage.addChild(gameRoot, 1, 1);
+    sceneCtx.stage.addChild(foreground, 2, 2);
     sceneCtx.root = gameRoot;
+
+    var sprite = new cc.Sprite("fire://static/img/cocos-logo.png");
+    sprite.x = width/2;
+    sprite.y = height/2;
+    gameRoot.addChild(sprite);
 
     Engine._renderContext.sceneView = sceneCtx;
     return sceneCtx;
