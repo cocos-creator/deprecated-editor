@@ -1,3 +1,6 @@
+var Remote = require('remote');
+var Menu = Remote.require('menu');
+
 Polymer({
     created: function () {
         this.icon = new Image();
@@ -48,8 +51,12 @@ Polymer({
     },
 
     createAction: function () {
-        var type = 'create';
-        // TODO: Menu.popup(this.$.assetsTree.getCreateMenuTemplate());
+        var rect = this.$.addIcon.getBoundingClientRect();
+        var template = this.$.assetsTree.getCreateMenuTemplate();
+        var menu = Menu.buildFromTemplate(template);
+        menu.popup(Remote.getCurrentWindow(),
+                   Math.floor(rect.right),
+                   Math.floor(rect.bottom));
     },
 
 });
