@@ -224,11 +224,13 @@ Polymer({
     },
 
     updateTitle: function () {
-        var url = Fire.AssetDB.uuidToUrl(Fire.Engine._scene._uuid);
-        if ( !url ) {
-            url = 'Untitled';
-        }
-        Remote.getCurrentWindow().setTitle( "Fireball Editor - " + url );
+        setImmediate(function () {
+            var url = Fire.AssetDB.uuidToUrl(Fire.Engine._scene._uuid);
+            if ( !url ) {
+                url = 'Untitled';
+            }
+            Remote.getCurrentWindow().setTitle( "Fireball Editor - " + url );
+        }.bind(this));
     },
 
     _updateSceneInterval: function () {
