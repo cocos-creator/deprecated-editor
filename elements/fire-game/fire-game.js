@@ -6,6 +6,18 @@ Polymer({
         this.ipc = new Fire.IpcListener();
 
         this.renderContext = null;
+        this.curResolution = 0;
+    },
+
+    ready: function () {
+        this.$.resolutionSelect.options = [
+            { name: "Free Aspect", value: 0 },
+            { name: "iPhone 5 (9:16)", value: 1 },
+            { name: "iPhone 6 (2:3)", value: 2 },
+            { name: "Custom", value: 3 },
+        ];
+
+        this.$.view.tabIndex = EditorUI.getParentTabIndex(this)+1;
     },
 
     attached: function () {

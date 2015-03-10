@@ -8,7 +8,17 @@
     <template>
         <link rel="stylesheet" href="fire-game.css">
 
-        <div class="border" id="view" fit></div>
+        <fire-ui-toolbar justify-between>
+            <div class="left">
+                <fire-ui-select id="resolutionSelect" value="{{curResolution}}"></fire-ui-select>
+            </div>
+            <div class="right">
+            </div>
+        </fire-ui-toolbar>
+
+        <div class="border" flex-1>
+            <div id="view" fit></div>
+        </div>
     </template>
 
     <script type="text/javascript" src="fire-game.js"></script>

@@ -1,8 +1,10 @@
 :host {
-    position: relative
+    display: flex
+    flex-direction: column
+    flex-wrap: nowrap
+    align-items: stretch
+
     font-size: 12px
-    margin-top: 2px
-    border: 1px solid #171717
     white-space: nowrap
 
     // box-shadow: inset 0 0 8px 2px rgba(0,0,0,0.2);
@@ -13,7 +15,9 @@
 }
 
 .border {
+    border: 1px solid #171717
     position: relative
+    background: #333
 }
 
 canvas {
