@@ -39,6 +39,20 @@ Polymer({
                 Fire.sendToPages('quick-asset:closed');
             });
         }
+
+        window.onkeydown = function ( event ) {
+            switch ( event.which ) {
+            // enter, esc
+            case 13:
+            case 27:
+                var browserWindow = remote.getCurrentWindow();
+                browserWindow.close();
+                break;
+
+            default:
+                this.$.search.focus();
+            }
+        }.bind(this);
     },
 
     attached: function () {

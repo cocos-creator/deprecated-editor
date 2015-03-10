@@ -4,6 +4,7 @@
     name="quick-assets"
     constructor="QuickAssets"
     on-selected="{{selectAction}}"
+    on-keydown="{{keydownAction}}"
     >
     <template>
         <link rel="stylesheet" href="quick-assets.css">
@@ -18,7 +19,7 @@
                 </fire-ui-bi>
             </fire-ui-button-group>
             <span class="space"></span>
-            <fire-ui-text-input flex-1 placeholder="Search"
+            <fire-ui-text-input id="search" flex-1 placeholder="Search"
                 inputValue="{{searchText}}"
                 >
                 </fire-ui-text-input>
