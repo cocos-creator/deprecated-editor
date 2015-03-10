@@ -764,18 +764,24 @@ Polymer({
         if ( event.target instanceof AssetsItem ) {
             if ( event.target.extname === '.fire' ) {
                 var defaultEvent = event.target.userId;
-                if (Fire.Engine._scene._uuid !== "") {
-                    dialog.showMessageBox({ type: "warning",buttons:["yes","no","cancel"],title:"this scene has changed,do you want to saving it?",message:"this scene has changed,do you want to saving it?",detail:Fire.AssetDB.uuidToUrl(Fire.Engine._scene._uuid)},function (res) {
-                        if (res === 2) {
-                            return;
-                        }
-                        else {
-                            if (res === 0) {
-                                Fire.sendToPages('scene:save');
+                if ( Fire.AssetDB.isValidUuid(Fire.Engine._scene._uuid) ) {
+                    dialog.showMessageBox( {
+                        type: "warning",
+                        buttons: ["yes","no","cancel"],
+                        title: "this scene has changed,do you want to saving it?",
+                        message: "this scene has changed,do you want to saving it?",
+                        detail: Fire.AssetDB.uuidToUrl(Fire.Engine._scene._uuid)},
+                        function (res) {
+                            if (res === 2) {
+                                return;
                             }
-                            Fire.sendToMainPage('engine:openScene', defaultEvent);
-                        }
-                    });
+                            else {
+                                if (res === 0) {
+                                    Fire.sendToPages('scene:save');
+                                }
+                                Fire.sendToMainPage('engine:openScene', defaultEvent);
+                            }
+                    } );
                 }
                 else {
                     Fire.sendToMainPage('engine:openScene', event.target.userId);
