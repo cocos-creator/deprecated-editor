@@ -84,6 +84,12 @@ Polymer({
         var results = items.filter( function ( item ) {
             return item.text.toLowerCase().indexOf(searchText) !== -1;
         });
+        results.unshift({
+            icon: null,
+            text: "None",
+            uuid: "",
+            selected: this._curId === "",
+        });
         return results;
     },
 

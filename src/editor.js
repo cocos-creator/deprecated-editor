@@ -217,7 +217,7 @@ Fire.browseObject = function ( type, fobjectEL ) {
             height: 600,
             show: true,
             resizable: true,
-            query: { typeID: typeID, id: fobjectEL.value ? fobjectEL.value._uuid : -1 },
+            query: { typeID: typeID, id: fobjectEL.value ? fobjectEL.value._uuid : "" },
             closeWhenBlur: true,
         } );
         ipc.on('quick-asset:selected', function ( uuid ) {
