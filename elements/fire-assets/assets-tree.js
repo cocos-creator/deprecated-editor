@@ -3,7 +3,6 @@ var Url = require('fire-url');
 
 var Remote = require('remote');
 var Menu = Remote.require('menu');
-var dialog = Remote.require('dialog');
 
 function _isTexture ( extname ) {
     return extname === '.png' || extname === '.jpg';
@@ -777,36 +776,7 @@ Polymer({
             return;
         }
 
-        var currentID = event.target.userId;
-        if ( event.target.extname === '.fire' ) {
-            if ( Fire.Engine._scene.dirty ) {
-                dialog.showMessageBox( {
-                    type: "warning",
-                    buttons: ["yes","no","cancel"],
-                    title: "this scene has changed,do you want to saving it?",
-                    message: "this scene has changed,do you want to saving it?",
-                    detail: Fire.AssetDB.uuidToUrl(Fire.Engine._scene._uuid)
-                },
-                function (res) {
-                    if (res === 2) {
-                        return;
-                    }
-                    else {
-                        if (res === 0) {
-                            Fire.mainWindow.saveCurrentScene();
-                        }
-                        Fire.sendToMainPage('engine:openScene', currentID);
-                    }
-                } );
-            }
-            else {
-                Fire.sendToMainPage('engine:openScene', currentID);
-            }
-
-            return;
-        }
-
-        Fire.sendToCore('asset:open', currentID);
+        Fire.sendToAll('asset:open', event.target.userId, this.getUrl(event.target) );
     },
 
     contextmenuAction: function (event) {

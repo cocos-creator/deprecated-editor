@@ -88,6 +88,38 @@ Polymer({
             }
         }.bind(this) );
 
+        //
+        this.ipc.on('asset:open', function ( uuid, url ) {
+            if ( Url.extname(url) !== '.fire' ) {
+                return;
+            }
+
+            if ( Fire.Engine._scene.dirty ) {
+                var dialog = Remote.require('dialog');
+                dialog.showMessageBox( Remote.getCurrentWindow(), {
+                    type: "warning",
+                    buttons: ["yes","no","cancel"],
+                    title: "this scene has changed,do you want to saving it?",
+                    message: "this scene has changed,do you want to saving it?",
+                    detail: Fire.AssetDB.uuidToUrl(Fire.Engine._scene._uuid)
+                },
+                function (res) {
+                    if (res === 2) {
+                        return;
+                    }
+                    else {
+                        if (res === 0) {
+                            this.saveCurrentScene();
+                        }
+                        Fire.sendToMainPage('engine:openScene', uuid);
+                    }
+                }.bind(this) );
+            }
+            else {
+                Fire.sendToMainPage('engine:openScene', uuid);
+            }
+        }.bind(this) );
+
         this.ipc.on('entity:added', this.setSceneDirty.bind(this,true,false));
         this.ipc.on('entity:removed', this.setSceneDirty.bind(this,true,false));
         this.ipc.on('entity:parentChanged', this.setSceneDirty.bind(this,true,false));
