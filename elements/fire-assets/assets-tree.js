@@ -742,6 +742,11 @@ Polymer({
     openAction: function (event) {
         if ( event.target instanceof AssetsItem ) {
             if ( event.target.extname === '.fire' ) {
+                if (Fire.Engine._scene._uuid !== "") {
+                    if (window.confirm('this scene has changed,do you want to saving it?')) {
+                        Fire.sendToPages('scene:save');
+                    }
+                }
                 Fire.sendToMainPage('engine:openScene', event.target.userId);
                 return;
             }
