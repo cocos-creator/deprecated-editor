@@ -3,6 +3,7 @@ var Url = require('fire-url');
 
 var Remote = require('remote');
 var Menu = Remote.require('menu');
+var dialog = Remote.require('dialog');
 
 function _isTexture ( extname ) {
     return extname === '.png' || extname === '.jpg';
@@ -762,16 +763,26 @@ Polymer({
     openAction: function (event) {
         if ( event.target instanceof AssetsItem ) {
             if ( event.target.extname === '.fire' ) {
+                var defaultEvent = event.target.userId;
                 if (Fire.Engine._scene._uuid !== "") {
-                    if (window.confirm('this scene has changed,do you want to saving it?')) {
-                        Fire.sendToPages('scene:save');
-                    }
+                    dialog.showMessageBox({ type: "warning",buttons:["yes","no","cancel"],title:"this scene has changed,do you want to saving it?",message:"this scene has changed,do you want to saving it?",detail:Fire.AssetDB.uuidToUrl(Fire.Engine._scene._uuid)},function (res) {
+                        if (res === 2) {
+                            return;
+                        }
+                        else {
+                            if (res === 0) {
+                                Fire.sendToPages('scene:save');
+                            }
+                            Fire.sendToMainPage('engine:openScene', defaultEvent);
+                        }
+                    });
                 }
-                Fire.sendToMainPage('engine:openScene', event.target.userId);
-                return;
+                else {
+                    Fire.sendToMainPage('engine:openScene', event.target.userId);
+                }
             }
-
             Fire.sendToCore('asset:open', event.target.userId);
+            return;
         }
         event.stopPropagation();
     },
