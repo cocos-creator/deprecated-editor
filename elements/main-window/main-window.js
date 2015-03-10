@@ -98,20 +98,30 @@ Polymer({
                 var dialog = Remote.require('dialog');
                 dialog.showMessageBox( Remote.getCurrentWindow(), {
                     type: "warning",
-                    buttons: ["yes","no","cancel"],
-                    title: "this scene has changed,do you want to saving it?",
-                    message: "this scene has changed,do you want to saving it?",
-                    detail: Fire.AssetDB.uuidToUrl(Fire.Engine._scene._uuid)
+                    buttons: ["Save","Cancel","Don't Save"],
+                    title: "Save Scene Confirm",
+                    message: Fire.AssetDB.uuidToUrl(Fire.Engine._scene._uuid) + " has changed, do you want to save it?",
+                    detail: "Your changes will be lost if you close this item without saving."
                 },
                 function (res) {
-                    if (res === 2) {
-                        return;
-                    }
-                    else {
-                        if (res === 0) {
-                            this.saveCurrentScene();
+                    switch ( res ) {
+                    // save
+                    case 0:
+                        this.saveCurrentScene();
+                        // don't re-open current saving scene
+                        if ( uuid !== Fire.Engine._scene._uuid ) {
+                            Fire.sendToMainPage('engine:openScene', uuid);
                         }
+                        break;
+
+                    // cancel
+                    case 1:
+                        break;
+
+                    // don't save
+                    case 2:
                         Fire.sendToMainPage('engine:openScene', uuid);
+                        break;
                     }
                 }.bind(this) );
             }
