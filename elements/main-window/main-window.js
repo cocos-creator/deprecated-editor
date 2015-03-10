@@ -63,6 +63,13 @@ Polymer({
             Fire.sendToAll('asset-library:debugger:uuid-asset-results', results);
         }.bind(this));
 
+        this.ipc.on('asset:moved', function (uuid, destUrl) {
+            // if it is current scene renamed, update title
+            if ( uuid === Fire.Engine._scene._uuid ) {
+                this.updateTitle();
+            }
+        }.bind(this));
+
         // NOTE: the scene:launched and engine:played must be ipc event to make sure component:disabled been called before it.
 
         this.ipc.on('scene:launched', function ( event ) {
@@ -82,6 +89,7 @@ Polymer({
             }
 
             this._updateSceneInterval();
+            this.updateTitle();
         }.bind(this));
 
         this.ipc.on('engine:played', function ( continued ) {
@@ -197,16 +205,6 @@ Polymer({
                     camera.addComponent(Fire.Camera);
                 }
 
-                // observe the current scene name
-                self.updateTitle();
-                if ( self.sceneNameObserver ) {
-                    self.sceneNameObserver.close();
-                }
-                self.sceneNameObserver = new PathObserver( Fire.Engine._scene, "_name" );
-                self.sceneNameObserver.open( function ( newValue, oldValue ) {
-                    self.updateTitle();
-                }, self );
-
                 next();
             },
 
@@ -226,11 +224,11 @@ Polymer({
     },
 
     updateTitle: function () {
-        var sceneName = Fire.Engine._scene.name;
-        if ( !sceneName ) {
-            sceneName = 'Untitled';
+        var url = Fire.AssetDB.uuidToUrl(Fire.Engine._scene._uuid);
+        if ( !url ) {
+            url = 'Untitled';
         }
-        Remote.getCurrentWindow().setTitle( sceneName + " - Fireball Editor" );
+        Remote.getCurrentWindow().setTitle( "Fireball Editor - " + url );
     },
 
     _updateSceneInterval: function () {
