@@ -6,8 +6,6 @@ Polymer({
     created: function () {
         this.super();
 
-        this.contextSelection = [];
-
         // dragging
         this.dragenterCnt = 0;
         this.curDragoverEL = null;
@@ -48,16 +46,19 @@ Polymer({
         this.ipc.on('hierarchy-menu:create-entity', this.createEntity.bind(this));
         this.ipc.on('hierarchy-menu:create-child-entity', this.createChildEntity.bind(this));
         this.ipc.on('hierarchy-menu:rename', function () {
-            if ( this.contextSelection.length > 0 ) {
-                var targetEL = this.idToItem[this.contextSelection[0]];
+            var contextSelection = Fire.Selection.contextEntities;
+            if ( contextSelection.length > 0 ) {
+                var targetEL = this.idToItem[contextSelection[0]];
                 this.rename(targetEL);
             }
         }.bind(this));
         this.ipc.on('hierarchy-menu:delete', function () {
-            Fire.sendToMainPage('engine:deleteEntities', this.contextSelection);
+            var contextSelection = Fire.Selection.contextEntities;
+            Fire.sendToMainPage('engine:deleteEntities', contextSelection);
         }.bind(this));
         this.ipc.on('hierarchy-menu:duplicate', function () {
-            var entities = this.getToplevelElements(this.contextSelection).map(function (element) {
+            var contextSelection = Fire.Selection.contextEntities;
+            var entities = this.getToplevelElements(contextSelection).map(function (element) {
                 return element && element.userId;
             });
             Fire.sendToMainPage('engine:duplicateEntities', entities);
@@ -227,8 +228,9 @@ Polymer({
     },
 
     createEntity: function () {
-        if ( this.contextSelection.length > 0 ) {
-            var targetEL = this.idToItem[this.contextSelection[0]];
+        var contextSelection = Fire.Selection.contextEntities;
+        if ( contextSelection.length > 0 ) {
+            var targetEL = this.idToItem[contextSelection[0]];
             var parentEL = targetEL.parentElement;
             if ( parentEL && parentEL instanceof HierarchyItem ) {
                 Fire.sendToMainPage('engine:createEntity', parentEL.userId);
@@ -240,8 +242,9 @@ Polymer({
     },
 
     createChildEntity: function () {
-        if ( this.contextSelection.length > 0 ) {
-            var targetEL = this.idToItem[this.contextSelection[0]];
+        var contextSelection = Fire.Selection.contextEntities;
+        if ( contextSelection.length > 0 ) {
+            var targetEL = this.idToItem[contextSelection[0]];
             Fire.sendToMainPage('engine:createEntity', targetEL.userId);
         }
         else {
@@ -371,11 +374,7 @@ Polymer({
             curContextID = event.target.userId;
         }
 
-        //
-        this.contextSelection = Fire.Selection.entities.reverse();
-        if ( curContextID && this.contextSelection.indexOf(curContextID) === -1 ) {
-            this.contextSelection = [curContextID];
-        }
+        Fire.Selection.setContextEntity(curContextID);
 
         Fire.popupMenu(this.getContextMenuTemplate());
         event.stopPropagation();

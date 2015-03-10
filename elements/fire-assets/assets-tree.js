@@ -150,8 +150,9 @@ function _addCustomAssetMenu(target, template) {
     }
 
     function onclick() {
-        if (target.contextSelection.length > 0) {
-            var targetEL = target.idToItem[target.contextSelection[0]];
+        var contextSelection = Fire.Selection.contextAssets;
+        if (contextSelection.length > 0) {
+            var targetEL = target.idToItem[contextSelection[0]];
             if (!targetEL.isFolder) {
                 targetEL = targetEL.parentElement;
             }
@@ -225,7 +226,6 @@ Polymer({
         this.super();
 
         this.contextmenu = null;
-        this.contextSelection = [];
 
         // dragging
         this.curDragoverEL = null;
@@ -308,8 +308,9 @@ Polymer({
                 label: 'New Scene',
                 click: function () {
                     var url = "assets://";
-                    if ( this.contextSelection.length > 0 ) {
-                        var targetEL = this.idToItem[this.contextSelection[0]];
+                    var contextSelection = Fire.Selection.contextAssets;
+                    if ( contextSelection.length > 0 ) {
+                        var targetEL = this.idToItem[contextSelection[0]];
                         if ( !targetEL.isFolder )
                             targetEL = targetEL.parentElement;
                         url = this.getUrl(targetEL);
@@ -329,8 +330,9 @@ Polymer({
                 label: 'New Folder',
                 click: function () {
                     var url = "assets://";
-                    if ( this.contextSelection.length > 0 ) {
-                        var targetEL = this.idToItem[this.contextSelection[0]];
+                    var contextSelection = Fire.Selection.contextAssets;
+                    if ( contextSelection.length > 0 ) {
+                        var targetEL = this.idToItem[contextSelection[0]];
                         if ( !targetEL.isFolder )
                             targetEL = targetEL.parentElement;
                         url = this.getUrl(targetEL);
@@ -347,8 +349,9 @@ Polymer({
                 label: 'New Sprite (Standalone)',
                 click: function () {
                     var targetEL = null;
-                    if ( this.contextSelection.length > 0 ) {
-                        targetEL = this.idToItem[this.contextSelection[0]];
+                    var contextSelection = Fire.Selection.contextAssets;
+                    if ( contextSelection.length > 0 ) {
+                        targetEL = this.idToItem[contextSelection[0]];
                     }
 
                     if ( targetEL && _isTexture(targetEL.extname) ) {
@@ -378,8 +381,9 @@ Polymer({
             {
                 label: 'New Atlas',
                 click: function () {
-                    if ( this.contextSelection.length > 0 ) {
-                        var targetEL = this.idToItem[this.contextSelection[0]];
+                    var contextSelection = Fire.Selection.contextAssets;
+                    if ( contextSelection.length > 0 ) {
+                        var targetEL = this.idToItem[contextSelection[0]];
                         if ( !targetEL.isFolder )
                             targetEL = targetEL.parentElement;
 
@@ -411,8 +415,9 @@ Polymer({
             {
                 label: 'Rename',
                 click: function () {
-                    if ( this.contextSelection.length > 0 ) {
-                        var targetEL = this.idToItem[this.contextSelection[0]];
+                    var contextSelection = Fire.Selection.contextAssets;
+                    if ( contextSelection.length > 0 ) {
+                        var targetEL = this.idToItem[contextSelection[0]];
                         this.rename(targetEL);
                     }
                 }.bind(this),
@@ -422,7 +427,8 @@ Polymer({
             {
                 label: 'Delete',
                 click: function () {
-                    var elements = this.getToplevelElements(this.contextSelection);
+                    var contextSelection = Fire.Selection.contextAssets;
+                    var elements = this.getToplevelElements(contextSelection);
                     for (var i = 0; i < elements.length; i++) {
                         Fire.sendToCore( 'asset-db:delete', this.getUrl(elements[i]) );
                     }
@@ -433,8 +439,9 @@ Polymer({
             {
                 label: 'Reimport',
                 click: function () {
-                    if ( this.contextSelection.length > 0 ) {
-                        var selectedItemEl = this.idToItem[this.contextSelection[0]];
+                    var contextSelection = Fire.Selection.contextAssets;
+                    if ( contextSelection.length > 0 ) {
+                        var selectedItemEl = this.idToItem[contextSelection[0]];
                         var url = this.getUrl(selectedItemEl);
 
                         // remove childnodes
@@ -456,8 +463,9 @@ Polymer({
             {
                 label: 'Show in ' + (Fire.isWin32 ? 'Explorer' : 'Finder'),
                 click: function () {
-                    if ( this.contextSelection.length > 0 ) {
-                        var targetEL = this.idToItem[this.contextSelection[0]];
+                    var contextSelection = Fire.Selection.contextAssets;
+                    if ( contextSelection.length > 0 ) {
+                        var targetEL = this.idToItem[contextSelection[0]];
                         Fire.sendToCore( 'asset-db:explore', this.getUrl(targetEL) );
                     }
                 }.bind(this)
@@ -467,8 +475,9 @@ Polymer({
             {
                 label: 'Show in Library',
                 click: function () {
-                    if ( this.contextSelection.length > 0 ) {
-                        var targetEL = this.idToItem[this.contextSelection[0]];
+                    var contextSelection = Fire.Selection.contextAssets;
+                    if ( contextSelection.length > 0 ) {
+                        var targetEL = this.idToItem[contextSelection[0]];
                         Fire.sendToCore( 'asset-db:explore-lib', this.getUrl(targetEL) );
                     }
                 }.bind(this)
@@ -478,8 +487,9 @@ Polymer({
             {
                 label: 'Show Uuid',
                 click: function () {
-                    for ( var i = 0; i < this.contextSelection.length; ++i ) {
-                        var targetEL = this.idToItem[this.contextSelection[i]];
+                    var contextSelection = Fire.Selection.contextAssets;
+                    for ( var i = 0; i < contextSelection.length; ++i ) {
+                        var targetEL = this.idToItem[contextSelection[i]];
                         Fire.log( targetEL.userId );
                     }
                 }.bind(this)
@@ -784,10 +794,7 @@ Polymer({
             curContextID = event.target.userId;
         }
 
-        this.contextSelection = Fire.Selection.assets.reverse();
-        if ( this.contextSelection.indexOf(curContextID) === -1 ) {
-            this.contextSelection = [curContextID];
-        }
+        Fire.Selection.setContextAsset(curContextID);
 
         if (!this.contextmenu) {
             this.createContextMenu();
