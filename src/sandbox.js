@@ -170,6 +170,13 @@ var Sandbox = (function () {
         purgeMemory();
         Sandbox.globalVarsChecker.restore(Fire.warn, 'playing');
 
+        // force ignore dont destroy flags
+        var entities = Fire.Engine._scene.entities;
+        var DontDestroy = Fire._ObjectFlags.DontDestroy;
+        for (var i = 0, len = entities.length; i < len; i++) {
+            entities[i]._objFlags &= ~DontDestroy;
+        }
+
         this._launchScene(stashedScene, function () {
             //gVarsCheckerForPlaying.restore(Fire.warn);
             Sandbox.globalVarsChecker.restore(Fire.warn, 'destroying playing scene');
