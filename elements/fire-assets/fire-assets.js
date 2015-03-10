@@ -1,3 +1,6 @@
+var Remote = require('remote');
+var Menu = Remote.require('menu');
+
 Polymer({
     created: function () {
         this.icon = new Image();
@@ -16,6 +19,11 @@ Polymer({
 
     detached: function () {
         this.ipc.clear();
+    },
+
+    domReady: function () {
+        Fire.info("browse assets://");
+        this.$.assetsTree.browse("assets://");
     },
 
     select: function (selected, ids) {
@@ -42,9 +50,13 @@ Polymer({
         this.$.assetsTree.hintItem(uuid);
     },
 
-    domReady: function () {
-        Fire.info("browse assets://");
-        this.$.assetsTree.browse("assets://");
+    createAction: function () {
+        var rect = this.$.addIcon.getBoundingClientRect();
+        var template = this.$.assetsTree.getCreateMenuTemplate();
+        var menu = Menu.buildFromTemplate(template);
+        menu.popup(Remote.getCurrentWindow(),
+                   Math.floor(rect.right),
+                   Math.floor(rect.bottom));
     },
 
 });

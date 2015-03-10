@@ -53,6 +53,8 @@ Polymer({
     browseAction: function ( event ) {
         event.stopPropagation();
 
+        EditorUI.addHitGhost('cursor', '998');
+
         var dialog = Remote.require('dialog');
 
         var result = dialog.showOpenDialog ( {
@@ -63,6 +65,8 @@ Polymer({
         if ( result ) {
             this.path = result[0];
         }
+
+        EditorUI.removeHitGhost();
     },
 
     createAction: function ( event ) {
