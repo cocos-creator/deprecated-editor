@@ -17,9 +17,17 @@ Polymer(EditorUI.mixin({
         }
     },
 
+    logChanged: function () {
+        this.$.log.innerHTML = this.replaceWarp(this.log);
+    },
+
     clear: function () {
         this.log = '';
         this.type = '';
     },
+
+    replaceWarp: function (log) {
+        return log.replace(/\r\n/g,"<br/>").replace(/\n/g,"<br/>");
+    }
 
 }, EditorUI.resizable));
