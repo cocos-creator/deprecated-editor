@@ -555,6 +555,7 @@ Polymer({
                             ent.parent = parentEnt;
                             ent.transform.position = new Fire.Vec2(0,0);
                             Fire.Selection.selectEntity( ent.id, false, true );
+                            Fire.sendToMainPage( 'entity:added', ent.id );
                             Fire.sendToPages( 'scene:dirty' );
                             Fire.AssetLibrary.cacheAsset( asset );
                         }.bind(this) );

@@ -1,6 +1,7 @@
 var Remote = require('remote');
 var Async = require('async');
 var Url = require('fire-url');
+var Path = require('fire-path');
 
 Polymer({
     _scriptCompiled: false,
@@ -20,6 +21,8 @@ Polymer({
 
         this._updateSceneIntervalID = null;
         this._updateSceneAnimFrameID = null;
+
+        this._newsceneUrl = null;
     },
 
     ready: function () {
@@ -70,6 +73,29 @@ Polymer({
             }
         }.bind(this));
 
+        this.ipc.on('scene:save', this.saveCurrentScene.bind(this) );
+
+        // scene saved
+        this.ipc.on('asset:saved', function ( url, uuid ) {
+            // update the uuid of current scene, if we first time save it
+            if ( this._newsceneUrl === url ) {
+                this._newsceneUrl = null;
+                var sceneName = Url.basename(url);
+                Fire.Engine._scene._uuid = uuid;
+                Fire.Engine._scene.name = sceneName;
+
+                this.setSceneDirty(false,true);
+            }
+        }.bind(this) );
+
+        this.ipc.on('entity:added', this.setSceneDirty.bind(this,true,false));
+        this.ipc.on('entity:removed', this.setSceneDirty.bind(this,true,false));
+        this.ipc.on('entity:parentChanged', this.setSceneDirty.bind(this,true,false));
+        this.ipc.on('entity:indexChanged', this.setSceneDirty.bind(this,true,false));
+        this.ipc.on('entity:renamed', this.setSceneDirty.bind(this,true,false));
+        this.ipc.on('entity:inspector-dirty', this.setSceneDirty.bind(this,true,false));
+        this.ipc.on('gizmos:dirty', this.setSceneDirty.bind(this,true,false));
+
         // NOTE: the scene:launched and engine:played must be ipc event to make sure component:disabled been called before it.
 
         this.ipc.on('scene:launched', function ( event ) {
@@ -83,13 +109,14 @@ Polymer({
             }
 
             //
+            this.setSceneDirty(false,true);
+
+            //
             if ( this._updateSceneIntervalID ) {
                 Fire.warn( 'The _updateSceneInterval still ON' );
                 return;
             }
-
             this._updateSceneInterval();
-            this.updateTitle();
         }.bind(this));
 
         this.ipc.on('engine:played', function ( continued ) {
@@ -223,14 +250,79 @@ Polymer({
         event.stopPropagation();
     },
 
+    setSceneDirty: function ( dirty, forceUpdateTitle ) {
+        var updateTitle = forceUpdateTitle;
+        if ( Fire.Engine._scene.dirty !== dirty ) {
+            Fire.Engine._scene.dirty = dirty;
+            updateTitle = true;
+        }
+
+        if ( updateTitle ) {
+            this.updateTitle();
+        }
+    },
+
     updateTitle: function () {
         setImmediate(function () {
             var url = Fire.AssetDB.uuidToUrl(Fire.Engine._scene._uuid);
             if ( !url ) {
                 url = 'Untitled';
             }
+            url += Fire.Engine._scene.dirty ? "*" : "";
             Remote.getCurrentWindow().setTitle( "Fireball Editor - " + url );
         }.bind(this));
+    },
+
+    addPlugin: function ( panel, plugin, id, name ) {
+        var pluginInst = new plugin();
+        pluginInst.setAttribute('id', id);
+        pluginInst.setAttribute('name', name);
+        pluginInst.setAttribute('fit', '');
+        this.$[id] = pluginInst;
+        panel.add(pluginInst);
+        panel.$.tabs.select(0);
+    },
+
+    saveCurrentScene: function () {
+        var currentScene = Fire.Engine._scene;
+        var dialog = Remote.require('dialog');
+        var saveUrl = Fire.AssetDB.uuidToUrl(currentScene._uuid);
+
+        if ( !saveUrl ) {
+            var rootPath = Fire.AssetDB._fspath("assets://");
+            var savePath = dialog.showSaveDialog( Remote.getCurrentWindow(), {
+                title: "Save Scene",
+                defaultPath: rootPath,
+                filters: [
+                    { name: 'Scenes', extensions: ['fire'] },
+                ],
+            } );
+
+            if ( savePath ) {
+                if ( Path.contains( rootPath, savePath ) ) {
+                    saveUrl = 'assets://' + Path.relative( rootPath, savePath );
+                }
+                else {
+                    dialog.showMessageBox ( Remote.getCurrentWindow(), {
+                        type: "warning",
+                        buttons: ["OK"],
+                        title: "Warning",
+                        message: "Warning: please save the scene in the assets folder.",
+                        detail: "The scene needs to be saved inside the assets folder of your project.",
+                    } );
+                    // try to popup the dailog for user to save the scene
+                    this.saveCurrentScene();
+                }
+            }
+        }
+
+        //
+        if ( saveUrl ) {
+            this._newsceneUrl = saveUrl;
+            Fire.sendToCore( 'asset-db:save',
+                          this._newsceneUrl,
+                          Fire.serialize(currentScene) );
+        }
     },
 
     _updateSceneInterval: function () {
@@ -259,15 +351,5 @@ Polymer({
             window.cancelAnimationFrame(this._updateSceneAnimFrameID);
             this._updateSceneAnimFrameID = null;
         }
-    },
-
-    addPlugin: function ( panel, plugin, id, name ) {
-        var pluginInst = new plugin();
-        pluginInst.setAttribute('id', id);
-        pluginInst.setAttribute('name', name);
-        pluginInst.setAttribute('fit', '');
-        this.$[id] = pluginInst;
-        panel.add(pluginInst);
-        panel.$.tabs.select(0);
     },
 });

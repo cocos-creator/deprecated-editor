@@ -8,8 +8,6 @@ Polymer({
         this.icon.src = "fire://static/img/plugin-scene.png";
 
         this.ipc = new Fire.IpcListener();
-
-        this._newsceneUrl = null;
     },
 
     ready: function () {
@@ -22,17 +20,6 @@ Polymer({
         this.ipc.on('selection:entity:hover', this.hover.bind(this) );
         this.ipc.on('selection:entity:hoverout', this.hoverout.bind(this) );
         this.ipc.on('scene:dirty', this.delayRepaintScene.bind(this) );
-        this.ipc.on('scene:save', this.saveCurrentScene.bind(this) );
-        this.ipc.on('asset:saved', function ( url, uuid ) {
-            // update the uuid of current scene, if we first time save it
-            if ( this._newsceneUrl === url ) {
-                this._newsceneUrl = null;
-                var sceneName = Url.basename(url);
-                Fire.Engine._scene._uuid = uuid;
-                Fire.Engine._scene.name = sceneName;
-                Fire.log(url + ' saved');
-            }
-        }.bind(this) );
     },
 
     detached: function () {
@@ -90,48 +77,6 @@ Polymer({
 
     initSceneCamera: function () {
         this.$.view.initSceneCamera();
-    },
-
-    saveCurrentScene: function () {
-        var currentScene = Fire.Engine._scene;
-        var dialog = Remote.require('dialog');
-        var saveUrl = Fire.AssetDB.uuidToUrl(currentScene._uuid);
-
-        if ( !saveUrl ) {
-            var rootPath = Fire.AssetDB._fspath("assets://");
-            var savePath = dialog.showSaveDialog( Remote.getCurrentWindow(), {
-                title: "Save Scene",
-                defaultPath: rootPath,
-                filters: [
-                    { name: 'Scenes', extensions: ['fire'] },
-                ],
-            } );
-
-            if ( savePath ) {
-                if ( Path.contains( rootPath, savePath ) ) {
-                    saveUrl = 'assets://' + Path.relative( rootPath, savePath );
-                }
-                else {
-                    dialog.showMessageBox ( Remote.getCurrentWindow(), {
-                        type: "warning",
-                        buttons: ["OK"],
-                        title: "Warning",
-                        message: "Warning: please save the scene in the assets folder.",
-                        detail: "The scene needs to be saved inside the assets folder of your project.",
-                    } );
-                    // try to popup the dailog for user to save the scene
-                    this.saveCurrentScene();
-                }
-            }
-        }
-
-        //
-        if ( saveUrl ) {
-            this._newsceneUrl = saveUrl;
-            Fire.sendToCore( 'asset-db:save',
-                          this._newsceneUrl,
-                          Fire.serialize(currentScene) );
-        }
     },
 
     layoutToolsAction: function ( event ) {

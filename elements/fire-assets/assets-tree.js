@@ -779,7 +779,7 @@ Polymer({
 
         var currentID = event.target.userId;
         if ( event.target.extname === '.fire' ) {
-            if ( Fire.AssetDB.isValidUuid(Fire.Engine._scene._uuid) ) {
+            if ( Fire.Engine._scene.dirty ) {
                 dialog.showMessageBox( {
                     type: "warning",
                     buttons: ["yes","no","cancel"],
@@ -793,7 +793,7 @@ Polymer({
                     }
                     else {
                         if (res === 0) {
-                            Fire.sendToPages('scene:save');
+                            Fire.mainWindow.saveCurrentScene();
                         }
                         Fire.sendToMainPage('engine:openScene', currentID);
                     }

@@ -629,6 +629,7 @@ Polymer({
         if ( !this.renderContext || !this.renderContext.camera )
             return;
 
+        Fire.sendToMainPage( 'gizmos:dirty' );
         this.repaint();
         event.stopPropagation();
     },

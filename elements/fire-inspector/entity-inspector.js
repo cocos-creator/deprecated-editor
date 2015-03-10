@@ -116,6 +116,7 @@ Polymer({
             Fire.AssetLibrary.cacheAsset(detail);
         }
 
+        Fire.sendToMainPage( 'entity:inspector-dirty' );
         Fire.sendToPages( 'scene:dirty' );
     },
 
