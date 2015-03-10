@@ -54,7 +54,9 @@ Polymer({
                                                           this.view.height,
                                                           this.$.canvas );
         if ( this.renderContext !== null ) {
-            this.pixiGrids = new cc.Sprite();
+            this.pixiGrids = new cc.Sprite("fire://static/img/cocos-logo.png");
+            this.pixiGrids.x = this.view.width/2;
+            this.pixiGrids.y = this.view.height/2;
             this.renderContext.getBackgroundNode().addChild(this.pixiGrids);
 
             //this.initSceneCamera();

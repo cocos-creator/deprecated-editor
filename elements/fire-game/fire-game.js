@@ -40,7 +40,7 @@ Polymer({
     },
 
     repaintScene: function () {
-        Fire.Engine._scene.render(this.renderContext);
+        Fire.Engine.step();
     },
 
     delayRepaintScene: function () {

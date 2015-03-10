@@ -14,11 +14,6 @@ RenderContext.createSceneRenderCtx = function (width, height, canvas, transparen
     sceneCtx.stage.addChild(foreground, 2, 2);
     sceneCtx.root = gameRoot;
 
-    var sprite = new cc.Sprite("fire://static/img/cocos-logo.png");
-    sprite.x = width/2;
-    sprite.y = height/2;
-    gameRoot.addChild(sprite);
-
     Engine._renderContext.sceneView = sceneCtx;
     return sceneCtx;
 };
