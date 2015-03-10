@@ -777,7 +777,7 @@ Polymer({
                 if ( Fire.AssetDB.isValidUuid(Fire.Engine._scene._uuid) ) {
                     dialog.showMessageBox( {
                         type: "warning",
-                        buttons: ["yes","no","cancel"],
+                        buttons: ["Save","Don't Save","Cancel"],
                         title: "this scene has changed,do you want to saving it?",
                         message: "this scene has changed,do you want to saving it?",
                         detail: Fire.AssetDB.uuidToUrl(Fire.Engine._scene._uuid)},
