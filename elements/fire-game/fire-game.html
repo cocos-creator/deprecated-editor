@@ -4,16 +4,22 @@
     on-show="{{showAction}}"
     on-hide="{{hideAction}}"
     on-resize="{{resizeAction}}"
+    on-mousedown="{{mousedownAction}}"
     >
     <template>
         <link rel="stylesheet" href="fire-game.css">
 
-        <fire-ui-toolbar justify-between>
-            <div class="left">
-                <fire-ui-select id="resolutionSelect" value="{{curResolution}}"></fire-ui-select>
-            </div>
-            <div class="right">
-            </div>
+        <fire-ui-toolbar>
+            <fire-ui-select id="resolutionOptions" value="{{curResolution}}"></fire-ui-select>
+            <span class="space"></span>
+
+            <fire-ui-checkbox value="{{rotate}}">Rotate</fire-ui-checkbox>
+            <span class="space"></span>
+
+            <fire-ui-unit-input disabled="{{curResolution !== 1}}" value="{{customWidth}}" type="int" unit="w" min="0"></fire-ui-unit-input>
+            <span class="text">X</span>
+            <fire-ui-unit-input disabled="{{curResolution !== 1}}" value="{{customHeight}}" type="int" unit="h" min="0"></fire-ui-unit-input>
+            <span class="space"></span>
         </fire-ui-toolbar>
 
         <div class="border" flex-1>
