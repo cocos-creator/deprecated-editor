@@ -139,9 +139,9 @@ Polymer({
         if ( !this.renderContext )
             return;
 
-        // this.pixiGrids.update();
-        // Fire.Engine._scene.render(this.renderContext);
-        // this.interactionContext.update(Fire.Engine._scene.entities);
+        //this.pixiGrids.update();
+        Fire.Engine._scene.render(this.renderContext);
+        this.interactionContext.update(Fire.Engine._scene.entities);
     },
 
     updateGizmos: function () {
