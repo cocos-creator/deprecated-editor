@@ -23,6 +23,7 @@ Polymer({
         this._updateSceneAnimFrameID = null;
 
         this._newsceneUrl = null;
+        this._sceneDirtyFlag = false;
     },
 
     ready: function () {
@@ -117,6 +118,7 @@ Polymer({
             // save
             case 0:
                 this.saveCurrentScene();
+                this._sceneDirtyFlag = false;
                 // don't re-open current saving scene
                 if ( uuid !== Fire.Engine._scene._uuid ) {
                     Fire.sendToMainPage('engine:openScene', uuid);
@@ -129,6 +131,7 @@ Polymer({
 
             // don't save
             case 2:
+                this._sceneDirtyFlag = false;
                 Fire.sendToMainPage('engine:openScene', uuid);
                 break;
             }
@@ -155,7 +158,7 @@ Polymer({
             }
 
             //
-            this.setSceneDirty(false,true);
+            this.setSceneDirty(this._sceneDirtyFlag,true);
 
             //
             if ( this._updateSceneIntervalID ) {
@@ -177,6 +180,8 @@ Polymer({
                 return;
             }
 
+            // store scene dirty flag
+            this._sceneDirtyFlag = Fire.Engine._scene.dirty;
             this._updateSceneInAnimationFrame();
         }.bind(this));
     },
@@ -330,7 +335,7 @@ Polymer({
     },
 
     confirmCloseScene: function () {
-        if ( Fire.Engine._scene.dirty ) {
+        if ( Fire.Engine._scene && Fire.Engine._scene.dirty ) {
             var dialog = Remote.require('dialog');
             return dialog.showMessageBox( Remote.getCurrentWindow(), {
                 type: "warning",
