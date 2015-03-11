@@ -239,6 +239,9 @@ Polymer({
                 Fire.sendToMainPage('engine:createEntity');
             }
         }
+        else {
+            Fire.sendToMainPage('engine:createEntity');
+        }
     },
 
     createChildEntity: function () {
