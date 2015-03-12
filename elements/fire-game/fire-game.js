@@ -23,6 +23,13 @@ Polymer({
         this.customHeight = 480;
     },
 
+    observe: {
+        'curResolution': 'resize',
+        'rotate': 'resize',
+        'customWidth': 'resize',
+        'customHeight': 'resize',
+    },
+
     ready: function () {
         this.$.resolutionOptions.options = resolutionList.map( function ( item, idx ) {
             return { value: idx, name: item.name };
@@ -37,14 +44,6 @@ Polymer({
 
     detached: function () {
         this.ipc.clear();
-    },
-
-    curResolutionChanged: function () {
-        this.resize();
-    },
-
-    rotateChanged: function () {
-        this.resize();
     },
 
     setRenderContext: function ( renderContext ) {
