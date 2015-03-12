@@ -770,9 +770,33 @@ Polymer({
     },
 
     openAction: function (event) {
-        event.stopPropagation();
-
-        if ( !event.target instanceof AssetsItem ) {
+        if ( event.target instanceof AssetsItem ) {
+            if ( event.target.extname === '.fire' ) {
+                var defaultEvent = event.target.userId;
+                if ( Fire.AssetDB.isValidUuid(Fire.Engine._scene._uuid) ) {
+                    dialog.showMessageBox( {
+                        type: "warning",
+                        buttons: ["Save","Don't Save","Cancel"],
+                        title: "this scene has changed,do you want to saving it?",
+                        message: "this scene has changed,do you want to saving it?",
+                        detail: Fire.AssetDB.uuidToUrl(Fire.Engine._scene._uuid)},
+                        function (res) {
+                            if (res === 2) {
+                                return;
+                            }
+                            else {
+                                if (res === 0) {
+                                    Fire.sendToPages('scene:save');
+                                }
+                                Fire.sendToMainPage('engine:openScene', defaultEvent);
+                            }
+                    } );
+                }
+                else {
+                    Fire.sendToMainPage('engine:openScene', event.target.userId);
+                }
+            }
+            Fire.sendToCore('asset:open', event.target.userId);
             return;
         }
 
