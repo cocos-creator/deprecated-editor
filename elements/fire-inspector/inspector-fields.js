@@ -51,9 +51,12 @@ Polymer({
 
         //
         var el;
-        if ( this.target instanceof Fire.AssetInspector ||
-             this.target instanceof Fire.CustomAsset ) {
-            el = _fieldSection( "Properties", this.target, false );
+        if ( this.target instanceof Fire.Asset ) {
+            el = _fieldSection( "Asset", this.target, false );
+            this.appendChild( el );
+        }
+        else if ( this.target instanceof Fire.AssetMeta ) {
+            el = _fieldSection( "Meta", this.target, false );
             this.appendChild( el );
         }
         else if ( this.target instanceof Fire.Entity ) {
