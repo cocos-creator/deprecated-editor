@@ -684,7 +684,7 @@ Polymer({
         if ( items.length > 0 ) {
             if ( dragType === 'asset' ) {
                 for ( var i = 0; i < items.length; ++i ) {
-                    Fire.AssetLibrary.loadAsset( items[i], onload );
+                    Fire.AssetLibrary.loadAssetInEditor( items[i], onload );
                 }
             }
         }

@@ -36,7 +36,7 @@ Polymer({
             this.$.assetFields.refresh();
         }
         else {
-            Fire.AssetLibrary.loadAsset( this.meta.uuid, function ( err, asset ) {
+            Fire.AssetLibrary.loadAssetInEditor( this.meta.uuid, function ( err, asset ) {
                 if ( asset && this.meta.uuid === asset._uuid ) {
                     this.$.metaFields.target = this.meta;
                     this.$.metaFields.refresh();

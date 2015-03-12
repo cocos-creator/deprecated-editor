@@ -67,7 +67,7 @@ Polymer({
         this.resize();
 
         if ( this.asset instanceof Fire.Sprite ) {
-            Fire.AssetLibrary.loadAsset( this.meta.rawTextureUuid, function ( err, rawTexture ) {
+            Fire.AssetLibrary.loadAssetInEditor( this.meta.rawTextureUuid, function ( err, rawTexture ) {
                 this.rawTexture = rawTexture;
                 this.repaint();
             }.bind(this) );
