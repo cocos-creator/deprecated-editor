@@ -70,12 +70,6 @@ Polymer({
 
     _onAssetChanged: function ( uuid ) {
         if ( this.target && this.target.uuid === uuid ) {
-            // instead of reload asset, we do fast memory apply
-            if ( this.$.inspector.applyAsset ) {
-                this.$.inspector.applyAsset();
-            }
-
-            //
             var metaJson = Fire.AssetDB.loadMetaJson(uuid);
             Fire.AssetLibrary.loadMeta(metaJson, function ( err, meta ) {
                 this.inspect(meta,true);

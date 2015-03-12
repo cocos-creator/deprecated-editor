@@ -53,9 +53,8 @@ Polymer({
     // applyAction: function ( event ) {
     //     event.stopPropagation();
     //     Fire.sendToCore('asset-db:apply',
-    //                     Fire.serialize(this.asset),
     //                     Fire.serialize(this.meta),
-    //                     Fire.serialize(this.inspector)
+    //                     Fire.serialize(this.asset)
     //                    );
     // },
 
