@@ -4,7 +4,8 @@
     position: absolute
     left: 50%
     width: 400px
-    height: 600px
+    // height: 600px
+    max-height: 600px
     margin-left: -185px
     font-family: Helvetica,Arial,sans-serif
     top: 50%
@@ -34,34 +35,29 @@
     }
 
     .scroll {
-        width:100%
-        height:554px
-        overflow-y:scroll
-        overflow-x:hidden
-        float:left
+        width: 100%
+        height: auto
+        max-height: 554px
+        overflow-y: scroll
+        overflow-x: hidden
+        float: left
     }
 
     .content {
         width: 395px
         height: auto
+        padding-bottom: 20px
         float: left
         background: rgb(233,233,233)
         .title {
             width: 380px
             margin: 10px
+            color: black
             height: 20px
+            margin-top:30px
             line-height: 10px
             float: left
             border-bottom: 1px solid gray
-        }
-        .item {
-            padding-left: 15px
-            padding-right: 15px
-            width: 100%
-            height: auto
-            color: rgb(58,58,58)
-            font-size: 14px
-            margin-top: 10px
         }
     }
 
