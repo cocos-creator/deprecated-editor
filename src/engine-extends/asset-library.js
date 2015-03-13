@@ -148,6 +148,10 @@ Fire.AssetLibrary.onAssetReimported = function (uuid) {
         return;
     }
 
+    if (exists instanceof Fire._Scene) {
+        return;
+    }
+    
     // 重新读取 asset 并将数据覆盖到已有 asset，如果 asset 引用到的其它 asset uuid 不变，
     // 则其它 asset 不会重新读取。
     this.loadAsset(uuid, function (err, asset) {
