@@ -1,0 +1,25 @@
+<polymer-element
+    name="map-sections"
+    constructor="MapSections"
+    >
+<template>
+    <style>
+        .item {
+            padding-left: 15px;
+            padding-right: 15px;
+            width: 100%;
+            height: auto;
+            color: rgb(58,58,58);
+            font-size: 14px;
+            margin-top: 10px;
+        }
+    </style>
+    <template repeat="{{item in items}}">
+        <div flex-row class="item">
+            <span flex-1>{{item.keys | platform}}</span>
+            <span flex-2>{{item.discription | platform}}</span>
+        </div>
+    </template>
+</template>
+<script type="text/javascript" src="map-sections.js"></script>
+</polymer-element>
