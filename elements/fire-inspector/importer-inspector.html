@@ -10,18 +10,27 @@
         <fire-ui-resize-wrapper auto-layout flex-col flex-stretch>
             <fire-ui-toolbar class="toolbar" justify-end>
                 <span class="asset-name" flex-1>{{asset.name}}</span>
-                <fire-ui-button disabled="{{!inspector.dirty}}" on-click="{{revertAction}}">
+                <fire-ui-button disabled="{{!asset.dirty && !meta.dirty}}" on-click="{{revertAction}}">
                     <i class="fa fa-close"></i>
                 </fire-ui-button>
-                <fire-ui-button disabled="{{!inspector.dirty}}" on-click="{{applyAction}}">
+                <fire-ui-button disabled="{{!asset.dirty && !meta.dirty}}" on-click="{{applyAction}}">
                     <i class="fa fa-check"></i>
                 </fire-ui-button>
             </fire-ui-toolbar>
 
-            <inspector-fields id="fields" flex-1
-                on-changed="{{fieldsChangedAction}}"
-            >
-            </inspector-fields>
+            <div class="fields" flex-1>
+                <inspector-fields id="metaFields"
+                    on-changed="{{metaFieldsChangedAction}}"
+                >
+                </inspector-fields>
+
+                <span class="space"></span>
+
+                <inspector-fields id="assetFields"
+                    on-changed="{{assetFieldsChangedAction}}"
+                >
+                </inspector-fields>
+            </div>
         </fire-ui-resize-wrapper>
 
         <fire-ui-splitter id="splitter"></fire-ui-splitter>

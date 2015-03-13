@@ -4,10 +4,7 @@ Polymer({
     created: function () {
         this.asset = null;
         this.meta = null;
-        this.inspector = null;
     },
-
-    lastUuid: "",
 
     resize: function () {
         if ( !this.$.preview.hide ) {
@@ -15,18 +12,7 @@ Polymer({
         }
     },
 
-    // NOTE: this is call after asset successfully applied from editor-core
-    applyAsset: function () {
-        this.inspector.applyAsset(this.asset);
-    },
-
     metaChanged: function () {
-        var inspectorDirty = false;
-        if ( this.meta.uuid === this.lastUuid ) {
-            inspectorDirty = true;
-        }
-        this.lastUuid = this.meta.uuid;
-
         // update preview
         if ( this.meta instanceof Fire.TextureMeta ||
              this.meta instanceof Fire.SpriteMeta ||
@@ -42,50 +28,52 @@ Polymer({
 
         // load asset
         if ( this.meta instanceof Fire.FolderMeta ) {
+            this.$.metaFields.target = null;
+            this.$.metaFields.refresh();
+
             this.asset = null;
-            this.inspector = null;
-            this.$.fields.target = this.inspector;
-            this.$.fields.refresh();
+            this.$.assetFields.target = null;
+            this.$.assetFields.refresh();
         }
         else {
-            Fire.AssetLibrary.loadAsset( this.meta.uuid, function ( err, asset ) {
+            Fire.AssetLibrary.loadAssetInEditor( this.meta.uuid, function ( err, asset ) {
                 if ( asset && this.meta.uuid === asset._uuid ) {
+                    this.$.metaFields.target = this.meta;
+                    this.$.metaFields.refresh();
+
                     this.asset = asset;
-                    this.inspector = null;
-
-                    if ( this.meta.inspector ) {
-                        var inspector = new this.meta.inspector();
-                        inspector.init( this.asset, this.meta );
-                        this.inspector = inspector;
-                    }
-
-                    this.$.fields.target = this.inspector;
-                    this.$.fields.refresh();
-
-                    if ( inspectorDirty && this.inspector ) {
-                        Fire.sendToPages( 'inspector:dirty', this.meta.uuid, Fire.serialize(this.inspector) );
-                    }
+                    this.$.assetFields.target = this.asset;
+                    this.$.assetFields.refresh();
                 }
             }.bind(this) );
         }
     },
 
-    fieldsChangedAction: function ( event ) {
+    assetFieldsChangedAction: function ( event ) {
         event.stopPropagation();
 
-        if ( this.inspector ) {
-            this.inspector.dirty = true;
-            Fire.sendToPages( 'inspector:dirty', this.meta.uuid, Fire.serialize(this.inspector) );
+        if ( this.asset ) {
+            this.asset.dirty = true;
+            Fire.sendToPages( 'inspector:asset:dirty', this.meta.uuid, Fire.serialize(this.asset) );
+        }
+    },
+
+    metaFieldsChangedAction: function ( event ) {
+        event.stopPropagation();
+
+        if ( this.meta ) {
+            this.meta.dirty = true;
+            Fire.sendToPages( 'inspector:meta:dirty', this.meta.uuid, Fire.serialize(this.meta) );
         }
     },
 
     applyAction: function ( event ) {
         event.stopPropagation();
-        Fire.sendToCore('asset-db:apply',
-                        Fire.serialize(this.asset),
-                        Fire.serializeMeta(this.meta),
-                        Fire.serialize(this.inspector)
-                       );
+
+        var metaJson = Fire.serializeMeta(this.meta);
+        var assetJson = Fire.serialize(this.asset);
+
+        Fire.sendToCore('asset-db:apply', metaJson, assetJson, this.asset.dirty );
     },
 
     revertAction: function ( event ) {

@@ -27,7 +27,7 @@ Polymer({
             this._timeout = null;
         }
 
-        Fire.AssetLibrary.loadAsset( this.meta.uuid, function ( err, asset ) {
+        Fire.AssetLibrary.loadAssetInEditor( this.meta.uuid, function ( err, asset ) {
             if ( !asset instanceof Fire.CustomAsset ) {
                 Fire.error( 'The asset is corrupted!' );
             }
@@ -53,9 +53,8 @@ Polymer({
     // applyAction: function ( event ) {
     //     event.stopPropagation();
     //     Fire.sendToCore('asset-db:apply',
-    //                     Fire.serialize(this.asset),
     //                     Fire.serialize(this.meta),
-    //                     Fire.serialize(this.inspector)
+    //                     Fire.serialize(this.asset)
     //                    );
     // },
 

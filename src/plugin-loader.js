@@ -45,10 +45,7 @@ PluginLoader.prototype._loadImpl = function (plugin) {
                 meta.prototype[name] = script;
             }
         }
-        var meta = load('meta');
-        if (meta) {
-            loadToMeta('inspector');
-        }
+        load('meta');
     });
 };
 
@@ -57,7 +54,7 @@ PluginLoader.prototype._unloadImpl = function (plugin) {
 
     // unload meta
     PluginLoader.parseMeta(plugin, function (asset) {
-        var metaType = ['inspector', 'meta'];
+        var metaType = ['meta'];
         for (var index in metaType ) {
             var name = metaType[index];
             if (asset[name]) {
