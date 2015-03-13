@@ -1,3 +1,4 @@
+<link rel="import" href="map-sections.html">
 <polymer-element
     name="key-settings"
     constructor="KeySettings"
@@ -12,97 +13,10 @@
     </div>
     <div class="scroll">
         <div class="content">
-            <span class="title">General</span>
-            <div flex-row class="item">
-                <span flex-1 class="key">⌘+N</span>
-                <span flex-2 class="discription">New Project</span>
-            </div>
-
-            <div flex-row class="item">
-                <span flex-1 class="key">⌘+B</span>
-                <span flex-2 class="discription">Build</span>
-            </div>
-
-            <span class="title">General</span>
-            <div flex-row class="item">
-                <span flex-1 class="key">⌘+N</span>
-                <span flex-2 class="discription">New Project</span>
-            </div>
-
-            <div flex-row class="item">
-                <span flex-1 class="key">⌘+B</span>
-                <span flex-2 class="discription">Build</span>
-            </div>
-            <span class="title">General</span>
-            <div flex-row class="item">
-                <span flex-1 class="key">⌘+N</span>
-                <span flex-2 class="discription">New Project</span>
-            </div>
-
-            <div flex-row class="item">
-                <span flex-1 class="key">⌘+B</span>
-                <span flex-2 class="discription">Build</span>
-            </div>
-            <span class="title">General</span>
-            <div flex-row class="item">
-                <span flex-1 class="key">⌘+N</span>
-                <span flex-2 class="discription">New Project</span>
-            </div>
-
-            <div flex-row class="item">
-                <span flex-1 class="key">⌘+B</span>
-                <span flex-2 class="discription">Build</span>
-            </div>
-            <span class="title">General</span>
-            <div flex-row class="item">
-                <span flex-1 class="key">⌘+N</span>
-                <span flex-2 class="discription">New Project</span>
-            </div>
-
-            <div flex-row class="item">
-                <span flex-1 class="key">⌘+B</span>
-                <span flex-2 class="discription">Build</span>
-            </div>
-            <span class="title">General</span>
-            <div flex-row class="item">
-                <span flex-1 class="key">⌘+N</span>
-                <span flex-2 class="discription">New Project</span>
-            </div>
-
-            <div flex-row class="item">
-                <span flex-1 class="key">⌘+B</span>
-                <span flex-2 class="discription">Build</span>
-            </div>
-            <span class="title">General</span>
-            <div flex-row class="item">
-                <span flex-1 class="key">⌘+N</span>
-                <span flex-2 class="discription">New Project</span>
-            </div>
-
-            <div flex-row class="item">
-                <span flex-1 class="key">⌘+B</span>
-                <span flex-2 class="discription">Build</span>
-            </div>
-            <span class="title">General</span>
-            <div flex-row class="item">
-                <span flex-1 class="key">⌘+N</span>
-                <span flex-2 class="discription">New Project</span>
-            </div>
-
-            <div flex-row class="item">
-                <span flex-1 class="key">⌘+B</span>
-                <span flex-2 class="discription">Build</span>
-            </div>
-            <span class="title">General</span>
-            <div flex-row class="item">
-                <span flex-1 class="key">⌘+N</span>
-                <span flex-2 class="discription">New Project</span>
-            </div>
-
-            <div flex-row class="item">
-                <span flex-1 class="key">⌘+B</span>
-                <span flex-2 class="discription">Build</span>
-            </div>
+            <template repeat="{{ item in hotKeys}}">
+            <span class="title">{{item.name}}</span>
+                <map-sections items="{{item.value}}"></map-sections>
+            </template>
         </div>
     </div>
 </template>
