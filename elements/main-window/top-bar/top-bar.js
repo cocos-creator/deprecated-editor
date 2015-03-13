@@ -1,12 +1,12 @@
 Polymer({
-    publish: {
-        keySettings: null,
-    },
+    keySettings: null,
+
     helpAction: function () {
         if (!this.keySettings) {
             this.keySettings = new KeySettings();
             document.body.appendChild(this.keySettings);
-        }else {
+        }
+        else {
             this.keySettings.show();
         }
 
