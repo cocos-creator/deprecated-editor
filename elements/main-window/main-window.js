@@ -320,7 +320,9 @@ Polymer({
                 url = 'Untitled';
             }
             url += Fire.Engine._scene.dirty ? "*" : "";
-            Remote.getCurrentWindow().setTitle( "Fireball Editor - " + url );
+            var currentWin = Remote.getCurrentWindow();
+            currentWin.setTitle( "Fireball Editor - " + url );
+            currentWin.setDocumentEdited(Fire.Engine._scene.dirty);
         }.bind(this));
     },
 
