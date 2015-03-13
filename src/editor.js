@@ -205,9 +205,11 @@ Fire.browseObject = function ( type, fobjectEL ) {
 
     if ( Fire.isChildClassOf( type, Fire.Entity ) ) {
         Fire.warn('TODO: ask johnny how to do this.');
+        _isBrowsing = false;
     }
     else if ( Fire.isChildClassOf( type, Fire.Component ) ) {
         Fire.warn('TODO: ask johnny how to do this.');
+        _isBrowsing = false;
     }
     else if ( Fire.isChildClassOf( type, Fire.Asset ) ) {
         var typeID = Fire.JS._getClassId(type);
