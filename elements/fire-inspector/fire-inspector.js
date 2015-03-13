@@ -70,10 +70,23 @@ Polymer({
 
     _onAssetChanged: function ( uuid ) {
         if ( this.target && this.target.uuid === uuid ) {
-            var metaJson = Fire.AssetDB.loadMetaJson(uuid);
-            Fire.AssetLibrary.loadMeta(metaJson, function ( err, meta ) {
-                this.inspect(meta,true);
-            }.bind(this));
+            var reloadMeta = true;
+
+            // NOTE: we don't need to reload custom-asset if it is auto-saved
+            if ( this.target instanceof Fire.CustomAssetMeta ) {
+                if ( this.$.inspector.asset && this.$.inspector.asset.dirty ) {
+                    this.$.inspector.asset.dirty = false;
+                    reloadMeta = false;
+                }
+            }
+
+            //
+            if ( reloadMeta ) {
+                var metaJson = Fire.AssetDB.loadMetaJson(uuid);
+                Fire.AssetLibrary.loadMeta(metaJson, function ( err, meta ) {
+                    this.inspect(meta,true);
+                }.bind(this));
+            }
         }
     },
 

@@ -54,7 +54,7 @@ Polymer({
 
         if ( this.asset ) {
             this.asset.dirty = true;
-            // TODO: Fire.sendToPages( 'inspector:dirty', this.meta.uuid, Fire.serialize(this.inspector) );
+            Fire.sendToPages( 'inspector:asset:dirty', this.meta.uuid, Fire.serialize(this.asset) );
         }
     },
 
@@ -63,7 +63,7 @@ Polymer({
 
         if ( this.meta ) {
             this.meta.dirty = true;
-            // TODO: Fire.sendToPages( 'inspector:dirty', this.meta.uuid, Fire.serialize(this.inspector) );
+            Fire.sendToPages( 'inspector:meta:dirty', this.meta.uuid, Fire.serialize(this.meta) );
         }
     },
 
