@@ -145,6 +145,10 @@ Polymer({
         this.ipc.on('entity:inspector-dirty', this.setSceneDirty.bind(this,true,false));
         this.ipc.on('gizmos:dirty', this.setSceneDirty.bind(this,true,false));
 
+        this.ipc.on('scene:new', function ( event ) {
+            this.newScene();
+        }.bind(this));
+
         // NOTE: the scene:launched and engine:played must be ipc event to make sure component:disabled been called before it.
 
         this.ipc.on('scene:launched', function ( event ) {
@@ -277,10 +281,7 @@ Polymer({
                 // TODO: load last-open scene or init new
                 var lastEditScene = null;
                 if ( lastEditScene === null ) {
-                    Fire.Engine._setCurrentScene(new Fire._Scene());
-
-                    var camera = new Fire.Entity('Main Camera');
-                    camera.addComponent(Fire.Camera);
+                    self.newScene();
                 }
 
                 next();
@@ -334,6 +335,13 @@ Polymer({
         this.$[id] = pluginInst;
         panel.add(pluginInst);
         panel.$.tabs.select(0);
+    },
+
+    newScene: function () {
+        Fire.Engine._setCurrentScene(new Fire._Scene());
+
+        var camera = new Fire.Entity('Main Camera');
+        camera.addComponent(Fire.Camera);
     },
 
     confirmCloseScene: function () {
