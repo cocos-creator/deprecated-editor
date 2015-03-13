@@ -51,4 +51,36 @@
             }
         }
     }
+
+    button {
+        float: right
+        width: 80px
+        height: 30px
+        margin-right: 15px
+        border: 1px solid #252525
+        border-radius: 2px
+        padding: 4px 8px
+        cursor: pointer
+        color: #bdbdbd
+        outline: none
+        &.green {
+            background-color: #090
+
+            &:hover {
+                background-color: #090 + 10%
+            }
+
+            &:active {
+                background-color: #090 - 10%
+            }
+        }
+        ([disabled]) {
+            * {
+                pointer-events: none
+                background: black
+            }
+
+            // background: color-bg-disabled
+        }
+    }
 }

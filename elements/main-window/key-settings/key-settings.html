@@ -1,0 +1,24 @@
+<link rel="import" href="map-sections.html">
+<polymer-element
+    name="key-settings"
+    constructor="KeySettings"
+    >
+<template>
+    <link rel="stylesheet" href="key-settings.css">
+    <div class="topbar">
+        <span>
+            Keyboard Shortcuts
+        </span>
+        <fire-ui-button on-click="{{closeAction}}">Close</fire-ui-button>
+    </div>
+    <div class="scroll">
+        <div class="content">
+            <template repeat="{{ item in hotKeys}}">
+            <span class="title">{{item.name}}</span>
+                <map-sections items="{{item.value}}"></map-sections>
+            </template>
+        </div>
+    </div>
+</template>
+<script type="text/javascript" src="key-settings.js"></script>
+</polymer-element>

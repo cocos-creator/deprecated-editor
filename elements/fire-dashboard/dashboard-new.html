@@ -24,7 +24,7 @@
         </div>
 
         <div class="field" flex-row>
-            <fire-ui-button on-click="{{createAction}}" disabled="{{curSelect===null}}">Create</fire-ui-button>
+            <button class="green" on-click="{{createAction}}" disabled {{curSelect===null? 'disabled':''}}>Create</button>
         </div>
 
         <fire-ui-tabs>
