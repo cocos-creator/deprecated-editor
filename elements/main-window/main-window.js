@@ -264,8 +264,7 @@ Polymer({
                     }
                 });
                 console.time('query scenes');
-                Fire.AssetDB.query({
-                    url: "assets://",
+                Fire.AssetDB.query( "assets://", {
                     typeID: SCENE_ID
                 });
             },

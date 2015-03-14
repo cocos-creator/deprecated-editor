@@ -25,8 +25,7 @@ Polymer({
             }
         }
 
-        Fire.AssetDB.query({
-            url: "assets://",
+        Fire.AssetDB.query( "assets://", {
             typeID: typeID
         });
 

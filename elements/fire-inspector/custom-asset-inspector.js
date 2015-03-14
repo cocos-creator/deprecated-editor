@@ -16,7 +16,9 @@ Polymer({
         }
 
         this._timeout = setTimeout ( function () {
-            Fire.AssetDB.saveByUuid( this.meta.uuid, Fire.serialize(this.asset) );
+            Fire.AssetDB.saveByUuid( this.meta.uuid, {
+                assetJson: Fire.serialize(this.asset)
+            } );
         }.bind(this), 500);
     },
 
