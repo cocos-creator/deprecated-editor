@@ -15,7 +15,6 @@ for ( var i = 0; i < queryList.length; ++i ) {
 
 //
 var Util = require('util');
-var remote = require('remote');
 var Ipc = require('ipc');
 
 // console
@@ -251,9 +250,6 @@ Fire.serializeMeta = function ( meta ) {
 
     return json;
 };
-
-// get remote globals
-Fire.AssetDB = remote.getGlobal( 'AssetDB@' + fireID );
 
 //
 Fire.plugins = {}; // TODO: 做成Remote Object，确保全局只有一份?

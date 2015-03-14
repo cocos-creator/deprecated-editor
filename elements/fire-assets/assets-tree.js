@@ -160,7 +160,7 @@ function _addCustomAssetMenu(target, template) {
             var newCustomAsset = new item.customAsset();
             var newAssetUrl = Url.join(url, fileName + '.asset');
             target._focusUrl = newAssetUrl;
-            Fire.sendToCore('asset-db:save', newAssetUrl, Fire.serialize(newCustomAsset));
+            Fire.AssetDB.save( newAssetUrl, Fire.serialize(newCustomAsset) );
         }
     }
 
@@ -319,9 +319,7 @@ Polymer({
                     var newScene = new Fire._Scene();
                     var newAssetUrl = Url.join( url, 'New Scene.fire' );
                     this._focusUrl = newAssetUrl;
-                    Fire.sendToCore( 'asset-db:save',
-                                  newAssetUrl,
-                                  Fire.serialize(newScene) );
+                    Fire.AssetDB.save( newAssetUrl, Fire.serialize(newScene) );
                 }.bind(this)
             },
 
@@ -366,9 +364,7 @@ Polymer({
                             var url = this.getUrl(targetEL.parentElement);
                             var newAssetUrl = Url.join( url, textureName + '.sprite' );
                             this._focusUrl = newAssetUrl;
-                            Fire.sendToCore( 'asset-db:save',
-                                          newAssetUrl,
-                                          Fire.serialize(newSprite) );
+                            Fire.AssetDB.save( newAssetUrl, Fire.serialize(newSprite) );
                         }.bind(this) );
                     }
                     else {
@@ -391,9 +387,7 @@ Polymer({
                         var url = this.getUrl(targetEL);
                         var newAssetUrl = Url.join( url, 'New Atlas.atlas' );
                         this._focusUrl = newAssetUrl;
-                        Fire.sendToCore( 'asset-db:save',
-                                        newAssetUrl,
-                                        Fire.serialize(newAtlas) );
+                        Fire.AssetDB.save( newAssetUrl, Fire.serialize(newAtlas) );
                     }
                 }.bind(this)
             },
@@ -430,7 +424,7 @@ Polymer({
                     var contextSelection = Fire.Selection.contextAssets;
                     var elements = this.getToplevelElements(contextSelection);
                     for (var i = 0; i < elements.length; i++) {
-                        Fire.sendToCore( 'asset-db:delete', this.getUrl(elements[i]) );
+                        Fire.AssetDB.delete(this.getUrl(elements[i]));
                     }
                 }.bind(this),
             },
@@ -451,7 +445,7 @@ Polymer({
                             }
                             selectedItemEl.foldable = false;
                         }
-                        Fire.sendToCore( 'asset-db:reimport', url );
+                        Fire.AssetDB.reimport(url);
                     }
                 }.bind(this)
             },
@@ -466,7 +460,7 @@ Polymer({
                     var contextSelection = Fire.Selection.contextAssets;
                     if ( contextSelection.length > 0 ) {
                         var targetEL = this.idToItem[contextSelection[0]];
-                        Fire.sendToCore( 'asset-db:explore', this.getUrl(targetEL) );
+                        Fire.AssetDB.explore(this.getUrl(targetEL));
                     }
                 }.bind(this)
             },
@@ -478,7 +472,7 @@ Polymer({
                     var contextSelection = Fire.Selection.contextAssets;
                     if ( contextSelection.length > 0 ) {
                         var targetEL = this.idToItem[contextSelection[0]];
-                        Fire.sendToCore( 'asset-db:explore-lib', this.getUrl(targetEL) );
+                        Fire.AssetDB.exploreLib(this.getUrl(targetEL));
                     }
                 }.bind(this)
             },
@@ -505,7 +499,7 @@ Polymer({
         var rootEL = _newAssetsItem.call(this, url, 'root', Fire.UUID.AssetsRoot, this);
         rootEL.folded = false;
 
-        Fire.sendToCore('asset-db:deep-query', url);
+        Fire.AssetDB.deepQuery(url);
     },
 
     newItem: function ( url, id, parentId, isDirectory ) {
@@ -551,7 +545,7 @@ Polymer({
     deleteSelection: function () {
         var elements = this.getToplevelElements(Fire.Selection.assets);
         for (var i = 0; i < elements.length; i++) {
-            Fire.sendToCore( 'asset-db:delete', this.getUrl(elements[i]) );
+            Fire.AssetDB.delete(this.getUrl(elements[i]));
         }
     },
 
@@ -667,7 +661,7 @@ Polymer({
             if ( el.contains(targetEL) === false ) {
                 var srcUrl = this.getUrl(el);
                 var destUrl = Url.join( targetUrl, el.name + el.extname );
-                Fire.sendToCore('asset-db:move', srcUrl, destUrl );
+                Fire.AssetDB.move( srcUrl, destUrl );
             }
         }
     },
@@ -765,7 +759,7 @@ Polymer({
         if ( renamingEL.name !== event.target.value ) {
             var srcUrl = this.getUrl(renamingEL);
             var destUrl = Url.join( Url.dirname(srcUrl), event.target.value + renamingEL.extname );
-            Fire.sendToCore('asset-db:move', srcUrl, destUrl );
+            Fire.AssetDB.move( srcUrl, destUrl );
         }
     },
 
@@ -940,7 +934,7 @@ Polymer({
         if ( items.length > 0 ) {
             if ( dragType === 'file' ) {
                 var dstUrl = this.getUrl(targetEL);
-                Fire.sendToCore('asset-db:import', dstUrl, items );
+                Fire.AssetDB.import( dstUrl, items );
             }
             else if ( dragType === 'asset' ) {
                 this.moveAssets( targetEL, items );

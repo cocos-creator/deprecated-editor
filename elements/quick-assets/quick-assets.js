@@ -25,7 +25,10 @@ Polymer({
             }
         }
 
-        Fire.sendToCore('asset-db:query', "assets://", typeID);
+        Fire.AssetDB.query({
+            url: "assets://",
+            typeID: typeID
+        });
 
         if ( typeID !== Fire.JS._getClassId(Fire.Texture) ) {
             this.$.btnGroup.style.display = "none";

@@ -70,10 +70,11 @@ Polymer({
     applyAction: function ( event ) {
         event.stopPropagation();
 
-        var metaJson = Fire.serializeMeta(this.meta);
-        var assetJson = Fire.serialize(this.asset);
-
-        Fire.sendToCore('asset-db:apply', metaJson, assetJson, this.asset.dirty );
+        Fire.AssetDB.apply({
+            metaJson: Fire.serializeMeta(this.meta),
+            assetJson: Fire.serializeMeta(this.asset),
+            assetDirty: this.asset.dirty,
+        });
     },
 
     revertAction: function ( event ) {

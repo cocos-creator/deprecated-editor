@@ -38,6 +38,7 @@ var paths = {
         'src/plugin-loader.js',
         'src/sandbox.js',
         'src/editor.js',
+        'src/asset-db.js',
         'src/menu.js',
         'src/pixi-grids.js',
         'src/svg-grids.js',

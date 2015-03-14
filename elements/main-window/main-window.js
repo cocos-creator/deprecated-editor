@@ -264,7 +264,10 @@ Polymer({
                     }
                 });
                 console.time('query scenes');
-                Fire.sendToCore('asset-db:query', "assets://", SCENE_ID);
+                Fire.AssetDB.query({
+                    url: "assets://",
+                    typeID: SCENE_ID
+                });
             },
 
             function ( next ) {
@@ -396,9 +399,7 @@ Polymer({
         //
         if ( saveUrl ) {
             this._newsceneUrl = saveUrl;
-            Fire.sendToCore( 'asset-db:save',
-                          this._newsceneUrl,
-                          Fire.serialize(currentScene) );
+            Fire.AssetDB.save( this._newsceneUrl, Fire.serialize(currentScene) );
         }
     },
 
