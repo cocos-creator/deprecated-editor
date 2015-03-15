@@ -12,7 +12,8 @@ Polymer({
 
     platform: function (value) {
         if (!this.isMac) {
-            return value = value.replace('⌘','Ctrl').replace('⇧','Shift').replace('⌥','Alt');
+            value = value.replace('⌘','Ctrl').replace('⇧','Shift').replace('⌥','Alt');
+            return value;
         }
         return value;
     },
