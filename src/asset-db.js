@@ -4,7 +4,7 @@ var remoteDB = Remote.getGlobal('ASSET_DB');
 Fire.AssetDB = {
     // remote sync
     get _libraryPath() { return remoteDB._libraryPath; },
-    _fspath: function (url) { return remoteDB._fspath; },
+    _fspath: function (url) { return remoteDB._fspath(url); },
     isValidUuid: function (uuid) { return remoteDB.isValidUuid(uuid); },
     urlToUuid: function (url) { return remoteDB.urlToUuid(url); },
     loadMetaJson: function (uuid) { return remoteDB.loadMetaJson(uuid); },
