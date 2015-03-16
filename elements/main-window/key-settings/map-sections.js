@@ -1,6 +1,6 @@
 Polymer({
-    created: function () {
-        this.items = [];
+    publish: {
+        items : [],
     },
 
     platform: function (value) {
