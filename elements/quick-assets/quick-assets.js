@@ -38,7 +38,7 @@ Polymer({
         var browserWindow = remote.getCurrentWindow();
         if ( browserWindow ) {
             browserWindow.on ( 'close', function () {
-                Fire.sendToPages('quick-asset:closed');
+                Fire.sendToWindows('quick-asset:closed');
             });
         }
 
@@ -106,6 +106,6 @@ Polymer({
     selectAction: function ( event ) {
         event.stopPropagation();
 
-        Fire.sendToPages('quick-asset:selected', event.detail.uuid);
+        Fire.sendToWindows('quick-asset:selected', event.detail.uuid);
     },
 });

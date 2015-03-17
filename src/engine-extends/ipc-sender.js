@@ -4,7 +4,7 @@
 var editorCallback = Fire.Engine._editorCallback;
 
 // pre-declaration for unit tests, overridable for editor
-Fire.sendToPages = function () {};
+Fire.sendToWindows = function () {};
 
 editorCallback.onEnginePlayed = function (continued) {
     window.dispatchEvent( new CustomEvent ('engine-played', {
@@ -13,7 +13,7 @@ editorCallback.onEnginePlayed = function (continued) {
         cancelable: false,
     }) );
 
-    Fire.sendToPages('engine:played', continued);
+    Fire.sendToWindows('engine:played', continued);
 };
 editorCallback.onEngineStopped = function () {
     window.dispatchEvent( new CustomEvent ('engine-stopped', {
@@ -21,10 +21,10 @@ editorCallback.onEngineStopped = function () {
         cancelable: false,
     }) );
 
-    Fire.sendToPages('engine:stopped');
+    Fire.sendToWindows('engine:stopped');
 };
 editorCallback.onEnginePaused = function () {
-    Fire.sendToPages('engine:paused');
+    Fire.sendToWindows('engine:paused');
 };
 
 function takeEntitySnapshot(entity) {
@@ -58,29 +58,29 @@ editorCallback.onSceneLaunched = function (scene) {
         cancelable: false,
     }) );
 
-    Fire.sendToPages('scene:launched', takeSceneSnapshot(scene));
-    Fire.sendToPages('scene:dirty');
+    Fire.sendToWindows('scene:launched', takeSceneSnapshot(scene));
+    Fire.sendToWindows('scene:dirty');
 };
 
 //editorCallback.onSceneLoaded = function (scene) {
-//    Fire.sendToPages('scene:loaded', scene.entities);
+//    Fire.sendToWindows('scene:loaded', scene.entities);
 //};
 
 var onEntityCreated = 'entity:created';
 editorCallback.onEntityCreated = function (entity) {
     if (entity._children.length === 0) {
-        Fire.sendToPages( onEntityCreated, entity._name, entity._objFlags, entity.id );
+        Fire.sendToWindows( onEntityCreated, entity._name, entity._objFlags, entity.id );
     }
     else {
-        Fire.sendToPages( onEntityCreated, takeEntitySnapshot(entity) );
+        Fire.sendToWindows( onEntityCreated, takeEntitySnapshot(entity) );
     }
-    Fire.sendToPages('scene:dirty');
+    Fire.sendToWindows('scene:dirty');
 };
 
 var onEntityRemoved = 'entity:removed';
 editorCallback.onEntityRemoved = function (entity/*, isTopMost*/) {
-    Fire.sendToPages( onEntityRemoved, entity.id );
-    Fire.sendToPages('scene:dirty');
+    Fire.sendToWindows( onEntityRemoved, entity.id );
+    Fire.sendToWindows('scene:dirty');
     // deselect
     var entities = Fire.Selection.entities;
     if (entity.childCount > 0) {
@@ -114,8 +114,8 @@ editorCallback.onEntityRemoved = function (entity/*, isTopMost*/) {
 
 var onEntityParentChanged = 'entity:parentChanged';
 editorCallback.onEntityParentChanged = function (entity) {
-    Fire.sendToPages( onEntityParentChanged, entity.id, entity.parent && entity.parent.id );
-    Fire.sendToPages('scene:dirty');
+    Fire.sendToWindows( onEntityParentChanged, entity.id, entity.parent && entity.parent.id );
+    Fire.sendToWindows('scene:dirty');
 };
 
 var onEntityIndexChanged = 'entity:indexChanged';
@@ -128,26 +128,26 @@ editorCallback.onEntityIndexChanged = function (entity, oldIndex, newIndex) {
         next = entity.getSibling(i);
     } while (next && (next._objFlags & Fire._ObjectFlags.HideInEditor));
     //
-    Fire.sendToPages( onEntityIndexChanged, entity.id, next && next.id );
-    Fire.sendToPages('scene:dirty');
+    Fire.sendToWindows( onEntityIndexChanged, entity.id, next && next.id );
+    Fire.sendToWindows('scene:dirty');
 };
 
 editorCallback.onEntityRenamed = function (entity) {
-    Fire.sendToPages('entity:renamed', entity.id, entity._name);
+    Fire.sendToWindows('entity:renamed', entity.id, entity._name);
 };
 
 editorCallback.onComponentEnabled = function (component) {
-    Fire.sendToPages('component:enabled', component.id);
+    Fire.sendToWindows('component:enabled', component.id);
 };
 
 editorCallback.onComponentDisabled = function (component) {
-    Fire.sendToPages('component:disabled', component.id);
+    Fire.sendToWindows('component:disabled', component.id);
 };
 
 editorCallback.onComponentAdded = function (entity, component) {
-    Fire.sendToPages('component:added', entity.id, component.id);
+    Fire.sendToWindows('component:added', entity.id, component.id);
 };
 
 editorCallback.onComponentRemoved = function (entity, component) {
-    Fire.sendToPages('component:removed', entity.id, component.id);
+    Fire.sendToWindows('component:removed', entity.id, component.id);
 };

@@ -54,14 +54,14 @@ Polymer({
         }.bind(this));
         this.ipc.on('hierarchy-menu:delete', function () {
             var contextSelection = Fire.Selection.contextEntities;
-            Fire.sendToMainPage('engine:deleteEntities', contextSelection);
+            Fire.sendToMainWindow('engine:deleteEntities', contextSelection);
         }.bind(this));
         this.ipc.on('hierarchy-menu:duplicate', function () {
             var contextSelection = Fire.Selection.contextEntities;
             var entities = this.getToplevelElements(contextSelection).map(function (element) {
                 return element && element.userId;
             });
-            Fire.sendToMainPage('engine:duplicateEntities', entities);
+            Fire.sendToMainWindow('engine:duplicateEntities', entities);
         }.bind(this));
     },
 
@@ -224,7 +224,7 @@ Polymer({
 
     moveEntities: function ( targetEL, entities, nextSiblingId ) {
         // TODO: Fire.Selection.filter(entities,'sorted');
-        Fire.sendToMainPage('engine:moveEntities', entities, targetEL ? targetEL.userId : null, nextSiblingId);
+        Fire.sendToMainWindow('engine:moveEntities', entities, targetEL ? targetEL.userId : null, nextSiblingId);
     },
 
     createEntity: function () {
@@ -233,14 +233,14 @@ Polymer({
             var targetEL = this.idToItem[contextSelection[0]];
             var parentEL = targetEL.parentElement;
             if ( parentEL && parentEL instanceof HierarchyItem ) {
-                Fire.sendToMainPage('engine:createEntity', parentEL.userId);
+                Fire.sendToMainWindow('engine:createEntity', parentEL.userId);
             }
             else {
-                Fire.sendToMainPage('engine:createEntity');
+                Fire.sendToMainWindow('engine:createEntity');
             }
         }
         else {
-            Fire.sendToMainPage('engine:createEntity');
+            Fire.sendToMainWindow('engine:createEntity');
         }
     },
 
@@ -248,23 +248,23 @@ Polymer({
         var contextSelection = Fire.Selection.contextEntities;
         if ( contextSelection.length > 0 ) {
             var targetEL = this.idToItem[contextSelection[0]];
-            Fire.sendToMainPage('engine:createEntity', targetEL.userId);
+            Fire.sendToMainWindow('engine:createEntity', targetEL.userId);
         }
         else {
             var activeId = Fire.Selection.activeEntityId;
-            Fire.sendToMainPage('engine:createEntity', activeId);
+            Fire.sendToMainWindow('engine:createEntity', activeId);
         }
     },
 
     deleteSelection: function () {
-        Fire.sendToMainPage('engine:deleteEntities', Fire.Selection.entities);
+        Fire.sendToMainWindow('engine:deleteEntities', Fire.Selection.entities);
     },
 
     duplicateSelection: function () {
         var entities = this.getToplevelElements(Fire.Selection.entities).map(function (element) {
             return element && element.userId;
         });
-        Fire.sendToMainPage('engine:duplicateEntities', entities);
+        Fire.sendToMainWindow('engine:duplicateEntities', entities);
     },
 
     select: function ( element ) {
@@ -358,7 +358,7 @@ Polymer({
         renamingEL._renaming = false;
 
         // TODO: pull up to view ?
-        Fire.sendToMainPage('engine:renameEntity', renamingEL.userId, event.target.value);
+        Fire.sendToMainWindow('engine:renameEntity', renamingEL.userId, event.target.value);
     },
 
     openAction: function (event) {
@@ -558,8 +558,8 @@ Polymer({
                             ent.parent = parentEnt;
                             ent.transform.position = new Fire.Vec2(0,0);
                             Fire.Selection.selectEntity( ent.id, false, true );
-                            Fire.sendToMainPage( 'entity:added', ent.id );
-                            Fire.sendToPages( 'scene:dirty' );
+                            Fire.sendToMainWindow( 'entity:added', ent.id );
+                            Fire.sendToWindows( 'scene:dirty' );
                             Fire.AssetLibrary.cacheAsset( asset );
                         }.bind(this) );
                     }

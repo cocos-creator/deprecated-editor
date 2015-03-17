@@ -106,7 +106,7 @@ Polymer({
     },
 
     addComponent: function (componentCtor) {
-        Fire.sendToMainPage('engine:addComponent', this.target.id, Fire.JS._getClassId(componentCtor) );
+        Fire.sendToMainWindow('engine:addComponent', this.target.id, Fire.JS._getClassId(componentCtor) );
     },
 
     fieldsChangedAction: function ( event, detail ) {
@@ -116,8 +116,8 @@ Polymer({
             Fire.AssetLibrary.cacheAsset(detail);
         }
 
-        Fire.sendToMainPage( 'entity:inspector-dirty' );
-        Fire.sendToPages( 'scene:dirty' );
+        Fire.sendToMainWindow( 'entity:inspector-dirty' );
+        Fire.sendToWindows( 'scene:dirty' );
     },
 
     addComponentAction: function ( event ) {

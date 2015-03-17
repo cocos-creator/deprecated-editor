@@ -112,11 +112,11 @@ Fire.JS.mixin( Fire, {
      * @param {...*} [arg] - whatever arguments the message needs
      * @param {object} [options] - you can indicate the options such as Fire.SelfExcluded
      */
-    sendToPages: function ( message ) {
+    sendToWindows: function ( message ) {
         'use strict';
         if ( typeof message === 'string' ) {
             var args = [].slice.call( arguments );
-            Ipc.send.apply( Ipc, ['send2pages'].concat( args ) );
+            Ipc.send.apply( Ipc, ['send2wins'].concat( args ) );
         }
         else {
             Fire.error('The message must be provided');
@@ -129,11 +129,11 @@ Fire.JS.mixin( Fire, {
      * @param {string} message - the message to send
      * @param {...*} [arg] - whatever arguments the message needs
      */
-    sendToMainPage: function ( message ) {
+    sendToMainWindow: function ( message ) {
         'use strict';
         if ( typeof message === 'string' ) {
             var args = [].slice.call( arguments );
-            Ipc.send.apply( Ipc, ['send2mainpage'].concat( args ) );
+            Ipc.send.apply( Ipc, ['send2mainwin'].concat( args ) );
         }
         else {
             Fire.error('The message must be provided');
@@ -184,13 +184,13 @@ Fire.observe = function ( target, enabled ) {
 
 Fire.hintObject = function ( target ) {
     if ( target instanceof Fire.Entity ) {
-        Fire.sendToPages('entity:hint', target.id );
+        Fire.sendToWindows('entity:hint', target.id );
     }
     else if ( target instanceof Fire.Component ) {
-        Fire.sendToPages('entity:hint', target.entity.id );
+        Fire.sendToWindows('entity:hint', target.entity.id );
     }
     else if ( target instanceof Fire.Asset ) {
-        Fire.sendToPages('asset:hint', target._uuid );
+        Fire.sendToWindows('asset:hint', target._uuid );
     }
 };
 

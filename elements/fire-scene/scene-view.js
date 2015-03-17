@@ -197,7 +197,7 @@ Polymer({
     },
 
     deleteSelection: function () {
-        Fire.sendToMainPage('engine:deleteEntities', Fire.Selection.entities);
+        Fire.sendToMainWindow('engine:deleteEntities', Fire.Selection.entities);
     },
 
     hover: function ( entityID ) {
@@ -629,7 +629,7 @@ Polymer({
         if ( !this.renderContext || !this.renderContext.camera )
             return;
 
-        Fire.sendToMainPage( 'gizmos:dirty' );
+        Fire.sendToMainWindow( 'gizmos:dirty' );
         this.repaint();
         event.stopPropagation();
     },
