@@ -12,7 +12,7 @@ Fire.sendToCore = function ( message ) {
     'use strict';
     if ( typeof message === 'string' ) {
         var args = [].slice.call( arguments );
-        Ipc.send.apply( Ipc, ['send2core'].concat( args ) );
+        Ipc.send.apply( Ipc, ['fire:send2core'].concat( args ) );
     }
     else {
         Fire.error('The message must be provided');
@@ -30,7 +30,7 @@ Fire.sendToWindows = function ( message ) {
     'use strict';
     if ( typeof message === 'string' ) {
         var args = [].slice.call( arguments );
-        Ipc.send.apply( Ipc, ['send2wins'].concat( args ) );
+        Ipc.send.apply( Ipc, ['fire:send2wins'].concat( args ) );
     }
     else {
         Fire.error('The message must be provided');
@@ -47,7 +47,7 @@ Fire.sendToMainWindow = function ( message ) {
     'use strict';
     if ( typeof message === 'string' ) {
         var args = [].slice.call( arguments );
-        Ipc.send.apply( Ipc, ['send2mainwin'].concat( args ) );
+        Ipc.send.apply( Ipc, ['fire:send2mainwin'].concat( args ) );
     }
     else {
         Fire.error('The message must be provided');
@@ -64,7 +64,7 @@ Fire.sendToAll = function ( message ) {
     'use strict';
     if ( typeof message === 'string' ) {
         var args = [].slice.call( arguments );
-        Ipc.send.apply( Ipc, ['send2all'].concat( args ) );
+        Ipc.send.apply( Ipc, ['fire:send2all'].concat( args ) );
     }
     else {
         Fire.error('The message must be provided');
@@ -105,7 +105,7 @@ Fire.sendRequestToCore = function (request) {
             var key = "" + sessionId;
             replyCallbacks[key] = reply;
 
-            Ipc.send('fire/sendReq2core', request, args, sessionId);
+            Ipc.send('fire:sendreq2core', request, args, sessionId);
         }
         else {
             Fire.error('The reply must be of type function');
@@ -116,7 +116,7 @@ Fire.sendRequestToCore = function (request) {
     }
 };
 
-Ipc.on('fire/sendReplyBack', function replyCallback (args, sessionId) {
+Ipc.on('fire:send-reply-back', function replyCallback (args, sessionId) {
     'use strict';
     var key = "" + sessionId;
     var cb = replyCallbacks[key];
