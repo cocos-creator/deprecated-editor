@@ -35,7 +35,7 @@ var paths = {
         'src/engine-extends/ipc-receiver.js',
 
         // editor
-        'src/ipc-patterns.js',
+        'src/ipc-utils.js',
         'src/plugin-loader.js',
         'src/sandbox.js',
         'src/editor.js',

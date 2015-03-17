@@ -15,7 +15,6 @@ for ( var i = 0; i < queryList.length; ++i ) {
 
 //
 var Util = require('util');
-var Ipc = require('ipc');
 
 // console
 Fire.log = function ( text ) {
@@ -84,90 +83,6 @@ Fire.info = function ( text ) {
     console.info(text);
     Fire.sendToCore('console:info', text);
 };
-
-Fire.JS.mixin( Fire, {
-
-    // messages
-
-    /**
-     * Send message to editor-core, which is so called as main app, or atom shell's browser side.
-     * @param {string} message - the message to send
-     * @param {...*} [arg] - whatever arguments the message needs
-     */
-    sendToCore: function ( message ) {
-        'use strict';
-        if ( typeof message === 'string' ) {
-            var args = [].slice.call( arguments );
-            Ipc.send.apply( Ipc, ['send2core'].concat( args ) );
-        }
-        else {
-            Fire.error('The message must be provided');
-        }
-    },
-
-    /**
-     * Broadcast message to all pages.
-     * The page is so called as atom shell's web side. Each application window is an independent page and has its own JavaScript context.
-     * @param {string} message - the message to send
-     * @param {...*} [arg] - whatever arguments the message needs
-     * @param {object} [options] - you can indicate the options such as Fire.SelfExcluded
-     */
-    sendToWindows: function ( message ) {
-        'use strict';
-        if ( typeof message === 'string' ) {
-            var args = [].slice.call( arguments );
-            Ipc.send.apply( Ipc, ['send2wins'].concat( args ) );
-        }
-        else {
-            Fire.error('The message must be provided');
-        }
-    },
-
-    /**
-     * Broadcast message to main page.
-     * The page is so called as atom shell's web side. Each application window is an independent page and has its own JavaScript context.
-     * @param {string} message - the message to send
-     * @param {...*} [arg] - whatever arguments the message needs
-     */
-    sendToMainWindow: function ( message ) {
-        'use strict';
-        if ( typeof message === 'string' ) {
-            var args = [].slice.call( arguments );
-            Ipc.send.apply( Ipc, ['send2mainwin'].concat( args ) );
-        }
-        else {
-            Fire.error('The message must be provided');
-        }
-    },
-
-    /**
-     * Broadcast message to all pages and editor-core
-     * @param {string} message - the message to send
-     * @param {...*} [arg] - whatever arguments the message needs
-     * @param {object} [options] - you can indicate the options such as Fire.SelfExcluded
-     */
-    sendToAll: function ( message ) {
-        'use strict';
-        if ( typeof message === 'string' ) {
-            var args = [].slice.call( arguments );
-            Ipc.send.apply( Ipc, ['send2all'].concat( args ) );
-        }
-        else {
-            Fire.error('The message must be provided');
-        }
-    },
-
-    rpc: function ( name ) {
-        'use strict';
-        if ( typeof name === 'string' ) {
-            var args = [].slice.call( arguments );
-            Ipc.send.apply( Ipc, ['rpc'].concat( args ) );
-        }
-        else {
-            Fire.error('The name of rpc must be provided');
-        }
-    }
-});
 
 Fire.observe = function ( target, enabled ) {
     if ( !target.isValid ) {
