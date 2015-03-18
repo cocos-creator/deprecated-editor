@@ -23,9 +23,7 @@
             </div>
         </div>
 
-        <div class="field" flex-row>
-            <fire-ui-button on-click="{{createAction}}" disabled="{{curSelect===null}}">Create</fire-ui-button>
-        </div>
+
 
         <fire-ui-tabs>
             <fire-ui-tab on-active="{{templateAction}}">Templates</fire-ui-tab>
@@ -39,6 +37,14 @@
                     </dashboard-template-item>
                 </template>
             </div>
+        </div>
+
+        <div class="field" style="margin-top:10px" flex-row>
+            <span flex-5></span>
+            <button flex-1 on-click="{{createAction}}" class="createbtn {{curSelect===null ? 'disabled': ''}}">
+                Create
+                <li class="fa fa-file-o"></li>
+            </button>
         </div>
     </template>
 

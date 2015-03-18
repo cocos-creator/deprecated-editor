@@ -13,14 +13,11 @@
             <div id="menu">
                 <div class="item" on-click="{{recentAction}}">Recent Proejcts</div>
                 <div class="item" on-click="{{newAction}}">New Project</div>
+                <div class="item" style="cursor:pointer;" on-click="{{openAction}}">Open Other ...</div>
                 <div class="item" on-click="{{helpAction}}">Help</div>
             </div>
 
             <span flex-1></span>
-
-            <div class="btn-group">
-                <fire-ui-button on-click="{{openAction}}">Open...</fire-ui-button>
-            </div>
         </div>
 
         <div id="content" class="content">
