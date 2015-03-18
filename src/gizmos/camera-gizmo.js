@@ -58,7 +58,7 @@ CameraGizmo.prototype.update = function () {
     if ( !this.target.isValid )
         return;
 
-    var zoom = this._svg.view.height / this._svg.camera.size;
+    var zoom = this._svg.camera.size !== 0 ? (this._svg.view.height / this._svg.camera.size) : 1;
 
     var localToWorld = this.target.entity.transform.getLocalToWorldMatrix();
     var worldpos = new Fire.Vec2(localToWorld.tx, localToWorld.ty);

@@ -45,6 +45,7 @@ var paths = {
         'src/svg-grids.js',
         'src/gizmos-utils.js',
         'src/svg-gizmos.js',
+        'src/build-assets.js',
 
         // plugins
         'src/plugins/hierarchy.js',
