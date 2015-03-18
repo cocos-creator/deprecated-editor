@@ -72,7 +72,7 @@ Polymer({
 
         Fire.AssetDB.apply({
             metaJson: Fire.serializeMeta(this.meta),
-            assetJson: Fire.serializeMeta(this.asset),
+            assetJson: Fire.serialize(this.asset),
             assetDirty: this.asset.dirty,
         });
     },
