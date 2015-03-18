@@ -82,7 +82,9 @@ Polymer({
                 var asset = Fire.AssetLibrary._uuidToAsset[p];
                 results.push( { uuid: p, name: asset.name, type: Fire.JS.getClassName(asset) } );
             }
-            Fire.sendToAll('asset-library:debugger:uuid-asset-results', results);
+            Fire.sendToAll('asset-library:debugger:uuid-asset-results', {
+                results: results
+            });
         }.bind(this));
 
         this.ipc.on('asset:moved', function (uuid, destUrl) {

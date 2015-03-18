@@ -1,20 +1,20 @@
-// skip "?fireID="
-// var fireID = JSON.parse(decodeURIComponent(location.search.substr(8)));
-var fireID = -1;
+//
+var Util = require('util');
 
+// init argument list sending from core by url?queries
 // format: "?foo=bar&hell=world"
 // skip "?"
 var queryString = decodeURIComponent(location.search.substr(1));
 var queryList = queryString.split('&');
+var queries = {};
 for ( var i = 0; i < queryList.length; ++i ) {
     var pair = queryList[i].split("=");
-    if ( pair[0] === "fireID" ) {
-        fireID = parseInt(pair[1]);
+    if ( pair.length === 2) {
+        queries[pair[0]] = pair[1];
     }
 }
+Fire.argv = queries;
 
-//
-var Util = require('util');
 
 // console
 Fire.log = function ( text ) {
@@ -133,8 +133,8 @@ Fire.browseObject = function ( type, fobjectEL ) {
             height: 600,
             show: true,
             resizable: true,
-            query: { typeID: typeID, id: fobjectEL.value ? fobjectEL.value._uuid : "" },
             closeWhenBlur: true,
+            argv: { typeID: typeID, id: fobjectEL.value ? fobjectEL.value._uuid : "" },
         } );
         ipc.on('quick-asset:selected', function ( uuid ) {
             fobjectEL.setAsset(uuid);

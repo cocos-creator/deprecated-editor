@@ -36,6 +36,7 @@ var paths = {
 
         // editor
         'src/ipc-utils.js',
+        'src/panel-mng.js',
         'src/plugin-loader.js',
         'src/sandbox.js',
         'src/editor.js',

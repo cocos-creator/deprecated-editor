@@ -71,6 +71,24 @@ Fire.sendToAll = function ( message ) {
     }
 };
 
+/**
+ * Send message to specific panel
+ * @param {string} pluginName - the plugin name
+ * @param {string} panelName - the panel name
+ * @param {string} message - the message to send
+ * @param {...*} [arg] - whatever arguments the message needs
+ */
+Fire.sendToPanel = function ( pluginName, panelName, message ) {
+    'use strict';
+    if ( typeof message === 'string' ) {
+        var args = [].slice.call( arguments );
+        Ipc.send.apply( Ipc, ['fire:send2panel'].concat( args ) );
+    }
+    else {
+        Fire.error('The message must be provided');
+    }
+};
+
 Fire.rpc = function ( name ) {
     'use strict';
     if ( typeof name === 'string' ) {
@@ -131,4 +149,8 @@ Ipc.on('fire:send-reply-back', function replyCallback (args, sessionId) {
     else {
         Fire.error('non-exists callback of session:', sessionId);
     }
+});
+
+Ipc.on('fire:send2panel', function () {
+    Fire.PanelMng.dispatch.apply(Fire.PanelMng,arguments);
 });
