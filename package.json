@@ -5,9 +5,10 @@
   "homepage": "http://github.com/fireball-x/editor",
   "license": "MIT",
   "licenseUrl": "http://opensource.org/licenses/MIT",
-  "dependencies": {},
+  "dependencies": {
+    "gulp": ""
+  },
   "devDependencies": {
-    "gulp": "",
     "gulp-concat": "",
     "gulp-fb": "",
     "gulp-jshint": "",

@@ -35,6 +35,7 @@ Polymer({
         if ( result ) {
             Fire.sendToCore( 'dashboard:add-project', result[0], true );
         }
+        this.selectItem(2);
     },
 
     projectAddedAction: function ( event ) {
@@ -58,6 +59,6 @@ Polymer({
     helpAction: function ( event ) {
         event.stopPropagation();
 
-        this.selectItem(2);
+        this.selectItem(3);
     },
 });
