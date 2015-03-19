@@ -29,13 +29,19 @@ Fire.PanelMng = {
             _idToPanelInfo[panelID] = {
                 element: viewEL,
                 messages: panelInfo.messages,
-                'ipc-listener': ipcListener
+                ipcListener: ipcListener
             };
             Fire.sendToCore('panel:dock', panelID, Fire.RequireIpcEvent);
 
             //
             cb ( null, viewEL );
         });
+    },
+
+    closeAll: function () {
+        for ( var id in _idToPanelInfo ) {
+            Fire.PanelMng.close(id);
+        }
     },
 
     close: function ( panelID ) {
@@ -57,9 +63,21 @@ Fire.PanelMng = {
             return;
         }
 
+        var detail;
+
+        // special message
+        if ( ipcMessage === 'panel:open' ) {
+            detail = {};
+            if ( arguments.length > 3 ) {
+                detail = arguments[3];
+            }
+            panelInfo.element.fire( 'open', detail );
+        }
+
+        // other messages
         var domEvent = panelInfo.messages[ipcMessage];
         if ( domEvent ) {
-            var detail = {};
+            detail = {};
             if ( arguments.length > 3 ) {
                 detail = arguments[3];
             }
