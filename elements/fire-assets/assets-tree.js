@@ -257,20 +257,30 @@ Polymer({
 
     attached: function () {
         // register Ipc
-        this.ipc.on('folder:created', function ( url, id, parentId ) {
+        this.ipc.on('folder:created', function ( detail ) {
+            var url = detail.url;
+            var id = detail.id;
+            var parentId = detail.parentId;
+
             this.newItem( url, id, parentId, true );
         }.bind(this) );
-        this.ipc.on('asset:created', function ( url, id, parentId ) {
+        this.ipc.on('asset:created', function ( detail ) {
+            var url = detail.url;
+            var id = detail.uuid;
+            var parentId = detail.parentUuid;
+
             this.newItem( url, id, parentId, false );
         }.bind(this) );
         this.ipc.on('asset:moved', this.moveItem.bind(this) );
-        this.ipc.on('assets:created', function ( results ) {
+        this.ipc.on('assets:created', function ( detail ) {
+            var results = detail.results;
             for ( var i = 0; i < results.length; ++i ) {
                 var info = results[i];
                 this.newItem( info.url, info.uuid, info.parentUuid, info.isDir );
             }
         }.bind(this) );
-        this.ipc.on('assets:deleted', function (results) {
+        this.ipc.on('assets:deleted', function (detail) {
+            var results = detail.results;
             var filterResults = Fire.arrayCmpFilter ( results, function ( a, b ) {
                 if ( Path.contains( a.url, b.url ) ) {
                     return 1;
@@ -283,12 +293,6 @@ Polymer({
 
             for ( var i = 0; i < filterResults.length; ++i ) {
                 this.deleteItemById(filterResults[i].uuid);
-            }
-        }.bind(this) );
-        this.ipc.on('asset-db:deep-query-results', function ( url, results ) {
-            for ( var i = 0; i < results.length; ++i ) {
-                var info = results[i];
-                this.newItem( info.url, info.uuid, info.parentUuid, info.isDir );
             }
         }.bind(this) );
         this.ipc.on('asset:refresh-context-menu', function () {
@@ -499,7 +503,12 @@ Polymer({
         var rootEL = _newAssetsItem.call(this, url, 'root', Fire.UUID.AssetsRoot, this);
         rootEL.folded = false;
 
-        Fire.AssetDB.deepQuery(url);
+        Fire.AssetDB.deepQuery(url, function ( results ) {
+            for ( var i = 0; i < results.length; ++i ) {
+                var info = results[i];
+                this.newItem( info.url, info.uuid, info.parentUuid, info.isDir );
+            }
+        }.bind(this));
     },
 
     newItem: function ( url, id, parentId, isDirectory ) {
@@ -519,7 +528,11 @@ Polymer({
         }
     },
 
-    moveItem: function ( id, destUrl, destDirId ) {
+    moveItem: function ( detail ) {
+        var id = detail.uuid;
+        var destUrl = detail.destUrl;
+        var destDirId = detail.destParentUuid;
+
         var srcEL = this.idToItem[id];
         if ( !srcEL ) {
             Fire.warn( 'Can not find source element: ' + id );

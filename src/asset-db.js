@@ -69,14 +69,14 @@ Fire.AssetDB = {
         Fire.sendToCore('asset-db:apply', options );
     },
 
-    query: function ( url, options ) {
+    query: function ( url, options, cb ) {
         options = Fire.JS.mixin( options || {}, { url: url } );
-        Fire.sendToCore('asset-db:query', options);
+        Fire.sendRequestToCore('asset-db:query', options, cb);
     },
 
-    deepQuery: function ( url ) {
-        Fire.sendToCore('asset-db:deep-query', {
+    deepQuery: function ( url, cb ) {
+        Fire.sendRequestToCore('asset-db:deep-query', {
             url: url
-        });
+        }, cb);
     },
 };

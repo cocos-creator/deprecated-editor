@@ -25,8 +25,25 @@ Polymer({
             }
         }
 
+        var self = this;
         Fire.AssetDB.query( "assets://", {
             typeID: typeID
+        }, function ( results ) {
+            self.items = results.map ( function ( item ) {
+                var icon = '';
+                if ( typeID === Fire.JS._getClassId(Fire.Texture) ) {
+                    icon = "uuid://" + item.uuid + "?thumb";
+                }
+
+                return {
+                    icon: icon,
+                    text: Url.basenameNoExt(item.url),
+                    uuid: item.uuid,
+                    selected: (item.uuid === self._curId)
+                };
+            }).sort( function (a,b) {
+                return a.text.localeCompare(b.text);
+            });
         });
 
         if ( typeID !== Fire.JS._getClassId(Fire.Texture) ) {
@@ -58,24 +75,6 @@ Polymer({
     },
 
     attached: function () {
-        this.ipc.on('asset-db:query-results', function ( url, typeID, results ) {
-            var quickAssets = this;
-            this.items = results.map ( function ( item ) {
-                var icon = '';
-                if ( typeID === Fire.JS._getClassId(Fire.Texture) ) {
-                    icon = "uuid://" + item.uuid + "?thumb";
-                }
-
-                return {
-                    icon: icon,
-                    text: Url.basenameNoExt(item.url),
-                    uuid: item.uuid,
-                    selected: (item.uuid === quickAssets._curId)
-                };
-            }).sort( function (a,b) {
-                return a.text.localeCompare(b.text);
-            });
-        }.bind(this) );
     },
 
     detached: function () {

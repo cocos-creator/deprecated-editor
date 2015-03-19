@@ -87,7 +87,10 @@ Polymer({
             });
         }.bind(this));
 
-        this.ipc.on('asset:moved', function (uuid, destUrl) {
+        this.ipc.on('asset:moved', function ( detail ) {
+            var uuid = detail.uuid;
+            var destUrl = detail.destUrl;
+
             // if it is current scene renamed, update title
             if ( uuid === Fire.Engine._scene._uuid ) {
                 this.updateTitle();
@@ -97,7 +100,10 @@ Polymer({
         this.ipc.on('scene:save', this.saveCurrentScene.bind(this) );
 
         // scene saved
-        this.ipc.on('asset:saved', function ( url, uuid ) {
+        this.ipc.on('asset:saved', function ( detail ) {
+            var url = detail.url;
+            var uuid = detail.uuid;
+
             // update the uuid of current scene, if we first time save it
             if ( this._newsceneUrl === url ) {
                 this._newsceneUrl = null;
@@ -253,21 +259,16 @@ Polymer({
 
                 // query scenes
                 var SCENE_ID = Fire.JS._getClassId(Fire._Scene);
-                self.ipc.once('asset-db:query-results', function ( url, typeID, results ) {
-                    console.timeEnd('query scenes');
-                    if ( typeID === SCENE_ID ) {
-                        for ( var i = 0; i < results.length; ++i ) {
-                            var result = results[i];
-                            var name = Url.basenameNoExt(result.url);
-                            self.sceneInfo[result.uuid] = result.url;
-                            Fire.Engine._sceneInfos[name] = result.uuid;
-                        }
-                        next();
-                    }
-                });
-                console.time('query scenes');
                 Fire.AssetDB.query( "assets://", {
                     typeID: SCENE_ID
+                }, function ( results ) {
+                    for ( var i = 0; i < results.length; ++i ) {
+                        var result = results[i];
+                        var name = Url.basenameNoExt(result.url);
+                        self.sceneInfo[result.uuid] = result.url;
+                        Fire.Engine._sceneInfos[name] = result.uuid;
+                    }
+                    next();
                 });
             },
 

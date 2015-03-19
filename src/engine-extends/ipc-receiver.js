@@ -129,7 +129,10 @@ Ipc.on('engine:openScene', function (uuid) {
     });
 });
 
-Ipc.on('asset:moved', function (uuid, destUrl) {
+Ipc.on('asset:moved', function ( detail ) {
+    var uuid = detail.uuid;
+    var destUrl = detail.destUrl;
+
     // rename asset
     var newName, asset = Fire.AssetLibrary.getAssetByUuid(uuid);
     if (asset) {
@@ -150,7 +153,8 @@ Ipc.on('asset:moved', function (uuid, destUrl) {
     }
 });
 
-Ipc.on('assets:deleted', function (results) {
+Ipc.on('assets:deleted', function (detail) {
+    var results = detail.results;
     for ( var i = 0; i < results.length; ++i ) {
         Fire.AssetLibrary.unloadAsset(results[i].uuid, true);
         // unregister scene
@@ -168,7 +172,10 @@ Ipc.on('asset:changed', function (detail) {
     Fire.AssetLibrary.onAssetReimported(uuid);
 });
 
-Ipc.on('asset:created', function ( url, id, parentId ) {
+Ipc.on('asset:created', function ( detail ) {
+    var url = detail.url;
+    var id = detail.uuid;
+
     // register scene
     if (Url.extname(url) === '.fire') {
         var name = Url.basenameNoExt(url);
@@ -176,7 +183,8 @@ Ipc.on('asset:created', function ( url, id, parentId ) {
     }
 });
 
-Ipc.on('assets:created', function ( results ) {
+Ipc.on('assets:created', function ( detail ) {
+    var results = detail.results;
     for ( var i = 0; i < results.length; ++i ) {
         var info = results[i];
         // register scene

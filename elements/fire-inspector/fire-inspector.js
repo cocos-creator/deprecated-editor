@@ -91,7 +91,9 @@ Polymer({
         }
     },
 
-    _onAssetMoved: function ( uuid, destUrl ) {
+    _onAssetMoved: function ( detail ) {
+        var uuid = detail.uuid;
+        var destUrl = detail.destUrl;
         if ( this.target && this.target.uuid === uuid ) {
             if ( this.$.inspector.asset ) {
                 this.$.inspector.asset.name = Url.basenameNoExt(destUrl);
@@ -99,7 +101,10 @@ Polymer({
         }
     },
 
-    _onAssetSaved: function ( url, uuid ) {
+    _onAssetSaved: function ( detail ) {
+        var url = detail.url;
+        var uuid = detail.uuid;
+
         if ( this.target && this.target.uuid === uuid ) {
             if ( this.$.inspector.saving !== undefined ) {
                 this.$.inspector.saving = false;

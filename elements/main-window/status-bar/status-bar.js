@@ -20,7 +20,8 @@ Polymer({
     },
 
     attached: function () {
-        this.ipc.on('asset-db:watch-changed', function ( state ) {
+        this.ipc.on('asset-db:watch-changed', function ( detail ) {
+            var state = detail.state;
             var expect = watchStates[state];
             if ( !expect ) {
                 this.watchState = watchStates.unknown;
@@ -30,8 +31,9 @@ Polymer({
             this.watchState = expect;
         }.bind(this) );
 
-        this.ipc.on('asset-db:syncing', function ( task ) {
-            this.dbState = { state: "syncing", task: task };
+        this.ipc.on('asset-db:syncing', function ( detail ) {
+            var taskName = detail.taskName;
+            this.dbState = { state: "syncing", task: taskName };
 
             if ( this._syncingTimeout === null ) {
                 this._syncingTimeout = setTimeout( function () {
