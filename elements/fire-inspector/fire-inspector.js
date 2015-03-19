@@ -68,7 +68,8 @@ Polymer({
         }
     },
 
-    _onAssetChanged: function ( uuid ) {
+    _onAssetChanged: function ( detail ) {
+        var uuid = detail.uuid;
         if ( this.target && this.target.uuid === uuid ) {
             var reloadMeta = true;
 

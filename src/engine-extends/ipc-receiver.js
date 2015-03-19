@@ -161,7 +161,8 @@ Ipc.on('assets:deleted', function (results) {
     }
 });
 
-Ipc.on('asset:changed', function (uuid) {
+Ipc.on('asset:changed', function (detail) {
+    var uuid = detail.uuid;
     // 某些 Importer 会依据修改后的 meta 重新 import 一次，
     // 对它们来说 asset 需要重新导入才能得到真正结果。
     Fire.AssetLibrary.onAssetReimported(uuid);
