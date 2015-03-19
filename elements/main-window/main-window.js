@@ -129,7 +129,9 @@ Polymer({
                 this._sceneDirtyFlag = false;
                 // don't re-open current saving scene
                 if ( uuid !== Fire.Engine._scene._uuid ) {
-                    Fire.sendToMainWindow('engine:openScene', uuid);
+                    Fire.sendToMainWindow('engine:open-scene', {
+                        uuid: uuid
+                    });
                 }
                 break;
 
@@ -140,7 +142,9 @@ Polymer({
             // don't save
             case 2:
                 this._sceneDirtyFlag = false;
-                Fire.sendToMainWindow('engine:openScene', uuid);
+                Fire.sendToMainWindow('engine:open-scene', {
+                    uuid: uuid
+                });
                 break;
             }
         }.bind(this) );

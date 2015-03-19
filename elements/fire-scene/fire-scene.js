@@ -39,11 +39,11 @@ Polymer({
         this.style.display = old;
     },
 
-    select: function ( selected, entityIDs ) {
+    select: function ( selected, entityIds ) {
         if ( selected )
-            this.$.view.select(entityIDs);
+            this.$.view.select(entityIds);
         else
-            this.$.view.unselect(entityIDs);
+            this.$.view.unselect(entityIds);
     },
 
     hover: function ( entityID ) {

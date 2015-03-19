@@ -106,7 +106,10 @@ Polymer({
     },
 
     addComponent: function (componentCtor) {
-        Fire.sendToMainWindow('engine:addComponent', this.target.id, Fire.JS._getClassId(componentCtor) );
+        Fire.sendToMainWindow('engine:add-component', {
+            entityId: this.target.id,
+            componentClassId: Fire.JS._getClassId(componentCtor)
+        });
     },
 
     fieldsChangedAction: function ( event, detail ) {

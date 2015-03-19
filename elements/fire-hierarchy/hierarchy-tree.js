@@ -54,14 +54,18 @@ Polymer({
         }.bind(this));
         this.ipc.on('hierarchy-menu:delete', function () {
             var contextSelection = Fire.Selection.contextEntities;
-            Fire.sendToMainWindow('engine:deleteEntities', contextSelection);
+            Fire.sendToMainWindow('engine:delete-entities', {
+                entityIds: contextSelection
+            });
         }.bind(this));
         this.ipc.on('hierarchy-menu:duplicate', function () {
             var contextSelection = Fire.Selection.contextEntities;
             var entities = this.getToplevelElements(contextSelection).map(function (element) {
                 return element && element.userId;
             });
-            Fire.sendToMainWindow('engine:duplicateEntities', entities);
+            Fire.sendToMainWindow('engine:duplicate-entities', {
+                entityIds: entities
+            });
         }.bind(this));
     },
 
@@ -224,7 +228,11 @@ Polymer({
 
     moveEntities: function ( targetEL, entities, nextSiblingId ) {
         // TODO: Fire.Selection.filter(entities,'sorted');
-        Fire.sendToMainWindow('engine:moveEntities', entities, targetEL ? targetEL.userId : null, nextSiblingId);
+        Fire.sendToMainWindow('engine:move-entities', {
+            entityIds: entities,
+            parentId: targetEL ? targetEL.userId : null,
+            nextSiblingId: nextSiblingId
+        });
     },
 
     createEntity: function () {
@@ -233,14 +241,16 @@ Polymer({
             var targetEL = this.idToItem[contextSelection[0]];
             var parentEL = targetEL.parentElement;
             if ( parentEL && parentEL instanceof HierarchyItem ) {
-                Fire.sendToMainWindow('engine:createEntity', parentEL.userId);
+                Fire.sendToMainWindow('engine:create-entity', {
+                    parentId: parentEL.userId
+                });
             }
             else {
-                Fire.sendToMainWindow('engine:createEntity');
+                Fire.sendToMainWindow('engine:create-entity');
             }
         }
         else {
-            Fire.sendToMainWindow('engine:createEntity');
+            Fire.sendToMainWindow('engine:create-entity');
         }
     },
 
@@ -248,23 +258,31 @@ Polymer({
         var contextSelection = Fire.Selection.contextEntities;
         if ( contextSelection.length > 0 ) {
             var targetEL = this.idToItem[contextSelection[0]];
-            Fire.sendToMainWindow('engine:createEntity', targetEL.userId);
+            Fire.sendToMainWindow('engine:create-entity', {
+                parentId: targetEL.userId
+            });
         }
         else {
             var activeId = Fire.Selection.activeEntityId;
-            Fire.sendToMainWindow('engine:createEntity', activeId);
+            Fire.sendToMainWindow('engine:create-entity', {
+                parentId: activeId
+            });
         }
     },
 
     deleteSelection: function () {
-        Fire.sendToMainWindow('engine:deleteEntities', Fire.Selection.entities);
+        Fire.sendToMainWindow('engine:delete-entities', {
+            entityIds: Fire.Selection.entities
+        });
     },
 
     duplicateSelection: function () {
         var entities = this.getToplevelElements(Fire.Selection.entities).map(function (element) {
             return element && element.userId;
         });
-        Fire.sendToMainWindow('engine:duplicateEntities', entities);
+        Fire.sendToMainWindow('engine:duplicate-entities', {
+            entityIds: entities
+        });
     },
 
     select: function ( element ) {
@@ -358,7 +376,10 @@ Polymer({
         renamingEL._renaming = false;
 
         // TODO: pull up to view ?
-        Fire.sendToMainWindow('engine:renameEntity', renamingEL.userId, event.target.value);
+        Fire.sendToMainWindow('engine:rename-entity', {
+            id: renamingEL.userId,
+            name: event.target.value
+        } );
     },
 
     openAction: function (event) {

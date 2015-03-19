@@ -197,7 +197,9 @@ Polymer({
     },
 
     deleteSelection: function () {
-        Fire.sendToMainWindow('engine:deleteEntities', Fire.Selection.entities);
+        Fire.sendToMainWindow('engine:delete-entities', {
+            entityIds: Fire.Selection.entities
+        });
     },
 
     hover: function ( entityID ) {
@@ -220,22 +222,22 @@ Polymer({
         }
     },
 
-    select: function ( entityIDs ) {
+    select: function ( entityIds ) {
         if ( this._editTool ) {
             this.svgGizmos.remove(null, this._editTool);
             this._editTool = null;
         }
 
-        this._editingEdityIds = this._editingEdityIds.concat(entityIDs);
+        this._editingEdityIds = this._editingEdityIds.concat(entityIds);
 
         if ( this._editingEdityIds.length > 0 ) {
             this.edit(this._editingEdityIds);
         }
     },
 
-    unselect: function ( entityIDs ) {
-        for ( var i = 0; i < entityIDs.length; ++i ) {
-            var id = entityIDs[i];
+    unselect: function ( entityIds ) {
+        for ( var i = 0; i < entityIds.length; ++i ) {
+            var id = entityIds[i];
 
             for ( var j = 0; j < this._editingEdityIds.length; ++j ) {
                 if ( this._editingEdityIds[j] === id ) {
@@ -244,7 +246,7 @@ Polymer({
                 }
             }
 
-            var entity = Fire._getInstanceById(entityIDs[i]);
+            var entity = Fire._getInstanceById(entityIds[i]);
             // NOTE: entity might be destroyed
             if ( entity ) {
                 this.updateComponentGizmos( entity, {
@@ -264,10 +266,10 @@ Polymer({
         }
     },
 
-    edit: function ( entityIDs ) {
+    edit: function ( entityIds ) {
         var i, gizmo, entities = [], entity = null;
-        for ( i = 0; i < entityIDs.length; ++i ) {
-            entity = Fire._getInstanceById(entityIDs[i]);
+        for ( i = 0; i < entityIds.length; ++i ) {
+            entity = Fire._getInstanceById(entityIds[i]);
             if (entity) {
                 entities.push( entity );
             }

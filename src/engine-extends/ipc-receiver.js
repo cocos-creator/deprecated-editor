@@ -9,14 +9,18 @@ var Engine = Fire.Engine;
 var Entity = Fire.Entity;
 var FObject = Fire.FObject;
 
-Ipc.on('engine:renameEntity', function (id, name) {
+Ipc.on('engine:rename-entity', function ( detail ) {
+    var id = detail.id;
+    var name = detail.name;
+
     var entity = Fire._getInstanceById(id);
     if (entity) {
         entity.name = name;
     }
 });
 
-Ipc.on('engine:deleteEntities', function (idList) {
+Ipc.on('engine:delete-entities', function ( detail ) {
+    var idList = detail.entityIds;
     for (var i = 0; i < idList.length; i++) {
         var id = idList[i];
         var entity = Fire._getInstanceById(id);
@@ -29,7 +33,11 @@ Ipc.on('engine:deleteEntities', function (idList) {
     }
 });
 
-Ipc.on('engine:createEntity', function (parentId) {
+Ipc.on('engine:create-entity', function (detail) {
+    var parentId;
+    if ( detail ) {
+        parentId = detail.parentId;
+    }
     var ent = new Entity();
     if (parentId) {
         var parent = Fire._getInstanceById(parentId);
@@ -39,10 +47,15 @@ Ipc.on('engine:createEntity', function (parentId) {
     }
 });
 
-Ipc.on('engine:moveEntities', function (idList, parentId, nextSiblingId) {
+Ipc.on('engine:move-entities', function ( detail ) {
+    var idList = detail.idList;
+    var parentId = detail.parentId;
+    var nextSiblingId = detail.nextSiblingId;
+
     var parent = parentId && Fire._getInstanceById(parentId);
     var next = nextSiblingId ? Fire._getInstanceById(nextSiblingId) : null;
     var nextIndex = next ? next.getSiblingIndex() : -1;
+
     for (var i = 0; i < idList.length; i++) {
         var id = idList[i];
         var entity = Fire._getInstanceById(id);
@@ -90,7 +103,9 @@ Ipc.on('engine:moveEntities', function (idList, parentId, nextSiblingId) {
     }
 });
 
-Ipc.on('engine:duplicateEntities', function (idList) {
+Ipc.on('engine:duplicate-entities', function ( detail ) {
+    var idList = detail.entityIds;
+
     for (var i = 0; i < idList.length; i++) {
         var id = idList[i];
         var entity = Fire._getInstanceById(id);
@@ -102,17 +117,21 @@ Ipc.on('engine:duplicateEntities', function (idList) {
     }
 });
 
-Ipc.on('engine:addComponent', function (entityId, compClassId) {
+Ipc.on('engine:add-component', function ( detail ) {
+    var entityId = detail.entityId;
+    var componentClassId = detail.componentClassId;
+
     var entity = Fire._getInstanceById(entityId);
     if (entity) {
-        var CompCtor = Fire.JS._getClassById(compClassId);
+        var CompCtor = Fire.JS._getClassById(componentClassId);
         if (CompCtor) {
             entity.addComponent(CompCtor);
         }
     }
 });
 
-Ipc.on('engine:removeComponent', function (componentId) {
+Ipc.on('engine:remove-component', function ( detail ) {
+    var componentId = detail.componentId;
     var comp = Fire._getInstanceById(componentId);
     if (comp) {
         comp.destroy();
@@ -122,7 +141,8 @@ Ipc.on('engine:removeComponent', function (componentId) {
     }
 });
 
-Ipc.on('engine:openScene', function (uuid) {
+Ipc.on('engine:open-scene', function ( detail ) {
+    var uuid = detail.uuid;
     Fire.AssetLibrary.clearAllCache();
     Fire.Engine._loadSceneByUuid(uuid, null, function () {
         Fire.Engine.stop();
