@@ -72,6 +72,7 @@ Fire.PanelMng = {
                 detail = arguments[3];
             }
             panelInfo.element.fire( 'open', detail );
+            return;
         }
 
         // other messages
