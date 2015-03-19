@@ -400,9 +400,7 @@ Polymer({
         //
         if ( saveUrl ) {
             this._newsceneUrl = saveUrl;
-            Fire.AssetDB.save( this._newsceneUrl, {
-                assetJson: Fire.serialize(currentScene)
-            } );
+            Fire.AssetDB.save( this._newsceneUrl, Fire.serialize(currentScene) );
         }
     },
 

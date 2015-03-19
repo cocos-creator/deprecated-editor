@@ -12,35 +12,57 @@ Fire.AssetDB = {
 
     // ipc
     explore: function ( url ) {
-        Fire.sendToCore( 'asset-db:explore', url );
+        Fire.sendToCore( 'asset-db:explore', {
+            url: url
+        });
     },
 
     exploreLib: function ( url ) {
-        Fire.sendToCore( 'asset-db:explore-lib', url );
+        Fire.sendToCore( 'asset-db:explore-lib', {
+            url: url
+        });
     },
 
     import: function ( destUrl, files ) {
-        Fire.sendToCore('asset-db:import', destUrl, files );
+        Fire.sendToCore('asset-db:import', {
+            destUrl: destUrl,
+            files: files
+        });
     },
 
     reimport: function ( url ) {
-        Fire.sendToCore('asset-db:reimport', url );
+        Fire.sendToCore('asset-db:reimport', {
+            url: url
+        });
     },
 
     delete: function ( url ) {
-        Fire.sendToCore('asset-db:delete', url );
+        Fire.sendToCore('asset-db:delete', {
+            url: url
+        });
     },
 
     move: function ( srcUrl, destUrl ) {
-        Fire.sendToCore('asset-db:move', srcUrl, destUrl );
+        Fire.sendToCore('asset-db:move', {
+            srcUrl: srcUrl,
+            destUrl: destUrl,
+        });
     },
 
-    save: function ( url, options ) {
-        Fire.sendToCore('asset-db:save', url, options );
+    save: function ( url, json, buffer ) {
+        Fire.sendToCore('asset-db:save', {
+            url: url,
+            json: json,
+            buffer: buffer
+        });
     },
 
-    saveByUuid: function ( uuid, options ) {
-        Fire.sendToCore('asset-db:save-by-uuid', uuid, options );
+    saveByUuid: function ( uuid, json, buffer ) {
+        Fire.sendToCore('asset-db:save-by-uuid', {
+            uuid: uuid,
+            json: json,
+            buffer: buffer
+        });
     },
 
     apply: function ( options ) {
@@ -48,10 +70,13 @@ Fire.AssetDB = {
     },
 
     query: function ( url, options ) {
-        Fire.sendToCore('asset-db:query', url, options);
+        options = Fire.JS.mixin( options || {}, { url: url } );
+        Fire.sendToCore('asset-db:query', options);
     },
 
     deepQuery: function ( url ) {
-        Fire.sendToCore('asset-db:deep-query', url);
+        Fire.sendToCore('asset-db:deep-query', {
+            url: url
+        });
     },
 };

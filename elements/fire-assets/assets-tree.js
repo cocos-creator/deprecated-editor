@@ -160,9 +160,7 @@ function _addCustomAssetMenu(target, template) {
             var newCustomAsset = new item.customAsset();
             var newAssetUrl = Url.join(url, fileName + '.asset');
             target._focusUrl = newAssetUrl;
-            Fire.AssetDB.save( newAssetUrl, {
-                assetJson: Fire.serialize(newCustomAsset)
-            } );
+            Fire.AssetDB.save( newAssetUrl, Fire.serialize(newCustomAsset) );
         }
     }
 
@@ -321,9 +319,7 @@ Polymer({
                     var newScene = new Fire._Scene();
                     var newAssetUrl = Url.join( url, 'New Scene.fire' );
                     this._focusUrl = newAssetUrl;
-                    Fire.AssetDB.save( newAssetUrl, {
-                        assetJson: Fire.serialize(newScene)
-                    } );
+                    Fire.AssetDB.save( newAssetUrl, Fire.serialize(newScene) );
                 }.bind(this)
             },
 
@@ -368,9 +364,7 @@ Polymer({
                             var url = this.getUrl(targetEL.parentElement);
                             var newAssetUrl = Url.join( url, textureName + '.sprite' );
                             this._focusUrl = newAssetUrl;
-                            Fire.AssetDB.save( newAssetUrl, {
-                                assetJson: Fire.serialize(newSprite)
-                            } );
+                            Fire.AssetDB.save( newAssetUrl, Fire.serialize(newSprite) );
                         }.bind(this) );
                     }
                     else {
@@ -393,9 +387,7 @@ Polymer({
                         var url = this.getUrl(targetEL);
                         var newAssetUrl = Url.join( url, 'New Atlas.atlas' );
                         this._focusUrl = newAssetUrl;
-                        Fire.AssetDB.save( newAssetUrl, {
-                            assetJson: Fire.serialize(newAtlas)
-                        } );
+                        Fire.AssetDB.save( newAssetUrl, Fire.serialize(newAtlas) );
                     }
                 }.bind(this)
             },
