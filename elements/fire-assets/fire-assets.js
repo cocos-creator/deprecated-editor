@@ -55,8 +55,8 @@ Polymer({
         var template = this.$.assetsTree.getCreateMenuTemplate();
         var menu = Menu.buildFromTemplate(template);
         menu.popup(Remote.getCurrentWindow(),
-                   Math.floor(rect.right),
-                   Math.floor(rect.bottom));
+                   Math.floor(rect.left + 5),
+                   Math.floor(rect.bottom + 10));
     },
 
 });

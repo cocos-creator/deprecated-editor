@@ -259,8 +259,8 @@ Polymer({
         // register Ipc
         this.ipc.on('folder:created', function ( detail ) {
             var url = detail.url;
-            var id = detail.id;
-            var parentId = detail.parentId;
+            var id = detail.uuid;
+            var parentId = detail.parentUuid;
 
             this.newItem( url, id, parentId, true );
         }.bind(this) );
@@ -307,6 +307,25 @@ Polymer({
 
     getCreateMenuTemplate: function () {
         return [
+            // New Folder
+            {
+                label: 'New Folder',
+                click: function () {
+                    var url = "assets://";
+                    var contextSelection = Fire.Selection.contextAssets;
+                    if ( contextSelection.length > 0 ) {
+                        var targetEL = this.idToItem[contextSelection[0]];
+                        if ( !targetEL.isFolder )
+                            targetEL = targetEL.parentElement;
+                        url = this.getUrl(targetEL);
+                    }
+
+                    var newAssetUrl = Url.join( url, 'New Folder' );
+                    this._focusUrl = newAssetUrl;
+                    Fire.rpc( 'asset-db:makedirs', newAssetUrl );
+                }.bind(this)
+            },
+
             // New Scene
             {
                 label: 'New Scene',
@@ -327,9 +346,9 @@ Polymer({
                 }.bind(this)
             },
 
-            // New Folder
+            // New Atlas
             {
-                label: 'New Folder',
+                label: 'New Atlas',
                 click: function () {
                     var url = "assets://";
                     var contextSelection = Fire.Selection.contextAssets;
@@ -340,9 +359,10 @@ Polymer({
                         url = this.getUrl(targetEL);
                     }
 
-                    var newAssetUrl = Url.join( url, 'New Folder' );
+                    var newAtlas = new Fire.Atlas();
+                    var newAssetUrl = Url.join( url, 'New Atlas.atlas' );
                     this._focusUrl = newAssetUrl;
-                    Fire.rpc( 'asset-db:makedirs', newAssetUrl );
+                    Fire.AssetDB.save( newAssetUrl, Fire.serialize(newAtlas) );
                 }.bind(this)
             },
 
@@ -373,25 +393,6 @@ Polymer({
                     }
                     else {
                         Fire.warn( "Can not create sprite from non-texture element, please select a texture first." );
-                    }
-                }.bind(this)
-            },
-
-            // New Atlas
-            {
-                label: 'New Atlas',
-                click: function () {
-                    var contextSelection = Fire.Selection.contextAssets;
-                    if ( contextSelection.length > 0 ) {
-                        var targetEL = this.idToItem[contextSelection[0]];
-                        if ( !targetEL.isFolder )
-                            targetEL = targetEL.parentElement;
-
-                        var newAtlas = new Fire.Atlas();
-                        var url = this.getUrl(targetEL);
-                        var newAssetUrl = Url.join( url, 'New Atlas.atlas' );
-                        this._focusUrl = newAssetUrl;
-                        Fire.AssetDB.save( newAssetUrl, Fire.serialize(newAtlas) );
                     }
                 }.bind(this)
             },
