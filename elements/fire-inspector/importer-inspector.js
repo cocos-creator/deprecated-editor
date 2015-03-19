@@ -27,8 +27,9 @@ Polymer({
         }
 
         // load asset
-        if ( this.meta instanceof Fire.FolderMeta ) {
-            this.$.metaFields.target = null;
+        if ( this.meta instanceof Fire.FolderMeta ||
+             this.meta instanceof Fire.SceneMeta ) {
+            this.$.metaFields.target = this.meta;
             this.$.metaFields.refresh();
 
             this.asset = null;
