@@ -58,7 +58,7 @@ CameraGizmo.prototype.update = function () {
     if ( !this.target.isValid )
         return;
 
-    var zoom = this._svg.camera.size !== 0 ? (this._svg.view.height / this._svg.camera.size) : 1;
+    var zoom = this._svg.view.height / this._svg.camera.size;
 
     var localToWorld = this.target.entity.transform.getLocalToWorldMatrix();
     var worldpos = new Fire.Vec2(localToWorld.tx, localToWorld.ty);
@@ -74,7 +74,7 @@ CameraGizmo.prototype.update = function () {
               ;
 
     if ( this.hovering || this.selecting ) {
-        var gameViewSize = Fire.Engine.screenSize;
+        var gameViewSize = Fire.Screen.size;
         var height = this.target.size * zoom;
         var width = gameViewSize.x/gameViewSize.y * height;
 
