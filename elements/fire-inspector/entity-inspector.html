@@ -2,6 +2,10 @@
     name="entity-inspector"
     constructor="EntityInspector"
     on-changed="{{fieldsChangedAction}}"
+    on-drop-area-enter="{{dropAreaEnterAction}}"
+    on-drop-area-leave="{{dropAreaLeaveAction}}"
+    on-drop-area-accept="{{dropAreaAcceptAction}}"
+    on-drop-area-dragover="{{dropAreaDragoverAction}}"
     >
     <template>
         <link rel="stylesheet" href="entity-inspector.css">

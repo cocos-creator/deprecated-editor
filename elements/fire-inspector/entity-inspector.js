@@ -1,9 +1,25 @@
 var Remote = require('remote');
 var Menu = Remote.require('menu');
+var Url = Remote.require('fire-url');
 
-Polymer({
+Polymer(EditorUI.mixin({
+    publish: {
+        highlighted: {
+            value: false,
+            reflect: true,
+        },
+
+        // droppable
+        droppable: 'asset',
+        "single-drop": true,
+    },
+
     created: function () {
         this.target = null;
+    },
+
+    ready: function () {
+        this._initDroppable(this.$.fields);
     },
 
     refresh: function () {
@@ -134,4 +150,57 @@ Polymer({
         var menu = Menu.buildFromTemplate(template);
         menu.popup(Remote.getCurrentWindow(), Math.floor(x), Math.floor(y));
     },
-});
+
+    dropAreaEnterAction: function (event) {
+        event.stopPropagation();
+
+        var classDef = Fire.JS.getClassByName(this.type);
+        var dragItems = event.detail.dragItems;
+        var uuid = dragItems[0];
+
+        var metaJson = Fire.AssetDB.loadMetaJson(uuid);
+        if (metaJson) {
+            Fire.AssetLibrary.loadMeta(metaJson, function ( err, meta ) {
+                if ( meta instanceof Fire.ScriptAssetMeta ) {
+                    this.highlighted = true;
+                }
+            }.bind(this));
+        }
+    },
+
+    dropAreaLeaveAction: function (event) {
+        event.stopPropagation();
+        this.highlighted = false;
+    },
+
+    dropAreaAcceptAction: function (event) {
+        event.stopPropagation();
+
+        if ( this.highlighted ) {
+            this.highlighted = false;
+
+            var dragItems = event.detail.dragItems;
+            var uuid = dragItems[0];
+
+            // add component, NOTE: classID use the dash-stripped uuid
+            var classID = uuid.replace(/-/g, '');
+            var ctor = Fire.JS._getClassById(classID);
+            if ( ctor ) {
+                this.addComponent(ctor);
+            }
+        }
+    },
+
+    dropAreaDragoverAction: function (event) {
+        event.stopPropagation();
+
+        if ( this.highlighted ) {
+            EditorUI.DragDrop.allowDrop( event.detail.dataTransfer, true );
+            EditorUI.DragDrop.updateDropEffect(event.detail.dataTransfer, "copy");
+        }
+        else {
+            EditorUI.DragDrop.allowDrop( event.detail.dataTransfer, false );
+        }
+    },
+
+}, EditorUI.droppable));
