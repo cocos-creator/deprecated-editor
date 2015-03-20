@@ -48,7 +48,7 @@ Ipc.on('engine:create-entity', function (detail) {
 });
 
 Ipc.on('engine:move-entities', function ( detail ) {
-    var idList = detail.idList;
+    var idList = detail.entityIds;
     var parentId = detail.parentId;
     var nextSiblingId = detail.nextSiblingId;
 
