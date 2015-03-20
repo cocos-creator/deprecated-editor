@@ -65,6 +65,13 @@ Fire.AssetDB = {
         });
     },
 
+    newScript: function ( url, templateName ) {
+        Fire.sendToCore('asset-db:new-script', {
+            url: url,
+            template: templateName
+        });
+    },
+
     apply: function ( options ) {
         Fire.sendToCore('asset-db:apply', options );
     },

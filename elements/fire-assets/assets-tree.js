@@ -339,10 +339,10 @@ Polymer({
                         url = this.getUrl(targetEL);
                     }
 
-                    var newScene = new Fire._Scene();
+                    var newAsset = new Fire._Scene();
                     var newAssetUrl = Url.join( url, 'New Scene.fire' );
                     this._focusUrl = newAssetUrl;
-                    Fire.AssetDB.save( newAssetUrl, Fire.serialize(newScene) );
+                    Fire.AssetDB.save( newAssetUrl, Fire.serialize(newAsset) );
                 }.bind(this)
             },
 
@@ -359,10 +359,29 @@ Polymer({
                         url = this.getUrl(targetEL);
                     }
 
-                    var newAtlas = new Fire.Atlas();
+                    var newAsset = new Fire.Atlas();
                     var newAssetUrl = Url.join( url, 'New Atlas.atlas' );
                     this._focusUrl = newAssetUrl;
-                    Fire.AssetDB.save( newAssetUrl, Fire.serialize(newAtlas) );
+                    Fire.AssetDB.save( newAssetUrl, Fire.serialize(newAsset) );
+                }.bind(this)
+            },
+
+            // New Script
+            {
+                label: 'New Script',
+                click: function () {
+                    var url = "assets://";
+                    var contextSelection = Fire.Selection.contextAssets;
+                    if ( contextSelection.length > 0 ) {
+                        var targetEL = this.idToItem[contextSelection[0]];
+                        if ( !targetEL.isFolder )
+                            targetEL = targetEL.parentElement;
+                        url = this.getUrl(targetEL);
+                    }
+
+                    var newAssetUrl = Url.join( url, 'NewComponent.js' );
+                    this._focusUrl = newAssetUrl;
+                    Fire.AssetDB.newScript( newAssetUrl, "simple-component" );
                 }.bind(this)
             },
 

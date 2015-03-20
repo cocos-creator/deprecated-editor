@@ -1,5 +1,7 @@
 //
 var Util = require('util');
+var Remote = require('remote');
+var RemoteFire = Remote.getGlobal('Fire');
 
 // init argument list sending from core by url?queries
 // format: "?foo=bar&hell=world"
@@ -15,6 +17,10 @@ for ( var i = 0; i < queryList.length; ++i ) {
 }
 Fire.argv = queries;
 
+
+Fire.url = function (url) {
+    return RemoteFire.url(url);
+};
 
 // console
 Fire.log = function ( text ) {
