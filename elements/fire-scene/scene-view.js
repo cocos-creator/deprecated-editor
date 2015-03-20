@@ -372,7 +372,7 @@ Polymer({
     rectHitTest: function ( rect ) {
         var v1 = this.renderContext.camera.screenToWorld(new Fire.Vec2(rect.x,rect.y));
         var v2 = this.renderContext.camera.screenToWorld(new Fire.Vec2(rect.xMax,rect.yMax));
-        var worldRect = Fire.Rect.fromVec2(v1,v2);
+        var worldRect = Fire.Rect.fromMinMax(v1,v2);
 
         var result = [];
         var i, entities;
