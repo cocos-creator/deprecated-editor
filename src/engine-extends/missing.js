@@ -2,6 +2,20 @@
 
 var MissingScript = Fire._MissingScript;
 
+MissingScript.prop('_script', null, Fire.ObjectType(Fire.ScriptAsset), Fire.HideInInspector );
+MissingScript.getset('script',
+    function () {
+        return this._script;
+    },
+    function (value) {
+        if (this._script !== value) {
+            this._script = value;
+            // TODO: @jare, please add your ipc in here
+        }
+    },
+    Fire.ObjectType(Fire.ScriptAsset)
+);
+
 MissingScript.get('errorInfo', function () {
     return MSG;
 });
