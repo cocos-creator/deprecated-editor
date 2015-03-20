@@ -191,16 +191,17 @@ Polymer(EditorUI.mixin({
         }
     },
 
-    dropAreaDragoverAction: function (event) {
-        event.stopPropagation();
+    // DISABLE:
+    // dropAreaDragoverAction: function (event) {
+    //     event.stopPropagation();
 
-        if ( this.highlighted ) {
-            EditorUI.DragDrop.allowDrop( event.detail.dataTransfer, true );
-            EditorUI.DragDrop.updateDropEffect(event.detail.dataTransfer, "copy");
-        }
-        else {
-            EditorUI.DragDrop.allowDrop( event.detail.dataTransfer, false );
-        }
-    },
+    //     if ( this.highlighted ) {
+    //         EditorUI.DragDrop.allowDrop( event.detail.dataTransfer, true );
+    //         EditorUI.DragDrop.updateDropEffect(event.detail.dataTransfer, "copy");
+    //     }
+    //     else {
+    //         EditorUI.DragDrop.allowDrop( event.detail.dataTransfer, false );
+    //     }
+    // },
 
 }, EditorUI.droppable));
