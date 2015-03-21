@@ -182,8 +182,8 @@ Polymer(EditorUI.mixin({
             var dragItems = event.detail.dragItems;
             var uuid = dragItems[0];
 
-            // add component, NOTE: classID use the dash-stripped uuid
-            var classID = uuid.replace(/-/g, '');
+            // add component
+            var classID = Fire.compressUuid(uuid);
             var ctor = Fire.JS._getClassById(classID);
             if ( ctor ) {
                 this.addComponent(ctor);
