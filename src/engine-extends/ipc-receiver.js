@@ -176,11 +176,17 @@ Ipc.on('asset:moved', function ( detail ) {
 Ipc.on('assets:deleted', function (detail) {
     var results = detail.results;
     for ( var i = 0; i < results.length; ++i ) {
-        Fire.AssetLibrary.unloadAsset(results[i].uuid, true);
-        // unregister scene
-        if (Url.extname(results[i].url) === '.fire') {
-            var name = Url.basenameNoExt(results[i].url);
-            delete Fire.Engine._sceneInfos[name];
+        var cachedAsset = Fire.AssetLibrary.getCachedAsset(results[i].uuid);
+        if (cachedAsset) {
+            if (cachedAsset instanceof Fire._Scene) {
+                // unregister scene
+                // 如果是场景反注册就行了，不用销毁，因为可能还正在编辑。
+                var name = Url.basenameNoExt(results[i].url);
+                delete Fire.Engine._sceneInfos[name];
+            }
+            else {
+                Fire.AssetLibrary.unloadAsset(cachedAsset, true);
+            }
         }
     }
 });

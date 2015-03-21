@@ -50,6 +50,10 @@ Fire.AssetLibrary.clearAllCache = function () {
     this._uuidToAsset = {};
 };
 
+Fire.AssetLibrary.getCachedAsset = function (uuid) {
+    return this._uuidToAsset[uuid];
+};
+
 /**
  * @param {Fire.Asset} newAsset
  * @param {string} [uuid]
