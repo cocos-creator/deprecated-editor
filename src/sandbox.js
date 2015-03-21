@@ -221,7 +221,9 @@ var userScriptLoader = (function () {
         }
 
         // load depends
-        info.assignAssetsBy(Fire.AssetLibrary.getAssetByUuid);
+        if ( !info.assignAssetsBy(Fire.AssetLibrary.getAssetByUuid) ) {
+            Fire.error('Failed to assign asset to recreated scene, this can be caused by forgetting the call to AssetLibrary.cacheAsset');
+        }
 
         return newScene;
     }
