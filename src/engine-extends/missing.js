@@ -9,9 +9,10 @@ MissingScript.getset('script',
         return this._script;
     },
     function (value) {
-        if (this._script !== value) {
+        if (this._script !== value && value instanceof Fire.ScriptAsset && value._uuid) {
             this._script = value;
-            // TODO: @jare, please add your ipc in here
+            this._$erialized.__type__ = Fire.compressUuid(value._uuid);
+            Fire.sendToWindows('reload:window-scripts', Fire._Sandbox.compiled);
         }
     },
     Fire.ObjectType(Fire.ScriptAsset)
@@ -30,7 +31,7 @@ MissingScript.prop('_$erialized', null, Fire.HideInInspector, Fire.EditorOnly);
 
 
 MissingScript.prototype.getScriptUuid = function () {
-    var id = this._$erialized && this._$erialized.__type__;
+    var id = this._$erialized.__type__;
     if (Fire.isUuid(id)) {
         return Fire.decompressUuid(id);
     }
