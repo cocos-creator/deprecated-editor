@@ -207,7 +207,8 @@ function _addCustomAssetMenu(target, template) {
                 parent.submenu = [newMenu];
             }
             else {
-                parentMenuArray.splice(3, 0, newMenu);
+                //parentMenuArray.splice(3, 0, newMenu);
+                parentMenuArray.push(newMenu);
             }
             parent = newMenu;
         }
@@ -326,6 +327,29 @@ Polymer({
                 }.bind(this)
             },
 
+            { type: 'separator' },
+
+            // New Script
+            {
+                label: 'New Script',
+                click: function () {
+                    var url = "assets://";
+                    var contextSelection = Fire.Selection.contextAssets;
+                    if ( contextSelection.length > 0 ) {
+                        var targetEL = this.idToItem[contextSelection[0]];
+                        if ( !targetEL.isFolder )
+                            targetEL = targetEL.parentElement;
+                        url = this.getUrl(targetEL);
+                    }
+
+                    var newAssetUrl = Url.join( url, 'NewComponent.js' );
+                    this._focusUrl = newAssetUrl;
+                    Fire.AssetDB.newScript( newAssetUrl, "simple-component" );
+                }.bind(this)
+            },
+
+            { type: 'separator' },
+
             // New Scene
             {
                 label: 'New Scene',
@@ -366,25 +390,6 @@ Polymer({
                 }.bind(this)
             },
 
-            // New Script
-            {
-                label: 'New Script',
-                click: function () {
-                    var url = "assets://";
-                    var contextSelection = Fire.Selection.contextAssets;
-                    if ( contextSelection.length > 0 ) {
-                        var targetEL = this.idToItem[contextSelection[0]];
-                        if ( !targetEL.isFolder )
-                            targetEL = targetEL.parentElement;
-                        url = this.getUrl(targetEL);
-                    }
-
-                    var newAssetUrl = Url.join( url, 'NewComponent.js' );
-                    this._focusUrl = newAssetUrl;
-                    Fire.AssetDB.newScript( newAssetUrl, "simple-component" );
-                }.bind(this)
-            },
-
             // New Sprite (Standalone)
             {
                 label: 'New Sprite (Standalone)',
@@ -415,6 +420,8 @@ Polymer({
                     }
                 }.bind(this)
             },
+
+            { type: 'separator' },
         ];
     },
 
@@ -514,7 +521,8 @@ Polymer({
             },
         ];
 
-        _addCustomAssetMenu(this, template);
+        var create = template[0].submenu;
+        _addCustomAssetMenu(this, create);
 
         this.contextmenu = Menu.buildFromTemplate(template);
     },
