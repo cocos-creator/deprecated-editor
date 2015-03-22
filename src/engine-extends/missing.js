@@ -9,10 +9,25 @@ MissingScript.getset('script',
         return this._script;
     },
     function (value) {
-        if (this._script !== value && value instanceof Fire.ScriptAsset && value._uuid) {
-            this._script = value;
-            this._$erialized.__type__ = Fire.compressUuid(value._uuid);
-            Fire.sendToWindows('reload:window-scripts', Fire._Sandbox.compiled);
+        if ( !Fire._Sandbox.compiled ) {
+            Fire.error('Scripts not yet compiled, please fix script errors and compile first.');
+            return;
+        }
+        if (this._script !== value) {
+            if (value instanceof Fire.ScriptAsset && value._uuid) {
+                var classId = Fire.compressUuid(value._uuid);
+                if (Fire.JS._getClassById(classId)) {
+                    this._script = value;
+                    this._$erialized.__type__ = classId;
+                    Fire.sendToWindows('reload:window-scripts', Fire._Sandbox.compiled);
+                }
+                else {
+                    Fire.error('Can not find a component in the script "%s".', value.name);
+                }
+            }
+            else {
+                Fire.error('invalid script');
+            }
         }
     },
     Fire.ObjectType(Fire.ScriptAsset)
