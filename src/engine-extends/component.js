@@ -38,3 +38,12 @@ Fire._doDefine = function (className, baseClass, constructor) {
     }
     return comp;
 };
+
+// 如果不带有 uuid，则返回空字符串。
+Component.prototype.getScriptUuid = function () {
+    var id = Fire.JS._getClassId(this);
+    if (Fire.isUuid(id)) {
+        return Fire.decompressUuid(id);
+    }
+    return '';
+};

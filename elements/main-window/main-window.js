@@ -4,7 +4,7 @@ var Url = require('fire-url');
 var Path = require('fire-path');
 
 Polymer({
-    _scriptCompiled: false,
+    _scriptsLoaded: false,
 
     created: function () {
         Fire.mainWindow = this;
@@ -72,7 +72,7 @@ Polymer({
 
         this.ipc.on('reload:window-scripts', function ( compiled ) {
             Fire._Sandbox.reloadScripts(compiled, function () {
-                this._scriptCompiled = true;
+                this._scriptsLoaded = true;
             }.bind(this) );
         }.bind(this));
 
@@ -249,7 +249,7 @@ Polymer({
             function ( next ) {
                 Fire.sendToCore('compiler:compile-and-reload');
                 var id = setInterval( function () {
-                    if ( self._scriptCompiled ) {
+                    if ( self._scriptsLoaded ) {
                         clearInterval(id);
                         next();
                     }

@@ -1,8 +1,9 @@
-﻿var MSG = 'Can not load the associated script. Please fix any errors and assign a valid script.';
+﻿var MSG_COMPILED = 'Can not load the associated script. Please assign a valid script.';
+var MSG_NOT_COMPILED = 'Compilation fails, please fix errors and retry.';
 
 var MissingScript = Fire._MissingScript;
 
-MissingScript.prop('_script', null, Fire.ObjectType(Fire.ScriptAsset), Fire.HideInInspector );
+MissingScript.prop('_script', null, Fire.HideInInspector );
 MissingScript.getset('script',
     function () {
         return this._script;
@@ -16,13 +17,25 @@ MissingScript.getset('script',
     Fire.ObjectType(Fire.ScriptAsset)
 );
 
-MissingScript.get('errorInfo', function () {
-    return MSG;
-});
+MissingScript.get('errorInfo',
+    function () {
+        return Fire._Sandbox.compiled ? MSG_COMPILED : MSG_NOT_COMPILED;
+    },
+    Fire.MultiText
+);
 
 // the serialized data for original script object
 // NOTE: '_$erialized' 这个特殊标记只有声明为最后一个 prop 才有用，这个FireClass的原始序列化数据将直接赋给 prop。
 MissingScript.prop('_$erialized', null, Fire.HideInInspector, Fire.EditorOnly);
+
+
+MissingScript.prototype.getScriptUuid = function () {
+    var id = this._$erialized && this._$erialized.__type__;
+    if (Fire.isUuid(id)) {
+        return Fire.decompressUuid(id);
+    }
+    return '';
+};
 
 /**
  * @param {string} id

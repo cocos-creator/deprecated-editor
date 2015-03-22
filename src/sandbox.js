@@ -188,6 +188,8 @@ var Sandbox = (function () {
         stashedScene = null;
     };
 
+    Sandbox.compiled = false;
+
     return Sandbox;
 })();
 
@@ -342,6 +344,7 @@ Sandbox.reloadScripts = (function () {
     //})();
 
     function reloadScripts (compileSucceeded, callback) {
+        Sandbox.compiled = compileSucceeded;
         var scriptsLoaded = inited;
         if ( !inited ) {
             init();
