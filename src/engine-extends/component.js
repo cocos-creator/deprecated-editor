@@ -59,3 +59,23 @@ Component.prototype.getScriptUuid = function () {
     //}
     return '';
 };
+
+// 预定义一些容易混淆的字段，用来检查拼写
+
+var TypoCheckList = {
+    onEnabled: "onEnable",
+    enable: "enabled",
+    onDisabled: "onDisable",
+    onDestroyed: "onDestroy",
+    awake: "onLoad",
+    start: "onStart",
+};
+
+for (var typo in TypoCheckList) {
+    var correct = TypoCheckList[typo];
+    Object.defineProperty(Component.prototype, typo, {
+        set: function () {
+            Fire.warn('Potential Typo: Please use "%s" instead of "%s" for Component "%s"', correct, typo, Fire.JS.getClassName(this));
+        }
+    });
+}
