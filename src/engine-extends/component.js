@@ -72,10 +72,18 @@ var TypoCheckList = {
 };
 
 for (var typo in TypoCheckList) {
-    var correct = TypoCheckList[typo];
-    Object.defineProperty(Component.prototype, typo, {
-        set: function () {
-            Fire.warn('Potential Typo: Please use "%s" instead of "%s" for Component "%s"', correct, typo, Fire.JS.getClassName(this));
-        }
-    });
+    (function (typo) {
+        var correct = TypoCheckList[typo];
+        Object.defineProperty(Component.prototype, typo, {
+            set: function (value) {
+                Fire.warn('Potential Typo: Please use "%s" instead of "%s" for Component "%s"', correct,
+                          typo, Fire.JS.getClassName(this));
+                Object.defineProperty(Component.prototype, typo, {
+                    value: value,
+                    writable: true
+                });
+            },
+            configurable: true,
+        });
+    })(typo);
 }
