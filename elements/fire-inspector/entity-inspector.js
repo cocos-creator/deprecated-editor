@@ -134,6 +134,14 @@ Polymer(EditorUI.mixin({
         if ( detail instanceof Fire.Asset ) {
             Fire.AssetLibrary.cacheAsset(detail);
         }
+        else if ( Array.isArray(detail) ) {
+            for ( var i = 0; i < detail.length; ++i ) {
+                var item = detail[i];
+                if ( item instanceof Fire.Asset ) {
+                    Fire.AssetLibrary.cacheAsset(item);
+                }
+            }
+        }
 
         Fire.sendToMainWindow( 'entity:inspector-dirty' );
         Fire.sendToWindows( 'scene:dirty' );
