@@ -23,6 +23,7 @@ Component.prototype._onPreDestroy = function () {
     delete Fire._idToObject[this._id];
 };
 
+Component.prototype._cacheUuid = null;
 
 // extend Fire._doDefine to register the default component menu
 
@@ -31,9 +32,17 @@ Fire._doDefine = function (className, baseClass, constructor) {
     var comp = doDefine(className, baseClass, constructor);
     if (comp && Fire.isChildClassOf(baseClass, Fire.Component)) {
         var frame = Fire._RFget();
-        var isProjectScript = frame.uuid;
-        if (isProjectScript) {
+        var uuid = frame.uuid;
+        // project script
+        if (uuid) {
             Fire.addComponentMenu(comp, 'Scripts/' + Fire.JS.getClassName(comp), -1);
+            comp.prototype._cacheUuid = Fire.decompressUuid(uuid);
+            //Fire.AssetLibrary.loadAsset(uuid, function (err, scriptAsset) {
+            //    if (err) {
+            //        Fire.error('Failed to assign script reference of component "%s": %s', className, err);
+            //        return;
+            //    }
+            //});
         }
     }
     return comp;
@@ -41,9 +50,12 @@ Fire._doDefine = function (className, baseClass, constructor) {
 
 // 如果不带有 uuid，则返回空字符串。
 Component.prototype.getScriptUuid = function () {
-    var id = Fire.JS._getClassId(this);
-    if (Fire.isUuid(id)) {
-        return Fire.decompressUuid(id);
+    if (this._cacheUuid) {
+        return this._cacheUuid;
     }
+    //var id = Fire.JS._getClassId(this);
+    //if (Fire.isUuid(id)) {
+    //    return Fire.decompressUuid(id);
+    //}
     return '';
 };

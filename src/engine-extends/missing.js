@@ -3,34 +3,26 @@ var MSG_NOT_COMPILED = 'Compilation fails, please fix errors and retry.';
 
 var MissingScript = Fire._MissingScript;
 
-MissingScript.prop('_script', null, Fire.HideInInspector );
-MissingScript.getset('script',
-    function () {
-        return this._script;
-    },
+MissingScript.set('_scriptUuid',
     function (value) {
         if ( !Fire._Sandbox.compiled ) {
             Fire.error('Scripts not yet compiled, please fix script errors and compile first.');
             return;
         }
-        if (this._script !== value) {
-            if (value instanceof Fire.ScriptAsset && value._uuid) {
-                var classId = Fire.compressUuid(value._uuid);
-                if (Fire.JS._getClassById(classId)) {
-                    this._script = value;
-                    this._$erialized.__type__ = classId;
-                    Fire.sendToWindows('reload:window-scripts', Fire._Sandbox.compiled);
-                }
-                else {
-                    Fire.error('Can not find a component in the script "%s".', value.name);
-                }
+        if (value && Fire.isUuid(value._uuid)) {
+            var classId = Fire.compressUuid(value);
+            if (Fire.JS._getClassById(classId)) {
+                this._$erialized.__type__ = classId;
+                Fire.sendToWindows('reload:window-scripts', Fire._Sandbox.compiled);
             }
             else {
-                Fire.error('invalid script');
+                Fire.error('Can not find a component in the script which uuid is "%s".', value);
             }
         }
-    },
-    Fire.ObjectType(Fire.ScriptAsset)
+        else {
+            Fire.error('invalid script');
+        }
+    }
 );
 
 MissingScript.get('errorInfo',
