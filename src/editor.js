@@ -103,6 +103,18 @@ Fire.observe = function ( target, enabled ) {
     }
 };
 
+Fire.hintObjectById = function ( type, id ) {
+    if ( Fire.isChildClassOf( type, Fire.Entity ) ) {
+        Fire.sendToWindows('entity:hint', id );
+    }
+    else if ( Fire.isChildClassOf( type, Fire.Component ) ) {
+        Fire.sendToWindows('entity:hint', id );
+    }
+    else if ( Fire.isChildClassOf( type, Fire.Asset ) ) {
+        Fire.sendToWindows('asset:hint', id );
+    }
+};
+
 Fire.hintObject = function ( target ) {
     if ( target instanceof Fire.Entity ) {
         Fire.sendToWindows('entity:hint', target.id );

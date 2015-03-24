@@ -5,6 +5,16 @@ function _fieldSection ( name, target, closable ) {
     fireSectionEL.closable = closable;
     fireSectionEL.$ = {};
 
+    var isBuiltin = true;
+    var isComponent = false;
+    if ( target instanceof Fire.Component ) {
+        isComponent = true;
+        var uuid = target.getScriptUuid();
+        if ( uuid ) {
+            isBuiltin = false;
+        }
+    }
+
     var klass = target.constructor;
     if (klass.__props__) {
         for (var p = 0; p < klass.__props__.length; p++) {
@@ -13,6 +23,10 @@ function _fieldSection ( name, target, closable ) {
 
             // skip hide-in-inspector
             if ( attrs.hideInInspector ) {
+                continue;
+            }
+
+            if ( isComponent && isBuiltin && propName === '_scriptUuid' ) {
                 continue;
             }
 
