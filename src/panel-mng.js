@@ -32,9 +32,19 @@ Fire.PanelMng = {
                 ipcListener: ipcListener
             };
             Fire.sendToCore('panel:dock', panelID, Fire.RequireIpcEvent);
-
-            //
-            cb ( null, viewEL );
+            Fire.sendRequestToCore('panel:query-settings', {
+                id: panelID,
+                settings: viewEL.settings
+            }, function ( settings ) {
+                viewEL.settings = settings;
+                viewEL.settings.save = function () {
+                    Fire.sendToCore('panel:save-settings', {
+                        id: panelID,
+                        settings: viewEL.settings,
+                    } );
+                };
+                cb ( null, viewEL );
+            } );
         });
     },
 
