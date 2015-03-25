@@ -6,6 +6,7 @@ Polymer({
 
     ready: function () {
         this.selectItem(0);
+        Fire.Metrics.trackDashboardOpen();
     },
 
     detached: function () {

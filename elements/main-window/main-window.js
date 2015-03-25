@@ -54,6 +54,7 @@ Polymer({
             // save
             case 0:
                 this.saveCurrentScene();
+                Fire.Metrics.trackEditorClose();
                 return true;
 
             // cancel
@@ -62,6 +63,7 @@ Polymer({
 
             // don't save
             case 2:
+                Fire.Metrics.trackEditorClose();
                 return true;
             }
         }.bind(this);
@@ -293,6 +295,7 @@ Polymer({
                     self.newScene();
                 }
 
+                Fire.Metrics.trackEditorOpen();
                 next();
             },
 
