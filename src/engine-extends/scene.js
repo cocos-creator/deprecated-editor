@@ -80,3 +80,10 @@ Scene.prototype.findEntityByIndices = function (indices) {
     }
     return entity;
 };
+
+Scene.prototype._instantiate = function () {
+    var uuid = this._uuid;
+    var result = Fire._doInstantiate(this);
+    result._uuid = uuid;
+    return result;
+};
