@@ -3,7 +3,14 @@ var MSG_NOT_COMPILED = 'Compilation fails, please fix errors and retry.';
 
 var MissingScript = Fire._MissingScript;
 
-MissingScript.set('_scriptUuid',
+MissingScript.getset('_scriptUuid',
+    function () {
+        var id = this._$erialized.__type__;
+        if (Fire.isUuid(id)) {
+            return Fire.decompressUuid(id);
+        }
+        return '';
+    },
     function (value) {
         if ( !Fire._Sandbox.compiled ) {
             Fire.error('Scripts not yet compiled, please fix script errors and compile first.');
@@ -36,14 +43,6 @@ MissingScript.get('errorInfo',
 // NOTE: '_$erialized' 这个特殊标记只有声明为最后一个 prop 才有用，这个FireClass的原始序列化数据将直接赋给 prop。
 MissingScript.prop('_$erialized', null, Fire.HideInInspector, Fire.EditorOnly);
 
-
-MissingScript.prototype.getScriptUuid = function () {
-    var id = this._$erialized.__type__;
-    if (Fire.isUuid(id)) {
-        return Fire.decompressUuid(id);
-    }
-    return '';
-};
 
 /**
  * @param {string} id

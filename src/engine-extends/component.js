@@ -48,18 +48,6 @@ Fire._doDefine = function (className, baseClass, constructor) {
     return comp;
 };
 
-// 如果不带有 uuid，则返回空字符串。
-Component.prototype.getScriptUuid = function () {
-    if (this._cacheUuid) {
-        return this._cacheUuid;
-    }
-    //var id = Fire.JS._getClassId(this);
-    //if (Fire.isUuid(id)) {
-    //    return Fire.decompressUuid(id);
-    //}
-    return '';
-};
-
 // 预定义一些容易混淆的字段，用来检查拼写
 
 var TypoCheckList = {

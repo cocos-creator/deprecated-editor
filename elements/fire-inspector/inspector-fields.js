@@ -5,15 +5,8 @@ function _fieldSection ( name, target, closable ) {
     fireSectionEL.closable = closable;
     fireSectionEL.$ = {};
 
-    var isBuiltin = true;
-    var isComponent = false;
-    if ( target instanceof Fire.Component ) {
-        isComponent = true;
-        var uuid = target.getScriptUuid();
-        if ( uuid ) {
-            isBuiltin = false;
-        }
-    }
+    var isComponent = target instanceof Fire.Component;
+    var isBuiltinComp = isComponent && !target._scriptUuid;
 
     var klass = target.constructor;
     if (klass.__props__) {
@@ -26,7 +19,7 @@ function _fieldSection ( name, target, closable ) {
                 continue;
             }
 
-            if ( isComponent && isBuiltin && propName === '_scriptUuid' ) {
+            if ( isBuiltinComp && propName === '_scriptUuid' ) {
                 continue;
             }
 
