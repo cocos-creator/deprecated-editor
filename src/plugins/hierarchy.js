@@ -15,7 +15,8 @@ var hierarchy = {
         });
 
         Fire.MainMenu.addTemplate('Entity', this.getMenuTemplate('main-menu'), {
-            type: 'window-static'
+            type: 'window-static',
+            index: 3
         });
     },
 
