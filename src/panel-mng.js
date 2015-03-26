@@ -3,49 +3,47 @@ var Remote = require('remote');
 var _idToPanelInfo = {};
 
 
-_getTabs = function ( panelEL ) {
-    var tabs = [];
+_getPanels = function ( panelEL ) {
+    var panels = [];
 
     for ( var i = 0; i < panelEL.childElementCount; ++i ) {
         var childEL = panelEL.children[i];
-        tabs.push(childEL.tagName.toLowerCase());
+        panels.push(childEL.tagName.toLowerCase());
     }
 
-    return tabs;
+    return panels;
 };
 
-_getLayout = function ( dockEL ) {
+_getDocks = function ( dockEL ) {
     var docks = [];
 
     for ( var i = 0; i < dockEL.childElementCount; ++i ) {
         var childEL = dockEL.children[i];
 
+        if ( !(childEL instanceof FireDock) )
+            continue;
+
+        var info = {
+            row: childEL.row,
+            'auto-layout': childEL['auto-layout'],
+            width: childEL.width,
+            height: childEL.height,
+            'min-width': childEL['min-width'],
+            'min-height': childEL['min-height'],
+            'max-width': childEL['max-width'],
+            'max-height': childEL['max-height'],
+        };
+
         if ( childEL instanceof FirePanel ) {
-            docks.push({
-                type: 'panel',
-                row: childEL.row,
-                width: childEL.width,
-                height: childEL.height,
-                'min-width': childEL['min-width'],
-                'min-height': childEL['min-height'],
-                'max-width': childEL['max-width'],
-                'max-height': childEL['max-height'],
-                tabs: _getTabs(childEL),
-            });
+            info.type = 'panel';
+            info.panels = _getPanels(childEL);
         }
-        else if ( childEL instanceof FireDock ) {
-            docks.push({
-                type: 'dock',
-                row: childEL.row,
-                width: childEL.width,
-                height: childEL.height,
-                'min-width': childEL['min-width'],
-                'min-height': childEL['min-height'],
-                'max-width': childEL['max-width'],
-                'max-height': childEL['max-height'],
-                docks: _getLayout(childEL),
-            });
+        else {
+            info.type = 'dock';
+            info.docks = _getDocks(childEL);
         }
+
+        docks.push(info);
     }
 
     return docks;
@@ -151,7 +149,8 @@ Fire.PanelMng = {
         return {
             type: 'dock',
             row: this.root.row,
-            docks: _getLayout(this.root),
+            'no-collapse': true,
+            docks: _getDocks(this.root),
         };
     },
 };
