@@ -27,6 +27,26 @@ Polymer({
     },
 
     ready: function () {
+        window.onbeforeunload = function ( event ) {
+            var res = this.confirmCloseScene();
+            switch ( res ) {
+            // save
+            case 0:
+                this.saveCurrentScene();
+                Fire.Metrics.trackEditorClose();
+                return true;
+
+            // cancel
+            case 1:
+                return false;
+
+            // don't save
+            case 2:
+                Fire.Metrics.trackEditorClose();
+                return true;
+            }
+        }.bind(this);
+
         window.addEventListener('resize', function() {
             this.$.mainDock._notifyResize();
         }.bind(this));
@@ -47,26 +67,6 @@ Polymer({
             // stop anim frame update
             this._stopSceneInAnimationFrame();
         }.bind(this));
-
-        window.onbeforeunload = function ( event ) {
-            var res = this.confirmCloseScene();
-            switch ( res ) {
-            // save
-            case 0:
-                this.saveCurrentScene();
-                Fire.Metrics.trackEditorClose();
-                return true;
-
-            // cancel
-            case 1:
-                return false;
-
-            // don't save
-            case 2:
-                Fire.Metrics.trackEditorClose();
-                return true;
-            }
-        }.bind(this);
     },
 
     attached: function () {
@@ -209,6 +209,7 @@ Polymer({
     },
 
     domReady: function () {
+        Fire.PanelMng.root = this.$.mainDock;
         Fire.sendToCore('project:init');
     },
 
@@ -243,6 +244,12 @@ Polymer({
                         }
                     }
 
+                    // save layout
+                    Fire.sendToCore( 'window:save-layout',
+                                    Fire.PanelMng.getLayout(),
+                                    Fire.RequireIpcEvent );
+
+                    //
                     next();
                 });
             },

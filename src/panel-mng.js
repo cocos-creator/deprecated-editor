@@ -2,7 +2,58 @@ var Remote = require('remote');
 
 var _idToPanelInfo = {};
 
+
+_getTabs = function ( panelEL ) {
+    var tabs = [];
+
+    for ( var i = 0; i < panelEL.childElementCount; ++i ) {
+        var childEL = panelEL.children[i];
+        tabs.push(childEL.tagName.toLowerCase());
+    }
+
+    return tabs;
+};
+
+_getLayout = function ( dockEL ) {
+    var docks = [];
+
+    for ( var i = 0; i < dockEL.childElementCount; ++i ) {
+        var childEL = dockEL.children[i];
+
+        if ( childEL instanceof FirePanel ) {
+            docks.push({
+                type: 'panel',
+                row: childEL.row,
+                width: childEL.width,
+                height: childEL.height,
+                'min-width': childEL['min-width'],
+                'min-height': childEL['min-height'],
+                'max-width': childEL['max-width'],
+                'max-height': childEL['max-height'],
+                tabs: _getTabs(childEL),
+            });
+        }
+        else if ( childEL instanceof FireDock ) {
+            docks.push({
+                type: 'dock',
+                row: childEL.row,
+                width: childEL.width,
+                height: childEL.height,
+                'min-width': childEL['min-width'],
+                'min-height': childEL['min-height'],
+                'max-width': childEL['max-width'],
+                'max-height': childEL['max-height'],
+                docks: _getLayout(childEL),
+            });
+        }
+    }
+
+    return docks;
+};
+
 Fire.PanelMng = {
+    root: null, // The mainDock, init by panel-init.js or main-window.js
+
     load: function ( url, panelID, panelInfo, cb ) {
         Polymer.import([url], function () {
             var viewEL = new window[panelInfo.ctor]();
@@ -94,6 +145,14 @@ Fire.PanelMng = {
             }
             panelInfo.element.fire( domEvent, detail );
         }
+    },
+
+    getLayout: function () {
+        return {
+            type: 'dock',
+            row: this.root.row,
+            docks: _getLayout(this.root),
+        };
     },
 };
 
