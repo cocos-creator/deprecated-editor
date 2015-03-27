@@ -273,7 +273,7 @@ Polymer({
                 // query scenes
                 var SCENE_ID = Fire.JS._getClassId(Fire._Scene);
                 Fire.AssetDB.query( "assets://", {
-                    typeID: SCENE_ID
+                    'type-id': SCENE_ID
                 }, function ( results ) {
                     for ( var i = 0; i < results.length; ++i ) {
                         var result = results[i];

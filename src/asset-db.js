@@ -25,8 +25,8 @@ Fire.AssetDB = {
 
     import: function ( destUrl, files ) {
         Fire.sendToCore('asset-db:import', {
-            destUrl: destUrl,
-            files: files
+            'dest-Url': destUrl,
+            'files': files
         });
     },
 
@@ -44,8 +44,8 @@ Fire.AssetDB = {
 
     move: function ( srcUrl, destUrl ) {
         Fire.sendToCore('asset-db:move', {
-            srcUrl: srcUrl,
-            destUrl: destUrl,
+            'src-url': srcUrl,
+            'dest-url': destUrl,
         });
     },
 

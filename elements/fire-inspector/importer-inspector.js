@@ -78,9 +78,9 @@ Polymer({
         event.stopPropagation();
 
         Fire.AssetDB.apply({
-            metaJson: Fire.serializeMeta(this.meta),
-            assetJson: Fire.serialize(this.asset),
-            assetDirty: this.asset.dirty,
+            'meta-json': Fire.serializeMeta(this.meta),
+            'asset-json': Fire.serialize(this.asset),
+            'asset-dirty': this.asset.dirty,
         });
     },
 

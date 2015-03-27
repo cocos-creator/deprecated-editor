@@ -27,7 +27,7 @@ Polymer({
 
         var self = this;
         Fire.AssetDB.query( "assets://", {
-            typeID: typeID
+            'type-id': typeID
         }, function ( results ) {
             self.items = results.map ( function ( item ) {
                 var icon = '';
