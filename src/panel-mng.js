@@ -143,12 +143,25 @@ Fire.PanelMng = {
     },
 
     getLayout: function () {
-        return {
-            type: 'dock',
-            row: this.root.row,
-            'no-collapse': true,
-            docks: _getDocks(this.root),
-        };
+        if ( this.root instanceof FireDock ) {
+            return {
+                type: 'dock',
+                row: this.root.row,
+                'no-collapse': true,
+                docks: _getDocks(this.root),
+            };
+        }
+        else {
+            var id = this.root.getAttribute('id');
+            var rect = this.root.getBoundingClientRect();
+
+            return {
+                type: 'standalone',
+                panel: id,
+                width: rect.width,
+                height: rect.height,
+            };
+        }
     },
 };
 
