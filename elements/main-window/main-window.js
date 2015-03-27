@@ -118,7 +118,10 @@ Polymer({
         }.bind(this) );
 
         //
-        this.ipc.on('asset:open', function ( uuid, url ) {
+        this.ipc.on('asset:open', function (detail) {
+            var uuid = detail.uuid;
+            var url = detail.url;
+
             if ( Url.extname(url) !== '.fire' ) {
                 return;
             }

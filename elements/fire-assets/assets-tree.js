@@ -811,7 +811,10 @@ Polymer({
             return;
         }
 
-        Fire.sendToAll('asset:open', event.target.userId, this.getUrl(event.target) );
+        Fire.sendToAll('asset:open', {
+            uuid: event.target.userId,
+            url: this.getUrl(event.target)
+        });
     },
 
     contextmenuAction: function (event) {
