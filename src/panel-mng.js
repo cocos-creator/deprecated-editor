@@ -8,7 +8,8 @@ _getPanels = function ( panelEL ) {
 
     for ( var i = 0; i < panelEL.childElementCount; ++i ) {
         var childEL = panelEL.children[i];
-        panels.push(childEL.tagName.toLowerCase());
+        var id = childEL.getAttribute('id');
+        panels.push(id);
     }
 
     return panels;
@@ -23,15 +24,12 @@ _getDocks = function ( dockEL ) {
         if ( !(childEL instanceof FireDock) )
             continue;
 
+        var rect = childEL.getBoundingClientRect();
         var info = {
-            row: childEL.row,
+            'row': childEL.row,
             'auto-layout': childEL['auto-layout'],
-            width: childEL.width,
-            height: childEL.height,
-            'min-width': childEL['min-width'],
-            'min-height': childEL['min-height'],
-            'max-width': childEL['max-width'],
-            'max-height': childEL['max-height'],
+            'width': rect.width,
+            'height': rect.height,
         };
 
         if ( childEL instanceof FirePanel ) {
@@ -58,7 +56,6 @@ Fire.PanelMng = {
             viewEL.setAttribute('id', panelID);
             viewEL.setAttribute('name', panelInfo.title);
             viewEL.setAttribute('fit', '');
-            // TODO: panel min, max width, height
 
             // jshint ignore:start
             // register ipc events
