@@ -93,7 +93,7 @@ Polymer({
 
     _onAssetMoved: function ( detail ) {
         var uuid = detail.uuid;
-        var destUrl = detail.destUrl;
+        var destUrl = detail['dest-url'];
         if ( this.target && this.target.uuid === uuid ) {
             if ( this.$.inspector.asset ) {
                 this.$.inspector.asset.name = Url.basenameNoExt(destUrl);

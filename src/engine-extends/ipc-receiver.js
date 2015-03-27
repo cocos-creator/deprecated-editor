@@ -151,7 +151,7 @@ Ipc.on('engine:open-scene', function ( detail ) {
 
 Ipc.on('asset:moved', function ( detail ) {
     var uuid = detail.uuid;
-    var destUrl = detail.destUrl;
+    var destUrl = detail['dest-url'];
 
     // rename asset
     var newName, asset = Fire.AssetLibrary.getAssetByUuid(uuid);

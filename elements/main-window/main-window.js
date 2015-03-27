@@ -91,7 +91,7 @@ Polymer({
 
         this.ipc.on('asset:moved', function ( detail ) {
             var uuid = detail.uuid;
-            var destUrl = detail.destUrl;
+            var destUrl = detail['dest-url'];
 
             // if it is current scene renamed, update title
             if ( uuid === Fire.Engine._scene._uuid ) {

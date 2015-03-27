@@ -268,7 +268,7 @@ Polymer({
         this.ipc.on('asset:created', function ( detail ) {
             var url = detail.url;
             var id = detail.uuid;
-            var parentId = detail.parentUuid;
+            var parentId = detail['parent-uuid'];
 
             this.newItem( url, id, parentId, false );
         }.bind(this) );
@@ -558,8 +558,8 @@ Polymer({
 
     moveItem: function ( detail ) {
         var id = detail.uuid;
-        var destUrl = detail.destUrl;
-        var destDirId = detail.destParentUuid;
+        var destUrl = detail['dest-url'];
+        var destDirId = detail['dest-parent-uuid'];
 
         var srcEL = this.idToItem[id];
         if ( !srcEL ) {
