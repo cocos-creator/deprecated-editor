@@ -20,7 +20,7 @@ Ipc.on('engine:rename-entity', function ( detail ) {
 });
 
 Ipc.on('engine:delete-entities', function ( detail ) {
-    var idList = detail.entityIds;
+    var idList = detail['entity-id-list'];
     for (var i = 0; i < idList.length; i++) {
         var id = idList[i];
         var entity = Fire._getInstanceById(id);
@@ -36,7 +36,7 @@ Ipc.on('engine:delete-entities', function ( detail ) {
 Ipc.on('engine:create-entity', function (detail) {
     var parentId;
     if ( detail ) {
-        parentId = detail.parentId;
+        parentId = detail['parent-id'];
     }
     var ent = new Entity();
     if (parentId) {
@@ -48,9 +48,9 @@ Ipc.on('engine:create-entity', function (detail) {
 });
 
 Ipc.on('engine:move-entities', function ( detail ) {
-    var idList = detail.entityIds;
-    var parentId = detail.parentId;
-    var nextSiblingId = detail.nextSiblingId;
+    var idList = detail['entity-id-list'];
+    var parentId = detail['parent-id'];
+    var nextSiblingId = detail['next-sibling-id'];
 
     var parent = parentId && Fire._getInstanceById(parentId);
     var next = nextSiblingId ? Fire._getInstanceById(nextSiblingId) : null;
@@ -104,7 +104,7 @@ Ipc.on('engine:move-entities', function ( detail ) {
 });
 
 Ipc.on('engine:duplicate-entities', function ( detail ) {
-    var idList = detail.entityIds;
+    var idList = detail['entity-id-list'];
 
     for (var i = 0; i < idList.length; i++) {
         var id = idList[i];
@@ -118,8 +118,8 @@ Ipc.on('engine:duplicate-entities', function ( detail ) {
 });
 
 Ipc.on('engine:add-component', function ( detail ) {
-    var entityId = detail.entityId;
-    var componentClassId = detail.componentClassId;
+    var entityId = detail['entity-id'];
+    var componentClassId = detail['component-class-id'];
 
     var entity = Fire._getInstanceById(entityId);
     if (entity) {
@@ -131,7 +131,7 @@ Ipc.on('engine:add-component', function ( detail ) {
 });
 
 Ipc.on('engine:remove-component', function ( detail ) {
-    var componentId = detail.componentId;
+    var componentId = detail['component-id'];
     var comp = Fire._getInstanceById(componentId);
     if (comp) {
         comp.destroy();

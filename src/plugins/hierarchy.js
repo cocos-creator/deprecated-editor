@@ -10,7 +10,7 @@ var hierarchy = {
         ipc.on('main-menu:create-child-entity', function () {
             var activeId = Fire.Selection.activeEntityId;
             Fire.sendToMainWindow('engine:create-entity', {
-                parentId: activeId
+                'parent-id': activeId
             });
         });
 

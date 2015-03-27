@@ -55,7 +55,7 @@ Polymer({
         this.ipc.on('hierarchy-menu:delete', function () {
             var contextSelection = Fire.Selection.contextEntities;
             Fire.sendToMainWindow('engine:delete-entities', {
-                entityIds: contextSelection
+                'entity-id-list': contextSelection
             });
         }.bind(this));
         this.ipc.on('hierarchy-menu:duplicate', function () {
@@ -64,7 +64,7 @@ Polymer({
                 return element && element.userId;
             });
             Fire.sendToMainWindow('engine:duplicate-entities', {
-                entityIds: entities
+                'entity-id-list': entities
             });
         }.bind(this));
     },
@@ -229,9 +229,9 @@ Polymer({
     moveEntities: function ( targetEL, entities, nextSiblingId ) {
         // TODO: Fire.Selection.filter(entities,'sorted');
         Fire.sendToMainWindow('engine:move-entities', {
-            entityIds: entities,
-            parentId: targetEL ? targetEL.userId : null,
-            nextSiblingId: nextSiblingId
+            'entity-id-list': entities,
+            'parent-id': targetEL ? targetEL.userId : null,
+            'next-sibling-id': nextSiblingId
         });
     },
 
@@ -242,7 +242,7 @@ Polymer({
             var parentEL = targetEL.parentElement;
             if ( parentEL && parentEL instanceof HierarchyItem ) {
                 Fire.sendToMainWindow('engine:create-entity', {
-                    parentId: parentEL.userId
+                    'parent-id': parentEL.userId
                 });
             }
             else {
@@ -259,20 +259,20 @@ Polymer({
         if ( contextSelection.length > 0 ) {
             var targetEL = this.idToItem[contextSelection[0]];
             Fire.sendToMainWindow('engine:create-entity', {
-                parentId: targetEL.userId
+                'parent-id': targetEL.userId
             });
         }
         else {
             var activeId = Fire.Selection.activeEntityId;
             Fire.sendToMainWindow('engine:create-entity', {
-                parentId: activeId
+                'parent-id': activeId
             });
         }
     },
 
     deleteSelection: function () {
         Fire.sendToMainWindow('engine:delete-entities', {
-            entityIds: Fire.Selection.entities
+            'entity-id-list': Fire.Selection.entities
         });
     },
 
@@ -281,7 +281,7 @@ Polymer({
             return element && element.userId;
         });
         Fire.sendToMainWindow('engine:duplicate-entities', {
-            entityIds: entities
+            'entity-id-list': entities
         });
     },
 

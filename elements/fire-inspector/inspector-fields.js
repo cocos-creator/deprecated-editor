@@ -35,7 +35,7 @@ function _fieldSection ( name, target, closable ) {
         fireSectionEL.addEventListener('close', function ( event ) {
             event.stopPropagation();
             Fire.sendToMainWindow('engine:remove-component', {
-                componentId: target.id
+                'component-id': target.id
             });
         });
     }

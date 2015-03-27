@@ -123,8 +123,8 @@ Polymer(EditorUI.mixin({
 
     addComponent: function (componentCtor) {
         Fire.sendToMainWindow('engine:add-component', {
-            entityId: this.target.id,
-            componentClassId: Fire.JS._getClassId(componentCtor)
+            'entity-id': this.target.id,
+            'component-class-id': Fire.JS._getClassId(componentCtor)
         });
     },
 

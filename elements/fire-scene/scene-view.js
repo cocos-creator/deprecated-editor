@@ -198,7 +198,7 @@ Polymer({
 
     deleteSelection: function () {
         Fire.sendToMainWindow('engine:delete-entities', {
-            entityIds: Fire.Selection.entities
+            'entity-id-list': Fire.Selection.entities
         });
     },
 
