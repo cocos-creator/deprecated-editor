@@ -23,7 +23,6 @@ Polymer({
         this._updateSceneAnimFrameID = null;
 
         this._newsceneUrl = null;
-        this._sceneDirtyFlag = false;
     },
 
     ready: function () {
@@ -131,7 +130,6 @@ Polymer({
             // save
             case 0:
                 this.saveCurrentScene();
-                this._sceneDirtyFlag = false;
                 // don't re-open current saving scene
                 if ( uuid !== Fire.Engine._scene._uuid ) {
                     Fire.sendToMainWindow('engine:open-scene', {
@@ -146,7 +144,6 @@ Polymer({
 
             // don't save
             case 2:
-                this._sceneDirtyFlag = false;
                 Fire.sendToMainWindow('engine:open-scene', {
                     uuid: uuid
                 });
@@ -179,9 +176,6 @@ Polymer({
             }
 
             //
-            this.setSceneDirty(this._sceneDirtyFlag,true);
-
-            //
             if ( this._updateSceneIntervalID ) {
                 Fire.warn( 'The _updateSceneInterval still ON' );
                 return;
@@ -202,7 +196,6 @@ Polymer({
             }
 
             // store scene dirty flag
-            this._sceneDirtyFlag = Fire.Engine._scene.dirty;
             this._updateSceneInAnimationFrame();
         }.bind(this));
     },
