@@ -21,8 +21,52 @@
         component._watcherHandler = null;
     };
 
-    function forceSetterNotify(constructor, name, setter) {
-        Object.defineProperty(constructor.prototype, name, {
+    // 查找所有父类，直到找到原始定义 property 的地方
+    function getPropertyDescriptor (obj, name) {
+        if (obj.hasOwnProperty(name)) {
+            var pd = Object.getOwnPropertyDescriptor(obj, name);
+            if (pd) {
+                return pd;
+            }
+            else {
+                console.error('unknown error');
+                return null;
+            }
+        }
+        var p = Object.getPrototypeOf(obj);
+        if (p) {
+            return getPropertyDescriptor(p, name);
+        }
+        else {
+            return null;
+        }
+    }
+
+    function forceSetterNotify(component, name) {
+        var pd = getPropertyDescriptor(component, name);
+        if (pd && 'value' in pd) {
+            console.error('Internal Error: Cannot watch instance variable of %s.%s', component, name);
+            return;
+        }
+        if ( !pd ) {
+            console.error('Internal Error: Failed to get property descriptor of %s.%s', component, name);
+            return;
+        }
+        var propertyOwner;
+        if (component.hasOwnProperty(name)) {
+            propertyOwner = component;
+        }
+        else {
+            propertyOwner = Object.getPrototypeOf(component);
+        }
+        var existsPd = Object.getOwnPropertyDescriptor(propertyOwner, name);
+        if (existsPd && existsPd.configurable === false) {
+            console.error('Internal Error: Failed to register notifier for %s.%s', component, name);
+            return;
+        }
+
+        Object.defineProperty(propertyOwner, name, {
+            get: pd.get,
             set: function (value, forceRefresh) {
                 if (this._observing) {
                     Object.getNotifier(this).notify({
@@ -31,14 +75,14 @@
                         oldValue: this[name]
                     });
                 }
-                setter.call(this, value, forceRefresh);
+                // forceRefresh 如果为 true，那么哪怕资源的引用不变，也应该强制更新资源
+                pd.set.call(this, value, forceRefresh);
 
                 // 本来是应该用Object.observe，但既然这个 setter 要重载，不如就写在里面
                 if (this._watcherHandler && this._watcherHandler !== EmptyWatcher) {
                     this._watcherHandler.changeWatchAsset(name, value);
                 }
-            },
-            configurable: true
+            }
         });
     }
 
@@ -57,7 +101,7 @@
                 var isAssetType = (prop instanceof Fire.Asset || Fire.isChildClassOf(attrs.ctor, Fire.Asset));
                 var maybeAsset = prop === null || typeof prop === 'undefined';
                 if (isAssetType || maybeAsset) {
-                    forceSetterNotify(ctor, propName, attrs.originalSetter);
+                    forceSetterNotify(component, propName);
                     if ( assetPropsAttr.assetProps ) {
                         assetPropsAttr.assetProps.push(propName);
                     }
