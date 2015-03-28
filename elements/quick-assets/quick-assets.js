@@ -11,6 +11,9 @@ Polymer({
     },
 
     domReady: function () {
+        // TEMP HACK: after fireball-x/dev#481 this should be removed
+        Fire.PanelMng.root = this;
+
         var typeID = "";
         // get typeID from url query
         var queryString = decodeURIComponent(location.search.substr(1));
