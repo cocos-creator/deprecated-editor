@@ -325,6 +325,10 @@ Polymer({
     },
 
     setSceneDirty: function ( dirty, forceUpdateTitle ) {
+        if (Fire.Engine.isPlaying) {
+            return;
+        }
+
         var updateTitle = forceUpdateTitle;
         if ( Fire.Engine._scene.dirty !== dirty ) {
             Fire.Engine._scene.dirty = dirty;
