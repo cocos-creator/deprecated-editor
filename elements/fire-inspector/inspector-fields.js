@@ -1,3 +1,7 @@
+var warningMessage = "The property %s can not show in inspector, \
+because it keeps return new object. \
+Please set visible to false in properties define in this class.";
+
 function _fieldSection ( name, target, closable ) {
     //
     var fireSectionEL = new FireSection();
@@ -22,6 +26,19 @@ function _fieldSection ( name, target, closable ) {
             if ( isBuiltinComp && propName === '_scriptUuid' ) {
                 continue;
             }
+
+            // NOTE: this protects issues like fireball-x/dev#483
+            if ( attrs.hasGetter ) {
+                var val1 = target[propName];
+                if ( !val1.equals ) {
+                    var val2 = target[propName];
+                    if ( val1 !== val2 ) {
+                        Fire.warn( warningMessage, propName );
+                        continue;
+                    }
+                }
+            }
+
 
             var propEL = new FireProp();
             propEL.initWithAttrs(target, propName, attrs);
