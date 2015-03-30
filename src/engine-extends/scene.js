@@ -86,6 +86,6 @@ Scene.prototype._instantiate = function () {
     var dirty = this.dirty;
     var result = Fire._doInstantiate(this);
     result._uuid = uuid;
-    result.dirty = dirty;
+    result.dirty = dirty;   // 这里虽然会保持 dirty 状态，但要注意现有的 IPC 体系很脆弱不应该完全依赖这个标志
     return result;
 };
