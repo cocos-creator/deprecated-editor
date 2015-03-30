@@ -18,13 +18,17 @@ Polymer({
 
     setRenderContext: function ( renderContext ) {
         if ( this.renderContext !== null ) {
-            this.$.view.removeChild(this.renderContext.canvas);
+            this.$.view.removeChild(this.renderContext.domNode);
         }
 
         this.renderContext = renderContext;
 
         if ( this.renderContext !== null ) {
-            this.$.view.appendChild(this.renderContext.canvas);
+            this.$.view.appendChild(this.renderContext.domNode);
+            // this.renderContext.setDesignResolutionSize( this.$.view.clientWidth,
+            //                                             this.$.view.clientHeight,
+            //                                             cc.ResolutionPolicy.SHOW_ALL );
+            this.resize();
         }
     },
 
@@ -32,8 +36,9 @@ Polymer({
         if ( this.renderContext !== null ) {
             var old = this.style.display;
             this.style.display = "";
-            this.renderContext.size = new Fire.Vec2( this.$.view.clientWidth,
-                                                     this.$.view.clientHeight );
+            this.renderContext.setDesignResolutionSize( this.$.view.clientWidth,
+                                                        this.$.view.clientHeight,
+                                                        cc.ResolutionPolicy.SHOW_ALL );
             this.style.display = old;
             this.repaintScene();
         }

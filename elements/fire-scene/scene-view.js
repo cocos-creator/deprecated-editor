@@ -54,12 +54,12 @@ Polymer({
                                                           this.view.height,
                                                           this.$.canvas );
         if ( this.renderContext !== null ) {
-            this.pixiGrids = new cc.Sprite("fire://static/img/cocos-logo.png");
-            this.pixiGrids.x = this.view.width/2;
-            this.pixiGrids.y = this.view.height/2;
-            this.renderContext.getBackgroundNode().addChild(this.pixiGrids);
+            // this.pixiGrids = new cc.Sprite("fire://static/img/cocos-logo.png");
+            // this.pixiGrids.x = this.view.width/2;
+            // this.pixiGrids.y = this.view.height/2;
+            // this.renderContext.getBackgroundNode().addChild(this.pixiGrids);
 
-            //this.initSceneCamera();
+            this.initSceneCamera();
             this.resize(); // make sure we apply the size to all canvas
         }
     },
@@ -103,8 +103,7 @@ Polymer({
                 height: clientRect.height,
             };
             //this.renderContext.size = new Fire.Vec2( this.view.width, this.view.height );
-            this.renderContext.view.setFrame(this.renderContext.game.container);
-            this.renderContext.view.setDesignResolutionSize( this.view.width, this.view.height, cc.ResolutionPolicy.SHOW_ALL );
+            this.renderContext.setDesignResolutionSize( this.view.width, this.view.height, cc.ResolutionPolicy.SHOW_ALL );
             this.svgGizmos.resize( this.view.width, this.view.height );
 
             this.repaint();
@@ -118,8 +117,6 @@ Polymer({
     },
 
     updateCamera: function () {
-        return;
-
         if ( !Fire.Engine._scene )
             return;
 
