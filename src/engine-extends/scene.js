@@ -64,7 +64,7 @@ Scene.prototype.findEntityWithFlag = function (path, flags) {
 
 /**
  * @param {number[]} indices - the array contains index of all entities parents in the hierarchy
- * @returns {Entity} the entity or null if not found
+ * @return {Entity} the entity or null if not found
  */
 Scene.prototype.findEntityByIndices = function (indices) {
     var entity;
