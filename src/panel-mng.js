@@ -57,6 +57,25 @@ Fire.PanelMng = {
             viewEL.setAttribute('name', panelInfo.title);
             viewEL.setAttribute('fit', '');
 
+            // set size attribute
+            if ( panelInfo.width )
+                viewEL.setAttribute( 'width', panelInfo.width );
+
+            if ( panelInfo.height )
+                viewEL.setAttribute( 'height', panelInfo.height );
+
+            if ( panelInfo['min-width'] )
+                viewEL.setAttribute( 'min-width', panelInfo['min-width'] );
+
+            if ( panelInfo['min-height'] )
+                viewEL.setAttribute( 'min-height', panelInfo['min-height'] );
+
+            if ( panelInfo['max-width'] )
+                viewEL.setAttribute( 'max-width', panelInfo['max-width'] );
+
+            if ( panelInfo['max-height'] )
+                viewEL.setAttribute( 'max-height', panelInfo['max-height'] );
+
             // jshint ignore:start
             // register ipc events
             var ipcListener = new Fire.IpcListener();
@@ -145,10 +164,10 @@ Fire.PanelMng = {
     getLayout: function () {
         if ( this.root instanceof FireDock ) {
             return {
-                type: 'dock',
-                row: this.root.row,
+                'type': 'dock',
+                'row': this.root.row,
                 'no-collapse': true,
-                docks: _getDocks(this.root),
+                'docks': _getDocks(this.root),
             };
         }
         else {
@@ -156,10 +175,10 @@ Fire.PanelMng = {
             var rect = this.root.getBoundingClientRect();
 
             return {
-                type: 'standalone',
-                panel: id,
-                width: rect.width,
-                height: rect.height,
+                'type': 'standalone',
+                'panel': id,
+                'width': rect.width,
+                'height': rect.height,
             };
         }
     },
