@@ -20,8 +20,8 @@ RenderContext.createSceneRenderCtx = function (width, height, canvas, transparen
 };
 
 /**
- * @param {Fire.Renderer} renderer
- * @returns {PIXI.DisplayObject}
+ * @param {Renderer} renderer
+ * @return {PIXI.DisplayObject}
  */
 RenderContext.prototype.getDisplayObject = function (renderer) {
     var isSceneView = this.sceneView;

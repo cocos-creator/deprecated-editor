@@ -55,7 +55,7 @@ Fire.AssetLibrary.getCachedAsset = function (uuid) {
 };
 
 /**
- * @param {Fire.Asset} newAsset
+ * @param {Asset} newAsset
  * @param {string} [uuid]
  */
 Fire.AssetLibrary.replaceAsset = function (newAsset, uuid) {
@@ -79,7 +79,7 @@ Fire.AssetLibrary._onAssetChanged = function (uuid, asset) {
 ///**
 // * Shadow copy all serializable properties from supplied asset to another indicated by uuid.
 // * @param {string} uuid
-// * @param {Fire.Asset} newAsset
+// * @param {Asset} newAsset
 // */
 //Fire.AssetLibrary._updateAsset = function (uuid, newAsset) {
 //    var asset = this._uuidToAsset[uuid];

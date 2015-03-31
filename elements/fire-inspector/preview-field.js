@@ -41,7 +41,7 @@ Polymer(EditorUI.mixin({
         {
             this._fieldEL = new ImagePreviewField();
         }
-        else if ( this.asset instanceof Fire.AudioClip ) {
+        else if ( Fire.AudioClip && this.asset instanceof Fire.AudioClip ) {
             this._fieldEL = new AudioPreviewField();
         }
 
