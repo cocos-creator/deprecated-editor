@@ -1,6 +1,6 @@
-var warningMessage = "The property %s can not show in inspector, \
+var warningMessage = 'The property %s can not show in inspector, \
 because it keeps return new object. \
-Please set visible to false in properties define in this class.";
+Please set visible to false in properties define in this class.';
 
 function _fieldSection ( name, target, closable ) {
     //
@@ -30,7 +30,7 @@ function _fieldSection ( name, target, closable ) {
             // NOTE: this protects issues like fireball-x/dev#483
             if ( attrs.hasGetter ) {
                 var val1 = target[propName];
-                if ( !val1.equals ) {
+                if ( typeof val1 === 'object' && !val1.equals ) {
                     var val2 = target[propName];
                     if ( val1 !== val2 ) {
                         Fire.warn( warningMessage, propName );
@@ -38,7 +38,6 @@ function _fieldSection ( name, target, closable ) {
                     }
                 }
             }
-
 
             var propEL = new FireProp();
             propEL.initWithAttrs(target, propName, attrs);
@@ -78,11 +77,11 @@ Polymer({
         //
         var el;
         if ( this.target instanceof Fire.Asset ) {
-            el = _fieldSection( "Asset", this.target, false );
+            el = _fieldSection( 'Asset', this.target, false );
             this.appendChild( el );
         }
         else if ( this.target instanceof Fire.AssetMeta ) {
-            el = _fieldSection( "Meta", this.target, false );
+            el = _fieldSection( 'Meta', this.target, false );
             this.appendChild( el );
         }
         else if ( this.target instanceof Fire.Entity ) {
