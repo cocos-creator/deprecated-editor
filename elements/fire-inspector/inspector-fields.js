@@ -30,7 +30,7 @@ function _fieldSection ( name, target, closable ) {
             // NOTE: this protects issues like fireball-x/dev#483
             if ( attrs.hasGetter ) {
                 var val1 = target[propName];
-                if ( typeof val1 === 'object' && !val1.equals ) {
+                if ( typeof val1 === 'object' && val1 && !val1.equals ) {
                     var val2 = target[propName];
                     if ( val1 !== val2 ) {
                         Fire.warn( warningMessage, propName );
