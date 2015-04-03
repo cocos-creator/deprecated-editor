@@ -221,4 +221,10 @@ Polymer({
             this.style.display = old;
         }
     },
+
+    showAction: function ( event ) {
+        if ( this.$.inspector && this.$.inspector.repaint ) {
+            this.$.inspector.repaint();
+        }
+    },
 });

@@ -21,6 +21,13 @@ Polymer(EditorUI.mixin({
             this._fieldEL.resize();
     },
 
+    repaint: function () {
+        if ( this._fieldEL ) {
+            this._fieldEL.resize();
+            this._fieldEL.repaint();
+        }
+    },
+
     assetChanged: function () {
         //
         if ( this._fieldEL ) {

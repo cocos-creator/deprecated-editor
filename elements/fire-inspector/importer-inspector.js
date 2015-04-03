@@ -12,6 +12,12 @@ Polymer({
         }
     },
 
+    repaint: function () {
+        if ( this.$.preview.repaint ) {
+            this.$.preview.repaint();
+        }
+    },
+
     metaChanged: function () {
         // update preview
         if ( this.meta instanceof Fire.TextureMeta ||
