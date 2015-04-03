@@ -27,7 +27,6 @@ _getDocks = function ( dockEL ) {
         var rect = childEL.getBoundingClientRect();
         var info = {
             'row': childEL.row,
-            'auto-layout': childEL['auto-layout'],
             'width': rect.width,
             'height': rect.height,
         };

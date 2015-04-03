@@ -34,7 +34,7 @@
 
         </fire-ui-toolbar>
         <div flex-1 flex-col flex-stretch>
-            <console-view id="view" auto-layout min-height="50">
+            <console-view id="view" min-height="50">
                 <template repeat="{{log in logs | applyFilter(filterText,option,useRegex,collapse)}}">
                     <console-item
                         type="[[log.type]]"

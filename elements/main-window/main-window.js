@@ -230,12 +230,34 @@ Polymer({
                     "fire://src/editor/fire-scene/fire-scene.html",
                     "fire://src/editor/fire-game/fire-game.html",
                 ], function () {
-                    self.addPlugin( self.$.hierarchyPanel, FireHierarchy, 'hierarchy', 'Hierarchy' );
-                    self.addPlugin( self.$.assetsPanel, FireAssets, 'assets', 'Assets' );
-                    self.addPlugin( self.$.inspectorPanel, FireInspector, 'inspector', 'Inspector' );
-                    self.addPlugin( self.$.consolePanel, FireConsole, 'console', 'Console' );
-                    self.addPlugin( self.$.editPanel, FireScene, 'scene', 'Scene' );
-                    self.addPlugin( self.$.editPanel, FireGame, 'game', 'Game' );
+                    self.addPlugin( self.$.hierarchyPanel, FireHierarchy, 'hierarchy', 'Hierarchy', {
+                        width: 200,
+                    } );
+
+                    self.addPlugin( self.$.assetsPanel, FireAssets, 'assets', 'Assets', {
+                        width: 200,
+                    } );
+
+                    self.addPlugin( self.$.inspectorPanel, FireInspector, 'inspector', 'Inspector', {
+                        width: 300,
+                        'min-width': 240,
+                    } );
+
+                    self.addPlugin( self.$.consolePanel, FireConsole, 'console', 'Console', {
+                        height: 300,
+                    } );
+
+                    self.addPlugin( self.$.editPanel, FireScene, 'scene', 'Scene', {
+                        width: 'auto',
+                        height: 'auto',
+                    } );
+
+                    self.addPlugin( self.$.editPanel, FireGame, 'game', 'Game', {
+                        width: 'auto',
+                        height: 'auto',
+                    } );
+
+                    EditorUI.DockUtils.reflow();
 
                     // for each plugin
                     for ( var key in Fire.plugins) {
@@ -353,11 +375,26 @@ Polymer({
         }.bind(this));
     },
 
-    addPlugin: function ( panel, plugin, id, name ) {
+    addPlugin: function ( panel, plugin, id, name, opts ) {
         var pluginInst = new plugin();
         pluginInst.setAttribute('id', id);
         pluginInst.setAttribute('name', name);
         pluginInst.setAttribute('fit', '');
+
+        var keys = [
+            'width',
+            'height',
+            'min-width',
+            'min-height',
+            'max-width',
+            'max-height',
+        ];
+        for ( var i = 0; i < keys.length; ++i ) {
+            var k = keys[i];
+            if ( opts[k] )
+                pluginInst.setAttribute(k, opts[k]);
+        }
+
         this.$[id] = pluginInst;
         panel.add(pluginInst);
         panel.$.tabs.select(0);

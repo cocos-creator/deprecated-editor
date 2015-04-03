@@ -7,7 +7,7 @@
     <template>
         <link rel="stylesheet" href="importer-inspector.css">
 
-        <fire-ui-resize-wrapper auto-layout flex-col flex-stretch>
+        <fire-ui-resize-wrapper flex-col flex-stretch>
             <fire-ui-toolbar class="toolbar" justify-end>
                 <span class="asset-name" flex-1>{{asset.name}}</span>
                 <fire-ui-button disabled="{{!asset.dirty && !meta.dirty}}" on-click="{{revertAction}}">
@@ -35,7 +35,9 @@
 
         <fire-ui-splitter id="splitter"></fire-ui-splitter>
 
-        <preview-field id="preview" asset="{{asset}}" meta="{{meta}}">
+        <preview-field id="preview" asset="{{asset}}" meta="{{meta}}"
+                       height="200" min-height="100"
+        >
         </preview-field>
     </template>
 
