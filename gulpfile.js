@@ -15,13 +15,13 @@ var stylish = require('jshint-stylish');
 var paths = {
     src: [
         // asset extends
-        'src/engine-extends/asset-library.js',
-        'src/engine-extends/asset-watcher.js',
-        'src/assets/bitmap-font.js',
-        'src/assets/sprite.js',
-        'src/assets/texture.js',
+        'src/asset-extends/bitmap-font.js',
+        'src/asset-extends/sprite.js',
+        'src/asset-extends/texture.js',
 
         // engine extends
+        'src/engine-extends/asset-library.js',
+        'src/engine-extends/asset-watcher.js',
         'src/engine-extends/dom.js',
         'src/engine-extends/file-utils.js',
         'src/engine-extends/misc.js',
@@ -35,14 +35,18 @@ var paths = {
         'src/engine-extends/ipc-receiver.js',
 
         // editor
+        'src/ipc-utils.js',
+        'src/panel-mng.js',
         'src/plugin-loader.js',
         'src/sandbox.js',
         'src/editor.js',
+        'src/asset-db.js',
         'src/menu.js',
         'src/pixi-grids.js',
         'src/svg-grids.js',
         'src/gizmos-utils.js',
         'src/svg-gizmos.js',
+        'src/build-assets.js',
 
         // plugins
         'src/plugins/hierarchy.js',

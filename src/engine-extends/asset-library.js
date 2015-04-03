@@ -20,7 +20,8 @@ Fire.AssetLibrary.loadMeta = function (metaJson, callback) {
             }
         }
     }
-    this.loadJson(metaJsonObj, '', function (error, meta) {
+
+    this.loadJson(metaJsonObj, function (error, meta) {
         if (meta && meta.subRawData) {
             readSubAssetsUuid(meta.subRawData);
         }
@@ -28,6 +29,14 @@ Fire.AssetLibrary.loadMeta = function (metaJson, callback) {
         //
         callback(error, meta);
     }, true);
+};
+
+/**
+ * @param {string} uuid
+ * @param {function} callback
+ */
+Fire.AssetLibrary.loadAssetInEditor = function (uuid, callback) {
+    this.loadAsset(uuid, callback, false, false);
 };
 
 /**
@@ -39,6 +48,10 @@ Fire.AssetLibrary.loadMeta = function (metaJson, callback) {
  */
 Fire.AssetLibrary.clearAllCache = function () {
     this._uuidToAsset = {};
+};
+
+Fire.AssetLibrary.getCachedAsset = function (uuid) {
+    return this._uuidToAsset[uuid];
 };
 
 /**
@@ -101,9 +114,24 @@ Fire.AssetLibrary._onAssetChanged = function (uuid, asset) {
  * you should call cacheAsset manually to ensure the asset's reference is unique.
  */
 Fire.AssetLibrary.cacheAsset = function (asset) {
+    var _uuidToAsset = this._uuidToAsset;
+    function cacheDependsAssets (asset) {
+        for (var key in asset) {
+            if (asset.hasOwnProperty(key)) {
+                var val = asset[key];
+                if (val instanceof Fire.Asset && val._uuid && !(val._uuid in _uuidToAsset)) {
+                    _uuidToAsset[val._uuid] = val;
+                    cacheDependsAssets(val);
+                }
+            }
+        }
+    }
     if (asset) {
         if (asset._uuid) {
-            this._uuidToAsset[asset._uuid] = asset;
+            if ( !_uuidToAsset[asset._uuid] ) {
+                _uuidToAsset[asset._uuid] = asset;
+                cacheDependsAssets(asset);
+            }
         }
         else {
             Fire.error('[AssetLibrary] Not defined uuid of the asset to cache');
@@ -124,15 +152,19 @@ Fire.AssetLibrary.onAssetReimported = function (uuid) {
         return;
     }
 
+    if (exists instanceof Fire._Scene) {
+        return;
+    }
+    
     // 重新读取 asset 并将数据覆盖到已有 asset，如果 asset 引用到的其它 asset uuid 不变，
     // 则其它 asset 不会重新读取。
-    this._loadAssetByUuid(uuid, function (err, asset) {
+    this.loadAsset(uuid, function (err, asset) {
         var notUnloaded = uuid in this._uuidToAsset;
         if (asset && notUnloaded) {
             console.assert(asset === exists);
             this._onAssetChanged(uuid, asset);
         }
-    }.bind(this), false, null, exists);
+    }.bind(this), false, true, exists);
 
     //// 删除旧的引用，所有用到 asset 的地方必须通过 assetListener 监听资源的更新
     //// 否则资源将出现新旧两份引用。

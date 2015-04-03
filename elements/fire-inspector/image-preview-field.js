@@ -12,33 +12,12 @@ Polymer({
             return;
 
         var contentRect = this.$.content.getBoundingClientRect();
-
-        if ( this.asset.width > contentRect.width &&
-             this.asset.height > contentRect.height )
-        {
-            var width = contentRect.width;
-            var height = this.asset.height * contentRect.width/this.asset.width;
-
-            if ( height > contentRect.height ) {
-                height = contentRect.height;
-                width = this.asset.width * contentRect.height/this.asset.height;
-            }
-
-            this.$.canvas.width = width;
-            this.$.canvas.height = height;
-        }
-        else if ( this.asset.width > contentRect.width ) {
-            this.$.canvas.width = contentRect.width;
-            this.$.canvas.height = this.asset.height * contentRect.width/this.asset.width;
-        }
-        else if ( this.asset.height > contentRect.height ) {
-            this.$.canvas.width = this.asset.width * contentRect.height/this.asset.height;
-            this.$.canvas.height = contentRect.height;
-        }
-        else {
-            this.$.canvas.width = this.asset.width;
-            this.$.canvas.height = this.asset.height;
-        }
+        var result = Fire.fitSize( this.asset.width,
+                                   this.asset.height,
+                                   contentRect.width,
+                                   contentRect.height );
+        this.$.canvas.width = result[0];
+        this.$.canvas.height = result[1];
 
         //
         this.repaint();
@@ -88,7 +67,7 @@ Polymer({
         this.resize();
 
         if ( this.asset instanceof Fire.Sprite ) {
-            Fire.AssetLibrary.loadAsset( this.meta.rawTextureUuid, function ( err, rawTexture ) {
+            Fire.AssetLibrary.loadAssetInEditor( this.meta.rawTextureUuid, function ( err, rawTexture ) {
                 this.rawTexture = rawTexture;
                 this.repaint();
             }.bind(this) );

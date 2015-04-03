@@ -1,14 +1,14 @@
 {
   "name": "fireball-editor",
-  "version": "0.1.4",
+  "version": "0.1.7",
   "description": "Fireball Editor",
   "homepage": "http://github.com/fireball-x/editor",
   "license": "MIT",
   "licenseUrl": "http://opensource.org/licenses/MIT",
   "dependencies": {
+    "gulp": ""
   },
   "devDependencies": {
-    "gulp": "",
     "gulp-concat": "",
     "gulp-fb": "",
     "gulp-jshint": "",
@@ -21,7 +21,7 @@
     "jshint-stylish": "",
     "q": "1.1.2",
     "express": "",
-    "del": "",
+    "del": "1.1.1",
     "gulp-minify-css": "0.4.5"
   }
 }

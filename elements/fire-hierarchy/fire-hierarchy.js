@@ -81,8 +81,10 @@ Polymer({
     },
 
     createAction: function () {
-        var type = 'create';
-        Fire.popupMenu(Fire.plugins.hierarchy.getMenuTemplate(type));
+        var rect = this.$.addIcon.getBoundingClientRect();
+        Fire.popupMenu(Fire.plugins.hierarchy.getMenuTemplate('main-menu'),
+                       Math.floor(rect.left + 5),
+                       Math.floor(rect.bottom + 10));
     },
 
     reload: function (sceneSnapshot) {

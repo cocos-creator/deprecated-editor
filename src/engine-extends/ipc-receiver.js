@@ -3,19 +3,24 @@
 }
 
 var Ipc = require('ipc');
+var Url = require('fire-url');
 
 var Engine = Fire.Engine;
 var Entity = Fire.Entity;
 var FObject = Fire.FObject;
 
-Ipc.on('engine:renameEntity', function (id, name) {
+Ipc.on('engine:rename-entity', function ( detail ) {
+    var id = detail.id;
+    var name = detail.name;
+
     var entity = Fire._getInstanceById(id);
     if (entity) {
         entity.name = name;
     }
 });
 
-Ipc.on('engine:deleteEntities', function (idList) {
+Ipc.on('engine:delete-entities', function ( detail ) {
+    var idList = detail['entity-id-list'];
     for (var i = 0; i < idList.length; i++) {
         var id = idList[i];
         var entity = Fire._getInstanceById(id);
@@ -28,7 +33,11 @@ Ipc.on('engine:deleteEntities', function (idList) {
     }
 });
 
-Ipc.on('engine:createEntity', function (parentId) {
+Ipc.on('engine:create-entity', function (detail) {
+    var parentId;
+    if ( detail ) {
+        parentId = detail['parent-id'];
+    }
     var ent = new Entity();
     if (parentId) {
         var parent = Fire._getInstanceById(parentId);
@@ -38,10 +47,15 @@ Ipc.on('engine:createEntity', function (parentId) {
     }
 });
 
-Ipc.on('engine:moveEntities', function (idList, parentId, nextSiblingId) {
+Ipc.on('engine:move-entities', function ( detail ) {
+    var idList = detail['entity-id-list'];
+    var parentId = detail['parent-id'];
+    var nextSiblingId = detail['next-sibling-id'];
+
     var parent = parentId && Fire._getInstanceById(parentId);
     var next = nextSiblingId ? Fire._getInstanceById(nextSiblingId) : null;
     var nextIndex = next ? next.getSiblingIndex() : -1;
+
     for (var i = 0; i < idList.length; i++) {
         var id = idList[i];
         var entity = Fire._getInstanceById(id);
@@ -89,7 +103,9 @@ Ipc.on('engine:moveEntities', function (idList, parentId, nextSiblingId) {
     }
 });
 
-Ipc.on('engine:duplicateEntities', function (idList) {
+Ipc.on('engine:duplicate-entities', function ( detail ) {
+    var idList = detail['entity-id-list'];
+
     for (var i = 0; i < idList.length; i++) {
         var id = idList[i];
         var entity = Fire._getInstanceById(id);
@@ -101,17 +117,21 @@ Ipc.on('engine:duplicateEntities', function (idList) {
     }
 });
 
-Ipc.on('engine:addComponent', function (entityId, compClassId) {
+Ipc.on('engine:add-component', function ( detail ) {
+    var entityId = detail['entity-id'];
+    var componentClassId = detail['component-class-id'];
+
     var entity = Fire._getInstanceById(entityId);
     if (entity) {
-        var CompCtor = Fire.JS._getClassById(compClassId);
+        var CompCtor = Fire.JS._getClassById(componentClassId);
         if (CompCtor) {
             entity.addComponent(CompCtor);
         }
     }
 });
 
-Ipc.on('engine:removeComponent', function (componentId) {
+Ipc.on('engine:remove-component', function ( detail ) {
+    var componentId = detail['component-id'];
     var comp = Fire._getInstanceById(componentId);
     if (comp) {
         comp.destroy();
@@ -121,30 +141,82 @@ Ipc.on('engine:removeComponent', function (componentId) {
     }
 });
 
-Ipc.on('engine:openScene', function (uuid) {
-    Fire.Engine.stop();
+Ipc.on('engine:open-scene', function ( detail ) {
+    var uuid = detail.uuid;
     Fire.AssetLibrary.clearAllCache();
-    Fire.Engine.loadScene(uuid);
+    Fire.Engine._loadSceneByUuid(uuid, null, function () {
+        Fire.Engine.stop();
+    });
 });
 
-Ipc.on('asset:moved', function (uuid, destUrl) {
+Ipc.on('asset:moved', function ( detail ) {
+    var uuid = detail.uuid;
+    var destUrl = detail['dest-url'];
+
     // rename asset
-    var asset = Fire.AssetLibrary.getAssetByUuid(uuid);
+    var newName, asset = Fire.AssetLibrary.getAssetByUuid(uuid);
     if (asset) {
-        var Url = require('fire-url');
-        var name = Url.basename(destUrl, Url.extname(destUrl));
-        asset.name = name;
+        newName = Url.basenameNoExt(destUrl);
+        asset.name = newName;
+    }
+
+    // rename scene
+    if (Url.extname(destUrl) === '.fire') {
+        for (var key in Fire.Engine._sceneInfos) {
+            if (Fire.Engine._sceneInfos[key] === uuid) {
+                delete Fire.Engine._sceneInfos[key];
+                newName = Url.basenameNoExt(destUrl);
+                Fire.Engine._sceneInfos[newName] = uuid;
+                break;
+            }
+        }
     }
 });
 
-Ipc.on('assets:deleted', function (results) {
+Ipc.on('assets:deleted', function (detail) {
+    var results = detail.results;
     for ( var i = 0; i < results.length; ++i ) {
-        Fire.AssetLibrary.unloadAsset(results[i].uuid, true);
+        var cachedAsset = Fire.AssetLibrary.getCachedAsset(results[i].uuid);
+        if (cachedAsset) {
+            if (cachedAsset instanceof Fire._Scene) {
+                // unregister scene
+                // 如果是场景反注册就行了，不用销毁，因为可能还正在编辑。
+                var name = Url.basenameNoExt(results[i].url);
+                delete Fire.Engine._sceneInfos[name];
+            }
+            else {
+                Fire.AssetLibrary.unloadAsset(cachedAsset, true);
+            }
+        }
     }
 });
 
-Ipc.on('asset:changed', function (uuid) {
-    // 虽然在 applyAsset 时已经修改过内存中的 asset 了，但某些 Importer 会依据修改后的 meta 重新 import 一次，
+Ipc.on('asset:changed', function (detail) {
+    var uuid = detail.uuid;
+    // 某些 Importer 会依据修改后的 meta 重新 import 一次，
     // 对它们来说 asset 需要重新导入才能得到真正结果。
     Fire.AssetLibrary.onAssetReimported(uuid);
+});
+
+Ipc.on('asset:created', function ( detail ) {
+    var url = detail.url;
+    var id = detail.uuid;
+
+    // register scene
+    if (Url.extname(url) === '.fire') {
+        var name = Url.basenameNoExt(url);
+        Fire.Engine._sceneInfos[name] = id;
+    }
+});
+
+Ipc.on('assets:created', function ( detail ) {
+    var results = detail.results;
+    for ( var i = 0; i < results.length; ++i ) {
+        var info = results[i];
+        // register scene
+        if (Url.extname(info.url) === '.fire') {
+            var name = Url.basenameNoExt(info.url);
+            Fire.Engine._sceneInfos[name] = info.uuid;
+        }
+    }
 });

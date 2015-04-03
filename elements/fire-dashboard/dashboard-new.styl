@@ -1,10 +1,14 @@
+color-button-text = #bdbdbd
+color-button-bg = #4a4a4a
+color-border-normal = #4a4a4a - 50%
+
 :host {
     position: absolute
     top: 0
     right: 0
     bottom: 0
     left: 0
-    padding: 30px
+    padding: 20px
 
     display: flex
     flex-direction: column
@@ -50,5 +54,39 @@
                 outline: none
             }
         }
+    }
+
+    .createbtn {
+        float: right
+        height: 30px
+        border: 1px solid #252525
+        border-radius: 2px
+        padding: 4px 8px
+        cursor: pointer
+        color: white
+        background-color: #D8AB32
+
+        li {
+            font-size: 14px
+            margin-left: 5px
+        }
+        &:focus {
+            outline: none
+        }
+
+        &:hover {
+            background-color: #D8AB32 + 10%
+        }
+
+        &:active {
+            background-color: #D8AB32 - 10%
+        }
+    }
+
+    .disabled {
+        pointer-events: none
+        border-color: rgb(33,33,33)
+        background-color: rgb(52,52,52)
+        color: color-button-text - 50%
     }
 }

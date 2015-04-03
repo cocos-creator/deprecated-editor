@@ -23,34 +23,55 @@ Component.prototype._onPreDestroy = function () {
     delete Fire._idToObject[this._id];
 };
 
+Component.prototype._cacheUuid = null;
 
-// extend defineComponent to register the default component menu
-var doDefine = Fire.defineComponent;
-var doExtend = Fire.extendComponent;
+// extend Fire._doDefine to register the default component menu
 
-/**
- * @method defineComponent
- * @static
- * @param {function} [constructor]
- */
-Fire.defineComponent = function (constructor) {
-    var comp = doDefine(constructor);
-    if (comp) {
-        Fire.addComponentMenu(comp, 'Scripts/' + Fire.JS.getClassName(comp), -1);
+var doDefine = Fire._doDefine;
+Fire._doDefine = function (className, baseClass, constructor) {
+    var comp = doDefine(className, baseClass, constructor);
+    if (comp && Fire.isChildClassOf(baseClass, Fire.Component)) {
+        var frame = Fire._RFget();
+        var uuid = frame.uuid;
+        // project script
+        if (uuid) {
+            Fire.addComponentMenu(comp, 'Scripts/' + Fire.JS.getClassName(comp), -1);
+            comp.prototype._cacheUuid = Fire.decompressUuid(uuid);
+            //Fire.AssetLibrary.loadAsset(uuid, function (err, scriptAsset) {
+            //    if (err) {
+            //        Fire.error('Failed to assign script reference of component "%s": %s', className, err);
+            //        return;
+            //    }
+            //});
+        }
     }
     return comp;
 };
 
-/**
- * @method extendComponent
- * @static
- * @param {function} baseClass
- * @param {function} [constructor]
- */
-Fire.extendComponent = function (baseClass, constructor) {
-    var comp = doExtend(baseClass, constructor);
-    if (comp) {
-        Fire.addComponentMenu(comp, 'Scripts/' + Fire.JS.getClassName(comp), -1);
-    }
-    return comp;
+// 预定义一些容易混淆的字段，用来检查拼写
+
+var TypoCheckList = {
+    onEnabled: "onEnable",
+    enable: "enabled",
+    onDisabled: "onDisable",
+    onDestroyed: "onDestroy",
+    awake: "onLoad",
+    start: "onStart",
 };
+
+for (var typo in TypoCheckList) {
+    (function (typo) {
+        var correct = TypoCheckList[typo];
+        Object.defineProperty(Component.prototype, typo, {
+            set: function (value) {
+                Fire.warn('Potential Typo: Please use "%s" instead of "%s" for Component "%s"', correct,
+                          typo, Fire.JS.getClassName(this));
+                Object.defineProperty(Component.prototype, typo, {
+                    value: value,
+                    writable: true
+                });
+            },
+            configurable: true,
+        });
+    })(typo);
+}

@@ -11,6 +11,9 @@ Polymer({
     },
 
     domReady: function () {
+        // TEMP HACK: after fireball-x/dev#481 this should be removed
+        Fire.PanelMng.root = this;
+
         var typeID = "";
         // get typeID from url query
         var queryString = decodeURIComponent(location.search.substr(1));
@@ -25,7 +28,26 @@ Polymer({
             }
         }
 
-        Fire.sendToCore('asset-db:query', "assets://", typeID);
+        var self = this;
+        Fire.AssetDB.query( "assets://", {
+            'type-id': typeID
+        }, function ( results ) {
+            self.items = results.map ( function ( item ) {
+                var icon = '';
+                if ( typeID === Fire.JS._getClassId(Fire.Texture) ) {
+                    icon = "uuid://" + item.uuid + "?thumb";
+                }
+
+                return {
+                    icon: icon,
+                    text: Url.basenameNoExt(item.url),
+                    uuid: item.uuid,
+                    selected: (item.uuid === self._curId)
+                };
+            }).sort( function (a,b) {
+                return a.text.localeCompare(b.text);
+            });
+        });
 
         if ( typeID !== Fire.JS._getClassId(Fire.Texture) ) {
             this.$.btnGroup.style.display = "none";
@@ -36,30 +58,26 @@ Polymer({
         var browserWindow = remote.getCurrentWindow();
         if ( browserWindow ) {
             browserWindow.on ( 'close', function () {
-                Fire.sendToPages('quick-asset:closed');
+                Fire.sendToWindows('quick-asset:closed');
             });
         }
+
+        window.onkeydown = function ( event ) {
+            switch ( event.which ) {
+            // enter, esc
+            case 13:
+            case 27:
+                var browserWindow = remote.getCurrentWindow();
+                browserWindow.close();
+                break;
+
+            default:
+                this.$.search.focus();
+            }
+        }.bind(this);
     },
 
     attached: function () {
-        this.ipc.on('asset-db:query-results', function ( url, typeID, results ) {
-            var quickAssets = this;
-            this.items = results.map ( function ( item ) {
-                var icon = '';
-                if ( typeID === Fire.JS._getClassId(Fire.Texture) ) {
-                    icon = "uuid://" + item.uuid + "?thumb";
-                }
-
-                return {
-                    icon: icon,
-                    text: Url.basenameNoExt(item.url),
-                    uuid: item.uuid,
-                    selected: (item.uuid === quickAssets._curId)
-                };
-            }).sort( function (a,b) {
-                return a.text.localeCompare(b.text);
-            });
-        }.bind(this) );
     },
 
     detached: function () {
@@ -69,6 +87,12 @@ Polymer({
     applyFilter: function ( items, searchText ) {
         var results = items.filter( function ( item ) {
             return item.text.toLowerCase().indexOf(searchText) !== -1;
+        });
+        results.unshift({
+            icon: null,
+            text: "None",
+            uuid: "",
+            selected: this._curId === "",
         });
         return results;
     },
@@ -84,6 +108,6 @@ Polymer({
     selectAction: function ( event ) {
         event.stopPropagation();
 
-        Fire.sendToPages('quick-asset:selected', event.detail.uuid);
+        Fire.sendToWindows('quick-asset:selected', event.detail.uuid);
     },
 });

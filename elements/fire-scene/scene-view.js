@@ -53,24 +53,26 @@ Polymer({
         this.renderContext = Fire.Engine.createSceneView( this.view.width,
                                                           this.view.height,
                                                           this.$.canvas );
-        if ( this.renderContext !== null ) {
-            // this.pixiGrids = new cc.Sprite("fire://static/img/cocos-logo.png");
-            // this.pixiGrids.x = this.view.width/2;
-            // this.pixiGrids.y = this.view.height/2;
-            // this.renderContext.getBackgroundNode().addChild(this.pixiGrids);
 
-            this.initSceneCamera();
-            this.resize(); // make sure we apply the size to all canvas
+        if ( this.renderContext ) {
+            // var graphics = new PIXI.Graphics();
+            // this.renderContext.getBackgroundNode().addChild(graphics);
+            // this.pixiGrids.setGraphics(graphics);
+
+            // make sure we apply the size to all canvas
+            this.resize();
         }
     },
 
     initSceneCamera: function () {
-        if ( !Fire.Engine._scene )
+        if ( !Fire.Engine._scene ) {
+            Fire.error( "Failed to init camera, can not find current scene in Fire.Engine." );
             return;
+        }
 
         var camera = null;
-        var cameraEnt = Fire.Engine._scene.findEntityWithFlag('/Scene Camera',
-                                                           Fire._ObjectFlags.Hide | Fire._ObjectFlags.EditorOnly);
+        var cameraEnt = Fire.Engine._scene.findEntityWithFlag('/Scene Camera', Fire._ObjectFlags.Hide | Fire._ObjectFlags.EditorOnly);
+
         // create editor camera
         if ( cameraEnt === null ) {
             // TODO: add this code to EditorUtils
@@ -89,12 +91,15 @@ Polymer({
         //
         camera.size = this.view.height;
         this.renderContext.camera = camera;
-        this.svgGizmos.setCamera(camera);
         //this.pixiGrids.setCamera(camera);
+        this.svgGizmos.setCamera(camera);
+
+        //
+        this.repaint();
     },
 
     resize: function () {
-        if ( this.renderContext !== null ) {
+        if ( this.renderContext ) {
             var clientRect = this.getBoundingClientRect();
             this.view = {
                 left: clientRect.left,
@@ -117,10 +122,7 @@ Polymer({
     },
 
     updateCamera: function () {
-        if ( !Fire.Engine._scene )
-            return;
-
-        if ( !this.renderContext )
+        if ( !this.renderContext || !this.renderContext.camera )
             return;
 
         this.renderContext.camera.size = this.view.height / this.sceneCamera.scale;
@@ -130,10 +132,7 @@ Polymer({
     },
 
     updateScene: function () {
-        if ( !Fire.Engine._scene )
-            return;
-
-        if ( !this.renderContext )
+        if ( !this.renderContext || !this.renderContext.camera )
             return;
 
         //this.pixiGrids.update();
@@ -142,10 +141,7 @@ Polymer({
     },
 
     updateGizmos: function () {
-        if ( !Fire.Engine._scene )
-            return;
-
-        if ( !this.renderContext )
+        if ( !this.renderContext || !this.renderContext.camera )
             return;
 
         this.svgGizmos.update();
@@ -201,6 +197,12 @@ Polymer({
         }
     },
 
+    deleteSelection: function () {
+        Fire.sendToMainWindow('engine:delete-entities', {
+            'entity-id-list': Fire.Selection.entities
+        });
+    },
+
     hover: function ( entityID ) {
         var entity = Fire._getInstanceById(entityID);
         // NOTE: entity might be destroyed
@@ -221,22 +223,22 @@ Polymer({
         }
     },
 
-    select: function ( entityIDs ) {
+    select: function ( entityIds ) {
         if ( this._editTool ) {
             this.svgGizmos.remove(null, this._editTool);
             this._editTool = null;
         }
 
-        this._editingEdityIds = this._editingEdityIds.concat(entityIDs);
+        this._editingEdityIds = this._editingEdityIds.concat(entityIds);
 
         if ( this._editingEdityIds.length > 0 ) {
             this.edit(this._editingEdityIds);
         }
     },
 
-    unselect: function ( entityIDs ) {
-        for ( var i = 0; i < entityIDs.length; ++i ) {
-            var id = entityIDs[i];
+    unselect: function ( entityIds ) {
+        for ( var i = 0; i < entityIds.length; ++i ) {
+            var id = entityIds[i];
 
             for ( var j = 0; j < this._editingEdityIds.length; ++j ) {
                 if ( this._editingEdityIds[j] === id ) {
@@ -245,7 +247,7 @@ Polymer({
                 }
             }
 
-            var entity = Fire._getInstanceById(entityIDs[i]);
+            var entity = Fire._getInstanceById(entityIds[i]);
             // NOTE: entity might be destroyed
             if ( entity ) {
                 this.updateComponentGizmos( entity, {
@@ -265,14 +267,17 @@ Polymer({
         }
     },
 
-    edit: function ( entityIDs ) {
+    edit: function ( entityIds ) {
         var i, gizmo, entities = [], entity = null;
-        for ( i = 0; i < entityIDs.length; ++i ) {
-            entity = Fire._getInstanceById(entityIDs[i]);
+        for ( i = 0; i < entityIds.length; ++i ) {
+            entity = Fire._getInstanceById(entityIds[i]);
             if (entity) {
                 entities.push( entity );
             }
         }
+
+        if ( entities.length <= 0 )
+            return;
 
         switch ( Fire.mainWindow.settings.handle ) {
             case "move":
@@ -332,9 +337,6 @@ Polymer({
     },
 
     hitTest: function ( x, y ) {
-        if ( this.renderContext )
-            return null;
-
         // check if we hit gizmos
         var gizmos = this.svgGizmos.hitTest ( x, y, 1, 1 );
         if ( gizmos.length > 0 ) {
@@ -371,7 +373,7 @@ Polymer({
     rectHitTest: function ( rect ) {
         var v1 = this.renderContext.camera.screenToWorld(new Fire.Vec2(rect.x,rect.y));
         var v2 = this.renderContext.camera.screenToWorld(new Fire.Vec2(rect.xMax,rect.yMax));
-        var worldRect = Fire.Rect.fromVec2(v1,v2);
+        var worldRect = Fire.Rect.fromMinMax(v1,v2);
 
         var result = [];
         var i, entities;
@@ -398,6 +400,9 @@ Polymer({
     },
 
     mousemoveAction: function ( event ) {
+        if ( !this.renderContext || !this.renderContext.camera )
+            return;
+
         //
         var hoverEntity = this.hitTest(event.offsetX, event.offsetY);
         Fire.Selection.hoverEntity(hoverEntity && hoverEntity.id);
@@ -406,6 +411,9 @@ Polymer({
     },
 
     mousedownAction: function ( event ) {
+        if ( !this.renderContext || !this.renderContext.camera )
+            return;
+
         // process camera panning
         if ( event.which === 1 && event.shiftKey ) {
             var mousemoveHandle = function(event) {
@@ -458,11 +466,24 @@ Polymer({
 
         // process rect-selection
         if ( event.which === 1 ) {
+            var toggleMode = false;
+            var lastSelection = Fire.Selection.entities;
+            if ( event.metaKey || event.ctrlKey ) {
+                toggleMode = true;
+            }
+
+            //
             var selectmoveHandle = function(event) {
                 var x = this._rectSelectStartX - this.view.left;
                 var y = this._rectSelectStartY - this.view.top;
                 var w = event.clientX - this._rectSelectStartX;
                 var h = event.clientY - this._rectSelectStartY;
+
+                var magSqr = w*w + h*h;
+                if ( magSqr < 2.0 * 2.0 ) {
+                    return;
+                }
+
                 if ( w < 0.0 ) {
                     x += w;
                     w = -w;
@@ -473,19 +494,26 @@ Polymer({
                 }
 
                 this.svgGizmos.updateSelection( x, y, w, h);
-
-                //
+                var i, ids;
                 var entities = this.rectHitTest( new Fire.Rect( x, y, w, h ) );
-                if ( entities.length > 0 ) {
-                    var ids = [];
-                    for ( var i = 0; i < entities.length; ++i ) {
-                        ids.push( entities[i].id );
+
+                // toggle mode will always act added behaviour when we in rect-select-state
+                if ( toggleMode ) {
+                    ids = lastSelection.slice();
+
+                    for ( i = 0; i < entities.length; ++i ) {
+                        if ( ids.indexOf(entities[i].id) === -1 )
+                            ids.push( entities[i].id );
                     }
-                    Fire.Selection.selectEntity ( ids, true, false );
                 }
                 else {
-                    Fire.Selection.clearEntity ();
+                    ids = [];
+
+                    for ( i = 0; i < entities.length; ++i ) {
+                        ids.push( entities[i].id );
+                    }
                 }
+                Fire.Selection.selectEntity ( ids, true, false );
 
                 //
                 event.stopPropagation();
@@ -510,11 +538,24 @@ Polymer({
                 }
                 else {
                     var entity = this.hitTest( x, y );
-                    if ( entity ) {
-                        Fire.Selection.selectEntity ( entity.id, true );
+
+                    if ( toggleMode ) {
+                        if ( entity ) {
+                            if ( lastSelection.indexOf(entity.id) === -1 ) {
+                                Fire.Selection.selectEntity ( entity.id, false, true );
+                            }
+                            else {
+                                Fire.Selection.unselectEntity ( entity.id, true );
+                            }
+                        }
                     }
                     else {
-                        Fire.Selection.clearEntity ();
+                        if ( entity ) {
+                            Fire.Selection.selectEntity ( entity.id, true, true );
+                        }
+                        else {
+                            Fire.Selection.clearEntity ();
+                        }
                     }
                 }
             }.bind(this);
@@ -532,6 +573,9 @@ Polymer({
     },
 
     mousewheelAction: function ( event ) {
+        if ( !this.renderContext || !this.renderContext.camera )
+            return;
+
         var scale = this.sceneCamera.scale;
         scale = Math.pow( 2, event.wheelDelta * 0.002) * scale;
         scale = Math.max( 0.01, Math.min( scale, 1000 ) );
@@ -543,11 +587,38 @@ Polymer({
     },
 
     mouseleaveAction: function ( event ) {
+        if ( !this.renderContext || !this.renderContext.camera )
+            return;
+
         Fire.Selection.hoverEntity(null);
         event.stopPropagation();
     },
 
+    keydownAction: function (event) {
+        if ( !this.renderContext || !this.renderContext.camera )
+            return;
+
+        switch ( event.which ) {
+            // delete (Windows)
+            case 46:
+                this.deleteSelection();
+                event.stopPropagation();
+            break;
+
+            // command + delete (Mac)
+            case 8:
+                if ( event.metaKey ) {
+                    this.deleteSelection();
+                }
+                event.stopPropagation();
+            break;
+        }
+    },
+
     gizmoshoverAction: function ( event ) {
+        if ( !this.renderContext || !this.renderContext.camera )
+            return;
+
         var entity = event.detail.entity;
         if ( entity )
             Fire.Selection.hoverEntity(entity.id);
@@ -558,11 +629,18 @@ Polymer({
     },
 
     gizmosdirtyAction: function ( event ) {
+        if ( !this.renderContext || !this.renderContext.camera )
+            return;
+
+        Fire.sendToMainWindow( 'gizmos:dirty' );
         this.repaint();
         event.stopPropagation();
     },
 
     dragoverAction: function ( event ) {
+        if ( !this.renderContext || !this.renderContext.camera )
+            return;
+
         var dragType = EditorUI.DragDrop.type(event.dataTransfer);
         if ( dragType !== "asset" ) {
             EditorUI.DragDrop.allowDrop( event.dataTransfer, false );
@@ -577,6 +655,9 @@ Polymer({
     },
 
     dropAction: function ( event ) {
+        if ( !this.renderContext || !this.renderContext.camera )
+            return;
+
         var dragType = EditorUI.DragDrop.type(event.dataTransfer);
 
         if ( dragType !== 'asset' && dragType !== 'entity' )
@@ -606,7 +687,7 @@ Polymer({
         if ( items.length > 0 ) {
             if ( dragType === 'asset' ) {
                 for ( var i = 0; i < items.length; ++i ) {
-                    Fire.AssetLibrary.loadAsset( items[i], onload );
+                    Fire.AssetLibrary.loadAssetInEditor( items[i], onload );
                 }
             }
         }

@@ -25,7 +25,7 @@ function _newAssetsItem ( url, type, id, parentEL ) {
     var img;
 
     newEL.extname = extname;
-    type = type || extname;
+    type = type || extname.toLowerCase();
     switch ( type ) {
     case 'root':
         newEL.setIcon('db');
@@ -150,16 +150,17 @@ function _addCustomAssetMenu(target, template) {
     }
 
     function onclick() {
-        if (target.contextmenuAt instanceof AssetsItem) {
-            var targetEL = target.contextmenuAt;
-            if (!target.contextmenuAt.isFolder) {
-                targetEL = target.contextmenuAt.parentElement;
+        var contextSelection = Fire.Selection.contextAssets;
+        if (contextSelection.length > 0) {
+            var targetEL = target.idToItem[contextSelection[0]];
+            if (!targetEL.isFolder) {
+                targetEL = targetEL.parentElement;
             }
             var url = target.getUrl(targetEL);
             var newCustomAsset = new item.customAsset();
             var newAssetUrl = Url.join(url, fileName + '.asset');
             target._focusUrl = newAssetUrl;
-            Fire.sendToCore('asset-db:save', newAssetUrl, Fire.serialize(newCustomAsset));
+            Fire.AssetDB.save( newAssetUrl, Fire.serialize(newCustomAsset) );
         }
     }
 
@@ -206,7 +207,8 @@ function _addCustomAssetMenu(target, template) {
                 parent.submenu = [newMenu];
             }
             else {
-                parentMenuArray.splice(3, 0, newMenu);
+                //parentMenuArray.splice(3, 0, newMenu);
+                parentMenuArray.push(newMenu);
             }
             parent = newMenu;
         }
@@ -225,7 +227,6 @@ Polymer({
         this.super();
 
         this.contextmenu = null;
-        this.contextmenuAt = null;
 
         // dragging
         this.curDragoverEL = null;
@@ -257,20 +258,30 @@ Polymer({
 
     attached: function () {
         // register Ipc
-        this.ipc.on('folder:created', function ( url, id, parentId ) {
+        this.ipc.on('folder:created', function ( detail ) {
+            var url = detail.url;
+            var id = detail.uuid;
+            var parentId = detail.parentUuid;
+
             this.newItem( url, id, parentId, true );
         }.bind(this) );
-        this.ipc.on('asset:created', function ( url, id, parentId ) {
+        this.ipc.on('asset:created', function ( detail ) {
+            var url = detail.url;
+            var id = detail.uuid;
+            var parentId = detail['parent-uuid'];
+
             this.newItem( url, id, parentId, false );
         }.bind(this) );
         this.ipc.on('asset:moved', this.moveItem.bind(this) );
-        this.ipc.on('assets:created', function ( results ) {
+        this.ipc.on('assets:created', function ( detail ) {
+            var results = detail.results;
             for ( var i = 0; i < results.length; ++i ) {
                 var info = results[i];
                 this.newItem( info.url, info.uuid, info.parentUuid, info.isDir );
             }
         }.bind(this) );
-        this.ipc.on('assets:deleted', function (results) {
+        this.ipc.on('assets:deleted', function (detail) {
+            var results = detail.results;
             var filterResults = Fire.arrayCmpFilter ( results, function ( a, b ) {
                 if ( Path.contains( a.url, b.url ) ) {
                     return 1;
@@ -285,12 +296,6 @@ Polymer({
                 this.deleteItemById(filterResults[i].uuid);
             }
         }.bind(this) );
-        this.ipc.on('asset-db:deep-query-results', function ( url, results ) {
-            for ( var i = 0; i < results.length; ++i ) {
-                var info = results[i];
-                this.newItem( info.url, info.uuid, info.parentUuid, info.isDir );
-            }
-        }.bind(this) );
         this.ipc.on('asset:refresh-context-menu', function () {
             // make context menu dirty
             this.contextmenu = null;
@@ -301,95 +306,131 @@ Polymer({
         this.ipc.clear();
     },
 
+    getCreateMenuTemplate: function () {
+        return [
+            // New Folder
+            {
+                label: 'New Folder',
+                click: function () {
+                    var url = "assets://";
+                    var contextSelection = Fire.Selection.contextAssets;
+                    if ( contextSelection.length > 0 ) {
+                        var targetEL = this.idToItem[contextSelection[0]];
+                        if ( !targetEL.isFolder )
+                            targetEL = targetEL.parentElement;
+                        url = this.getUrl(targetEL);
+                    }
+
+                    var newAssetUrl = Url.join( url, 'New Folder' );
+                    this._focusUrl = newAssetUrl;
+                    Fire.rpc( 'asset-db:makedirs', newAssetUrl );
+                }.bind(this)
+            },
+
+            { type: 'separator' },
+
+            // New Script
+            {
+                label: 'New Script',
+                click: function () {
+                    var url = "assets://";
+                    var contextSelection = Fire.Selection.contextAssets;
+                    if ( contextSelection.length > 0 ) {
+                        var targetEL = this.idToItem[contextSelection[0]];
+                        if ( !targetEL.isFolder )
+                            targetEL = targetEL.parentElement;
+                        url = this.getUrl(targetEL);
+                    }
+
+                    var newAssetUrl = Url.join( url, 'NewComponent.js' );
+                    this._focusUrl = newAssetUrl;
+                    Fire.AssetDB.newScript( newAssetUrl, "simple-component" );
+                }.bind(this)
+            },
+
+            { type: 'separator' },
+
+            // New Scene
+            {
+                label: 'New Scene',
+                click: function () {
+                    var url = "assets://";
+                    var contextSelection = Fire.Selection.contextAssets;
+                    if ( contextSelection.length > 0 ) {
+                        var targetEL = this.idToItem[contextSelection[0]];
+                        if ( !targetEL.isFolder )
+                            targetEL = targetEL.parentElement;
+                        url = this.getUrl(targetEL);
+                    }
+
+                    var newAsset = new Fire._Scene();
+                    var newAssetUrl = Url.join( url, 'New Scene.fire' );
+                    this._focusUrl = newAssetUrl;
+                    Fire.AssetDB.save( newAssetUrl, Fire.serialize(newAsset) );
+                }.bind(this)
+            },
+
+            // New Atlas
+            {
+                label: 'New Atlas',
+                click: function () {
+                    var url = "assets://";
+                    var contextSelection = Fire.Selection.contextAssets;
+                    if ( contextSelection.length > 0 ) {
+                        var targetEL = this.idToItem[contextSelection[0]];
+                        if ( !targetEL.isFolder )
+                            targetEL = targetEL.parentElement;
+                        url = this.getUrl(targetEL);
+                    }
+
+                    var newAsset = new Fire.Atlas();
+                    var newAssetUrl = Url.join( url, 'New Atlas.atlas' );
+                    this._focusUrl = newAssetUrl;
+                    Fire.AssetDB.save( newAssetUrl, Fire.serialize(newAsset) );
+                }.bind(this)
+            },
+
+            // New Sprite (Standalone)
+            {
+                label: 'New Sprite (Standalone)',
+                click: function () {
+                    var targetEL = null;
+                    var contextSelection = Fire.Selection.contextAssets;
+                    if ( contextSelection.length > 0 ) {
+                        targetEL = this.idToItem[contextSelection[0]];
+                    }
+
+                    if ( targetEL && _isTexture(targetEL.extname) ) {
+                        var textureName = targetEL.name;
+
+                        Fire.AssetLibrary.loadAssetInEditor ( targetEL.userId, function ( error, asset ) {
+                            var newSprite = new Fire.Sprite();
+                            newSprite.texture = asset;
+                            newSprite.width = asset.width;
+                            newSprite.height = asset.height;
+
+                            var url = this.getUrl(targetEL.parentElement);
+                            var newAssetUrl = Url.join( url, textureName + '.sprite' );
+                            this._focusUrl = newAssetUrl;
+                            Fire.AssetDB.save( newAssetUrl, Fire.serialize(newSprite) );
+                        }.bind(this) );
+                    }
+                    else {
+                        Fire.warn( "Can not create sprite from non-texture element, please select a texture first." );
+                    }
+                }.bind(this)
+            },
+
+            { type: 'separator' },
+        ];
+    },
+
     createContextMenu: function () {
         var template = [
             // Create
             {
                 label: 'Create',
-                submenu: [
-                    // New Scene
-                    {
-                        label: 'New Scene',
-                        click: function () {
-                            var targetEL = this.contextmenuAt;
-                            if ( targetEL instanceof AssetsItem ) {
-                                if ( !targetEL.isFolder )
-                                    targetEL = targetEL.parentElement;
-                                var url = this.getUrl(targetEL);
-                                var newScene = new Fire._Scene();
-                                var newAssetUrl = Url.join( url, 'New Scene.fire' );
-                                this._focusUrl = newAssetUrl;
-                                Fire.sendToCore( 'asset-db:save',
-                                              newAssetUrl,
-                                              Fire.serialize(newScene) );
-                            }
-                        }.bind(this)
-                    },
-
-                    // New Folder
-                    {
-                        label: 'New Folder',
-                        click: function () {
-                            var targetEL = this.contextmenuAt;
-                            if ( targetEL instanceof AssetsItem ) {
-                                if ( !targetEL.isFolder )
-                                    targetEL = targetEL.parentElement;
-                                var url = this.getUrl(targetEL);
-                                var newAssetUrl = Url.join( url, 'New Folder' );
-                                this._focusUrl = newAssetUrl;
-                                Fire.rpc( 'asset-db:makedirs', newAssetUrl );
-                            }
-                        }.bind(this)
-                    },
-
-                    // New Sprite (Standalone)
-                    {
-                        label: 'New Sprite (Standalone)',
-                        click: function () {
-                            var targetEL = this.contextmenuAt;
-                            if ( targetEL instanceof AssetsItem && _isTexture(targetEL.extname) ) {
-                                var textureName = targetEL.name;
-
-                                Fire.AssetLibrary.loadAsset ( targetEL.userId, function ( error, asset ) {
-                                    var newSprite = new Fire.Sprite();
-                                    newSprite.texture = asset;
-                                    newSprite.width = asset.width;
-                                    newSprite.height = asset.height;
-
-                                    var url = this.getUrl(targetEL.parentElement);
-                                    var newAssetUrl = Url.join( url, textureName + '.sprite' );
-                                    this._focusUrl = newAssetUrl;
-                                    Fire.sendToCore( 'asset-db:save',
-                                                  newAssetUrl,
-                                                  Fire.serialize(newSprite) );
-                                }.bind(this) );
-                            }
-                            else {
-                                Fire.warn( "Can not create sprite from non-texture element, please select a texture first." );
-                            }
-                        }.bind(this)
-                    },
-
-                    // New Atlas
-                    {
-                        label: 'New Atlas',
-                        click: function () {
-                            var targetEL = this.contextmenuAt;
-                            if ( targetEL instanceof AssetsItem ) {
-                                if ( !targetEL.isFolder )
-                                    targetEL = targetEL.parentElement;
-
-                                var newAtlas = new Fire.Atlas();
-                                var url = this.getUrl(targetEL);
-                                var newAssetUrl = Url.join( url, 'New Atlas.atlas' );
-                                this._focusUrl = newAssetUrl;
-                                Fire.sendToCore( 'asset-db:save',
-                                                newAssetUrl,
-                                                Fire.serialize(newAtlas) );
-                            }
-                        }.bind(this)
-                    },
-                ]
+                submenu: this.getCreateMenuTemplate(),
             },
 
             // =====================
@@ -399,26 +440,33 @@ Polymer({
             {
                 label: 'Rename',
                 click: function () {
-                    if ( this.contextmenuAt instanceof AssetsItem ) {
-                        this.rename(this.contextmenuAt);
+                    var contextSelection = Fire.Selection.contextAssets;
+                    if ( contextSelection.length > 0 ) {
+                        var targetEL = this.idToItem[contextSelection[0]];
+                        this.rename(targetEL);
                     }
                 }.bind(this),
-                //enable: this.contextmenuAt && this.contextmenuAt.isRoot === false && Fire.Selection.assets.length === 1,
             },
 
             // Delete
             {
                 label: 'Delete',
-                click: this.deleteSelection.bind(this),
-                //enable: this.contextmenuAt && this.contextmenuAt.isRoot === false,
+                click: function () {
+                    var contextSelection = Fire.Selection.contextAssets;
+                    var elements = this.getToplevelElements(contextSelection);
+                    for (var i = 0; i < elements.length; i++) {
+                        Fire.AssetDB.delete(this.getUrl(elements[i]));
+                    }
+                }.bind(this),
             },
 
             // Reimport
             {
                 label: 'Reimport',
                 click: function () {
-                    if ( this.contextmenuAt instanceof AssetsItem ) {
-                        var selectedItemEl = this.contextmenuAt;
+                    var contextSelection = Fire.Selection.contextAssets;
+                    if ( contextSelection.length > 0 ) {
+                        var selectedItemEl = this.idToItem[contextSelection[0]];
                         var url = this.getUrl(selectedItemEl);
 
                         // remove childnodes
@@ -428,7 +476,7 @@ Polymer({
                             }
                             selectedItemEl.foldable = false;
                         }
-                        Fire.sendToCore( 'asset-db:reimport', url );
+                        Fire.AssetDB.reimport(url);
                     }
                 }.bind(this)
             },
@@ -438,36 +486,43 @@ Polymer({
 
             // Show in finder
             {
-                label: 'Show in ' + (Fire.isWin32 ? 'Explorer' : 'finder'),
+                label: 'Show in ' + (Fire.isWin32 ? 'Explorer' : 'Finder'),
                 click: function () {
-                    if ( this.contextmenuAt instanceof AssetsItem ) {
-                        Fire.sendToCore( 'asset-db:explore', this.getUrl(this.contextmenuAt) );
+                    var contextSelection = Fire.Selection.contextAssets;
+                    if ( contextSelection.length > 0 ) {
+                        var targetEL = this.idToItem[contextSelection[0]];
+                        Fire.AssetDB.explore(this.getUrl(targetEL));
                     }
                 }.bind(this)
             },
 
             // Show in library
             {
-                label: 'Show in library',
+                label: 'Show in Library',
                 click: function () {
-                    if ( this.contextmenuAt instanceof AssetsItem ) {
-                        Fire.sendToCore( 'asset-db:explore-lib', this.getUrl(this.contextmenuAt) );
+                    var contextSelection = Fire.Selection.contextAssets;
+                    if ( contextSelection.length > 0 ) {
+                        var targetEL = this.idToItem[contextSelection[0]];
+                        Fire.AssetDB.exploreLib(this.getUrl(targetEL));
                     }
                 }.bind(this)
             },
 
             // Print uuid
             {
-                label: 'Show uuid',
+                label: 'Show Uuid',
                 click: function () {
-                    if ( this.contextmenuAt instanceof AssetsItem ) {
-                        Fire.log( this.contextmenuAt.userId );
+                    var contextSelection = Fire.Selection.contextAssets;
+                    for ( var i = 0; i < contextSelection.length; ++i ) {
+                        var targetEL = this.idToItem[contextSelection[i]];
+                        Fire.log( targetEL.userId );
                     }
                 }.bind(this)
             },
         ];
 
-        _addCustomAssetMenu(this, template);
+        var create = template[0].submenu;
+        _addCustomAssetMenu(this, create);
 
         this.contextmenu = Menu.buildFromTemplate(template);
     },
@@ -476,7 +531,12 @@ Polymer({
         var rootEL = _newAssetsItem.call(this, url, 'root', Fire.UUID.AssetsRoot, this);
         rootEL.folded = false;
 
-        Fire.sendToCore('asset-db:deep-query', url);
+        Fire.AssetDB.deepQuery(url, function ( results ) {
+            for ( var i = 0; i < results.length; ++i ) {
+                var info = results[i];
+                this.newItem( info.url, info.uuid, info.parentUuid, info.isDir );
+            }
+        }.bind(this));
     },
 
     newItem: function ( url, id, parentId, isDirectory ) {
@@ -490,12 +550,17 @@ Polymer({
 
         if ( this._focusUrl === url ) {
             this._focusUrl = null;
+            this.expand(newEL.userId);
             this.scrollToItem(newEL);
             Fire.Selection.selectAsset(newEL.userId, true, true);
         }
     },
 
-    moveItem: function ( id, destUrl, destDirId ) {
+    moveItem: function ( detail ) {
+        var id = detail.uuid;
+        var destUrl = detail['dest-url'];
+        var destDirId = detail['dest-parent-uuid'];
+
         var srcEL = this.idToItem[id];
         if ( !srcEL ) {
             Fire.warn( 'Can not find source element: ' + id );
@@ -521,7 +586,7 @@ Polymer({
     deleteSelection: function () {
         var elements = this.getToplevelElements(Fire.Selection.assets);
         for (var i = 0; i < elements.length; i++) {
-            Fire.sendToCore( 'asset-db:delete', this.getUrl(elements[i]) );
+            Fire.AssetDB.delete(this.getUrl(elements[i]));
         }
     },
 
@@ -637,7 +702,7 @@ Polymer({
             if ( el.contains(targetEL) === false ) {
                 var srcUrl = this.getUrl(el);
                 var destUrl = Url.join( targetUrl, el.name + el.extname );
-                Fire.sendToCore('asset-db:move', srcUrl, destUrl );
+                Fire.AssetDB.move( srcUrl, destUrl );
             }
         }
     },
@@ -735,42 +800,42 @@ Polymer({
         if ( renamingEL.name !== event.target.value ) {
             var srcUrl = this.getUrl(renamingEL);
             var destUrl = Url.join( Url.dirname(srcUrl), event.target.value + renamingEL.extname );
-            Fire.sendToCore('asset-db:move', srcUrl, destUrl );
+            Fire.AssetDB.move( srcUrl, destUrl );
         }
     },
 
     openAction: function (event) {
-        if ( event.target instanceof AssetsItem ) {
-            if ( event.target.extname === '.fire' ) {
-                Fire.sendToMainPage('engine:openScene', event.target.userId);
-                return;
-            }
-
-            Fire.sendToCore('asset:open', event.target.userId);
-        }
         event.stopPropagation();
+
+        if ( !event.target instanceof AssetsItem ) {
+            return;
+        }
+
+        Fire.sendToAll('asset:open', {
+            uuid: event.target.userId,
+            url: this.getUrl(event.target)
+        });
     },
 
     contextmenuAction: function (event) {
+        event.preventDefault();
         event.stopPropagation();
 
         //
         this.resetDragState();
 
         //
-        this.contextmenuAt = null;
+        var curContextID = Fire.UUID.AssetsRoot;
         if ( event.target instanceof AssetsItem ) {
-            this.contextmenuAt = event.target;
-            var unselectOther = (Fire.Selection.assets.indexOf(event.target.userId) === -1);
-            Fire.Selection.selectAsset(event.target.userId, unselectOther, true);
+            curContextID = event.target.userId;
         }
-        else {
-            this.contextmenuAt = this.idToItem[Fire.UUID.AssetsRoot];
-        }
+
+        Fire.Selection.setContextAsset(curContextID);
 
         if (!this.contextmenu) {
             this.createContextMenu();
         }
+
         this.contextmenu.popup(Remote.getCurrentWindow());
     },
 
@@ -913,7 +978,7 @@ Polymer({
         if ( items.length > 0 ) {
             if ( dragType === 'file' ) {
                 var dstUrl = this.getUrl(targetEL);
-                Fire.sendToCore('asset-db:import', dstUrl, items );
+                Fire.AssetDB.import( dstUrl, items );
             }
             else if ( dragType === 'asset' ) {
                 this.moveAssets( targetEL, items );

@@ -5,6 +5,9 @@ function _fieldSection ( name, target, closable ) {
     fireSectionEL.closable = closable;
     fireSectionEL.$ = {};
 
+    var isComponent = target instanceof Fire.Component;
+    var isBuiltinComp = isComponent && !target._scriptUuid;
+
     var klass = target.constructor;
     if (klass.__props__) {
         for (var p = 0; p < klass.__props__.length; p++) {
@@ -13,6 +16,10 @@ function _fieldSection ( name, target, closable ) {
 
             // skip hide-in-inspector
             if ( attrs.hideInInspector ) {
+                continue;
+            }
+
+            if ( isBuiltinComp && propName === '_scriptUuid' ) {
                 continue;
             }
 
@@ -27,7 +34,9 @@ function _fieldSection ( name, target, closable ) {
     if ( fireSectionEL.closable ) {
         fireSectionEL.addEventListener('close', function ( event ) {
             event.stopPropagation();
-            Fire.sendToMainPage('engine:removeComponent', target.id);
+            Fire.sendToMainWindow('engine:remove-component', {
+                'component-id': target.id
+            });
         });
     }
 
@@ -51,9 +60,12 @@ Polymer({
 
         //
         var el;
-        if ( this.target instanceof Fire.AssetInspector ||
-             this.target instanceof Fire.CustomAsset ) {
-            el = _fieldSection( "Properties", this.target, false );
+        if ( this.target instanceof Fire.Asset ) {
+            el = _fieldSection( "Asset", this.target, false );
+            this.appendChild( el );
+        }
+        else if ( this.target instanceof Fire.AssetMeta ) {
+            el = _fieldSection( "Meta", this.target, false );
             this.appendChild( el );
         }
         else if ( this.target instanceof Fire.Entity ) {

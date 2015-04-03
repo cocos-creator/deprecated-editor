@@ -6,8 +6,6 @@ Polymer({
     created: function () {
         this.super();
 
-        this.contextmenuAt = null;
-
         // dragging
         this.dragenterCnt = 0;
         this.curDragoverEL = null;
@@ -45,15 +43,30 @@ Polymer({
         this.ipc.on('entity:indexChanged', this.setItemIndex.bind(this));
         this.ipc.on('entity:renamed', this.renameItemById.bind(this));
 
-        this.ipc.on('hierarchy:createEntity', this.createEntity.bind(this));
-        this.ipc.on('hierarchy:createChildEntity', this.createChildEntity.bind(this));
-        this.ipc.on('hierarchy:rename', function () {
-            if ( this.contextmenuAt instanceof HierarchyItem ) {
-                this.contextmenuAt.rename();
+        this.ipc.on('hierarchy-menu:create-entity', this.createEntity.bind(this));
+        this.ipc.on('hierarchy-menu:create-child-entity', this.createChildEntity.bind(this));
+        this.ipc.on('hierarchy-menu:rename', function () {
+            var contextSelection = Fire.Selection.contextEntities;
+            if ( contextSelection.length > 0 ) {
+                var targetEL = this.idToItem[contextSelection[0]];
+                this.rename(targetEL);
             }
         }.bind(this));
-        this.ipc.on('hierarchy:delete', this.deleteSelection.bind(this));
-        this.ipc.on('hierarchy:duplicate', this.duplicateSelection.bind(this));
+        this.ipc.on('hierarchy-menu:delete', function () {
+            var contextSelection = Fire.Selection.contextEntities;
+            Fire.sendToMainWindow('engine:delete-entities', {
+                'entity-id-list': contextSelection
+            });
+        }.bind(this));
+        this.ipc.on('hierarchy-menu:duplicate', function () {
+            var contextSelection = Fire.Selection.contextEntities;
+            var entities = this.getToplevelElements(contextSelection).map(function (element) {
+                return element && element.userId;
+            });
+            Fire.sendToMainWindow('engine:duplicate-entities', {
+                'entity-id-list': entities
+            });
+        }.bind(this));
     },
 
     detached: function () {
@@ -62,28 +75,10 @@ Polymer({
 
     getContextMenuTemplate: function () {
         var template = [
-            //// Copy
-            //{
-            //    label: 'Copy',
-            //    click: function () {
-            //        if ( this.contextmenuAt instanceof HierarchyItem ) {
-            //            // TODO
-            //        }
-            //    }.bind(this)
-            //},
-
-            //// Paste
-            //{
-            //    label: 'Paste',
-            //    click: function () {
-            //        // TODO
-            //    }.bind(this)
-            //},
-
             // Duplicate
             {
                 label: 'Duplicate',
-                message: 'hierarchy:duplicate',
+                message: 'hierarchy-menu:duplicate',
             },
 
             // =====================
@@ -92,20 +87,20 @@ Polymer({
             // Rename
             {
                 label: 'Rename',
-                message: 'hierarchy:rename',
+                message: 'hierarchy-menu:rename',
             },
 
             // Delete
             {
                 label: 'Delete',
-                message: 'hierarchy:delete',
+                message: 'hierarchy-menu:delete',
             },
 
             // =====================
             { type: 'separator' },
         ];
         // append Create menu
-        var createMenu = Fire.plugins.hierarchy.getMenuTemplate('hierarchy');
+        var createMenu = Fire.plugins.hierarchy.getMenuTemplate('hierarchy-menu');
         template = template.concat(createMenu);
         //
         return template;
@@ -114,7 +109,6 @@ Polymer({
     newItem: function ( name, id, parentEL ) {
         var newEL = new HierarchyItem();
         this.initItem(newEL, name, id, parentEL);
-        newEL.folded = false;
         return newEL;
     },
 
@@ -234,38 +228,61 @@ Polymer({
 
     moveEntities: function ( targetEL, entities, nextSiblingId ) {
         // TODO: Fire.Selection.filter(entities,'sorted');
-        Fire.sendToMainPage('engine:moveEntities', entities, targetEL ? targetEL.userId : null, nextSiblingId);
+        Fire.sendToMainWindow('engine:move-entities', {
+            'entity-id-list': entities,
+            'parent-id': targetEL ? targetEL.userId : null,
+            'next-sibling-id': nextSiblingId
+        });
     },
 
     createEntity: function () {
-        var parentEL = this.contextmenuAt && this.contextmenuAt.parentElement;
-        if (parentEL instanceof HierarchyItem) {
-            Fire.sendToMainPage('engine:createEntity', parentEL.userId);
+        var contextSelection = Fire.Selection.contextEntities;
+        if ( contextSelection.length > 0 ) {
+            var targetEL = this.idToItem[contextSelection[0]];
+            var parentEL = targetEL.parentElement;
+            if ( parentEL && parentEL instanceof HierarchyItem ) {
+                Fire.sendToMainWindow('engine:create-entity', {
+                    'parent-id': parentEL.userId
+                });
+            }
+            else {
+                Fire.sendToMainWindow('engine:create-entity');
+            }
         }
         else {
-            Fire.sendToMainPage('engine:createEntity');
+            Fire.sendToMainWindow('engine:create-entity');
         }
     },
 
     createChildEntity: function () {
-        if (this.contextmenuAt) {
-            Fire.sendToMainPage('engine:createEntity', this.contextmenuAt.userId);
+        var contextSelection = Fire.Selection.contextEntities;
+        if ( contextSelection.length > 0 ) {
+            var targetEL = this.idToItem[contextSelection[0]];
+            Fire.sendToMainWindow('engine:create-entity', {
+                'parent-id': targetEL.userId
+            });
         }
         else {
             var activeId = Fire.Selection.activeEntityId;
-            Fire.sendToMainPage('engine:createEntity', activeId);
+            Fire.sendToMainWindow('engine:create-entity', {
+                'parent-id': activeId
+            });
         }
     },
 
     deleteSelection: function () {
-        Fire.sendToMainPage('engine:deleteEntities', Fire.Selection.entities);
+        Fire.sendToMainWindow('engine:delete-entities', {
+            'entity-id-list': Fire.Selection.entities
+        });
     },
 
     duplicateSelection: function () {
         var entities = this.getToplevelElements(Fire.Selection.entities).map(function (element) {
             return element && element.userId;
         });
-        Fire.sendToMainPage('engine:duplicateEntities', entities);
+        Fire.sendToMainWindow('engine:duplicate-entities', {
+            'entity-id-list': entities
+        });
     },
 
     select: function ( element ) {
@@ -359,7 +376,10 @@ Polymer({
         renamingEL._renaming = false;
 
         // TODO: pull up to view ?
-        Fire.sendToMainPage('engine:renameEntity', renamingEL.userId, event.target.value);
+        Fire.sendToMainWindow('engine:rename-entity', {
+            id: renamingEL.userId,
+            name: event.target.value
+        } );
     },
 
     openAction: function (event) {
@@ -373,12 +393,12 @@ Polymer({
         this.resetDragState();
 
         //
-        this.contextmenuAt = null;
+        var curContextID = null;
         if ( event.target instanceof HierarchyItem ) {
-            this.contextmenuAt = event.target;
-            var unselectOther = (Fire.Selection.entities.indexOf(event.target.userId) === -1);
-            Fire.Selection.selectEntity(event.target.userId, unselectOther, true);
+            curContextID = event.target.userId;
         }
+
+        Fire.Selection.setContextEntity(curContextID);
 
         Fire.popupMenu(this.getContextMenuTemplate());
         event.stopPropagation();
@@ -559,14 +579,15 @@ Polymer({
                             ent.parent = parentEnt;
                             ent.transform.position = new Fire.Vec2(0,0);
                             Fire.Selection.selectEntity( ent.id, false, true );
-                            Fire.sendToPages( 'scene:dirty' );
+                            Fire.sendToMainWindow( 'entity:added', ent.id );
+                            Fire.sendToWindows( 'scene:dirty' );
                             Fire.AssetLibrary.cacheAsset( asset );
                         }.bind(this) );
                     }
                 }.bind(this);
 
                 for ( var i = 0; i < items.length; ++i ) {
-                    Fire.AssetLibrary.loadAsset( items[i], onload );
+                    Fire.AssetLibrary.loadAssetInEditor( items[i], onload );
                 }
             }
         }

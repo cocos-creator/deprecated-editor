@@ -21,8 +21,52 @@
         component._watcherHandler = null;
     };
 
-    function forceSetterNotify(constructor, name, setter) {
-        Object.defineProperty(constructor.prototype, name, {
+    // 查找所有父类，直到找到原始定义 property 的地方
+    function getPropertyDescriptor (obj, name) {
+        if (obj.hasOwnProperty(name)) {
+            var pd = Object.getOwnPropertyDescriptor(obj, name);
+            if (pd) {
+                return pd;
+            }
+            else {
+                console.error('unknown error');
+                return null;
+            }
+        }
+        var p = Object.getPrototypeOf(obj);
+        if (p) {
+            return getPropertyDescriptor(p, name);
+        }
+        else {
+            return null;
+        }
+    }
+
+    function forceSetterNotify(component, name) {
+        var pd = getPropertyDescriptor(component, name);
+        if (pd && 'value' in pd) {
+            console.error('Internal Error: Cannot watch instance variable of %s.%s', component, name);
+            return;
+        }
+        if ( !pd ) {
+            console.error('Internal Error: Failed to get property descriptor of %s.%s', component, name);
+            return;
+        }
+        var propertyOwner;
+        if (component.hasOwnProperty(name)) {
+            propertyOwner = component;
+        }
+        else {
+            propertyOwner = Object.getPrototypeOf(component);
+        }
+        var existsPd = Object.getOwnPropertyDescriptor(propertyOwner, name);
+        if (existsPd && existsPd.configurable === false) {
+            console.error('Internal Error: Failed to register notifier for %s.%s', component, name);
+            return;
+        }
+
+        Object.defineProperty(propertyOwner, name, {
+            get: pd.get,
             set: function (value, forceRefresh) {
                 if (this._observing) {
                     Object.getNotifier(this).notify({
@@ -31,43 +75,51 @@
                         oldValue: this[name]
                     });
                 }
-                setter.call(this, value, forceRefresh);
+                // forceRefresh 如果为 true，那么哪怕资源的引用不变，也应该强制更新资源
+                pd.set.call(this, value, forceRefresh);
 
                 // 本来是应该用Object.observe，但既然这个 setter 要重载，不如就写在里面
                 if (this._watcherHandler && this._watcherHandler !== EmptyWatcher) {
                     this._watcherHandler.changeWatchAsset(name, value);
                 }
-            },
-            configurable: true
+            }
         });
     }
 
-    AssetsWatcher.initHandler = function (component) {
-        var handler = null;
-        // parse props
-        var props = component.constructor.__props__;
-        for (var i = 0; i < props.length; i++) {
+    function parseComponentProps (component) {
+        var ctor = component.constructor;
+        var assetPropsAttr = Fire.attr(ctor, 'A$$ETprops', {
+            parsed: true,
+            assetProps: null
+        });
+        for (var i = 0, props = ctor.__props__; i < props.length; i++) {
             var propName = props[i];
-            var attrs = Fire.attr(component.constructor, propName);
+            var attrs = Fire.attr(ctor, propName);
             if (attrs.hasSetter && attrs.hasGetter) {
                 var prop = component[propName];
+
                 var isAssetType = (prop instanceof Fire.Asset || Fire.isChildClassOf(attrs.ctor, Fire.Asset));
-                if (isAssetType) {
-                    forceSetterNotify(component.constructor, propName, attrs.originalSetter);
-                    var assetPropsAttr = Fire.attr(component.constructor, 'A$$ETprops', {});
-                    if (assetPropsAttr.assetProps) {
+                var maybeAsset = prop === null || typeof prop === 'undefined';
+                if (isAssetType || maybeAsset) {
+                    forceSetterNotify(component, propName);
+                    if ( assetPropsAttr.assetProps ) {
                         assetPropsAttr.assetProps.push(propName);
                     }
                     else {
                         assetPropsAttr.assetProps = [propName];
                     }
-                    if (!handler) {
-                        handler = new AssetsWatcher(component);
-                    }
                 }
             }
         }
-        component._watcherHandler = handler || EmptyWatcher;
+        return assetPropsAttr;
+    }
+
+    AssetsWatcher.initHandler = function (component) {
+        var attrs = Fire.attr(component.constructor, 'A$$ETprops');
+        if ( !(attrs && attrs.parsed) ) {
+            attrs = parseComponentProps(component);
+        }
+        component._watcherHandler = attrs.assetProps ? (new AssetsWatcher(component)) : EmptyWatcher;
     };
 
     AssetsWatcher.start = function (component) {
@@ -115,7 +167,9 @@
     AssetsWatcher.prototype.stop = function () {
         for (var key in this.watchingInfos) {
             var info = this.watchingInfos[key];
-            Fire.AssetLibrary.assetListener.remove(info.uuid, info.callback);
+            if (info) {
+                Fire.AssetLibrary.assetListener.remove(info.uuid, info.callback);
+            }
         }
         this.watchingInfos = {};
     };
@@ -128,6 +182,7 @@
                 return;
             }
             // if watching, remove
+            this.watchingInfos[propName] = null;
             Fire.AssetLibrary.assetListener.remove(info.uuid, info.callback);
         }
         // register new
@@ -143,10 +198,8 @@
                     uuid: newUuid,
                     callback: onDirty
                 };
-                return;
             }
         }
-        delete this.watchingInfos[propName];
     };
 
     return AssetsWatcher;

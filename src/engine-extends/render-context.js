@@ -13,6 +13,7 @@ RenderContext.createSceneRenderCtx = function (width, height, canvas, transparen
     sceneCtx.stage.addChild(gameRoot, 1, 1);
     sceneCtx.stage.addChild(foreground, 2, 2);
     sceneCtx.root = gameRoot;
+    sceneCtx.isSceneView = true;
 
     Engine._renderContext.sceneView = sceneCtx;
     return sceneCtx;

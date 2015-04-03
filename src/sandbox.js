@@ -1,4 +1,5 @@
 ﻿var FireUrl = require('fire-url');
+var Async = require('async');
 
 var GlobalVarsChecker = (function () {
 
@@ -169,6 +170,13 @@ var Sandbox = (function () {
         purgeMemory();
         Sandbox.globalVarsChecker.restore(Fire.warn, 'playing');
 
+        // force ignore dont destroy flags
+        var entities = Fire.Engine._scene.entities;
+        var DontDestroy = Fire._ObjectFlags.DontDestroy;
+        for (var i = 0, len = entities.length; i < len; i++) {
+            entities[i]._objFlags &= ~DontDestroy;
+        }
+
         this._launchScene(stashedScene, function () {
             //gVarsCheckerForPlaying.restore(Fire.warn);
             Sandbox.globalVarsChecker.restore(Fire.warn, 'destroying playing scene');
@@ -179,6 +187,8 @@ var Sandbox = (function () {
         Sandbox.globalVarsChecker.restore(Fire.warn, 'launching editing scene');
         stashedScene = null;
     };
+
+    Sandbox.compiled = false;
 
     return Sandbox;
 })();
@@ -213,17 +223,19 @@ var userScriptLoader = (function () {
         }
 
         // load depends
-        info.assignAssetsBy(Fire.AssetLibrary.getAssetByUuid);
+        if ( !info.assignAssetsBy(Fire.AssetLibrary.getAssetByUuid) ) {
+            Fire.error('Failed to assign asset to recreated scene, this can be caused by forgetting the call to AssetLibrary.cacheAsset');
+        }
 
         return newScene;
     }
 
-    function doLoad (src, onload) {
+    function doLoad (src, cb) {
         // 这里用 require 实现会更简单，但是为了和运行时保持尽量一致，还是改用 web 方式加载。
         var script = document.createElement('script');
         script.onload = function () {
             console.timeEnd('load ' + src);
-            onload();
+            cb();
         };
         script.onerror = function () {
             console.timeEnd('load ' + src);
@@ -231,6 +243,7 @@ var userScriptLoader = (function () {
                 loader.unloadAll();
             }
             Fire.error('Failed to load %s', src);
+            cb('Failed to load ' + src);
         };
         script.setAttribute('type','text/javascript');
         script.setAttribute('src', FireUrl.addRandomQuery(src));
@@ -241,14 +254,21 @@ var userScriptLoader = (function () {
 
     var loader = {
 
-        loadAll: function () {
-            doLoad(SRC_BUILTIN, function () {
-                Sandbox.globalVarsChecker.restore(Fire.log, 'loading builtin plugin runtime', 'require');
-
-                doLoad(SRC_PROJECT, function () {
-                    Sandbox.globalVarsChecker.restore(Fire.log, 'loading new scripts', 'require');
-
-                    // reload scene
+        loadAll: function (callback) {
+            Async.series([
+                function loadBuiltin (next) {
+                    doLoad(SRC_BUILTIN, function (err) {
+                        Sandbox.globalVarsChecker.restore(Fire.log, 'loading builtin plugin runtime', 'require');
+                        next(err);
+                    });
+                },
+                function loadProject (next) {
+                    doLoad(SRC_PROJECT, function (err) {
+                        Sandbox.globalVarsChecker.restore(Fire.log, 'loading new scripts', 'require');
+                        next(err);
+                    });
+                },
+                function reloadScene(next) {
                     if (Fire.Engine._scene) {
                         console.time('reload scene');
                         var newScene = recreateScene();
@@ -258,8 +278,9 @@ var userScriptLoader = (function () {
                         Sandbox.globalVarsChecker.restore(Fire.warn, 'launching scene by new scripts');
                         console.timeEnd('reload scene');
                     }
-                });
-            });
+                    next();
+                }
+            ], callback);
         },
 
         unloadAll: function () {
@@ -322,8 +343,8 @@ Sandbox.reloadScripts = (function () {
     //    return reloadPluginScripts;
     //})();
 
-    function reloadScripts (compileSucceeded) {
-
+    function reloadScripts (compileSucceeded, callback) {
+        Sandbox.compiled = compileSucceeded;
         var scriptsLoaded = inited;
         if ( !inited ) {
             init();
@@ -343,12 +364,26 @@ Sandbox.reloadScripts = (function () {
         }
 
         // load new
+        var loadTasks = [];
         if ( compileSucceeded ) {
-            userScriptLoader.loadAll();
-            Sandbox.globalVarsChecker.restore(Fire.warn, 'loading ' + userScriptLoader.name);
+            loadTasks.push(
+                function loadRuntime (next) {
+                    userScriptLoader.loadAll(function (err) {
+                        Sandbox.globalVarsChecker.restore(Fire.warn, 'loading ' + userScriptLoader.name);
+                        next(err);
+                    });
+                }
+            );
         }
-        Fire._pluginLoader.loadAll();
-        Sandbox.globalVarsChecker.restore(Fire.warn, 'loading ' + userScriptLoader.name);
+        loadTasks.push(
+            function loadEditPlugin (next) {
+                Fire._pluginLoader.loadAll(function (err) {
+                    Sandbox.globalVarsChecker.restore(Fire.warn, 'loading ' + Fire._pluginLoader.name);
+                    next(err);
+                });
+            }
+        );
+        Async.series(loadTasks, callback);
     }
 
     return reloadScripts;

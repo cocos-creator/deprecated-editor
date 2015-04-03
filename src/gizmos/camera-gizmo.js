@@ -74,7 +74,7 @@ CameraGizmo.prototype.update = function () {
               ;
 
     if ( this.hovering || this.selecting ) {
-        var gameViewSize = Fire.Engine.screenSize;
+        var gameViewSize = Fire.Screen.size;
         var height = this.target.size * zoom;
         var width = gameViewSize.x/gameViewSize.y * height;
 

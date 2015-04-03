@@ -1,9 +1,25 @@
 var Remote = require('remote');
 var Menu = Remote.require('menu');
+var Url = Remote.require('fire-url');
 
-Polymer({
+Polymer(EditorUI.mixin({
+    publish: {
+        highlighted: {
+            value: false,
+            reflect: true,
+        },
+
+        // droppable
+        droppable: 'asset',
+        "single-drop": true,
+    },
+
     created: function () {
         this.target = null;
+    },
+
+    ready: function () {
+        this._initDroppable(this.$.fields);
     },
 
     refresh: function () {
@@ -106,7 +122,10 @@ Polymer({
     },
 
     addComponent: function (componentCtor) {
-        Fire.sendToMainPage('engine:addComponent', this.target.id, Fire.JS._getClassId(componentCtor) );
+        Fire.sendToMainWindow('engine:add-component', {
+            'entity-id': this.target.id,
+            'component-class-id': Fire.JS._getClassId(componentCtor)
+        });
     },
 
     fieldsChangedAction: function ( event, detail ) {
@@ -115,7 +134,17 @@ Polymer({
         if ( detail instanceof Fire.Asset ) {
             Fire.AssetLibrary.cacheAsset(detail);
         }
-        Fire.sendToPages( 'scene:dirty' );
+        else if ( Array.isArray(detail) ) {
+            for ( var i = 0; i < detail.length; ++i ) {
+                var item = detail[i];
+                if ( item instanceof Fire.Asset ) {
+                    Fire.AssetLibrary.cacheAsset(item);
+                }
+            }
+        }
+
+        Fire.sendToMainWindow( 'entity:inspector-dirty' );
+        Fire.sendToWindows( 'scene:dirty' );
     },
 
     addComponentAction: function ( event ) {
@@ -129,4 +158,58 @@ Polymer({
         var menu = Menu.buildFromTemplate(template);
         menu.popup(Remote.getCurrentWindow(), Math.floor(x), Math.floor(y));
     },
-});
+
+    dropAreaEnterAction: function (event) {
+        event.stopPropagation();
+
+        var classDef = Fire.JS.getClassByName(this.type);
+        var dragItems = event.detail.dragItems;
+        var uuid = dragItems[0];
+
+        var metaJson = Fire.AssetDB.loadMetaJson(uuid);
+        if (metaJson) {
+            Fire.AssetLibrary.loadMeta(metaJson, function ( err, meta ) {
+                if ( meta instanceof Fire.ScriptAssetMeta ) {
+                    this.highlighted = true;
+                }
+            }.bind(this));
+        }
+    },
+
+    dropAreaLeaveAction: function (event) {
+        event.stopPropagation();
+        this.highlighted = false;
+    },
+
+    dropAreaAcceptAction: function (event) {
+        event.stopPropagation();
+
+        if ( this.highlighted ) {
+            this.highlighted = false;
+
+            var dragItems = event.detail.dragItems;
+            var uuid = dragItems[0];
+
+            // add component
+            var classID = Fire.compressUuid(uuid);
+            var ctor = Fire.JS._getClassById(classID);
+            if ( ctor ) {
+                this.addComponent(ctor);
+            }
+        }
+    },
+
+    // DISABLE:
+    // dropAreaDragoverAction: function (event) {
+    //     event.stopPropagation();
+
+    //     if ( this.highlighted ) {
+    //         EditorUI.DragDrop.allowDrop( event.detail.dataTransfer, true );
+    //         EditorUI.DragDrop.updateDropEffect(event.detail.dataTransfer, "copy");
+    //     }
+    //     else {
+    //         EditorUI.DragDrop.allowDrop( event.detail.dataTransfer, false );
+    //     }
+    // },
+
+}, EditorUI.droppable));

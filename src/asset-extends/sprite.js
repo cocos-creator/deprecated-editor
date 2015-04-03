@@ -5,6 +5,8 @@ Sprite.prototype.createEntity = function ( cb ) {
 
     var spriteRenderer = ent.addComponent(Fire.SpriteRenderer);
     spriteRenderer.sprite = this;
+    spriteRenderer.width = this.width;
+    spriteRenderer.height = this.height;
 
     if ( cb ) {
         cb ( ent );

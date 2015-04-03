@@ -1,6 +1,11 @@
 var Remote = require('remote');
+var Async = require('async');
+var Url = require('fire-url');
+var Path = require('fire-path');
 
 Polymer({
+    _scriptsLoaded: false,
+
     created: function () {
         Fire.mainWindow = this;
 
@@ -9,81 +14,68 @@ Polymer({
             coordinate: "local", // local, global
             pivot: "pivot", // pivot, center
         };
+        this.sceneInfo = {};
 
         this.sceneNameObserver = null;
         this.ipc = new Fire.IpcListener();
+
+        this._updateSceneIntervalID = null;
+        this._updateSceneAnimFrameID = null;
+
+        this._newsceneUrl = null;
     },
 
     ready: function () {
+        window.onbeforeunload = function ( event ) {
+            var res = this.confirmCloseScene();
+            switch ( res ) {
+            // save
+            case 0:
+                this.saveCurrentScene();
+                Fire.Metrics.trackEditorClose();
+                return true;
+
+            // cancel
+            case 1:
+                return false;
+
+            // don't save
+            case 2:
+                Fire.Metrics.trackEditorClose();
+                return true;
+            }
+        }.bind(this);
+
         window.addEventListener('resize', function() {
             this.$.mainDock._notifyResize();
+        }.bind(this));
+
+        // NOTE: the start-unload-scene and engine-stopped must be dom event because we want to stop repaint immediately
+
+        window.addEventListener('start-unload-scene', function ( event ) {
+            // do nothing if engine is playing
+            if ( Fire.Engine.isPlaying ) {
+                return;
+            }
+
+            //
+            this._stopSceneInterval();
+        }.bind(this));
+
+        window.addEventListener('engine-stopped', function ( event ) {
+            // stop anim frame update
+            this._stopSceneInAnimationFrame();
         }.bind(this));
     },
 
     attached: function () {
-        this.ipc.on('project:ready', function () {
-            Polymer.import([
-                "fire://src/editor/fire-assets/fire-assets.html",
-                "fire://src/editor/fire-hierarchy/fire-hierarchy.html",
-                "fire://src/editor/fire-inspector/fire-inspector.html",
-                "fire://src/editor/fire-console/fire-console.html",
-                "fire://src/editor/fire-scene/fire-scene.html",
-                "fire://src/editor/fire-game/fire-game.html",
-            ], function () {
-                this.addPlugin( this.$.hierarchyPanel, FireHierarchy, 'hierarchy', 'Hierarchy' );
-                this.addPlugin( this.$.assetsPanel, FireAssets, 'assets', 'Assets' );
-                this.addPlugin( this.$.inspectorPanel, FireInspector, 'inspector', 'Inspector' );
-                this.addPlugin( this.$.consolePanel, FireConsole, 'console', 'Console' );
-                this.addPlugin( this.$.editPanel, FireScene, 'scene', 'Scene' );
-                this.addPlugin( this.$.editPanel, FireGame, 'game', 'Game' );
+        this.ipc.on('project:ready', this.init.bind(this));
 
-                // for each plugin
-                for ( var key in Fire.plugins) {
-                    var plugin = Fire.plugins[key];
-
-                    // init plugin
-                    if ( plugin.init ) {
-                        plugin.init();
-                    }
-                }
-
-                // load scripts
-                Fire.sendToCore('compiler:compile-and-reload');
-
-                // init engine
-                Fire.info('fire-engine initializing...');
-                Fire.AssetLibrary.init("library://");
-                var renderContext = Fire.Engine.init( this.$.game.$.view.clientWidth,
-                                                      this.$.game.$.view.clientHeight );
-
-                // init game view
-                this.$.game.setRenderContext(renderContext);
-
-                // init scene view
-                this.$.scene.initRenderContext();
-
-                // TODO: load last-open scene or init new
-                var lastEditScene = null;
-                if ( lastEditScene === null ) {
-                    Fire.Engine._setCurrentScene(new Fire._Scene());
-
-                    var camera = new Fire.Entity('Main Camera');
-                    camera.addComponent(Fire.Camera);
-                }
-
-                // observe the current scene name
-                this.updateTitle();
-                if ( this.sceneNameObserver ) {
-                    this.sceneNameObserver.close();
-                }
-                this.sceneNameObserver = new PathObserver( Fire.Engine._scene, "_name" );
-                this.sceneNameObserver.open( function ( newValue, oldValue ) {
-                    this.updateTitle();
-                }, this );
-            }.bind(this));
-        }.bind(this) );
-
-        this.ipc.on('reload:window-scripts', Fire._Sandbox.reloadScripts);
+        this.ipc.on('reload:window-scripts', function ( compiled ) {
+            Fire._Sandbox.reloadScripts(compiled, function () {
+                this._scriptsLoaded = true;
+            }.bind(this) );
+        }.bind(this));
 
         this.ipc.on('asset-library:debugger:query-uuid-asset', function () {
             var results = [];
@@ -91,7 +83,120 @@ Polymer({
                 var asset = Fire.AssetLibrary._uuidToAsset[p];
                 results.push( { uuid: p, name: asset.name, type: Fire.JS.getClassName(asset) } );
             }
-            Fire.sendToAll('asset-library:debugger:uuid-asset-results', results);
+            Fire.sendToAll('asset-library:debugger:uuid-asset-results', {
+                results: results
+            });
+        }.bind(this));
+
+        this.ipc.on('asset:moved', function ( detail ) {
+            var uuid = detail.uuid;
+            var destUrl = detail['dest-url'];
+
+            // if it is current scene renamed, update title
+            if ( uuid === Fire.Engine._scene._uuid ) {
+                this.updateTitle();
+            }
+        }.bind(this));
+
+        this.ipc.on('scene:save', this.saveCurrentScene.bind(this) );
+
+        // scene saved
+        this.ipc.on('asset:saved', function ( detail ) {
+            var url = detail.url;
+            var uuid = detail.uuid;
+
+            // update the uuid of current scene, if we first time save it
+            if ( this._newsceneUrl === url ) {
+                this._newsceneUrl = null;
+                var sceneName = Url.basename(url);
+                Fire.Engine._scene._uuid = uuid;
+                Fire.Engine._scene.name = sceneName;
+
+                this.setSceneDirty(false,true);
+            }
+        }.bind(this) );
+
+        //
+        this.ipc.on('asset:open', function (detail) {
+            var uuid = detail.uuid;
+            var url = detail.url;
+
+            if ( Url.extname(url) !== '.fire' ) {
+                return;
+            }
+
+            var res = this.confirmCloseScene();
+            switch ( res ) {
+            // save
+            case 0:
+                this.saveCurrentScene();
+                // don't re-open current saving scene
+                if ( uuid !== Fire.Engine._scene._uuid ) {
+                    Fire.sendToMainWindow('engine:open-scene', {
+                        uuid: uuid
+                    });
+                }
+                break;
+
+            // cancel
+            case 1:
+                break;
+
+            // don't save
+            case 2:
+                Fire.sendToMainWindow('engine:open-scene', {
+                    uuid: uuid
+                });
+                break;
+            }
+        }.bind(this) );
+
+        this.ipc.on('entity:added', this.setSceneDirty.bind(this,true,false));
+        this.ipc.on('entity:removed', this.setSceneDirty.bind(this,true,false));
+        this.ipc.on('entity:parentChanged', this.setSceneDirty.bind(this,true,false));
+        this.ipc.on('entity:indexChanged', this.setSceneDirty.bind(this,true,false));
+        this.ipc.on('entity:renamed', this.setSceneDirty.bind(this,true,false));
+        this.ipc.on('entity:inspector-dirty', this.setSceneDirty.bind(this,true,false));
+        this.ipc.on('gizmos:dirty', this.setSceneDirty.bind(this,true,false));
+
+        this.ipc.on('scene:new', function ( event ) {
+            this.newScene();
+        }.bind(this));
+
+        // NOTE: the scene:launched and engine:played must be ipc event to make sure component:disabled been called before it.
+
+        this.ipc.on('scene:launched', function ( event ) {
+            // TEMP HACK: waiting for jare's new scene-camera, that will make scene camera only initialize once
+            this.$.scene.initSceneCamera();
+            this.$.game.resize();
+
+            // do nothing if engine is playing
+            if ( Fire.Engine.isPlaying ) {
+                return;
+            }
+
+            //
+            if ( this._updateSceneIntervalID ) {
+                Fire.warn( 'The _updateSceneInterval still ON' );
+                return;
+            }
+            this._updateSceneInterval();
+        }.bind(this));
+
+        this.ipc.on('engine:played', function ( continued ) {
+            // if this is resume from paused, do nothing
+            if ( continued ) {
+                return;
+            }
+
+            // check if we have invalid anim frame request
+            if ( this._updateSceneAnimFrameID ) {
+                Fire.warn( 'The _updateSceneInAnimationFrame still ON' );
+                return;
+            }
+
+            // store scene dirty flag
+            this._updateSceneInAnimationFrame();
         }.bind(this));
     },
 
@@ -100,7 +205,108 @@ Polymer({
     },
 
     domReady: function () {
+        Fire.PanelMng.root = this.$.mainDock;
         Fire.sendToCore('project:init');
+    },
+
+    init: function () {
+        var self = this;
+
+        Async.series([
+            // init plugins
+            function ( next ) {
+                Polymer.import([
+                    "fire://src/editor/fire-assets/fire-assets.html",
+                    "fire://src/editor/fire-hierarchy/fire-hierarchy.html",
+                    "fire://src/editor/fire-inspector/fire-inspector.html",
+                    "fire://src/editor/fire-console/fire-console.html",
+                    "fire://src/editor/fire-scene/fire-scene.html",
+                    "fire://src/editor/fire-game/fire-game.html",
+                ], function () {
+                    self.addPlugin( self.$.hierarchyPanel, FireHierarchy, 'hierarchy', 'Hierarchy' );
+                    self.addPlugin( self.$.assetsPanel, FireAssets, 'assets', 'Assets' );
+                    self.addPlugin( self.$.inspectorPanel, FireInspector, 'inspector', 'Inspector' );
+                    self.addPlugin( self.$.consolePanel, FireConsole, 'console', 'Console' );
+                    self.addPlugin( self.$.editPanel, FireScene, 'scene', 'Scene' );
+                    self.addPlugin( self.$.editPanel, FireGame, 'game', 'Game' );
+
+                    // for each plugin
+                    for ( var key in Fire.plugins) {
+                        var plugin = Fire.plugins[key];
+
+                        // init plugin
+                        if ( plugin.init ) {
+                            plugin.init();
+                        }
+                    }
+
+                    // save layout
+                    Fire.sendToCore( 'window:save-layout',
+                                    Fire.PanelMng.getLayout(),
+                                    Fire.RequireIpcEvent );
+
+                    //
+                    next();
+                });
+            },
+
+            // compile scripts
+            function ( next ) {
+                Fire.sendToCore('compiler:compile-and-reload');
+                var id = setInterval( function () {
+                    if ( self._scriptsLoaded ) {
+                        clearInterval(id);
+                        next();
+                    }
+                }, 100 );
+            },
+
+            function ( next ) {
+                // init AssetLibrary
+                Fire.info('asset-library initializing...');
+                Fire.AssetLibrary.init("library://");
+
+                // query scenes
+                var SCENE_ID = Fire.JS._getClassId(Fire._Scene);
+                Fire.AssetDB.query( "assets://", {
+                    'type-id': SCENE_ID
+                }, function ( results ) {
+                    for ( var i = 0; i < results.length; ++i ) {
+                        var result = results[i];
+                        var name = Url.basenameNoExt(result.url);
+                        self.sceneInfo[result.uuid] = result.url;
+                        Fire.Engine._sceneInfos[name] = result.uuid;
+                    }
+                    next();
+                });
+            },
+
+            function ( next ) {
+                Fire.info('fire-engine initializing...');
+
+                var renderContext = Fire.Engine.init( self.$.game.$.view.clientWidth,
+                                                      self.$.game.$.view.clientHeight );
+                // init game view
+                self.$.game.setRenderContext(renderContext);
+
+                // init scene view
+                self.$.scene.initRenderContext();
+
+                // TODO: load last-open scene or init new
+                var lastEditScene = null;
+                if ( lastEditScene === null ) {
+                    self.newScene();
+                }
+
+                Fire.Metrics.trackEditorOpen();
+                next();
+            },
+
+        ], function ( err ) {
+            if ( err ) {
+                Fire.error( err.message );
+            }
+        } );
     },
 
     layoutToolsAction: function ( event ) {
@@ -111,12 +317,29 @@ Polymer({
         event.stopPropagation();
     },
 
-    updateTitle: function () {
-        var sceneName = Fire.Engine._scene.name;
-        if ( !sceneName ) {
-            sceneName = 'Untitled';
+    setSceneDirty: function ( dirty, forceUpdateTitle ) {
+        var updateTitle = forceUpdateTitle;
+        if ( Fire.Engine._scene.dirty !== dirty ) {
+            Fire.Engine._scene.dirty = dirty;
+            updateTitle = true;
         }
-        Remote.getCurrentWindow().setTitle( sceneName + " - Fireball Editor" );
+
+        if ( updateTitle ) {
+            this.updateTitle();
+        }
+    },
+
+    updateTitle: function () {
+        setImmediate(function () {
+            var url = Fire.AssetDB.uuidToUrl(Fire.Engine._scene._uuid);
+            if ( !url ) {
+                url = 'Untitled';
+            }
+            url += Fire.Engine._scene.dirty ? "*" : "";
+            var currentWin = Remote.getCurrentWindow();
+            currentWin.setTitle( "Fireball Editor - " + url );
+            currentWin.setDocumentEdited(Fire.Engine._scene.dirty);
+        }.bind(this));
     },
 
     addPlugin: function ( panel, plugin, id, name ) {
@@ -127,5 +350,96 @@ Polymer({
         this.$[id] = pluginInst;
         panel.add(pluginInst);
         panel.$.tabs.select(0);
+    },
+
+    newScene: function () {
+        Fire.Engine._setCurrentScene(new Fire._Scene());
+
+        var camera = new Fire.Entity('Main Camera');
+        camera.addComponent(Fire.Camera);
+    },
+
+    confirmCloseScene: function () {
+        if ( Fire.Engine._scene && Fire.Engine._scene.dirty ) {
+            var dialog = Remote.require('dialog');
+            return dialog.showMessageBox( Remote.getCurrentWindow(), {
+                type: "warning",
+                buttons: ["Save","Cancel","Don't Save"],
+                title: "Save Scene Confirm",
+                message: Fire.AssetDB.uuidToUrl(Fire.Engine._scene._uuid) + " has changed, do you want to save it?",
+                detail: "Your changes will be lost if you close this item without saving."
+            } );
+        }
+
+        //
+        return 2;
+    },
+
+    saveCurrentScene: function () {
+        var currentScene = Fire.Engine._scene;
+        var dialog = Remote.require('dialog');
+        var saveUrl = Fire.AssetDB.uuidToUrl(currentScene._uuid);
+
+        if ( !saveUrl ) {
+            var rootPath = Fire.AssetDB._fspath("assets://");
+            var savePath = dialog.showSaveDialog( Remote.getCurrentWindow(), {
+                title: "Save Scene",
+                defaultPath: rootPath,
+                filters: [
+                    { name: 'Scenes', extensions: ['fire'] },
+                ],
+            } );
+
+            if ( savePath ) {
+                if ( Path.contains( rootPath, savePath ) ) {
+                    saveUrl = 'assets://' + Path.relative( rootPath, savePath );
+                }
+                else {
+                    dialog.showMessageBox ( Remote.getCurrentWindow(), {
+                        type: "warning",
+                        buttons: ["OK"],
+                        title: "Warning",
+                        message: "Warning: please save the scene in the assets folder.",
+                        detail: "The scene needs to be saved inside the assets folder of your project.",
+                    } );
+                    // try to popup the dailog for user to save the scene
+                    this.saveCurrentScene();
+                }
+            }
+        }
+
+        //
+        if ( saveUrl ) {
+            this._newsceneUrl = saveUrl;
+            Fire.AssetDB.save( this._newsceneUrl, Fire.serialize(currentScene) );
+        }
+    },
+
+    _updateSceneInterval: function () {
+        this._updateSceneIntervalID = setInterval ( function () {
+            this.$.scene.repaintScene();
+        }.bind(this), 500 );
+    },
+
+    _stopSceneInterval: function () {
+        if ( this._updateSceneIntervalID ) {
+            clearInterval (this._updateSceneIntervalID);
+            this._updateSceneIntervalID = null;
+        }
+    },
+
+    _updateSceneInAnimationFrame: function () {
+        this._updateSceneAnimFrameID = window.requestAnimationFrame( function () {
+            this.$.scene.repaintScene();
+            this._updateSceneInAnimationFrame();
+        }.bind(this) );
+    },
+
+    _stopSceneInAnimationFrame: function () {
+        // stop anim frame update
+        if ( this._updateSceneAnimFrameID ) {
+            window.cancelAnimationFrame(this._updateSceneAnimFrameID);
+            this._updateSceneAnimFrameID = null;
+        }
     },
 });

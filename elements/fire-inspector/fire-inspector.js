@@ -34,6 +34,9 @@ Polymer({
                 if (entity) {
                     this.inspect(entity);
                 }
+                else {
+                    this.inspect(null);
+                }
             }
             else if (this.target instanceof Fire.Entity) {
                 // uninspect
@@ -65,22 +68,32 @@ Polymer({
         }
     },
 
-    _onAssetChanged: function ( uuid ) {
+    _onAssetChanged: function ( detail ) {
+        var uuid = detail.uuid;
         if ( this.target && this.target.uuid === uuid ) {
-            // instead of reload asset, we do fast memory apply
-            if ( this.$.inspector.applyAsset ) {
-                this.$.inspector.applyAsset();
+            var reloadMeta = true;
+
+            // NOTE: we don't need to reload custom-asset if it is auto-saved
+            if ( this.target instanceof Fire.CustomAssetMeta ) {
+                if ( this.$.inspector.asset && this.$.inspector.asset.dirty ) {
+                    this.$.inspector.asset.dirty = false;
+                    reloadMeta = false;
+                }
             }
 
             //
-            var metaJson = Fire.AssetDB.loadMetaJson(uuid);
-            Fire.AssetLibrary.loadMeta(metaJson, function ( err, meta ) {
-                this.inspect(meta,true);
-            }.bind(this));
+            if ( reloadMeta ) {
+                var metaJson = Fire.AssetDB.loadMetaJson(uuid);
+                Fire.AssetLibrary.loadMeta(metaJson, function ( err, meta ) {
+                    this.inspect(meta,true);
+                }.bind(this));
+            }
         }
     },
 
-    _onAssetMoved: function ( uuid, destUrl ) {
+    _onAssetMoved: function ( detail ) {
+        var uuid = detail.uuid;
+        var destUrl = detail['dest-url'];
         if ( this.target && this.target.uuid === uuid ) {
             if ( this.$.inspector.asset ) {
                 this.$.inspector.asset.name = Url.basenameNoExt(destUrl);
@@ -88,10 +101,17 @@ Polymer({
         }
     },
 
-    _onAssetSaved: function ( url, uuid ) {
+    _onAssetSaved: function ( detail ) {
+        var url = detail.url;
+        var uuid = detail.uuid;
+
         if ( this.target && this.target.uuid === uuid ) {
             if ( this.$.inspector.saving !== undefined ) {
                 this.$.inspector.saving = false;
+
+                if ( this.$.inspector.asset && this.$.inspector.asset.dirty ) {
+                    this.$.inspector.asset.dirty = false;
+                }
             }
         }
     },
