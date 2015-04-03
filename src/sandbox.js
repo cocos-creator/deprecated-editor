@@ -126,7 +126,7 @@ var Sandbox = (function () {
 
         // launch
         //var checkerUnloadingGV = new GlobalVarsChecker().record();
-        Fire.Engine._setCurrentScene(scene, onPreSceneLoad/*function () {
+        Fire.Engine._launchScene(scene, onPreSceneLoad/*function () {
             checkerUnloadingGV.restore(Fire.error);
             if (onUnloaded) {
                 onUnloaded();

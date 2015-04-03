@@ -401,7 +401,7 @@ Polymer({
     },
 
     newScene: function () {
-        Fire.Engine._setCurrentScene(new Fire._Scene());
+        Fire.Engine._launchScene(new Fire._Scene());
 
         var camera = new Fire.Entity('Main Camera');
         camera.addComponent(Fire.Camera);
