@@ -188,6 +188,33 @@ var Sandbox = (function () {
         stashedScene = null;
     };
 
+    function recreateScene (scene) {
+        // serialize scene
+        var sceneSnapshot = Fire.serialize(scene, { stringify: false });
+
+        // deserialize scene
+        var info = new Fire._DeserializeInfo();
+        Fire.Engine._canModifyCurrentScene = false;
+        var newScene = Fire.deserialize(sceneSnapshot, info, {
+            classFinder: Fire._MissingScript.safeFindClass
+        });
+        Fire.Engine._canModifyCurrentScene = true;
+        //
+        Sandbox.globalVarsChecker.restore(Fire.log, 'deserializing scene by new scripts');
+
+        newScene._uuid = scene._uuid;
+        if (newScene._uuid) {
+            Fire.AssetLibrary.replaceAsset(newScene);
+        }
+
+        // load depends
+        if ( !info.assignAssetsBy(Fire.AssetLibrary.getAssetByUuid) ) {
+            Fire.error('Failed to assign asset to recreated scene, this can be caused by forgetting the call to AssetLibrary.cacheAsset');
+        }
+
+        return newScene;
+    }
+
     Sandbox.reloadScene = function () {
         if (stashedScene) {
             console.time('reload stashed scene');
@@ -219,33 +246,6 @@ var userScriptLoader = (function () {
 
     var loadedScriptNodes = [];
     //var gVarsCheckerBetweenReload = new GlobalVarsChecker();
-
-    function recreateScene (scene) {
-        // serialize scene
-        var sceneSnapshot = Fire.serialize(scene, { stringify: false });
-
-        // deserialize scene
-        var info = new Fire._DeserializeInfo();
-        Fire.Engine._canModifyCurrentScene = false;
-        var newScene = Fire.deserialize(sceneSnapshot, info, {
-            classFinder: Fire._MissingScript.safeFindClass
-        });
-        Fire.Engine._canModifyCurrentScene = true;
-        //
-        Sandbox.globalVarsChecker.restore(Fire.log, 'deserializing scene by new scripts');
-
-        newScene._uuid = scene._uuid;
-        if (newScene._uuid) {
-            Fire.AssetLibrary.replaceAsset(newScene);
-        }
-
-        // load depends
-        if ( !info.assignAssetsBy(Fire.AssetLibrary.getAssetByUuid) ) {
-            Fire.error('Failed to assign asset to recreated scene, this can be caused by forgetting the call to AssetLibrary.cacheAsset');
-        }
-
-        return newScene;
-    }
 
     function doLoad (src, cb) {
         // 这里用 require 实现会更简单，但是为了和运行时保持尽量一致，还是改用 web 方式加载。
