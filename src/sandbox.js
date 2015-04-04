@@ -188,6 +188,23 @@ var Sandbox = (function () {
         stashedScene = null;
     };
 
+    Sandbox.reloadScene = function () {
+        if (stashedScene) {
+            console.time('reload stashed scene');
+            stashedScene = recreateScene(stashedScene);
+            console.time('reload stashed scene');
+        }
+        if (Fire.Engine._scene) {
+            console.time('reload scene');
+            var newScene = recreateScene(Fire.Engine._scene);
+            Sandbox._launchScene(newScene, function () {
+                Sandbox.globalVarsChecker.restore(Fire.log, 'destroying last scene');
+            });
+            Sandbox.globalVarsChecker.restore(Fire.warn, 'launching scene by new scripts');
+            console.timeEnd('reload scene');
+        }
+    };
+
     Sandbox.compiled = false;
 
     return Sandbox;
@@ -203,9 +220,9 @@ var userScriptLoader = (function () {
     var loadedScriptNodes = [];
     //var gVarsCheckerBetweenReload = new GlobalVarsChecker();
 
-    function recreateScene () {
+    function recreateScene (scene) {
         // serialize scene
-        var sceneSnapshot = Fire.serialize(Fire.Engine._scene, { stringify: false });
+        var sceneSnapshot = Fire.serialize(scene, { stringify: false });
 
         // deserialize scene
         var info = new Fire._DeserializeInfo();
@@ -217,7 +234,7 @@ var userScriptLoader = (function () {
         //
         Sandbox.globalVarsChecker.restore(Fire.log, 'deserializing scene by new scripts');
 
-        newScene._uuid = Fire.Engine._scene._uuid;
+        newScene._uuid = scene._uuid;
         if (newScene._uuid) {
             Fire.AssetLibrary.replaceAsset(newScene);
         }
@@ -268,16 +285,8 @@ var userScriptLoader = (function () {
                         next(err);
                     });
                 },
-                function reloadScene(next) {
-                    if (Fire.Engine._scene) {
-                        console.time('reload scene');
-                        var newScene = recreateScene();
-                        Sandbox._launchScene(newScene, function () {
-                            Sandbox.globalVarsChecker.restore(Fire.log, 'destroying last scene');
-                        });
-                        Sandbox.globalVarsChecker.restore(Fire.warn, 'launching scene by new scripts');
-                        console.timeEnd('reload scene');
-                    }
+                function (next) {
+                    Sandbox.reloadScene();
                     next();
                 }
             ], callback);
