@@ -143,10 +143,12 @@ Ipc.on('engine:remove-component', function ( detail ) {
 
 Ipc.on('engine:open-scene', function ( detail ) {
     var uuid = detail.uuid;
-    Fire.AssetLibrary.clearAllCache();
-    Fire.Engine._loadSceneByUuid(uuid, null, function () {
-        Fire.Engine.stop();
-    });
+    if (! Fire.Engine.loadingScene) {
+        Fire.AssetLibrary.clearAllCache();
+        Fire.Engine._loadSceneByUuid(uuid, null, function () {
+            Fire.Engine.stop();
+        });
+    }
 });
 
 Ipc.on('asset:moved', function ( detail ) {
