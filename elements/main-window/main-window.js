@@ -47,10 +47,6 @@ Polymer({
             }
         }.bind(this);
 
-        window.addEventListener('resize', function() {
-            this.$.mainDock._notifyResize();
-        }.bind(this));
-
         // NOTE: the start-unload-scene and engine-stopped must be dom event because we want to stop repaint immediately
 
         window.addEventListener('start-unload-scene', function ( event ) {
@@ -257,7 +253,7 @@ Polymer({
                         height: 'auto',
                     } );
 
-                    EditorUI.DockUtils.reflow();
+                    EditorUI.DockUtils.reset();
 
                     // for each plugin
                     for ( var key in Fire.plugins) {
