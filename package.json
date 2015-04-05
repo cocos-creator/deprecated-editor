@@ -6,7 +6,8 @@
   "license": "MIT",
   "licenseUrl": "http://opensource.org/licenses/MIT",
   "dependencies": {
-    "gulp": ""
+    "gulp": "",
+    "source-map": "^0.4.2"
   },
   "devDependencies": {
     "gulp-concat": "",

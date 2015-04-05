@@ -241,8 +241,18 @@ var Sandbox = (function () {
 // 加载项目里的普通脚本
 var userScriptLoader = (function () {
 
-    var SRC_BUILTIN = 'library://bundle.builtin.js';
-    var SRC_PROJECT = 'library://bundle.project.js';
+    var SRC_BUILTIN = 'bundle.builtin.js';
+    var SRC_PROJECT = 'bundle.project.js';
+
+    var SRC_BUILTIN_URL = 'library://' + SRC_BUILTIN;
+    var SRC_PROJECT_URL = 'library://' + SRC_PROJECT;
+
+    var Remote = require('remote');
+    var Path = require('path');
+    var projectPath = Remote.getGlobal('FIRE_PROJECT_PATH');
+
+    var SRC_BUILTIN_PATH = Path.join(projectPath, 'library', SRC_BUILTIN);
+    var SRC_PROJECT_PATH = Path.join(projectPath, 'library', SRC_PROJECT);
 
     var loadedScriptNodes = [];
     //var gVarsCheckerBetweenReload = new GlobalVarsChecker();
@@ -263,7 +273,7 @@ var userScriptLoader = (function () {
             cb('Failed to load ' + src);
         };
         script.setAttribute('type','text/javascript');
-        script.setAttribute('src', FireUrl.addRandomQuery(src));
+        script.setAttribute('src', src);
         console.time('load ' + src);
         document.head.appendChild(script);
         loadedScriptNodes.push(script);
@@ -272,17 +282,34 @@ var userScriptLoader = (function () {
     var loader = {
 
         loadAll: function (callback) {
+            var builtinUrl = FireUrl.addRandomQuery(SRC_BUILTIN_URL);
+            var projectUrl = FireUrl.addRandomQuery(SRC_PROJECT_URL);
+
             Async.series([
                 function loadBuiltin (next) {
-                    doLoad(SRC_BUILTIN, function (err) {
+                    doLoad(builtinUrl, function (err) {
                         Sandbox.globalVarsChecker.restore(Fire.log, 'loading builtin plugin runtime', 'require');
                         next(err);
                     });
                 },
+                function loadBuiltinSrcMap (next) {
+                    console.time('load source map of ' + SRC_BUILTIN_URL);
+                    Fire._SourceMap.loadSrcMap(SRC_BUILTIN_PATH, SRC_BUILTIN_URL, function () {
+                        console.timeEnd('load source map of ' + SRC_BUILTIN_URL);
+                        next();
+                    });
+                },
                 function loadProject (next) {
-                    doLoad(SRC_PROJECT, function (err) {
+                    doLoad(projectUrl, function (err) {
                         Sandbox.globalVarsChecker.restore(Fire.log, 'loading new scripts', 'require');
                         next(err);
+                    });
+                },
+                function loadProjectSrcMap (next) {
+                    console.time('load source map of ' + SRC_PROJECT_URL);
+                    Fire._SourceMap.loadSrcMap(SRC_PROJECT_PATH, SRC_PROJECT_URL, function () {
+                        console.timeEnd('load source map of ' + SRC_PROJECT_URL);
+                        next();
                     });
                 },
                 function (next) {

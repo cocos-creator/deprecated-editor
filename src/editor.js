@@ -1,5 +1,6 @@
 //
 var Util = require('util');
+var Ipc = require('ipc');
 var Remote = require('remote');
 var RemoteFire = Remote.getGlobal('Fire');
 
@@ -98,6 +99,13 @@ Fire.info = function ( text ) {
  */
 Fire._throw = function (error) {
     console.error(error.stack);
+    var resolvedStack = Fire._SourceMap.resolveStack(error.stack);
+    if (Ipc._events['console:error']) {
+        Ipc.emit('console:error', resolvedStack);
+    }
+    else {
+        Fire.sendToMainWindow('console:error', resolvedStack);
+    }
 };
 
 Fire.observe = function ( target, enabled ) {
