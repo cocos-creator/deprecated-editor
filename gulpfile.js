@@ -18,6 +18,7 @@ var paths = {
         'src/asset-extends/bitmap-font.js',
         'src/asset-extends/sprite.js',
         'src/asset-extends/texture.js',
+        'src/asset-extends/script-asset.js',
 
         // engine extends
         'src/engine-extends/asset-library.js',
