@@ -90,6 +90,16 @@ Fire.info = function ( text ) {
     Fire.sendToCore('console:info', text);
 };
 
+/**
+ * show error stacks in editor
+ * @method _throw
+ * @param {Error} error
+ * @private
+ */
+Fire._throw = function (error) {
+    console.error(error.stack);
+};
+
 Fire.observe = function ( target, enabled ) {
     if ( !target.isValid ) {
         return;
