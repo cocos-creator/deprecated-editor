@@ -6,6 +6,8 @@ var GlobalVarsChecker = (function () {
     var DefaultIgnoreGlobalVars = [
         'webkitIndexedDB',      // deprecated warning
         'webkitStorageInfo',    // deprecated warning
+        'mixpanel',             // metrics
+        'analytics',            // metrics
     ];
 
     var globals = window;
@@ -367,7 +369,7 @@ Sandbox.reloadScripts = (function () {
         Fire.LoadManager.reset();
         // 清除 browserify 声明的 require 后，除非用户另外找地方存了原来的 require，否则之前的脚本都将会被垃圾回收
         require = Sandbox.nodeJsRequire;
-        Sandbox.globalVarsChecker.restore(Fire.log, 'purging', 'require', 'mixpanel');
+        Sandbox.globalVarsChecker.restore(Fire.log, 'purging', 'require');
         Fire._requiringStack = [];
     }
 
