@@ -1,11 +1,16 @@
-// 解析加载进来的 bundle 的 source map
+// 解析加载进来的 bundle 的 source map，并以此美化堆栈输出
+
 var Fs = require('fire-fs');
 var SourceMapConsumer = require('source-map').SourceMapConsumer;
 
 
 var HEAD = '//# sourceMappingURL=data:application/json;base64,';
-var INDENT = '&nbsp;&nbsp;&nbsp;&nbsp;';
 var COMPILED_LINE_OFFSET = -3;   // 扣除 pre compile 时加上的行数
+
+var INDENT = '&nbsp;&nbsp;&nbsp;&nbsp;';
+
+// 最后一个以这个命名结尾的方法，及之后的调用堆栈会隐藏不显示。
+var IGNORE_CALL_SUFFIX = 'InTryCatch';
 
 function getLastLine (text) {
     var begin = text.lastIndexOf('\n');
@@ -130,20 +135,41 @@ var SourceMap = {
     resolveStack: function (stack) {
         // before:
         //TypeError: Cannot read property 'a' of null
-        //at Fire.Class.onStart (library://bundle.project.js?1:390:7)
-        //at callOnStartInTryCatch (fire://src/engine/engine.js:1981:15)
+        //    at Fire.Class.onStart (library://bundle.project.js?1:390:7)
+        //    at callOnStartInTryCatch (fire://src/engine/engine.js:1981:15)
         // ...
         // after:
         //TypeError: Cannot read property 'a' of null
-        //at Fire.Class.onStart (NewComponent.js:26)
+        //    at Fire.Class.onStart (NewComponent.js:26)
 
-        var srcPrinted = false;
+        var PREFIX = '    at ';
+        var SUFFIX_CODE = ')'.charCodeAt(0);
 
         var lines = stack.split('\n');
-        for (var i = 0; i < lines.length; i++) {
-            var stackLine = lines[i];
+
+        var srcPrinted = false;
+        var i, stackLine;
+
+        // strip engine internal call stacks
+        for (i = lines.length - 1; i >= 0; i--) {
+            stackLine = lines[i];
             // if '    at ****)'
-            if (stackLine.indexOf('    at ') === 0 && stackLine.charCodeAt(stackLine.length - 1) === 41) {
+            if (stackLine.indexOf(PREFIX) === 0 && stackLine.charCodeAt(stackLine.length - 1) === SUFFIX_CODE) {
+                var funcNameEnd = stackLine.indexOf(' ', PREFIX.length);
+                var suffixStart = funcNameEnd - IGNORE_CALL_SUFFIX.length;
+                var ignoreFuncName = stackLine.lastIndexOf(IGNORE_CALL_SUFFIX, funcNameEnd - 1) === suffixStart;
+                if (ignoreFuncName) {
+                    lines.length = i;   // strip lines
+                    break;
+                }
+            }
+        }
+        //
+
+        for (i = 0; i < lines.length; i++) {
+            stackLine = lines[i];
+            // if '    at ****)'
+            if (stackLine.indexOf(PREFIX) === 0 && stackLine.charCodeAt(stackLine.length - 1) === SUFFIX_CODE) {
                 var infoEnd = stackLine.lastIndexOf(' (');
                 if (infoEnd === -1) {
                     continue;
