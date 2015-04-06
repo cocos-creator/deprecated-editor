@@ -1,10 +1,9 @@
 // 解析加载进来的 bundle 的 source map，并以此美化堆栈输出
 
 var Fs = require('fire-fs');
+var Path = require('fire-path');
 var SourceMapConsumer = require('source-map').SourceMapConsumer;
 
-
-var HEAD = '//# sourceMappingURL=data:application/json;base64,';
 var COMPILED_LINE_OFFSET = -3;   // 扣除 pre compile 时加上的行数
 
 var INDENT = '&nbsp;&nbsp;&nbsp;&nbsp;';
@@ -33,71 +32,115 @@ function decodeBase64 (base64) {
     return window.atob(base64);
 }
 
-function resolveSourceUrl (oriPos) {
-    // ../../../dev/builtin/src/audio-source.js
-    // ../../../dev/bin/node_modules/browserify/node_modules/browser-pack/_prelude.js
-    // ../../../dev/assets/script/GameOverMenu.js
-    var HEAD_MAC = '../../../dev/';
-    var HEAD_WIN = '..\\..\\..\\dev\\';
-    var HEAD_LEN = HEAD_MAC.length;
-    var url = oriPos.source;
-    if (url.indexOf(HEAD_MAC) === 0 || url.indexOf(HEAD_WIN) === 0) {
-        if (url.indexOf('assets', HEAD_LEN) === HEAD_LEN) {
-            oriPos.source = url.substring(HEAD_LEN + 6 + 1);
-            oriPos.line = oriPos.line + COMPILED_LINE_OFFSET;
+function resolveSourceUrls (rawSourceMap, sources) {
+    var srcUrls = rawSourceMap.sources;
+    console.log('resolving: ' + srcUrls);
+
+    // 不知道为什么开发版里 browserify 生成的 sources 含有 repo 所在的 dev 目录，只好这里去除
+    var Remote = require('remote');
+    var root = Remote.getGlobal('FIRE_PATH');
+    root = Path.resolve(root, '../');
+    var stripPrefix = Path.basename(root);
+
+    for (var i = 0; i < srcUrls.length; i++) {
+        var src = srcUrls[i];
+        // remove '../'
+        src = src.replace(/\.\.\//g, '');
+        src = src.replace(/\.\.\\/g, '');
+        // remove 'dev'
+        if (src.indexOf(stripPrefix) === 0) {
+            src = src.substring(stripPrefix.length + 1);
         }
-        else if (url.indexOf('bin', HEAD_LEN) === HEAD_LEN) {
-            oriPos.source = 'fire://' + url.substring(HEAD_LEN);
+        //
+        var lineOffset = 0;
+        if (src.indexOf('assets') === 0) {
+            src = src.substring('assets'.length + 1);
+            lineOffset = COMPILED_LINE_OFFSET;
         }
-        else if (url.indexOf('builtin', HEAD_LEN) === HEAD_LEN) {
-            oriPos.source = 'fire://builtin/*/' + url.substring(HEAD_LEN + 7 + 1);
-            oriPos.line = oriPos.line + COMPILED_LINE_OFFSET;
+        else if (src.indexOf('builtin') === 0) {
+            src = 'fire://builtin/*/' + src.substring('builtin'.length + 1);
+            lineOffset = COMPILED_LINE_OFFSET;
+        }
+        else if (src.indexOf('bin') === 0) {
+            src = 'fire://' + src.substring('bin'.length + 1);
+        }
+        else if (src.indexOf('app') === 0) {
+            src = 'fire://' + src.substring('app'.length + 1);
         }
         // TODO: global
+
+        srcUrls[i] = src;
+        sources[src] = {
+            lineOffset: lineOffset
+        };
     }
 }
 
-var srcMaps = {};   // { %bundle-url%: { smc: SourceMapConsumer, urlToLines: { %src-url%: sourceLine[] } } }
+//  %bundle-url%: {
+//      smc: SourceMapConsumer,
+//      sources: {
+//          %src-url%: {
+//              lines: sourceLine[],
+//              lineOffset: lineOffset
+//          }
+//      }
+//  }
+var srcMaps = {};
 
 var SourceMap = {
 
-    loadSrcMap: function (path, url, callback) {
+    _srcMaps: srcMaps,
+
+    loadFromSourceComment: function (source) {
+        var HEAD = '//# sourceMappingURL=data:application/json;base64,';
+
+        var lastLine = getLastLine(source);
+        if (! lastLine) {
+            throw 'file is empty';
+        }
+        if (lastLine.substring(0, HEAD.length) !== HEAD) {
+            throw 'unknown syntax';
+        }
+        var base64 = lastLine.substring(HEAD.length);
+        var json = decodeBase64(base64);
+        if (! json) {
+            throw 'can not decode from base64';
+        }
+        return JSON.parse(json);
+    },
+
+    loadFromFileComment: function (path, callback) {
         Fs.readFile(path, function (err, data) {
-
-            // parse source
-
             if (err) {
                 Fire.error('Failed to load source map from %s, %s', path, err);
-                return callback();
+                return callback(err);
             }
             var source = data.toString();
-            var lastLine = getLastLine(source);
-            if (! lastLine) {
-                Fire.warn('Failed to load source map from %s, file is empty.', path);
-                return callback();
-            }
-            if (lastLine.substring(0, HEAD.length) !== HEAD) {
-                Fire.error('Failed to load source map from %s, unknown syntax.', path);
-                return callback();
-            }
-            var base64 = lastLine.substring(HEAD.length);
-            var rawSourceMapJson = decodeBase64(base64);
-            if (! rawSourceMapJson) {
-                Fire.error('Failed to load source map from %s, can not decode from base64.', path);
-                return callback();
-            }
-            var rawSourceMap = null;
+            var result;
             try {
-                rawSourceMap = JSON.parse(rawSourceMapJson);
+                result = SourceMap.loadFromSourceComment(source);
             }
             catch (e) {
-                Fire.error('Failed to load source map from %s, %s', path, e);
+                Fire.error('Failed to load source map from %s, %s.', path, e.stack);
+                return callback(e);
+            }
+            callback(null, result);
+        });
+    },
+
+    loadSrcMap: function (path, url, callback) {
+        this.loadFromFileComment(path, function (err, rawSourceMap) {
+            if (err) {
                 return callback();
             }
 
             // 自己缓存源码
             var sourcesContent = rawSourceMap.sourcesContent;
             rawSourceMap.sourcesContent = undefined;
+
+            // 修正源文件 url
+            var sources = {};
+            resolveSourceUrls(rawSourceMap, sources);
 
             // create consumer
 
@@ -110,18 +153,17 @@ var SourceMap = {
                 return callback();
             }
 
-            var urlToLines = {};
             for (var i = 0; i < sourcesContent.length; i++) {
                 var content = sourcesContent[i];
                 var sourceLines = content.split('\n').map(function (x) {
                     return x.trim();
                 });
                 var oriUrl = rawSourceMap.sources[i];
-                urlToLines[oriUrl] = sourceLines;
+                sources[oriUrl].lines = sourceLines;
             }
             srcMaps[url] = {
                 smc: smc,
-                urlToLines: urlToLines,
+                sources: sources,
             };
 
             callback();
@@ -210,30 +252,24 @@ var SourceMap = {
                         line: line,
                         column: column
                     });
-                    var oriSource = oriPos.source;
-                    var oriLine = oriPos.line;
-                    if (oriSource) {
-                        resolveSourceUrl(oriPos);
+                    var srcUrl = oriPos.source;
+                    if (srcUrl) {
+                        var sources = sourceMap.sources[srcUrl];
                         var info;
                         if (srcPrinted) {
                             info = stackLine.substring(0, infoEnd + 2);
                         }
                         else {
-                            var sourceLines = sourceMap.urlToLines[oriSource];
-                            if (sourceLines) {
-                                var lineIndex = oriLine - 1;    // oriLine start from 1
-                                info = stackLine.substring(0, infoEnd) + ': "' + sourceLines[lineIndex] + '" (';
-                                srcPrinted = true;
-                            }
-                            else {
-                                info = stackLine.substring(0, infoEnd + 2);
-                            }
+                            var lineIndex = oriPos.line - 1;    // start from 1
+                            info = stackLine.substring(0, infoEnd) + ': "' + sources.lines[lineIndex] + '" (';
+                            srcPrinted = true;
                         }
+                        var srcLineIndex = oriPos.line + sources.lineOffset;
                         if (oriPos.column) {
-                            lines[i] = INDENT + info + oriPos.source + ':' + oriPos.line + ':' + oriPos.column + ')';
+                            lines[i] = INDENT + info + srcUrl + ':' + srcLineIndex + ':' + oriPos.column + ')';
                         }
                         else {
-                            lines[i] = INDENT + info + oriPos.source + ':' + oriPos.line + ')';
+                            lines[i] = INDENT + info + srcUrl + ':' + srcLineIndex + ')';
                         }
                         continue;
                     }
