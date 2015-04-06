@@ -4,6 +4,7 @@ var SourceMapConsumer = require('source-map').SourceMapConsumer;
 
 
 var HEAD = '//# sourceMappingURL=data:application/json;base64,';
+var INDENT = '&nbsp;&nbsp;&nbsp;&nbsp;';
 var COMPILED_LINE_OFFSET = -3;   // 扣除 pre compile 时加上的行数
 
 function getLastLine (text) {
@@ -140,9 +141,9 @@ var SourceMap = {
 
         var lines = stack.split('\n');
         for (var i = 0; i < lines.length; i++) {
-            var stackLine = lines[i].trim();
-            // if 'at ****)'
-            if (stackLine.indexOf('at ') === 0 && stackLine.charCodeAt(stackLine.length - 1) === 41) {
+            var stackLine = lines[i];
+            // if '    at ****)'
+            if (stackLine.indexOf('    at ') === 0 && stackLine.charCodeAt(stackLine.length - 1) === 41) {
                 var infoEnd = stackLine.lastIndexOf(' (');
                 if (infoEnd === -1) {
                     continue;
@@ -203,15 +204,17 @@ var SourceMap = {
                             }
                         }
                         if (oriPos.column) {
-                            lines[i] = info + oriPos.source + ':' + oriPos.line + ':' + oriPos.column + ')';
+                            lines[i] = INDENT + info + oriPos.source + ':' + oriPos.line + ':' + oriPos.column + ')';
                         }
                         else {
-                            lines[i] = info + oriPos.source + ':' + oriPos.line + ')';
+                            lines[i] = INDENT + info + oriPos.source + ':' + oriPos.line + ')';
                         }
+                        continue;
                     }
                 }
+                lines[i] = INDENT + lines[i];
             }
-        }
+        } // end for
         return lines.join('\n');
     }
 };
