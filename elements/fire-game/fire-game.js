@@ -63,16 +63,6 @@ Polymer({
     },
 
     resize: function () {
-<<<<<<< HEAD
-        if ( this.renderContext !== null ) {
-            var old = this.style.display;
-            this.style.display = "";
-            this.renderContext.setDesignResolutionSize( this.$.view.clientWidth,
-                                                        this.$.view.clientHeight,
-                                                        cc.ResolutionPolicy.SHOW_ALL );
-            this.style.display = old;
-            this.repaintScene();
-=======
         if ( !this.renderContext )
             return;
 
@@ -116,11 +106,13 @@ Polymer({
                 srcHeight = this.customHeight;
             }
             size = Fire.fitSize( srcWidth, srcHeight, contentRect.width, contentRect.height );
->>>>>>> 5c1ae6d51c16b276fe001ae9cddb5c7beca8c2fa
         }
         else {
             size = [this.$.view.clientWidth, this.$.view.clientHeight];
         }
+
+
+        this.renderContext.setDesignResolution( cc.ResolutionPolicy.SHOW_ALL );
 
         //
         this.renderContext.size = new Fire.Vec2( size[0], size[1] );
