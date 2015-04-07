@@ -1,10 +1,5 @@
 Polymer(EditorUI.mixin({
     publish: {
-        'width': 200,
-        'height': 200,
-        'min-width': 10,
-        'min-height': 10,
-
         asset: null,
         meta: null,
         hide: { value: false, reflect: true },
