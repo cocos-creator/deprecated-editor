@@ -112,8 +112,10 @@ var SourceMap = {
     loadFromFileComment: function (path, callback) {
         Fs.readFile(path, function (err, data) {
             if (err) {
-                Fire.error('Failed to load source map from %s, %s', path, err);
-                return callback(err);
+                //Fire.error('Failed to load source map from %s, %s', path, err);
+                //return callback(err);
+                // 可能是项目里没有脚本
+                return callback();
             }
             var source = data.toString();
             var result;
