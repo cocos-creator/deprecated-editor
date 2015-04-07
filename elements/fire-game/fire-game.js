@@ -111,9 +111,6 @@ Polymer({
             size = [this.$.view.clientWidth, this.$.view.clientHeight];
         }
 
-
-        this.renderContext.setDesignResolution( cc.ResolutionPolicy.SHOW_ALL );
-
         //
         this.renderContext.size = new Fire.Vec2( size[0], size[1] );
         this.style.display = oldDisplay;
