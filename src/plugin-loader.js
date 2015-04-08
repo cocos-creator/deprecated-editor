@@ -76,12 +76,32 @@ var Ipc = require('ipc');
 var MSG_LOAD = 'plugin:load';
 var MSG_UNLOAD = 'plugin:unload';
 
-Fire._pluginLoader = new PluginLoader('editor-window plugins');
+Fire._builtinPluginLoader = new PluginLoader('editor-window builtin plugins');
+Fire._globalPluginLoader = new PluginLoader('editor-window global plugins');
+Fire._projectPluginLoader = new PluginLoader('editor-window project plugins');
 
-Ipc.on(MSG_LOAD, function (pkg, pkgPath) {
-    Fire._pluginLoader.load(pkg, pkgPath);
+var TypeToLoader = {
+    'builtin plugins': Fire._builtinPluginLoader,
+    'global plugins': Fire._globalPluginLoader,
+    'project plugins': Fire._projectPluginLoader,
+};
+
+Ipc.on(MSG_LOAD, function (pkg, pkgPath, type) {
+    var loader = TypeToLoader[type];
+    if (loader) {
+        loader.load(pkg, pkgPath);
+    }
+    else {
+        Fire.error('Unknown plugin type to load', type);
+    }
 });
 
-Ipc.on(MSG_UNLOAD, function (name) {
-    Fire._pluginLoader.unload(name);
+Ipc.on(MSG_UNLOAD, function (name, type) {
+    var loader = TypeToLoader[type];
+    if (loader) {
+        loader.unload(name);
+    }
+    else {
+        Fire.error('Unknown plugin type to unload', type);
+    }
 });

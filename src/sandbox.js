@@ -241,7 +241,7 @@ var Sandbox = (function () {
 
 
 // 加载项目里的普通脚本
-var userScriptLoader = (function () {
+var runtimeScriptLoader = (function () {
 
     var SRC_BUILTIN = 'bundle.builtin.js';
     var SRC_PROJECT = 'bundle.project.js';
@@ -281,44 +281,31 @@ var userScriptLoader = (function () {
         loadedScriptNodes.push(script);
     }
 
+    function loadRuntime (url, fsPath, info, callback) {
+        url = FireUrl.addRandomQuery(url);
+        doLoad(url, function (err) {
+            Sandbox.globalVarsChecker.restore(Fire.log, info, 'require');
+            callback(err);
+            if (! err) {
+                loadSrcMap();
+            }
+        });
+        function loadSrcMap () {
+            console.time('load source map of ' + url);
+            Fire._SourceMap.loadSrcMap(fsPath, url, function () {
+                console.timeEnd('load source map of ' + url);
+            });
+        }
+    }
+
     var loader = {
 
-        loadAll: function (callback) {
-            var builtinUrl = FireUrl.addRandomQuery(SRC_BUILTIN_URL);
-            var projectUrl = FireUrl.addRandomQuery(SRC_PROJECT_URL);
+        loadBuiltin: function (callback) {
+            loadRuntime(SRC_BUILTIN_URL, SRC_BUILTIN_PATH, 'loading builtin plugin runtime', callback);
+        },
 
-            Async.series([
-                function loadBuiltin (next) {
-                    doLoad(builtinUrl, function (err) {
-                        Sandbox.globalVarsChecker.restore(Fire.log, 'loading builtin plugin runtime', 'require');
-                        next(err);
-                    });
-                },
-                function loadBuiltinSrcMap (next) {
-                    console.time('load source map of ' + SRC_BUILTIN_URL);
-                    Fire._SourceMap.loadSrcMap(SRC_BUILTIN_PATH, SRC_BUILTIN_URL, function () {
-                        console.timeEnd('load source map of ' + SRC_BUILTIN_URL);
-                        next();
-                    });
-                },
-                function loadProject (next) {
-                    doLoad(projectUrl, function (err) {
-                        Sandbox.globalVarsChecker.restore(Fire.log, 'loading new scripts', 'require');
-                        next(err);
-                    });
-                },
-                function loadProjectSrcMap (next) {
-                    console.time('load source map of ' + SRC_PROJECT_URL);
-                    Fire._SourceMap.loadSrcMap(SRC_PROJECT_PATH, SRC_PROJECT_URL, function () {
-                        console.timeEnd('load source map of ' + SRC_PROJECT_URL);
-                        next();
-                    });
-                },
-                function (next) {
-                    Sandbox.reloadScene();
-                    next();
-                }
-            ], callback);
+        loadProject: function (callback) {
+            loadRuntime(SRC_PROJECT_URL, SRC_PROJECT_PATH, 'loading new scripts', callback);
         },
 
         unloadAll: function () {
@@ -392,7 +379,10 @@ Sandbox.reloadScripts = (function () {
         Sandbox.globalVarsChecker.restore(Fire.log, 'editing');
         if (scriptsLoaded) {
             // unload old
-            var LoadSequence = [userScriptLoader, Fire._pluginLoader];
+            var LoadSequence = [runtimeScriptLoader,
+                                Fire._builtinPluginLoader,
+                                Fire._globalPluginLoader,
+                                Fire._projectPluginLoader];
             for (var j = LoadSequence.length - 1; j >= 0; j--) {
                 LoadSequence[j].unloadAll();
                 Sandbox.globalVarsChecker.restore(Fire.warn, 'unloading ' + LoadSequence[j].name);
@@ -401,27 +391,64 @@ Sandbox.reloadScripts = (function () {
             purge();
         }
 
-        // load new
-        var loadTasks = [];
-        if ( compileSucceeded ) {
-            loadTasks.push(
-                function loadRuntime (next) {
-                    userScriptLoader.loadAll(function (err) {
-                        Sandbox.globalVarsChecker.restore(Fire.warn, 'loading ' + userScriptLoader.name);
-                        next(err);
+        // 加载脚本和插件，这里的加载流程比较特殊，只好自己写。
+        // （加载报错时，依赖项正常终止，但非依赖项必须正常执行。最后所有项目结束或报错才能回调。）
+
+        var loadGlobalEditor;
+        var loadProjectRuntime;
+
+        Async.parallel([
+            // load builtin runtime and editors
+            function (cb) {
+                // load builtin runtime
+                runtimeScriptLoader.loadBuiltin(function (err) {
+                    if (! err) {
+                        loadBuiltinEditors();
+                        loadGlobalEditor();
+                        loadProjectRuntime();
+                    }
+                    else {
+                        cb();
+                    }
+                });
+                function loadBuiltinEditors () {
+                    Fire._builtinPluginLoader.loadAll(function (err) {
+                        Sandbox.globalVarsChecker.restore(Fire.warn, 'loading ' + Fire._builtinPluginLoader.name);
+                        cb();
                     });
                 }
-            );
-        }
-        loadTasks.push(
-            function loadEditPlugin (next) {
-                Fire._pluginLoader.loadAll(function (err) {
-                    Sandbox.globalVarsChecker.restore(Fire.warn, 'loading ' + Fire._pluginLoader.name);
-                    next(err);
-                });
-            }
-        );
-        Async.series(loadTasks, callback);
+            },
+            // load global editors
+            function (cb) {
+                loadGlobalEditor = function () {
+                    Fire._globalPluginLoader.loadAll(function (err) {
+                        Sandbox.globalVarsChecker.restore(Fire.warn, 'loading ' + Fire._globalPluginLoader.name);
+                        cb();
+                    });
+                };
+            },
+            // load project runtime and editors
+            function (cb) {
+                loadProjectRuntime = function () {
+                    Async.series([
+                        function (next) {
+                            runtimeScriptLoader.loadProject(function (err) {
+                                next(err);
+                                if (! err) {
+                                    Sandbox.reloadScene();
+                                }
+                            });
+                        },
+                        function (next) {
+                            Fire._projectPluginLoader.loadAll(function (err) {
+                                Sandbox.globalVarsChecker.restore(Fire.warn, 'loading ' + Fire._projectPluginLoader.name);
+                                next();
+                            });
+                        },
+                    ], cb);
+                };
+            },
+        ], callback);
     }
 
     return reloadScripts;
