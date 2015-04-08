@@ -6,7 +6,7 @@ var SourceMapConsumer = require('source-map').SourceMapConsumer;
 
 var COMPILED_LINE_OFFSET = -3;   // 扣除 pre compile 时加上的行数
 
-var INDENT = '&nbsp;&nbsp;&nbsp;&nbsp;';
+var INDENT = '    ';
 
 // 最后一个以这个命名结尾的方法，及之后的调用堆栈会隐藏不显示。
 var IGNORE_CALL_SUFFIX = 'InTryCatch';
