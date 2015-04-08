@@ -89,18 +89,6 @@ Fire.sendToPanel = function ( pluginName, panelName, message ) {
     }
 };
 
-Fire.rpc = function ( name ) {
-    'use strict';
-    if ( typeof name === 'string' ) {
-        var args = [].slice.call( arguments );
-        Ipc.send.apply( Ipc, ['rpc'].concat( args ) );
-    }
-    else {
-        Fire.error('The name of rpc must be provided');
-    }
-};
-
-
 // Communication Patterns
 
 var nextSessionId = 0;

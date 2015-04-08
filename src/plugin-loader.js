@@ -14,7 +14,7 @@ PluginLoader.prototype.onAfterUnload = function () {
     Fire._Sandbox.reloadScripts(true);
 };
 //PluginLoader.prototype._addMenuImpl = function (path, msg) {
-//    Fire.MainMenu.addCommandItem(path, msg);
+//    Fire.MainMenu.addItem(path, msg);
 //};
 //PluginLoader.prototype._getRequireCacheImpl = function () {
 //    return Fire._Sandbox.nodeJsRequire.cache;

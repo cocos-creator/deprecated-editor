@@ -8,22 +8,22 @@ Fire.MainMenu = {};
  * @param {*[]} [params]
  * @param {number} [priority] - the order which the menu item are displayed
  */
-Fire.MainMenu.addCommandItem = function (menuPath, message, params, priority) {
-    Fire.rpc('menu:main-add-item', menuPath, message, params, {
+Fire.MainMenu.addItem = function (menuPath, message, params, priority) {
+    Fire.sendToCore('main-menu:add-item', menuPath, message, params, {
         priority: priority,
         type: 'window-dynamic'
-    });
+    }, Fire.RequireIpcEvent );
 };
 
 ///**
 // * @param {string} menuPath - the menu path name. Eg. "Entity/So Cool"
 // */
 //Fire.MainMenu.remove = function (menuPath) {
-//    Fire.rpc('menu:main-remove-item', menuPath);
+//    Fire.sendToCore('main-menu:remove-item', menuPath);
 //};
 
 Fire.MainMenu.reset = function () {
-    Fire.rpc('menu:main-reset', 'window-dynamic');
+    Fire.sendToCore('main-menu:reset', 'window-dynamic');
 };
 
 ///**
@@ -64,7 +64,11 @@ Fire.MainMenu.addTemplate = function (menuPath, template, options) {
     if (checkTemplate(template)) {
         options = options || {};
         options.type = options.type || 'window-dynamic';
-        Fire.rpc('menu:main-add-template', menuPath, template, options);
+        Fire.sendToCore( 'main-menu:add-template',
+                         menuPath,
+                         template,
+                         options,
+                         Fire.RequireIpcEvent );
     }
 };
 
@@ -72,5 +76,5 @@ Fire.MainMenu.addTemplate = function (menuPath, template, options) {
  * @param {object[]} template -  the template is just an array of options for constructing MenuItem
  */
 Fire.popupMenu = function (template, x, y) {
-    Fire.rpc('menu:popup', template, x, y);
+    Fire.sendToCore('menu:popup', template, x, y);
 };

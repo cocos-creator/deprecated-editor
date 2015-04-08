@@ -323,7 +323,7 @@ Polymer({
 
                     var newAssetUrl = Url.join( url, 'New Folder' );
                     this._focusUrl = newAssetUrl;
-                    Fire.rpc( 'asset-db:makedirs', newAssetUrl );
+                    Fire.AssetDB.newFolder( newAssetUrl );
                 }.bind(this)
             },
 
