@@ -50,7 +50,7 @@ function _fieldSection ( name, target, closable ) {
     if ( fireSectionEL.closable ) {
         fireSectionEL.addEventListener('close', function ( event ) {
             event.stopPropagation();
-            Fire.sendToMainWindow('engine:remove-component', {
+            Editor.sendToMainWindow('engine:remove-component', {
                 'component-id': target.id
             });
         });
@@ -80,7 +80,7 @@ Polymer({
             el = _fieldSection( 'Asset', this.target, false );
             this.appendChild( el );
         }
-        else if ( this.target instanceof Fire.AssetMeta ) {
+        else if ( this.target instanceof Editor.AssetMeta ) {
             el = _fieldSection( 'Meta', this.target, false );
             this.appendChild( el );
         }

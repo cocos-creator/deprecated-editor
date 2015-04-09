@@ -9,7 +9,7 @@ Polymer({
         this.icon = new Image();
         this.icon.src = "fire://static/img/plugin-inspector.png";
 
-        this.ipc = new Fire.IpcListener();
+        this.ipc = new Editor.IpcListener();
     },
 
     attached: function () {
@@ -30,7 +30,7 @@ Polymer({
     _onInspect: function ( type, id ) {
         if (type === 'entity') {
             if (id) {
-                var entity = Fire._getInstanceById(id);
+                var entity = Editor.getInstanceById(id);
                 if (entity) {
                     this.inspect(entity);
                 }
@@ -46,7 +46,7 @@ Polymer({
         else if (type === 'asset') {
             if (id) {
                 this.lastUuid = id;
-                var metaJson = Fire.AssetDB.loadMetaJson(id);
+                var metaJson = Editor.AssetDB.loadMetaJson(id);
                 // Checks whether last uuid modified to ensure call stack not suspended by another ipc event
                 // This may occurred after ipc sync invocation such as AssetDB.xxx
                 if (metaJson && this.lastUuid === id) {
@@ -61,7 +61,7 @@ Polymer({
                     }.bind(this, metaJson));
                 }
             }
-            else if (this.target instanceof Fire.AssetMeta) {
+            else if (this.target instanceof Editor.AssetMeta) {
                 // uninspect
                 this.inspect(null);
             }
@@ -74,7 +74,7 @@ Polymer({
             var reloadMeta = true;
 
             // NOTE: we don't need to reload custom-asset if it is auto-saved
-            if ( this.target instanceof Fire.CustomAssetMeta ) {
+            if ( this.target instanceof Editor.CustomAssetMeta ) {
                 if ( this.$.inspector.asset && this.$.inspector.asset.dirty ) {
                     this.$.inspector.asset.dirty = false;
                     reloadMeta = false;
@@ -83,7 +83,7 @@ Polymer({
 
             //
             if ( reloadMeta ) {
-                var metaJson = Fire.AssetDB.loadMetaJson(uuid);
+                var metaJson = Editor.AssetDB.loadMetaJson(uuid);
                 Fire.AssetLibrary.loadMeta(metaJson, function ( err, meta ) {
                     this.inspect(meta,true);
                 }.bind(this));
@@ -124,7 +124,7 @@ Polymer({
 
     _onEntityDirty: function ( entityID, componentID ) {
         if ( this.target && this.target.id === entityID ) {
-            var entity = Fire._getInstanceById(entityID);
+            var entity = Editor.getInstanceById(entityID);
             if (entity) {
                 this.$.inspector.refresh();
             }
@@ -140,31 +140,31 @@ Polymer({
             }
 
             //
-            if ( this.target instanceof Fire.AssetMeta && obj instanceof Fire.AssetMeta ) {
+            if ( this.target instanceof Editor.AssetMeta && obj instanceof Editor.AssetMeta ) {
                 if ( this.target.uuid === obj.uuid ) {
                     return;
                 }
             }
         }
-        if ( obj && obj.constructor === Fire.AssetMeta ) {
+        if ( obj && obj.constructor === Editor.AssetMeta ) {
             // unknown asset
             obj = null;
         }
         //
         if ( this.target ) {
-            Fire.observe(this.target,false);
+            Editor.observe(this.target,false);
         }
         if ( obj ) {
-            Fire.observe(obj,true);
+            Editor.observe(obj,true);
         }
 
-        var isTargetCustom = this.target instanceof Fire.CustomAssetMeta;
-        var isObjCustom = obj instanceof Fire.CustomAssetMeta;
+        var isTargetCustom = this.target instanceof Editor.CustomAssetMeta;
+        var isObjCustom = obj instanceof Editor.CustomAssetMeta;
 
         if ( isTargetCustom && isObjCustom ) {
             this.target = this.$.inspector.meta = obj;
         }
-        else if ( this.target instanceof Fire.AssetMeta && obj instanceof Fire.AssetMeta &&
+        else if ( this.target instanceof Editor.AssetMeta && obj instanceof Editor.AssetMeta &&
                  !isTargetCustom && !isObjCustom )
         {
             this.target = this.$.inspector.meta = obj;
@@ -176,8 +176,8 @@ Polymer({
             while ( this.firstElementChild ) {
                 this.removeChild(this.firstElementChild);
             }
-            if ( obj instanceof Fire.AssetMeta ) {
-                if ( obj instanceof Fire.CustomAssetMeta ) {
+            if ( obj instanceof Editor.AssetMeta ) {
+                if ( obj instanceof Editor.CustomAssetMeta ) {
                     this.$.inspector = new CustomAssetInspector();
                     this.target = this.$.inspector.meta = obj;
                 }
@@ -203,8 +203,8 @@ Polymer({
     reloadAction: function ( event ) {
         event.stopPropagation();
 
-        if ( this.target && this.target instanceof Fire.AssetMeta ) {
-            var metaJson = Fire.AssetDB.loadMetaJson(this.target.uuid);
+        if ( this.target && this.target instanceof Editor.AssetMeta ) {
+            var metaJson = Editor.AssetDB.loadMetaJson(this.target.uuid);
             Fire.AssetLibrary.loadMeta(metaJson, function ( err, meta ) {
                 this.inspect(meta,true);
             }.bind(this));

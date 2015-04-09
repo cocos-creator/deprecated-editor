@@ -111,4 +111,4 @@ PixiGrids.prototype.update = function () {
     this.graphics.endFill();
 };
 
-Fire.PixiGrids = PixiGrids;
+Editor.PixiGrids = PixiGrids;

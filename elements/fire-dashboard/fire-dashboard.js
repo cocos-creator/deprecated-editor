@@ -6,7 +6,7 @@ Polymer({
 
     ready: function () {
         this.selectItem(0);
-        Fire.Metrics.trackDashboardOpen();
+        Editor.Metrics.trackDashboardOpen();
     },
 
     detached: function () {
@@ -34,7 +34,7 @@ Polymer({
         } );
 
         if ( result ) {
-            Fire.sendToCore( 'dashboard:add-project', result[0], true );
+            Editor.sendToCore( 'dashboard:add-project', result[0], true );
         }
         this.selectItem(2);
     },

@@ -81,7 +81,7 @@ Polymer({
             return;
         }
 
-        Fire.sendToCore( 'dashboard:create-project', projectPath );
+        Editor.sendToCore( 'dashboard:create-project', projectPath );
     },
 
     templateAction: function ( event ) {

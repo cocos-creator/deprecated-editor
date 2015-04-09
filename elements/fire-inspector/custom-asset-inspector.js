@@ -16,7 +16,7 @@ Polymer({
         }
 
         this._timeout = setTimeout ( function () {
-            Fire.AssetDB.saveByUuid( this.meta.uuid, Fire.serialize(this.asset) );
+            Editor.AssetDB.saveByUuid( this.meta.uuid, Editor.serialize(this.asset) );
         }.bind(this), 500);
     },
 
@@ -52,9 +52,9 @@ Polymer({
 
     // applyAction: function ( event ) {
     //     event.stopPropagation();
-    //     Fire.sendToCore('asset-db:apply',
-    //                     Fire.serialize(this.meta),
-    //                     Fire.serialize(this.asset)
+    //     Editor.sendToCore('asset-db:apply',
+    //                     Editor.serialize(this.meta),
+    //                     Editor.serialize(this.asset)
     //                    );
     // },
 

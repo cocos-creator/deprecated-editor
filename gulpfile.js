@@ -63,6 +63,7 @@ var paths = {
         'src/gizmos/bitmap-text-gizmo.js',
         'src/gizmos/audio-source-gizmo.js',
     ],
+    index: 'src/index.js',
 };
 
 // clean
@@ -252,6 +253,7 @@ gulp.task('src-dev', ['src-jshint'], function() {
     return gulp.src(paths.src)
     .pipe(fb.wrapScope())
     .pipe(concat('editor.js'))
+    .pipe(fb.wrapModule(paths.index))
     .pipe(gulp.dest('bin'))
     ;
 });

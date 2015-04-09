@@ -282,4 +282,4 @@ var SourceMap = {
         return lines.join('\n');
     }
 };
-Fire._SourceMap = SourceMap;
+Editor._SourceMap = SourceMap;

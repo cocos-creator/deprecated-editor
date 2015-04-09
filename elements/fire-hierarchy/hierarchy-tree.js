@@ -14,7 +14,7 @@ Polymer({
         // debug
         hierarchy = this;
 
-        this.ipc = new Fire.IpcListener();
+        this.ipc = new Editor.IpcListener();
     },
 
     ready: function () {
@@ -46,24 +46,24 @@ Polymer({
         this.ipc.on('hierarchy-menu:create-entity', this.createEntity.bind(this));
         this.ipc.on('hierarchy-menu:create-child-entity', this.createChildEntity.bind(this));
         this.ipc.on('hierarchy-menu:rename', function () {
-            var contextSelection = Fire.Selection.contextEntities;
+            var contextSelection = Editor.Selection.contextEntities;
             if ( contextSelection.length > 0 ) {
                 var targetEL = this.idToItem[contextSelection[0]];
                 this.rename(targetEL);
             }
         }.bind(this));
         this.ipc.on('hierarchy-menu:delete', function () {
-            var contextSelection = Fire.Selection.contextEntities;
-            Fire.sendToMainWindow('engine:delete-entities', {
+            var contextSelection = Editor.Selection.contextEntities;
+            Editor.sendToMainWindow('engine:delete-entities', {
                 'entity-id-list': contextSelection
             });
         }.bind(this));
         this.ipc.on('hierarchy-menu:duplicate', function () {
-            var contextSelection = Fire.Selection.contextEntities;
+            var contextSelection = Editor.Selection.contextEntities;
             var entities = this.getToplevelElements(contextSelection).map(function (element) {
                 return element && element.userId;
             });
-            Fire.sendToMainWindow('engine:duplicate-entities', {
+            Editor.sendToMainWindow('engine:duplicate-entities', {
                 'entity-id-list': entities
             });
         }.bind(this));
@@ -100,7 +100,7 @@ Polymer({
             { type: 'separator' },
         ];
         // append Create menu
-        var createMenu = Fire.plugins.hierarchy.getMenuTemplate('hierarchy-menu');
+        var createMenu = Editor.plugins.hierarchy.getMenuTemplate('hierarchy-menu');
         template = template.concat(createMenu);
         //
         return template;
@@ -151,9 +151,9 @@ Polymer({
         if (!Fire.Engine._scene) {
             return;
         }
-        var selection = Fire.Selection.entities;
+        var selection = Editor.Selection.entities;
         function createItem(entity, parentEL) {
-            var el = Fire.plugins.hierarchy.newEntity(entity.name, entity._objFlags, entity.id, parentEL);
+            var el = Editor.plugins.hierarchy.newEntity(entity.name, entity._objFlags, entity.id, parentEL);
             if (el) {
                 var children = entity._children;
                 for (var i = 0, len = children.length; i < len; i++) {
@@ -227,8 +227,8 @@ Polymer({
     },
 
     moveEntities: function ( targetEL, entities, nextSiblingId ) {
-        // TODO: Fire.Selection.filter(entities,'sorted');
-        Fire.sendToMainWindow('engine:move-entities', {
+        // TODO: Editor.Selection.filter(entities,'sorted');
+        Editor.sendToMainWindow('engine:move-entities', {
             'entity-id-list': entities,
             'parent-id': targetEL ? targetEL.userId : null,
             'next-sibling-id': nextSiblingId
@@ -236,61 +236,61 @@ Polymer({
     },
 
     createEntity: function () {
-        var contextSelection = Fire.Selection.contextEntities;
+        var contextSelection = Editor.Selection.contextEntities;
         if ( contextSelection.length > 0 ) {
             var targetEL = this.idToItem[contextSelection[0]];
             var parentEL = targetEL.parentElement;
             if ( parentEL && parentEL instanceof HierarchyItem ) {
-                Fire.sendToMainWindow('engine:create-entity', {
+                Editor.sendToMainWindow('engine:create-entity', {
                     'parent-id': parentEL.userId
                 });
             }
             else {
-                Fire.sendToMainWindow('engine:create-entity');
+                Editor.sendToMainWindow('engine:create-entity');
             }
         }
         else {
-            Fire.sendToMainWindow('engine:create-entity');
+            Editor.sendToMainWindow('engine:create-entity');
         }
     },
 
     createChildEntity: function () {
-        var contextSelection = Fire.Selection.contextEntities;
+        var contextSelection = Editor.Selection.contextEntities;
         if ( contextSelection.length > 0 ) {
             var targetEL = this.idToItem[contextSelection[0]];
-            Fire.sendToMainWindow('engine:create-entity', {
+            Editor.sendToMainWindow('engine:create-entity', {
                 'parent-id': targetEL.userId
             });
         }
         else {
-            var activeId = Fire.Selection.activeEntityId;
-            Fire.sendToMainWindow('engine:create-entity', {
+            var activeId = Editor.Selection.activeEntityId;
+            Editor.sendToMainWindow('engine:create-entity', {
                 'parent-id': activeId
             });
         }
     },
 
     deleteSelection: function () {
-        Fire.sendToMainWindow('engine:delete-entities', {
-            'entity-id-list': Fire.Selection.entities
+        Editor.sendToMainWindow('engine:delete-entities', {
+            'entity-id-list': Editor.Selection.entities
         });
     },
 
     duplicateSelection: function () {
-        var entities = this.getToplevelElements(Fire.Selection.entities).map(function (element) {
+        var entities = this.getToplevelElements(Editor.Selection.entities).map(function (element) {
             return element && element.userId;
         });
-        Fire.sendToMainWindow('engine:duplicate-entities', {
+        Editor.sendToMainWindow('engine:duplicate-entities', {
             'entity-id-list': entities
         });
     },
 
     select: function ( element ) {
-        Fire.Selection.selectEntity(element.userId, true, true);
+        Editor.Selection.selectEntity(element.userId, true, true);
     },
 
     clearSelect: function () {
-        Fire.Selection.clearEntity();
+        Editor.Selection.clearEntity();
         this.activeElement = null;
         this.shiftStartElement = null;
     },
@@ -327,20 +327,20 @@ Polymer({
                 }
             }
             userIds.push(event.target.userId);
-            Fire.Selection.selectEntity(userIds, true, false);
+            Editor.Selection.selectEntity(userIds, true, false);
         }
         else if ( event.detail.toggle ) {
             if ( event.target.selected ) {
-                Fire.Selection.unselectEntity(event.target.userId, false);
+                Editor.Selection.unselectEntity(event.target.userId, false);
             }
             else {
-                Fire.Selection.selectEntity(event.target.userId, false, false);
+                Editor.Selection.selectEntity(event.target.userId, false, false);
             }
         }
         else {
             // if target already selected, do not unselect others
             if ( !event.target.selected ) {
-                Fire.Selection.selectEntity(event.target.userId, true, false);
+                Editor.Selection.selectEntity(event.target.userId, true, false);
             }
         }
     },
@@ -349,13 +349,13 @@ Polymer({
         event.stopPropagation();
 
         if ( event.detail.shift ) {
-            Fire.Selection.confirm();
+            Editor.Selection.confirm();
         }
         else if ( event.detail.toggle ) {
-            Fire.Selection.confirm();
+            Editor.Selection.confirm();
         }
         else {
-            Fire.Selection.selectEntity(event.target.userId, true);
+            Editor.Selection.selectEntity(event.target.userId, true);
         }
     },
 
@@ -376,7 +376,7 @@ Polymer({
         renamingEL._renaming = false;
 
         // TODO: pull up to view ?
-        Fire.sendToMainWindow('engine:rename-entity', {
+        Editor.sendToMainWindow('engine:rename-entity', {
             id: renamingEL.userId,
             name: event.target.value
         } );
@@ -398,9 +398,9 @@ Polymer({
             curContextID = event.target.userId;
         }
 
-        Fire.Selection.setContextEntity(curContextID);
+        Editor.Selection.setContextEntity(curContextID);
 
-        Fire.popupMenu(this.getContextMenuTemplate());
+        Editor.popupMenu(this.getContextMenuTemplate());
         event.stopPropagation();
     },
 
@@ -430,8 +430,8 @@ Polymer({
     dragstartAction: function ( event ) {
         event.stopPropagation();
 
-        EditorUI.DragDrop.start( event.dataTransfer, 'move', 'entity', Fire.Selection.entities.map( function (item) {
-            var ent = Fire._getInstanceById(item);
+        EditorUI.DragDrop.start( event.dataTransfer, 'move', 'entity', Editor.Selection.entities.map( function (item) {
+            var ent = Editor.getInstanceById(item);
             return { name: ent.name, id: item };
         }) );
     },
@@ -440,7 +440,7 @@ Polymer({
         EditorUI.DragDrop.end();
 
         this.resetDragState();
-        Fire.Selection.cancel();
+        Editor.Selection.cancel();
     },
 
     dragoverAction: function (event) {
@@ -517,7 +517,7 @@ Polymer({
         var items = EditorUI.DragDrop.drop(event.dataTransfer);
 
         this.resetDragState();
-        Fire.Selection.cancel();
+        Editor.Selection.cancel();
 
         if ( items.length > 0 ) {
             // get next sibliing id
@@ -570,17 +570,17 @@ Polymer({
             else if ( dragType === 'asset' ) {
                 var parentEnt = null;
                 if ( targetEL )
-                    parentEnt = Fire._getInstanceById(targetEL.userId);
+                    parentEnt = Editor.getInstanceById(targetEL.userId);
 
-                Fire.Selection.clearEntity();
+                Editor.Selection.clearEntity();
                 var onload = function ( err, asset ) {
                     if ( asset && asset.createEntity ) {
                         asset.createEntity( function ( ent ) {
                             ent.parent = parentEnt;
                             ent.transform.position = new Fire.Vec2(0,0);
-                            Fire.Selection.selectEntity( ent.id, false, true );
-                            Fire.sendToMainWindow( 'entity:added', ent.id );
-                            Fire.sendToWindows( 'scene:dirty' );
+                            Editor.Selection.selectEntity( ent.id, false, true );
+                            Editor.sendToMainWindow( 'entity:added', ent.id );
+                            Editor.sendToWindows( 'scene:dirty' );
                             Fire.AssetLibrary.cacheAsset( asset );
                         }.bind(this) );
                     }

@@ -1,16 +1,16 @@
 ﻿var idToObject = {};
 
-Fire._idToObject = idToObject;
+Editor._idToObject = idToObject;
 
-Fire._getInstanceById = function (id) {
+Editor.getInstanceById = function (id) {
     return idToObject[id];
 };
 
 Object.defineProperty(Fire, '$0', {
     get: function () {
-        var id = Fire.Selection.entities[0];
+        var id = Editor.Selection.entities[0];
         if (id) {
-            return Fire._getInstanceById(id);
+            return Editor.getInstanceById(id);
         }
     }
 });

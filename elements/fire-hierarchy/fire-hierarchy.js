@@ -20,7 +20,7 @@ Polymer({
         this.icon = new Image();
         this.icon.src = "fire://static/img/plugin-hierarchy.png";
 
-        this.ipc = new Fire.IpcListener();
+        this.ipc = new Editor.IpcListener();
     },
 
     attached: function () {
@@ -82,7 +82,7 @@ Polymer({
 
     createAction: function () {
         var rect = this.$.addIcon.getBoundingClientRect();
-        Fire.popupMenu(Fire.plugins.hierarchy.getMenuTemplate('main-menu'),
+        Editor.popupMenu(Editor.plugins.hierarchy.getMenuTemplate('main-menu'),
                        Math.floor(rect.left + 5),
                        Math.floor(rect.bottom + 10));
     },
@@ -91,7 +91,7 @@ Polymer({
         var tree = this.$.hierarchyTree;
         tree.clear();
 
-        var selection = Fire.Selection.entities;
+        var selection = Editor.Selection.entities;
         var entityDatas = sceneSnapshot.entities;
         for (var i = 0, len = entityDatas.length; i < len; i++) {
             createEntityFromSnapshot(tree, selection, entityDatas[i]);

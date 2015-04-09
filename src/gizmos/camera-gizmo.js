@@ -1,5 +1,5 @@
 ﻿var CameraGizmo = Fire.extend("Fire.CameraGizmo",
-                              Fire.Gizmo,
+                              Editor.Gizmo,
                               function () {
     var svg = arguments[0];
     var target = arguments[1];
@@ -36,7 +36,7 @@
 
     this._selectTools = selectTools;
 });
-Fire.gizmos['Fire.Camera'] = CameraGizmo;
+Editor.gizmos['Fire.Camera'] = CameraGizmo;
 
 //
 CameraGizmo.prototype.remove = function () {
@@ -63,8 +63,8 @@ CameraGizmo.prototype.update = function () {
     var localToWorld = this.target.entity.transform.getLocalToWorldMatrix();
     var worldpos = new Fire.Vec2(localToWorld.tx, localToWorld.ty);
     var screenpos = this._svg.camera.worldToScreen(worldpos);
-    screenpos.x = Fire.GizmosUtils.snapPixel(screenpos.x);
-    screenpos.y = Fire.GizmosUtils.snapPixel(screenpos.y);
+    screenpos.x = Editor.GizmosUtils.snapPixel(screenpos.x);
+    screenpos.y = Editor.GizmosUtils.snapPixel(screenpos.y);
     var rotation = -this.target.entity.transform.worldRotation;
 
     var s = Math.max( zoom, 0.5 );
@@ -89,4 +89,4 @@ CameraGizmo.prototype.update = function () {
     }
 };
 
-Fire.CameraGizmo = CameraGizmo;
+Editor.CameraGizmo = CameraGizmo;

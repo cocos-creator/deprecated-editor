@@ -1,7 +1,7 @@
 var Remote = require('remote');
 var remoteDB = Remote.getGlobal('ASSET_DB');
 
-Fire.AssetDB = {
+Editor.AssetDB = {
     // remote sync
     get _libraryPath() { return remoteDB._libraryPath; },
     _fspath: function (url) { return remoteDB._fspath(url); },
@@ -12,45 +12,45 @@ Fire.AssetDB = {
 
     // ipc
     explore: function ( url ) {
-        Fire.sendToCore( 'asset-db:explore', {
+        Editor.sendToCore( 'asset-db:explore', {
             url: url
         });
     },
 
     exploreLib: function ( url ) {
-        Fire.sendToCore( 'asset-db:explore-lib', {
+        Editor.sendToCore( 'asset-db:explore-lib', {
             url: url
         });
     },
 
     import: function ( destUrl, files ) {
-        Fire.sendToCore('asset-db:import', {
+        Editor.sendToCore('asset-db:import', {
             'dest-url': destUrl,
             'files': files
         });
     },
 
     reimport: function ( url ) {
-        Fire.sendToCore('asset-db:reimport', {
+        Editor.sendToCore('asset-db:reimport', {
             url: url
         });
     },
 
     delete: function ( url ) {
-        Fire.sendToCore('asset-db:delete', {
+        Editor.sendToCore('asset-db:delete', {
             url: url
         });
     },
 
     move: function ( srcUrl, destUrl ) {
-        Fire.sendToCore('asset-db:move', {
+        Editor.sendToCore('asset-db:move', {
             'src-url': srcUrl,
             'dest-url': destUrl,
         });
     },
 
     save: function ( url, json, buffer ) {
-        Fire.sendToCore('asset-db:save', {
+        Editor.sendToCore('asset-db:save', {
             url: url,
             json: json,
             buffer: buffer
@@ -58,7 +58,7 @@ Fire.AssetDB = {
     },
 
     saveByUuid: function ( uuid, json, buffer ) {
-        Fire.sendToCore('asset-db:save-by-uuid', {
+        Editor.sendToCore('asset-db:save-by-uuid', {
             uuid: uuid,
             json: json,
             buffer: buffer
@@ -66,29 +66,29 @@ Fire.AssetDB = {
     },
 
     newFolder: function ( url ) {
-        Fire.sendToCore( 'asset-db:new-folder', {
+        Editor.sendToCore( 'asset-db:new-folder', {
             url: url
         });
     },
 
     newScript: function ( url, templateName ) {
-        Fire.sendToCore('asset-db:new-script', {
+        Editor.sendToCore('asset-db:new-script', {
             url: url,
             template: templateName
         });
     },
 
     apply: function ( options ) {
-        Fire.sendToCore('asset-db:apply', options );
+        Editor.sendToCore('asset-db:apply', options );
     },
 
     query: function ( url, options, cb ) {
         options = Fire.JS.mixin( options || {}, { url: url } );
-        Fire.sendRequestToCore('asset-db:query', options, cb);
+        Editor.sendRequestToCore('asset-db:query', options, cb);
     },
 
     deepQuery: function ( url, cb ) {
-        Fire.sendRequestToCore('asset-db:deep-query', {
+        Editor.sendRequestToCore('asset-db:deep-query', {
             url: url
         }, cb);
     },

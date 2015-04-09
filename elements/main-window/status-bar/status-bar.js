@@ -9,7 +9,7 @@ var watchStates = {
 
 Polymer({
     created: function () {
-        this.ipc = new Fire.IpcListener();
+        this.ipc = new Editor.IpcListener();
 
         this.version = remote.getGlobal( 'FIRE_VER' );
         this.watchState = watchStates["watch-off"];

@@ -1,7 +1,7 @@
 var Texture = Fire.Texture;
 
 Texture.prototype.createEntity = function ( cb ) {
-    var metaJson = Fire.AssetDB.loadMetaJson(this._uuid);
+    var metaJson = Editor.AssetDB.loadMetaJson(this._uuid);
     Fire.AssetLibrary.loadMeta(metaJson, function ( err, meta ) {
         if ( meta.subRawData && meta.subRawData.length > 0 ) {
             var subInfo = meta.subRawData[0];

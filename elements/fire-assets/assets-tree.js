@@ -150,7 +150,7 @@ function _addCustomAssetMenu(target, template) {
     }
 
     function onclick() {
-        var contextSelection = Fire.Selection.contextAssets;
+        var contextSelection = Editor.Selection.contextAssets;
         if (contextSelection.length > 0) {
             var targetEL = target.idToItem[contextSelection[0]];
             if (!targetEL.isFolder) {
@@ -160,7 +160,7 @@ function _addCustomAssetMenu(target, template) {
             var newCustomAsset = new item.customAsset();
             var newAssetUrl = Url.join(url, fileName + '.asset');
             target._focusUrl = newAssetUrl;
-            Fire.AssetDB.save( newAssetUrl, Fire.serialize(newCustomAsset) );
+            Editor.AssetDB.save( newAssetUrl, Editor.serialize(newCustomAsset) );
         }
     }
 
@@ -236,7 +236,7 @@ Polymer({
         // confliction
         this.confliction = [];
 
-        this.ipc = new Fire.IpcListener();
+        this.ipc = new Editor.IpcListener();
 
         this._focusUrl = null;
     },
@@ -282,7 +282,7 @@ Polymer({
         }.bind(this) );
         this.ipc.on('assets:deleted', function (detail) {
             var results = detail.results;
-            var filterResults = Fire.arrayCmpFilter ( results, function ( a, b ) {
+            var filterResults = Editor.arrayCmpFilter ( results, function ( a, b ) {
                 if ( Path.contains( a.url, b.url ) ) {
                     return 1;
                 }
@@ -313,7 +313,7 @@ Polymer({
                 label: 'New Folder',
                 click: function () {
                     var url = "assets://";
-                    var contextSelection = Fire.Selection.contextAssets;
+                    var contextSelection = Editor.Selection.contextAssets;
                     if ( contextSelection.length > 0 ) {
                         var targetEL = this.idToItem[contextSelection[0]];
                         if ( !targetEL.isFolder )
@@ -323,7 +323,7 @@ Polymer({
 
                     var newAssetUrl = Url.join( url, 'New Folder' );
                     this._focusUrl = newAssetUrl;
-                    Fire.AssetDB.newFolder( newAssetUrl );
+                    Editor.AssetDB.newFolder( newAssetUrl );
                 }.bind(this)
             },
 
@@ -334,7 +334,7 @@ Polymer({
                 label: 'New Script',
                 click: function () {
                     var url = "assets://";
-                    var contextSelection = Fire.Selection.contextAssets;
+                    var contextSelection = Editor.Selection.contextAssets;
                     if ( contextSelection.length > 0 ) {
                         var targetEL = this.idToItem[contextSelection[0]];
                         if ( !targetEL.isFolder )
@@ -344,7 +344,7 @@ Polymer({
 
                     var newAssetUrl = Url.join( url, 'NewComponent.js' );
                     this._focusUrl = newAssetUrl;
-                    Fire.AssetDB.newScript( newAssetUrl, "simple-component" );
+                    Editor.AssetDB.newScript( newAssetUrl, "simple-component" );
                 }.bind(this)
             },
 
@@ -355,7 +355,7 @@ Polymer({
                 label: 'New Scene',
                 click: function () {
                     var url = "assets://";
-                    var contextSelection = Fire.Selection.contextAssets;
+                    var contextSelection = Editor.Selection.contextAssets;
                     if ( contextSelection.length > 0 ) {
                         var targetEL = this.idToItem[contextSelection[0]];
                         if ( !targetEL.isFolder )
@@ -366,7 +366,7 @@ Polymer({
                     var newAsset = new Fire._Scene();
                     var newAssetUrl = Url.join( url, 'New Scene.fire' );
                     this._focusUrl = newAssetUrl;
-                    Fire.AssetDB.save( newAssetUrl, Fire.serialize(newAsset) );
+                    Editor.AssetDB.save( newAssetUrl, Editor.serialize(newAsset) );
                 }.bind(this)
             },
 
@@ -375,7 +375,7 @@ Polymer({
                 label: 'New Atlas',
                 click: function () {
                     var url = "assets://";
-                    var contextSelection = Fire.Selection.contextAssets;
+                    var contextSelection = Editor.Selection.contextAssets;
                     if ( contextSelection.length > 0 ) {
                         var targetEL = this.idToItem[contextSelection[0]];
                         if ( !targetEL.isFolder )
@@ -386,7 +386,7 @@ Polymer({
                     var newAsset = new Fire.Atlas();
                     var newAssetUrl = Url.join( url, 'New Atlas.atlas' );
                     this._focusUrl = newAssetUrl;
-                    Fire.AssetDB.save( newAssetUrl, Fire.serialize(newAsset) );
+                    Editor.AssetDB.save( newAssetUrl, Editor.serialize(newAsset) );
                 }.bind(this)
             },
 
@@ -395,7 +395,7 @@ Polymer({
                 label: 'New Sprite (Standalone)',
                 click: function () {
                     var targetEL = null;
-                    var contextSelection = Fire.Selection.contextAssets;
+                    var contextSelection = Editor.Selection.contextAssets;
                     if ( contextSelection.length > 0 ) {
                         targetEL = this.idToItem[contextSelection[0]];
                     }
@@ -412,7 +412,7 @@ Polymer({
                             var url = this.getUrl(targetEL.parentElement);
                             var newAssetUrl = Url.join( url, textureName + '.sprite' );
                             this._focusUrl = newAssetUrl;
-                            Fire.AssetDB.save( newAssetUrl, Fire.serialize(newSprite) );
+                            Editor.AssetDB.save( newAssetUrl, Editor.serialize(newSprite) );
                         }.bind(this) );
                     }
                     else {
@@ -440,7 +440,7 @@ Polymer({
             {
                 label: 'Rename',
                 click: function () {
-                    var contextSelection = Fire.Selection.contextAssets;
+                    var contextSelection = Editor.Selection.contextAssets;
                     if ( contextSelection.length > 0 ) {
                         var targetEL = this.idToItem[contextSelection[0]];
                         this.rename(targetEL);
@@ -452,10 +452,10 @@ Polymer({
             {
                 label: 'Delete',
                 click: function () {
-                    var contextSelection = Fire.Selection.contextAssets;
+                    var contextSelection = Editor.Selection.contextAssets;
                     var elements = this.getToplevelElements(contextSelection);
                     for (var i = 0; i < elements.length; i++) {
-                        Fire.AssetDB.delete(this.getUrl(elements[i]));
+                        Editor.AssetDB.delete(this.getUrl(elements[i]));
                     }
                 }.bind(this),
             },
@@ -464,7 +464,7 @@ Polymer({
             {
                 label: 'Reimport',
                 click: function () {
-                    var contextSelection = Fire.Selection.contextAssets;
+                    var contextSelection = Editor.Selection.contextAssets;
                     if ( contextSelection.length > 0 ) {
                         var selectedItemEl = this.idToItem[contextSelection[0]];
                         var url = this.getUrl(selectedItemEl);
@@ -476,7 +476,7 @@ Polymer({
                             }
                             selectedItemEl.foldable = false;
                         }
-                        Fire.AssetDB.reimport(url);
+                        Editor.AssetDB.reimport(url);
                     }
                 }.bind(this)
             },
@@ -488,10 +488,10 @@ Polymer({
             {
                 label: 'Show in ' + (Fire.isWin32 ? 'Explorer' : 'Finder'),
                 click: function () {
-                    var contextSelection = Fire.Selection.contextAssets;
+                    var contextSelection = Editor.Selection.contextAssets;
                     if ( contextSelection.length > 0 ) {
                         var targetEL = this.idToItem[contextSelection[0]];
-                        Fire.AssetDB.explore(this.getUrl(targetEL));
+                        Editor.AssetDB.explore(this.getUrl(targetEL));
                     }
                 }.bind(this)
             },
@@ -500,10 +500,10 @@ Polymer({
             {
                 label: 'Show in Library',
                 click: function () {
-                    var contextSelection = Fire.Selection.contextAssets;
+                    var contextSelection = Editor.Selection.contextAssets;
                     if ( contextSelection.length > 0 ) {
                         var targetEL = this.idToItem[contextSelection[0]];
-                        Fire.AssetDB.exploreLib(this.getUrl(targetEL));
+                        Editor.AssetDB.exploreLib(this.getUrl(targetEL));
                     }
                 }.bind(this)
             },
@@ -512,7 +512,7 @@ Polymer({
             {
                 label: 'Show Uuid',
                 click: function () {
-                    var contextSelection = Fire.Selection.contextAssets;
+                    var contextSelection = Editor.Selection.contextAssets;
                     for ( var i = 0; i < contextSelection.length; ++i ) {
                         var targetEL = this.idToItem[contextSelection[i]];
                         Fire.log( targetEL.userId );
@@ -528,10 +528,10 @@ Polymer({
     },
 
     browse: function ( url ) {
-        var rootEL = _newAssetsItem.call(this, url, 'root', Fire.UUID.AssetsRoot, this);
+        var rootEL = _newAssetsItem.call(this, url, 'root', Editor.UUID.AssetsRoot, this);
         rootEL.folded = false;
 
-        Fire.AssetDB.deepQuery(url, function ( results ) {
+        Editor.AssetDB.deepQuery(url, function ( results ) {
             for ( var i = 0; i < results.length; ++i ) {
                 var info = results[i];
                 this.newItem( info.url, info.uuid, info.parentUuid, info.isDir );
@@ -552,7 +552,7 @@ Polymer({
             this._focusUrl = null;
             this.expand(newEL.userId);
             this.scrollToItem(newEL);
-            Fire.Selection.selectAsset(newEL.userId, true, true);
+            Editor.Selection.selectAsset(newEL.userId, true, true);
         }
     },
 
@@ -584,9 +584,9 @@ Polymer({
     },
 
     deleteSelection: function () {
-        var elements = this.getToplevelElements(Fire.Selection.assets);
+        var elements = this.getToplevelElements(Editor.Selection.assets);
         for (var i = 0; i < elements.length; i++) {
-            Fire.AssetDB.delete(this.getUrl(elements[i]));
+            Editor.AssetDB.delete(this.getUrl(elements[i]));
         }
     },
 
@@ -702,17 +702,17 @@ Polymer({
             if ( el.contains(targetEL) === false ) {
                 var srcUrl = this.getUrl(el);
                 var destUrl = Url.join( targetUrl, el.name + el.extname );
-                Fire.AssetDB.move( srcUrl, destUrl );
+                Editor.AssetDB.move( srcUrl, destUrl );
             }
         }
     },
 
     select: function ( element ) {
-        Fire.Selection.selectAsset(element.userId, true, true);
+        Editor.Selection.selectAsset(element.userId, true, true);
     },
 
     clearSelect: function () {
-        Fire.Selection.clearAsset();
+        Editor.Selection.clearAsset();
         this.activeElement = null;
         this.shiftStartElement = null;
     },
@@ -749,20 +749,20 @@ Polymer({
                 }
             }
             userIds.push(event.target.userId);
-            Fire.Selection.selectAsset(userIds, true, false);
+            Editor.Selection.selectAsset(userIds, true, false);
         }
         else if ( event.detail.toggle ) {
             if ( event.target.selected ) {
-                Fire.Selection.unselectAsset(event.target.userId, false);
+                Editor.Selection.unselectAsset(event.target.userId, false);
             }
             else {
-                Fire.Selection.selectAsset(event.target.userId, false, false);
+                Editor.Selection.selectAsset(event.target.userId, false, false);
             }
         }
         else {
             // if target already selected, do not unselect others
             if ( !event.target.selected ) {
-                Fire.Selection.selectAsset(event.target.userId, true, false);
+                Editor.Selection.selectAsset(event.target.userId, true, false);
             }
         }
     },
@@ -771,13 +771,13 @@ Polymer({
         event.stopPropagation();
 
         if ( event.detail.shift ) {
-            Fire.Selection.confirm();
+            Editor.Selection.confirm();
         }
         else if ( event.detail.toggle ) {
-            Fire.Selection.confirm();
+            Editor.Selection.confirm();
         }
         else {
-            Fire.Selection.selectAsset(event.target.userId, true);
+            Editor.Selection.selectAsset(event.target.userId, true);
         }
     },
 
@@ -800,7 +800,7 @@ Polymer({
         if ( renamingEL.name !== event.target.value ) {
             var srcUrl = this.getUrl(renamingEL);
             var destUrl = Url.join( Url.dirname(srcUrl), event.target.value + renamingEL.extname );
-            Fire.AssetDB.move( srcUrl, destUrl );
+            Editor.AssetDB.move( srcUrl, destUrl );
         }
     },
 
@@ -811,7 +811,7 @@ Polymer({
             return;
         }
 
-        Fire.sendToAll('asset:open', {
+        Editor.sendToAll('asset:open', {
             uuid: event.target.userId,
             url: this.getUrl(event.target)
         });
@@ -825,12 +825,12 @@ Polymer({
         this.resetDragState();
 
         //
-        var curContextID = Fire.UUID.AssetsRoot;
+        var curContextID = Editor.UUID.AssetsRoot;
         if ( event.target instanceof AssetsItem ) {
             curContextID = event.target.userId;
         }
 
-        Fire.Selection.setContextAsset(curContextID);
+        Editor.Selection.setContextAsset(curContextID);
 
         if (!this.contextmenu) {
             this.createContextMenu();
@@ -865,7 +865,7 @@ Polymer({
     dragstartAction: function ( event ) {
         event.stopPropagation();
 
-        EditorUI.DragDrop.start( event.dataTransfer, 'copyMove', 'asset', Fire.Selection.assets.map(function (item) {
+        EditorUI.DragDrop.start( event.dataTransfer, 'copyMove', 'asset', Editor.Selection.assets.map(function (item) {
             var uuid = item;
             var itemEL = this.idToItem[uuid];
             return { name: itemEL.name, id: item };
@@ -876,7 +876,7 @@ Polymer({
         EditorUI.DragDrop.end();
 
         this.resetDragState();
-        Fire.Selection.cancel();
+        Editor.Selection.cancel();
     },
 
     dragoverAction: function (event) {
@@ -973,12 +973,12 @@ Polymer({
         var targetEL = this.curDragoverEL;
 
         this.resetDragState();
-        Fire.Selection.cancel();
+        Editor.Selection.cancel();
 
         if ( items.length > 0 ) {
             if ( dragType === 'file' ) {
                 var dstUrl = this.getUrl(targetEL);
-                Fire.AssetDB.import( dstUrl, items );
+                Editor.AssetDB.import( dstUrl, items );
             }
             else if ( dragType === 'asset' ) {
                 this.moveAssets( targetEL, items );

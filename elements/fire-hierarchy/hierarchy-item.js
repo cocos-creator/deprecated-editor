@@ -32,12 +32,12 @@ Polymer({
     },
 
     mouseenterAction: function ( event ) {
-        Fire.Selection.hoverEntity(this.userId);
+        Editor.Selection.hoverEntity(this.userId);
         event.stopPropagation();
     },
 
     mouseleaveAction: function ( event ) {
-        Fire.Selection.hoverEntity(null);
+        Editor.Selection.hoverEntity(null);
         event.stopPropagation();
     },
 });

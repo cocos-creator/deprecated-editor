@@ -61,7 +61,7 @@ var _doGetTrimRect = function (pixelBuffer, w, h, trimThreshold) {
 };
 
 //
-Fire.getTrimRect = function (img, trimThreshold) {
+Editor.getTrimRect = function (img, trimThreshold) {
     var canvas, ctx;
     if (img instanceof Image || img instanceof HTMLImageElement) {
         // create temp canvas
@@ -125,12 +125,12 @@ var _readEntries = function (entries, callback) {
 
 // 获得浏览器拖进来的文件，当包含文件夹时，callback将被多次调用
 // recursive read all the files and (sub-)folders which dragged and dropped to browser
-Fire.getDraggingFiles = function (event, callback) {
+Editor.getDraggingFiles = function (event, callback) {
     //var paths = [];
     //for (var i = 0; i < files.length; i++) {
     //    paths.push(files[i].path);
     //}
-    //files = Fire.readDirRecursively(paths);
+    //files = Editor.readDirRecursively(paths);
     var items = event.dataTransfer.items;
     if (!items) {
         callback(event.dataTransfer.files);
@@ -171,7 +171,7 @@ var _downloadDataUrl = function (url, filename) {
 window.navigator.saveBlob = window.navigator.saveBlob || window.navigator.msSaveBlob;
 window.URL = window.URL || window.webkitURL;
 
-Fire.downloadBlob = function (blob, filename) {
+Editor.downloadBlob = function (blob, filename) {
     if (window.navigator.saveBlob) {
         window.navigator.saveBlob(blob, filename);
     }
@@ -182,7 +182,7 @@ Fire.downloadBlob = function (blob, filename) {
     }
 };
 
-Fire.downloadCanvas = function (canvas, filename) {
+Editor.downloadCanvas = function (canvas, filename) {
     canvas.toBlob = canvas.toBlob || canvas.msToBlob;
     if (canvas.toBlob && window.navigator.saveBlob) {
         window.navigator.saveBlob(canvas.toBlob(), filename);

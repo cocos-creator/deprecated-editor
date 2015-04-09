@@ -13,7 +13,7 @@ Ipc.on('engine:rename-entity', function ( detail ) {
     var id = detail.id;
     var name = detail.name;
 
-    var entity = Fire._getInstanceById(id);
+    var entity = Editor.getInstanceById(id);
     if (entity) {
         entity.name = name;
     }
@@ -23,7 +23,7 @@ Ipc.on('engine:delete-entities', function ( detail ) {
     var idList = detail['entity-id-list'];
     for (var i = 0; i < idList.length; i++) {
         var id = idList[i];
-        var entity = Fire._getInstanceById(id);
+        var entity = Editor.getInstanceById(id);
         if (entity) {
             entity.destroy();
         }
@@ -40,7 +40,7 @@ Ipc.on('engine:create-entity', function (detail) {
     }
     var ent = new Entity();
     if (parentId) {
-        var parent = Fire._getInstanceById(parentId);
+        var parent = Editor.getInstanceById(parentId);
         if (parent) {
             ent.parent = parent;
         }
@@ -52,13 +52,13 @@ Ipc.on('engine:move-entities', function ( detail ) {
     var parentId = detail['parent-id'];
     var nextSiblingId = detail['next-sibling-id'];
 
-    var parent = parentId && Fire._getInstanceById(parentId);
-    var next = nextSiblingId ? Fire._getInstanceById(nextSiblingId) : null;
+    var parent = parentId && Editor.getInstanceById(parentId);
+    var next = nextSiblingId ? Editor.getInstanceById(nextSiblingId) : null;
     var nextIndex = next ? next.getSiblingIndex() : -1;
 
     for (var i = 0; i < idList.length; i++) {
         var id = idList[i];
-        var entity = Fire._getInstanceById(id);
+        var entity = Editor.getInstanceById(id);
         if (entity && (!parent || !parent.isChildOf(entity))) {
             if (entity.parent !== parent) {
                 // keep world transform not changed
@@ -108,7 +108,7 @@ Ipc.on('engine:duplicate-entities', function ( detail ) {
 
     for (var i = 0; i < idList.length; i++) {
         var id = idList[i];
-        var entity = Fire._getInstanceById(id);
+        var entity = Editor.getInstanceById(id);
         if (entity) {
             // duplicate
             var clone = Fire.instantiate(entity);
@@ -121,7 +121,7 @@ Ipc.on('engine:add-component', function ( detail ) {
     var entityId = detail['entity-id'];
     var componentClassId = detail['component-class-id'];
 
-    var entity = Fire._getInstanceById(entityId);
+    var entity = Editor.getInstanceById(entityId);
     if (entity) {
         var CompCtor = Fire.JS._getClassById(componentClassId);
         if (CompCtor) {
@@ -132,7 +132,7 @@ Ipc.on('engine:add-component', function ( detail ) {
 
 Ipc.on('engine:remove-component', function ( detail ) {
     var componentId = detail['component-id'];
-    var comp = Fire._getInstanceById(componentId);
+    var comp = Editor.getInstanceById(componentId);
     if (comp) {
         comp.destroy();
     }

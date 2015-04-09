@@ -5,19 +5,19 @@ var Path = require('path');
  * Implement PluginLoader for editor-window
  */
 function PluginLoader () {
-    Fire._PluginLoaderBase.apply(this, arguments);
+    Editor._PluginLoaderBase.apply(this, arguments);
 }
-Fire.JS.extend(PluginLoader, Fire._PluginLoaderBase);
+Fire.JS.extend(PluginLoader, Editor._PluginLoaderBase);
 
 PluginLoader.prototype.onAfterUnload = function () {
     // reload to ensure context clear and menu unloaded
-    Fire._Sandbox.reloadScripts(true);
+    Editor._Sandbox.reloadScripts(true);
 };
 //PluginLoader.prototype._addMenuImpl = function (path, msg) {
-//    Fire.MainMenu.addItem(path, msg);
+//    Editor.MainMenu.addItem(path, msg);
 //};
 //PluginLoader.prototype._getRequireCacheImpl = function () {
-//    return Fire._Sandbox.nodeJsRequire.cache;
+//    return Editor._Sandbox.nodeJsRequire.cache;
 //};
 
 PluginLoader.prototype._loadImpl = function (plugin) {
@@ -50,7 +50,7 @@ PluginLoader.prototype._loadImpl = function (plugin) {
 };
 
 PluginLoader.prototype._unloadImpl = function (plugin) {
-    var cache = Fire._Sandbox.nodeJsRequire.cache;
+    var cache = Editor._Sandbox.nodeJsRequire.cache;
 
     // unload meta
     PluginLoader.parseMeta(plugin, function (asset) {
@@ -76,14 +76,14 @@ var Ipc = require('ipc');
 var MSG_LOAD = 'plugin:load';
 var MSG_UNLOAD = 'plugin:unload';
 
-Fire._builtinPluginLoader = new PluginLoader('editor-window builtin plugins');
-Fire._globalPluginLoader = new PluginLoader('editor-window global plugins');
-Fire._projectPluginLoader = new PluginLoader('editor-window project plugins');
+Editor._builtinPluginLoader = new PluginLoader('editor-window builtin plugins');
+Editor._globalPluginLoader = new PluginLoader('editor-window global plugins');
+Editor._projectPluginLoader = new PluginLoader('editor-window project plugins');
 
 var TypeToLoader = {
-    'builtin plugins': Fire._builtinPluginLoader,
-    'global plugins': Fire._globalPluginLoader,
-    'project plugins': Fire._projectPluginLoader,
+    'builtin plugins': Editor._builtinPluginLoader,
+    'global plugins': Editor._globalPluginLoader,
+    'project plugins': Editor._projectPluginLoader,
 };
 
 Ipc.on(MSG_LOAD, function (pkg, pkgPath, type) {

@@ -98,5 +98,5 @@ Gizmo.prototype.dirty = function () {
     this._root.node.dispatchEvent(e);
 };
 
-Fire.Gizmo = Gizmo;
+Editor.Gizmo = Gizmo;
 

@@ -1,5 +1,5 @@
 var PositionGizmo = Fire.extend("Fire.PositionGizmo",
-                                Fire.Gizmo,
+                                Editor.Gizmo,
                                 function () {
     var svg = arguments[0];
     var target = arguments[1];
@@ -37,11 +37,11 @@ PositionGizmo.prototype.update = function () {
     var worldpos,screenpos,rotation;
 
     if ( this.pivot === "center" ) {
-        worldpos = Fire.GizmosUtils.getCenter(this.target);
+        worldpos = Editor.GizmosUtils.getCenter(this.target);
         screenpos = this._svg.camera.worldToScreen(worldpos);
 
-        screenpos.x = Fire.GizmosUtils.snapPixel(screenpos.x);
-        screenpos.y = Fire.GizmosUtils.snapPixel(screenpos.y);
+        screenpos.x = Editor.GizmosUtils.snapPixel(screenpos.x);
+        screenpos.y = Editor.GizmosUtils.snapPixel(screenpos.y);
 
         this._root.position = screenpos;
         this._root.rotation = 0.0;
@@ -52,8 +52,8 @@ PositionGizmo.prototype.update = function () {
         screenpos = this._svg.camera.worldToScreen(worldpos);
         rotation = -activeTarget.transform.worldRotation;
 
-        screenpos.x = Fire.GizmosUtils.snapPixel(screenpos.x);
-        screenpos.y = Fire.GizmosUtils.snapPixel(screenpos.y);
+        screenpos.x = Editor.GizmosUtils.snapPixel(screenpos.x);
+        screenpos.y = Editor.GizmosUtils.snapPixel(screenpos.y);
 
         this._root.position = screenpos;
         this._root.rotation = 0.0;
@@ -68,4 +68,4 @@ PositionGizmo.prototype.update = function () {
               ;
 };
 
-Fire.PositionGizmo = PositionGizmo;
+Editor.PositionGizmo = PositionGizmo;

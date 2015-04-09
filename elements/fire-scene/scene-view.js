@@ -12,7 +12,7 @@ Polymer({
             scale: 1.0,
         };
 
-        this.ipc = new Fire.IpcListener();
+        this.ipc = new Editor.IpcListener();
 
         this._editTool = null;
         this._editingEdityIds = [];
@@ -22,10 +22,10 @@ Polymer({
         this.tabIndex = EditorUI.getParentTabIndex(this)+1;
 
         // init pixi grids
-        this.pixiGrids = new Fire.PixiGrids();
+        this.pixiGrids = new Editor.PixiGrids();
 
         // init gizmos
-        this.svgGizmos = new Fire.SvgGizmos( this.$.gizmos );
+        this.svgGizmos = new Editor.SvgGizmos( this.$.gizmos );
     },
 
     attached: function () {
@@ -159,7 +159,7 @@ Polymer({
         var gizmo = null;
 
         if ( enabled ) {
-            var comp = Fire._getInstanceById(compID);
+            var comp = Editor.getInstanceById(compID);
             if ( !comp ) {
                 return;     // 就算是enabled消息，由于是异步处理，也有可能已经销毁
             }
@@ -168,7 +168,7 @@ Polymer({
             }
 
             var classname = Fire.JS.getClassName(comp);
-            var gizmosDef = Fire.gizmos[classname];
+            var gizmosDef = Editor.gizmos[classname];
             if ( gizmosDef ) {
                 gizmo = new gizmosDef( this.svgGizmos, comp );
                 gizmo.update();
@@ -197,13 +197,13 @@ Polymer({
     },
 
     deleteSelection: function () {
-        Fire.sendToMainWindow('engine:delete-entities', {
-            'entity-id-list': Fire.Selection.entities
+        Editor.sendToMainWindow('engine:delete-entities', {
+            'entity-id-list': Editor.Selection.entities
         });
     },
 
     hover: function ( entityID ) {
-        var entity = Fire._getInstanceById(entityID);
+        var entity = Editor.getInstanceById(entityID);
         // NOTE: entity might be destroyed
         if ( entity ) {
             this.updateComponentGizmos( entity, {
@@ -213,7 +213,7 @@ Polymer({
     },
 
     hoverout: function ( entityID ) {
-        var entity = Fire._getInstanceById(entityID);
+        var entity = Editor.getInstanceById(entityID);
         // NOTE: entity might be destroyed
         if ( entity ) {
             this.updateComponentGizmos( entity, {
@@ -246,7 +246,7 @@ Polymer({
                 }
             }
 
-            var entity = Fire._getInstanceById(entityIds[i]);
+            var entity = Editor.getInstanceById(entityIds[i]);
             // NOTE: entity might be destroyed
             if ( entity ) {
                 this.updateComponentGizmos( entity, {
@@ -269,7 +269,7 @@ Polymer({
     edit: function ( entityIds ) {
         var i, gizmo, entities = [], entity = null;
         for ( i = 0; i < entityIds.length; ++i ) {
-            entity = Fire._getInstanceById(entityIds[i]);
+            entity = Editor.getInstanceById(entityIds[i]);
             if (entity) {
                 entities.push( entity );
             }
@@ -278,23 +278,23 @@ Polymer({
         if ( entities.length <= 0 )
             return;
 
-        switch ( Fire.mainWindow.settings.handle ) {
+        switch ( Editor.mainWindow.settings.handle ) {
             case "move":
-                gizmo = new Fire.PositionGizmo( this.svgGizmos, entities );
+                gizmo = new Editor.PositionGizmo( this.svgGizmos, entities );
                 break;
 
             case "rotate":
-                gizmo = new Fire.RotationGizmo( this.svgGizmos, entities );
+                gizmo = new Editor.RotationGizmo( this.svgGizmos, entities );
                 break;
 
             case "scale":
-                gizmo = new Fire.ScaleGizmo( this.svgGizmos, entities );
+                gizmo = new Editor.ScaleGizmo( this.svgGizmos, entities );
                 break;
         }
 
         gizmo.hitTest = false;
-        gizmo.pivot = Fire.mainWindow.settings.pivot;
-        gizmo.coordinate = Fire.mainWindow.settings.coordinate;
+        gizmo.pivot = Editor.mainWindow.settings.pivot;
+        gizmo.coordinate = Editor.mainWindow.settings.coordinate;
         gizmo.update();
 
         this._editTool = gizmo;
@@ -404,7 +404,7 @@ Polymer({
 
         //
         var hoverEntity = this.hitTest(event.offsetX, event.offsetY);
-        Fire.Selection.hoverEntity(hoverEntity && hoverEntity.id);
+        Editor.Selection.hoverEntity(hoverEntity && hoverEntity.id);
 
         event.stopPropagation();
     },
@@ -466,7 +466,7 @@ Polymer({
         // process rect-selection
         if ( event.which === 1 ) {
             var toggleMode = false;
-            var lastSelection = Fire.Selection.entities;
+            var lastSelection = Editor.Selection.entities;
             if ( event.metaKey || event.ctrlKey ) {
                 toggleMode = true;
             }
@@ -512,7 +512,7 @@ Polymer({
                         ids.push( entities[i].id );
                     }
                 }
-                Fire.Selection.selectEntity ( ids, true, false );
+                Editor.Selection.selectEntity ( ids, true, false );
 
                 //
                 event.stopPropagation();
@@ -533,7 +533,7 @@ Polymer({
 
                 var magSqr = w*w + h*h;
                 if ( magSqr >= 2.0 * 2.0 ) {
-                    Fire.Selection.confirm ();
+                    Editor.Selection.confirm ();
                 }
                 else {
                     var entity = this.hitTest( x, y );
@@ -541,19 +541,19 @@ Polymer({
                     if ( toggleMode ) {
                         if ( entity ) {
                             if ( lastSelection.indexOf(entity.id) === -1 ) {
-                                Fire.Selection.selectEntity ( entity.id, false, true );
+                                Editor.Selection.selectEntity ( entity.id, false, true );
                             }
                             else {
-                                Fire.Selection.unselectEntity ( entity.id, true );
+                                Editor.Selection.unselectEntity ( entity.id, true );
                             }
                         }
                     }
                     else {
                         if ( entity ) {
-                            Fire.Selection.selectEntity ( entity.id, true, true );
+                            Editor.Selection.selectEntity ( entity.id, true, true );
                         }
                         else {
-                            Fire.Selection.clearEntity ();
+                            Editor.Selection.clearEntity ();
                         }
                     }
                 }
@@ -589,7 +589,7 @@ Polymer({
         if ( !this.renderContext || !this.renderContext.camera )
             return;
 
-        Fire.Selection.hoverEntity(null);
+        Editor.Selection.hoverEntity(null);
         event.stopPropagation();
     },
 
@@ -620,9 +620,9 @@ Polymer({
 
         var entity = event.detail.entity;
         if ( entity )
-            Fire.Selection.hoverEntity(entity.id);
+            Editor.Selection.hoverEntity(entity.id);
         else
-            Fire.Selection.hoverEntity(null);
+            Editor.Selection.hoverEntity(null);
 
         event.stopPropagation();
     },
@@ -631,7 +631,7 @@ Polymer({
         if ( !this.renderContext || !this.renderContext.camera )
             return;
 
-        Fire.sendToMainWindow( 'gizmos:dirty' );
+        Editor.sendToMainWindow( 'gizmos:dirty' );
         this.repaint();
         event.stopPropagation();
     },
@@ -665,7 +665,7 @@ Polymer({
         event.preventDefault();
         event.stopPropagation();
 
-        Fire.Selection.cancel();
+        Editor.Selection.cancel();
 
         var items = EditorUI.DragDrop.drop(event.dataTransfer);
         var clientRect = this.getBoundingClientRect();
@@ -676,7 +676,7 @@ Polymer({
                     var mousePos = new Fire.Vec2(event.clientX - clientRect.left, event.clientY - clientRect.top);
                     var worldMousePos = this.renderContext.camera.screenToWorld(mousePos);
                     ent.transform.worldPosition = worldMousePos;
-                    Fire.Selection.selectEntity( ent.id, true, true );
+                    Editor.Selection.selectEntity( ent.id, true, true );
                     Fire.AssetLibrary.cacheAsset( asset );
                     this.repaint();
                 }.bind(this) );

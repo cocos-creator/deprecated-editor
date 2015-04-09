@@ -1,5 +1,5 @@
 var SpriteRendererGizmo = Fire.extend("Fire.SpriteRendererGizmo",
-                                      Fire.Gizmo,
+                                      Editor.Gizmo,
                                       function () {
 
     var svg = arguments[0];
@@ -13,7 +13,7 @@ var SpriteRendererGizmo = Fire.extend("Fire.SpriteRendererGizmo",
 
     this._editTools = null;
 });
-Fire.gizmos['Fire.SpriteRenderer'] = SpriteRendererGizmo;
+Editor.gizmos['Fire.SpriteRenderer'] = SpriteRendererGizmo;
 
 //
 SpriteRendererGizmo.prototype.remove = function () {
@@ -181,10 +181,10 @@ SpriteRendererGizmo.prototype.update = function () {
 
         this._selectTools.show();
         this._selectTools.plot([
-            [Fire.GizmosUtils.snapPixel(v1.x), Fire.GizmosUtils.snapPixel(v1.y)],
-            [Fire.GizmosUtils.snapPixel(v2.x), Fire.GizmosUtils.snapPixel(v2.y)],
-            [Fire.GizmosUtils.snapPixel(v3.x), Fire.GizmosUtils.snapPixel(v3.y)],
-            [Fire.GizmosUtils.snapPixel(v4.x), Fire.GizmosUtils.snapPixel(v4.y)],
+            [Editor.GizmosUtils.snapPixel(v1.x), Editor.GizmosUtils.snapPixel(v1.y)],
+            [Editor.GizmosUtils.snapPixel(v2.x), Editor.GizmosUtils.snapPixel(v2.y)],
+            [Editor.GizmosUtils.snapPixel(v3.x), Editor.GizmosUtils.snapPixel(v3.y)],
+            [Editor.GizmosUtils.snapPixel(v4.x), Editor.GizmosUtils.snapPixel(v4.y)],
         ])
         .fill( "none" )
         .stroke( { color: color, width: 1 } )
@@ -220,10 +220,10 @@ SpriteRendererGizmo.prototype.update = function () {
 
         this._selectTools.show();
         this._selectTools.plot([
-            [Fire.GizmosUtils.snapPixel(v1.x), Fire.GizmosUtils.snapPixel(v1.y)],
-            [Fire.GizmosUtils.snapPixel(v2.x), Fire.GizmosUtils.snapPixel(v2.y)],
-            [Fire.GizmosUtils.snapPixel(v3.x), Fire.GizmosUtils.snapPixel(v3.y)],
-            [Fire.GizmosUtils.snapPixel(v4.x), Fire.GizmosUtils.snapPixel(v4.y)],
+            [Editor.GizmosUtils.snapPixel(v1.x), Editor.GizmosUtils.snapPixel(v1.y)],
+            [Editor.GizmosUtils.snapPixel(v2.x), Editor.GizmosUtils.snapPixel(v2.y)],
+            [Editor.GizmosUtils.snapPixel(v3.x), Editor.GizmosUtils.snapPixel(v3.y)],
+            [Editor.GizmosUtils.snapPixel(v4.x), Editor.GizmosUtils.snapPixel(v4.y)],
         ])
         .fill( "none" )
         .stroke( { color: "#09f", width: 1 } )
@@ -238,10 +238,10 @@ SpriteRendererGizmo.prototype.update = function () {
 
         this._selectTools.show();
         this._selectTools.plot([
-            [Fire.GizmosUtils.snapPixel(v1.x), Fire.GizmosUtils.snapPixel(v1.y)],
-            [Fire.GizmosUtils.snapPixel(v2.x), Fire.GizmosUtils.snapPixel(v2.y)],
-            [Fire.GizmosUtils.snapPixel(v3.x), Fire.GizmosUtils.snapPixel(v3.y)],
-            [Fire.GizmosUtils.snapPixel(v4.x), Fire.GizmosUtils.snapPixel(v4.y)],
+            [Editor.GizmosUtils.snapPixel(v1.x), Editor.GizmosUtils.snapPixel(v1.y)],
+            [Editor.GizmosUtils.snapPixel(v2.x), Editor.GizmosUtils.snapPixel(v2.y)],
+            [Editor.GizmosUtils.snapPixel(v3.x), Editor.GizmosUtils.snapPixel(v3.y)],
+            [Editor.GizmosUtils.snapPixel(v4.x), Editor.GizmosUtils.snapPixel(v4.y)],
         ])
         .fill( "none" )
         .stroke( { color: "#999", width: 1 } )
@@ -252,4 +252,4 @@ SpriteRendererGizmo.prototype.update = function () {
     }
 };
 
-Fire.SpriteRendererGizmo = SpriteRendererGizmo;
+Editor.SpriteRendererGizmo = SpriteRendererGizmo;

@@ -1,5 +1,5 @@
 ﻿var AudioSourceGizmo = Fire.extend("Fire.AudioSourceGizmo",
-                            Fire.Gizmo,
+                            Editor.Gizmo,
                             function () {
 
     var svg = arguments[0];
@@ -10,7 +10,7 @@
 
     this._icon = svg.icon("fire://static/img/gizmos-audio-source.png", 40, 40, target.entity);
 });
-Fire.gizmos['Fire.AudioSource'] = AudioSourceGizmo;
+Editor.gizmos['Fire.AudioSource'] = AudioSourceGizmo;
 
 //
 AudioSourceGizmo.prototype.remove = function () {
@@ -37,8 +37,8 @@ AudioSourceGizmo.prototype.update = function () {
     var localToWorld = this.target.entity.transform.getLocalToWorldMatrix();
     var worldpos = new Fire.Vec2(localToWorld.tx, localToWorld.ty);
     var screenpos = this._svg.camera.worldToScreen(worldpos);
-    screenpos.x = Fire.GizmosUtils.snapPixel(screenpos.x);
-    screenpos.y = Fire.GizmosUtils.snapPixel(screenpos.y);
+    screenpos.x = Editor.GizmosUtils.snapPixel(screenpos.x);
+    screenpos.y = Editor.GizmosUtils.snapPixel(screenpos.y);
     var rotation = -this.target.entity.transform.worldRotation;
 
     var s = Math.max(zoom, 0.5);
@@ -47,4 +47,4 @@ AudioSourceGizmo.prototype.update = function () {
               .rotate(rotation, screenpos.x, screenpos.y);
 };
 
-Fire.AudioSourceGizmo = AudioSourceGizmo;
+Editor.AudioSourceGizmo = AudioSourceGizmo;

@@ -122,7 +122,7 @@ Polymer(EditorUI.mixin({
     },
 
     addComponent: function (componentCtor) {
-        Fire.sendToMainWindow('engine:add-component', {
+        Editor.sendToMainWindow('engine:add-component', {
             'entity-id': this.target.id,
             'component-class-id': Fire.JS._getClassId(componentCtor)
         });
@@ -143,8 +143,8 @@ Polymer(EditorUI.mixin({
             }
         }
 
-        Fire.sendToMainWindow( 'entity:inspector-dirty' );
-        Fire.sendToWindows( 'scene:dirty' );
+        Editor.sendToMainWindow( 'entity:inspector-dirty' );
+        Editor.sendToWindows( 'scene:dirty' );
     },
 
     addComponentAction: function ( event ) {
@@ -166,10 +166,10 @@ Polymer(EditorUI.mixin({
         var dragItems = event.detail.dragItems;
         var uuid = dragItems[0];
 
-        var metaJson = Fire.AssetDB.loadMetaJson(uuid);
+        var metaJson = Editor.AssetDB.loadMetaJson(uuid);
         if (metaJson) {
             Fire.AssetLibrary.loadMeta(metaJson, function ( err, meta ) {
-                if ( meta instanceof Fire.ScriptAssetMeta ) {
+                if ( meta instanceof Editor.ScriptAssetMeta ) {
                     this.highlighted = true;
                 }
             }.bind(this));
@@ -191,7 +191,7 @@ Polymer(EditorUI.mixin({
             var uuid = dragItems[0];
 
             // add component
-            var classID = Fire.compressUuid(uuid);
+            var classID = Editor.compressUuid(uuid);
             var ctor = Fire.JS._getClassById(classID);
             if ( ctor ) {
                 this.addComponent(ctor);

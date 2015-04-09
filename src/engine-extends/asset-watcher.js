@@ -1,4 +1,4 @@
-﻿Fire._AssetsWatcher = (function () {
+﻿Editor._AssetsWatcher = (function () {
 
     function AssetsWatcher(owner) {
         this.owner = owner;

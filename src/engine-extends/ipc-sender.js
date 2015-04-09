@@ -4,7 +4,7 @@
 var editorCallback = Fire.Engine._editorCallback;
 
 // pre-declaration for unit tests, overridable for editor
-Fire.sendToWindows = function () {};
+Editor.sendToWindows = function () {};
 
 editorCallback.onEnginePlayed = function (continued) {
     window.dispatchEvent( new CustomEvent ('engine-played', {
@@ -13,7 +13,7 @@ editorCallback.onEnginePlayed = function (continued) {
         cancelable: false,
     }) );
 
-    Fire.sendToWindows('engine:played', continued);
+    Editor.sendToWindows('engine:played', continued);
 };
 editorCallback.onEngineStopped = function () {
     window.dispatchEvent( new CustomEvent ('engine-stopped', {
@@ -21,10 +21,10 @@ editorCallback.onEngineStopped = function () {
         cancelable: false,
     }) );
 
-    Fire.sendToWindows('engine:stopped');
+    Editor.sendToWindows('engine:stopped');
 };
 editorCallback.onEnginePaused = function () {
-    Fire.sendToWindows('engine:paused');
+    Editor.sendToWindows('engine:paused');
 };
 
 function takeEntitySnapshot(entity) {
@@ -58,64 +58,64 @@ editorCallback.onSceneLaunched = function (scene) {
         cancelable: false,
     }) );
 
-    Fire.sendToWindows('scene:launched', takeSceneSnapshot(scene));
-    Fire.sendToWindows('scene:dirty');
+    Editor.sendToWindows('scene:launched', takeSceneSnapshot(scene));
+    Editor.sendToWindows('scene:dirty');
 };
 
 //editorCallback.onSceneLoaded = function (scene) {
-//    Fire.sendToWindows('scene:loaded', scene.entities);
+//    Editor.sendToWindows('scene:loaded', scene.entities);
 //};
 
 var onEntityCreated = 'entity:created';
 editorCallback.onEntityCreated = function (entity) {
     if (entity._children.length === 0) {
-        Fire.sendToWindows( onEntityCreated, entity._name, entity._objFlags, entity.id );
+        Editor.sendToWindows( onEntityCreated, entity._name, entity._objFlags, entity.id );
     }
     else {
-        Fire.sendToWindows( onEntityCreated, takeEntitySnapshot(entity) );
+        Editor.sendToWindows( onEntityCreated, takeEntitySnapshot(entity) );
     }
-    Fire.sendToWindows('scene:dirty');
+    Editor.sendToWindows('scene:dirty');
 };
 
 var onEntityRemoved = 'entity:removed';
 editorCallback.onEntityRemoved = function (entity/*, isTopMost*/) {
-    Fire.sendToWindows( onEntityRemoved, entity.id );
-    Fire.sendToWindows('scene:dirty');
+    Editor.sendToWindows( onEntityRemoved, entity.id );
+    Editor.sendToWindows('scene:dirty');
     // deselect
-    var entities = Fire.Selection.entities;
+    var entities = Editor.Selection.entities;
     if (entity.childCount > 0) {
         var unselect = [];
         for (var i = 0; i < entities.length; i++) {
             var id = entities[i];
-            var selected = Fire._getInstanceById(id);
+            var selected = Editor.getInstanceById(id);
             if (selected && selected.isChildOf(entity)) {
                 unselect.push(id);
             }
         }
         if (unselect.length > 0) {
-            Fire.Selection.cancel();
-            Fire.Selection.unselectEntity(unselect);
+            Editor.Selection.cancel();
+            Editor.Selection.unselectEntity(unselect);
         }
     }
     else {
         if (entities.indexOf(entity.id) !== -1) {
-            Fire.Selection.cancel();
-            Fire.Selection.unselectEntity(entity.id);
+            Editor.Selection.cancel();
+            Editor.Selection.unselectEntity(entity.id);
         }
     }
     // hover out
-    if (Fire.Selection.hoveringEntityId) {
-        var hovering = Fire._getInstanceById(Fire.Selection.hoveringEntityId);
+    if (Editor.Selection.hoveringEntityId) {
+        var hovering = Editor.getInstanceById(Editor.Selection.hoveringEntityId);
         if (hovering && hovering.isChildOf(entity)) {
-            Fire.Selection.hoverEntity('');
+            Editor.Selection.hoverEntity('');
         }
     }
 };
 
 var onEntityParentChanged = 'entity:parentChanged';
 editorCallback.onEntityParentChanged = function (entity) {
-    Fire.sendToWindows( onEntityParentChanged, entity.id, entity.parent && entity.parent.id );
-    Fire.sendToWindows('scene:dirty');
+    Editor.sendToWindows( onEntityParentChanged, entity.id, entity.parent && entity.parent.id );
+    Editor.sendToWindows('scene:dirty');
 };
 
 var onEntityIndexChanged = 'entity:indexChanged';
@@ -128,26 +128,26 @@ editorCallback.onEntityIndexChanged = function (entity, oldIndex, newIndex) {
         next = entity.getSibling(i);
     } while (next && (next._objFlags & Fire._ObjectFlags.HideInEditor));
     //
-    Fire.sendToWindows( onEntityIndexChanged, entity.id, next && next.id );
-    Fire.sendToWindows('scene:dirty');
+    Editor.sendToWindows( onEntityIndexChanged, entity.id, next && next.id );
+    Editor.sendToWindows('scene:dirty');
 };
 
 editorCallback.onEntityRenamed = function (entity) {
-    Fire.sendToWindows('entity:renamed', entity.id, entity._name);
+    Editor.sendToWindows('entity:renamed', entity.id, entity._name);
 };
 
 editorCallback.onComponentEnabled = function (component) {
-    Fire.sendToWindows('component:enabled', component.id);
+    Editor.sendToWindows('component:enabled', component.id);
 };
 
 editorCallback.onComponentDisabled = function (component) {
-    Fire.sendToWindows('component:disabled', component.id);
+    Editor.sendToWindows('component:disabled', component.id);
 };
 
 editorCallback.onComponentAdded = function (entity, component) {
-    Fire.sendToWindows('component:added', entity.id, component.id);
+    Editor.sendToWindows('component:added', entity.id, component.id);
 };
 
 editorCallback.onComponentRemoved = function (entity, component) {
-    Fire.sendToWindows('component:removed', entity.id, component.id);
+    Editor.sendToWindows('component:removed', entity.id, component.id);
 };

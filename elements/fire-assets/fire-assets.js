@@ -6,7 +6,7 @@ Polymer({
         this.icon = new Image();
         this.icon.src = "fire://static/img/plugin-assets.png";
 
-        this.ipc = new Fire.IpcListener();
+        this.ipc = new Editor.IpcListener();
     },
 
     attached: function () {

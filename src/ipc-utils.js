@@ -8,7 +8,7 @@ var Ipc = require('ipc');
  * @param {string} message - the message to send
  * @param {...*} [arg] - whatever arguments the message needs
  */
-Fire.sendToCore = function ( message ) {
+Editor.sendToCore = function ( message ) {
     'use strict';
     if ( typeof message === 'string' ) {
         var args = [].slice.call( arguments );
@@ -24,9 +24,9 @@ Fire.sendToCore = function ( message ) {
  * The page is so called as atom shell's web side. Each application window is an independent page and has its own JavaScript context.
  * @param {string} message - the message to send
  * @param {...*} [arg] - whatever arguments the message needs
- * @param {object} [options] - you can indicate the options such as Fire.SelfExcluded
+ * @param {object} [options] - you can indicate the options such as Editor.SelfExcluded
  */
-Fire.sendToWindows = function ( message ) {
+Editor.sendToWindows = function ( message ) {
     'use strict';
     if ( typeof message === 'string' ) {
         var args = [].slice.call( arguments );
@@ -43,7 +43,7 @@ Fire.sendToWindows = function ( message ) {
  * @param {string} message - the message to send
  * @param {...*} [arg] - whatever arguments the message needs
  */
-Fire.sendToMainWindow = function ( message ) {
+Editor.sendToMainWindow = function ( message ) {
     'use strict';
     if ( typeof message === 'string' ) {
         var args = [].slice.call( arguments );
@@ -58,9 +58,9 @@ Fire.sendToMainWindow = function ( message ) {
  * Broadcast message to all pages and editor-core
  * @param {string} message - the message to send
  * @param {...*} [arg] - whatever arguments the message needs
- * @param {object} [options] - you can indicate the options such as Fire.SelfExcluded
+ * @param {object} [options] - you can indicate the options such as Editor.SelfExcluded
  */
-Fire.sendToAll = function ( message ) {
+Editor.sendToAll = function ( message ) {
     'use strict';
     if ( typeof message === 'string' ) {
         var args = [].slice.call( arguments );
@@ -78,7 +78,7 @@ Fire.sendToAll = function ( message ) {
  * @param {string} message - the message to send
  * @param {...*} [arg] - whatever arguments the message needs
  */
-Fire.sendToPanel = function ( pluginName, panelName, message ) {
+Editor.sendToPanel = function ( pluginName, panelName, message ) {
     'use strict';
     if ( typeof message === 'string' ) {
         var args = [].slice.call( arguments );
@@ -99,7 +99,7 @@ var replyCallbacks = {};
  * @param {...*} [arg] - whatever arguments the request needs
  * @param {function} reply - the callback used to handle replied arguments
  */
-Fire.sendRequestToCore = function (request) {
+Editor.sendRequestToCore = function (request) {
     'use strict';
     if (typeof request === 'string') {
         var args = [].slice.call(arguments, 1);
@@ -140,5 +140,5 @@ Ipc.on('fire:send-reply-back', function replyCallback (args, sessionId) {
 });
 
 Ipc.on('fire:send2panel', function () {
-    Fire.PanelMng.dispatch.apply(Fire.PanelMng,arguments);
+    Editor.PanelMng.dispatch.apply(Editor.PanelMng,arguments);
 });

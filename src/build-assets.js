@@ -20,7 +20,7 @@ Ipc.on('build-assets', function (proj, dest, debug) {
                 isEditor: false,
                 createAssetRefs: true
             });
-            data.contents = new Buffer(Fire.serialize(obj, {
+            data.contents = new Buffer(Editor.serialize(obj, {
                 exporting: true,
                 minify: !debug
             }));
@@ -33,6 +33,6 @@ Ipc.on('build-assets', function (proj, dest, debug) {
         .pipe(gulp.dest(dest));
 
     es.merge(buildAssets, copyRawFiles).on('end', function () {
-        Fire.sendToCore('build-assets:reply');
+        Editor.sendToCore('build-assets:reply');
     });
 });

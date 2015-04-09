@@ -1,7 +1,7 @@
 Polymer({
 
     created: function () {
-        this.ipc = new Fire.IpcListener();
+        this.ipc = new Editor.IpcListener();
     },
 
     attached: function () {
@@ -38,7 +38,7 @@ Polymer({
         event.stopPropagation();
 
         if ( !Fire.Engine.isPlaying ) {
-            Fire._Sandbox.stashScene(function () {
+            Editor._Sandbox.stashScene(function () {
                 if (this.$.pause.active) {
                     Fire.Engine.step();
                 }
@@ -48,7 +48,7 @@ Polymer({
             }.bind(this));
         }
         else {
-            Fire._Sandbox.rewindScene(function () {
+            Editor._Sandbox.rewindScene(function () {
                 Fire.Engine.stop();
             });
         }
@@ -75,7 +75,7 @@ Polymer({
 
         if ( !Fire.Engine.isPlaying ) {
             // before play
-            Fire._Sandbox.stashScene(function () {
+            Editor._Sandbox.stashScene(function () {
                 Fire.Engine.step();
             });
         }

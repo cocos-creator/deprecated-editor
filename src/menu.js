@@ -1,6 +1,6 @@
-﻿// Fire.MainMenu
+﻿// Editor.MainMenu
 
-Fire.MainMenu = {};
+Editor.MainMenu = {};
 
 /**
  * @param {string} menuPath - the menu path name. Eg. "Entity/So Cool"
@@ -8,22 +8,22 @@ Fire.MainMenu = {};
  * @param {*[]} [params]
  * @param {number} [priority] - the order which the menu item are displayed
  */
-Fire.MainMenu.addItem = function (menuPath, message, params, priority) {
-    Fire.sendToCore('main-menu:add-item', menuPath, message, params, {
+Editor.MainMenu.addItem = function (menuPath, message, params, priority) {
+    Editor.sendToCore('main-menu:add-item', menuPath, message, params, {
         priority: priority,
         type: 'window-dynamic'
-    }, Fire.RequireIpcEvent );
+    }, Editor.RequireIpcEvent );
 };
 
 ///**
 // * @param {string} menuPath - the menu path name. Eg. "Entity/So Cool"
 // */
-//Fire.MainMenu.remove = function (menuPath) {
-//    Fire.sendToCore('main-menu:remove-item', menuPath);
+//Editor.MainMenu.remove = function (menuPath) {
+//    Editor.sendToCore('main-menu:remove-item', menuPath);
 //};
 
-Fire.MainMenu.reset = function () {
-    Fire.sendToCore('main-menu:reset', 'window-dynamic');
+Editor.MainMenu.reset = function () {
+    Editor.sendToCore('main-menu:reset', 'window-dynamic');
 };
 
 ///**
@@ -31,7 +31,7 @@ Fire.MainMenu.reset = function () {
 // * @param {function} callback
 // * @param {number} [priority] - the order which the menu item are displayed
 // */
-//Fire.MainMenu.addCallbackItem = function (menuPath, callback, priority) {
+//Editor.MainMenu.addCallbackItem = function (menuPath, callback, priority) {
 //    // TODO 自动注册命令并触发回调
 //};
 
@@ -60,21 +60,21 @@ function checkTemplate(template) {
  *     type: ['window-dynamic' | 'window-static'],    // indicates the menu type
  * }
  */
-Fire.MainMenu.addTemplate = function (menuPath, template, options) {
+Editor.MainMenu.addTemplate = function (menuPath, template, options) {
     if (checkTemplate(template)) {
         options = options || {};
         options.type = options.type || 'window-dynamic';
-        Fire.sendToCore( 'main-menu:add-template',
+        Editor.sendToCore( 'main-menu:add-template',
                          menuPath,
                          template,
                          options,
-                         Fire.RequireIpcEvent );
+                         Editor.RequireIpcEvent );
     }
 };
 
 /**
  * @param {object[]} template -  the template is just an array of options for constructing MenuItem
  */
-Fire.popupMenu = function (template, x, y) {
-    Fire.sendToCore('menu:popup', template, x, y);
+Editor.popupMenu = function (template, x, y) {
+    Editor.sendToCore('menu:popup', template, x, y);
 };

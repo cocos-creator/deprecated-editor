@@ -18,7 +18,7 @@ Object.defineProperty ( Entity.prototype, 'id', {
         }
         //retval = Object.getOwnPropertyDescriptor(HashObject.prototype, 'id').get.call(this);
         retval = (this._id = '' + this.hashCode);
-        Fire._idToObject[retval] = this;
+        Editor._idToObject[retval] = this;
         return retval;
     }
 });
@@ -27,7 +27,7 @@ Object.defineProperty ( Entity.prototype, 'id', {
 var doOnPreDestroy = Entity.prototype._onPreDestroy;
 Entity.prototype._onPreDestroy = function () {
     doOnPreDestroy.call(this);
-    delete Fire._idToObject[this._id];
+    delete Editor._idToObject[this._id];
 };
 
 Entity.prototype._getIndices = function () {

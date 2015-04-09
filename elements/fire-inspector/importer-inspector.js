@@ -21,8 +21,8 @@ Polymer({
     metaChanged: function () {
         // update preview
         if ( this.meta instanceof Fire.TextureMeta ||
-             this.meta instanceof Fire.SpriteMeta ||
-             this.meta instanceof Fire.AudioClipMeta )
+             this.meta instanceof Editor.SpriteMeta ||
+             this.meta instanceof Editor.AudioClipMeta )
         {
             this.$.preview.hide = false;
             this.$.splitter.hide = false;
@@ -33,8 +33,8 @@ Polymer({
         }
 
         // load asset
-        if ( this.meta instanceof Fire.FolderMeta ||
-             this.meta instanceof Fire.SceneMeta ) {
+        if ( this.meta instanceof Editor.FolderMeta ||
+             this.meta instanceof Editor.SceneMeta ) {
             this.$.metaFields.target = this.meta;
             this.$.metaFields.refresh();
 
@@ -61,9 +61,9 @@ Polymer({
 
         if ( this.asset ) {
             this.asset.dirty = true;
-            Fire.sendToWindows( 'inspector:asset:dirty', {
+            Editor.sendToWindows( 'inspector:asset:dirty', {
                 uuid: this.meta.uuid,
-                json: Fire.serialize(this.asset)
+                json: Editor.serialize(this.asset)
             } );
         }
     },
@@ -73,9 +73,9 @@ Polymer({
 
         if ( this.meta ) {
             this.meta.dirty = true;
-            Fire.sendToWindows( 'inspector:meta:dirty', {
+            Editor.sendToWindows( 'inspector:meta:dirty', {
                 uuid: this.meta.uuid,
-                json: Fire.serializeMeta(this.meta)
+                json: Editor.serializeMeta(this.meta)
             } );
         }
     },
@@ -83,9 +83,9 @@ Polymer({
     applyAction: function ( event ) {
         event.stopPropagation();
 
-        Fire.AssetDB.apply({
-            'meta-json': Fire.serializeMeta(this.meta),
-            'asset-json': Fire.serialize(this.asset),
+        Editor.AssetDB.apply({
+            'meta-json': Editor.serializeMeta(this.meta),
+            'asset-json': Editor.serialize(this.asset),
             'asset-dirty': this.asset.dirty,
         });
     },

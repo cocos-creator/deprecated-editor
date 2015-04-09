@@ -11,7 +11,7 @@ Object.defineProperty ( Component.prototype, 'id', {
         }
         //retval = Object.getOwnPropertyDescriptor(HashObject.prototype, 'id').get.call(this);
         retval = (this._id = '' + this.hashCode);
-        Fire._idToObject[retval] = this;
+        Editor._idToObject[retval] = this;
         return retval;
     }
 });
@@ -20,7 +20,7 @@ Object.defineProperty ( Component.prototype, 'id', {
 var doOnPreDestroy = Component.prototype._onPreDestroy;
 Component.prototype._onPreDestroy = function () {
     doOnPreDestroy.call(this);
-    delete Fire._idToObject[this._id];
+    delete Editor._idToObject[this._id];
 };
 
 Component.prototype._cacheUuid = null;
@@ -36,7 +36,7 @@ Fire._doDefine = function (className, baseClass, constructor) {
         // project script
         if (uuid) {
             Fire.addComponentMenu(comp, 'Scripts/' + Fire.JS.getClassName(comp), -1);
-            comp.prototype._cacheUuid = Fire.decompressUuid(uuid);
+            comp.prototype._cacheUuid = Editor.decompressUuid(uuid);
             //Fire.AssetLibrary.loadAsset(uuid, function (err, scriptAsset) {
             //    if (err) {
             //        Fire.error('Failed to assign script reference of component "%s": %s', className, err);

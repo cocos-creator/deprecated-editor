@@ -53,4 +53,4 @@ GizmosUtils.getCenter = function ( entities ) {
     return new Fire.Vec2( centerX, centerY );
 };
 
-Fire.GizmosUtils = GizmosUtils;
+Editor.GizmosUtils = GizmosUtils;

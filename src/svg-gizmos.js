@@ -118,7 +118,7 @@ SvgGizmos.prototype.updateSelection = function ( x, y, w, h ) {
         this.selectRect = this.foreground.rect();
     }
 
-    this.selectRect.move( Fire.GizmosUtils.snapPixel(x), Fire.GizmosUtils.snapPixel(y) )
+    this.selectRect.move( Editor.GizmosUtils.snapPixel(x), Editor.GizmosUtils.snapPixel(y) )
                    .size( w, h )
                    .fill( { color: "#09f", opacity: 0.4 } )
                    .stroke( { width: 1, color: "#09f", opacity: 1.0 } )
@@ -753,4 +753,4 @@ SvgGizmos.prototype.scaleTool = function ( callbacks ) {
     return group;
 };
 
-Fire.SvgGizmos = SvgGizmos;
+Editor.SvgGizmos = SvgGizmos;

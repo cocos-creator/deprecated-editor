@@ -14,7 +14,7 @@ Polymer({
         this.icon = new Image();
         this.icon.src = "fire://static/img/plugin-game.png";
 
-        this.ipc = new Fire.IpcListener();
+        this.ipc = new Editor.IpcListener();
 
         this.renderContext = null;
         this.curResolution = 0;

@@ -46,7 +46,7 @@ Polymer({
 
             setTimeout( function () {
                 if ( openWhenAdded ) {
-                    Fire.sendToCore('dashboard:open-project', path);
+                    Editor.sendToCore('dashboard:open-project', path);
                 }
             }, 300 );
 
@@ -64,7 +64,7 @@ Polymer({
         }.bind(this) );
 
         //
-        Fire.sendToCore( 'dashboard:request-recent-projects' );
+        Editor.sendToCore( 'dashboard:request-recent-projects' );
     },
 
     detached: function () {
@@ -83,7 +83,7 @@ Polymer({
         var files = event.dataTransfer.files;
         for ( var i = 0; i < files.length; ++i ) {
             var file = files[i];
-            Fire.sendToCore( 'dashboard:add-project', file.path );
+            Editor.sendToCore( 'dashboard:add-project', file.path );
         }
     },
 });

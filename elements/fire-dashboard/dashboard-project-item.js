@@ -22,10 +22,10 @@ Polymer({
     },
 
     openAction: function ( event ) {
-        Fire.sendToCore('dashboard:open-project', this.path);
+        Editor.sendToCore('dashboard:open-project', this.path);
     },
 
     closeAction: function ( event ) {
-        Fire.sendToCore('dashboard:remove-project', this.path);
+        Editor.sendToCore('dashboard:remove-project', this.path);
     },
 });

@@ -46,7 +46,7 @@ _getDocks = function ( dockEL ) {
     return docks;
 };
 
-Fire.PanelMng = {
+Editor.PanelMng = {
     root: null, // The mainDock, init by panel-init.js or main-window.js
 
     load: function ( url, panelID, panelInfo, cb ) {
@@ -77,7 +77,7 @@ Fire.PanelMng = {
 
             // jshint ignore:start
             // register ipc events
-            var ipcListener = new Fire.IpcListener();
+            var ipcListener = new Editor.IpcListener();
             for ( var ipcName in panelInfo.messages ) {
                 ipcListener.on( ipcName, function () {
                     var detail = {};
@@ -95,14 +95,14 @@ Fire.PanelMng = {
                 messages: panelInfo.messages,
                 ipcListener: ipcListener
             };
-            Fire.sendToCore('panel:dock', panelID, Fire.RequireIpcEvent);
-            Fire.sendRequestToCore('panel:query-settings', {
+            Editor.sendToCore('panel:dock', panelID, Editor.RequireIpcEvent);
+            Editor.sendRequestToCore('panel:query-settings', {
                 id: panelID,
                 settings: viewEL.settings
             }, function ( settings ) {
                 viewEL.settings = settings;
                 viewEL.settings.save = function () {
-                    Fire.sendToCore('panel:save-settings', {
+                    Editor.sendToCore('panel:save-settings', {
                         id: panelID,
                         settings: viewEL.settings,
                     } );
@@ -114,7 +114,7 @@ Fire.PanelMng = {
 
     closeAll: function () {
         for ( var id in _idToPanelInfo ) {
-            Fire.PanelMng.close(id);
+            Editor.PanelMng.close(id);
         }
     },
 
@@ -126,7 +126,7 @@ Fire.PanelMng = {
             delete _idToPanelInfo[panelID];
         }
 
-        Fire.sendToCore('panel:undock', panelID, Fire.RequireIpcEvent);
+        Editor.sendToCore('panel:undock', panelID, Editor.RequireIpcEvent);
     },
 
     dispatch: function ( pluginName, panelName, ipcMessage ) {

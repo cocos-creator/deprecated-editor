@@ -1,5 +1,5 @@
 var ScaleGizmo = Fire.extend("Fire.ScaleGizmo",
-                              Fire.Gizmo,
+                              Editor.Gizmo,
                               function () {
 
     var svg = arguments[0];
@@ -24,7 +24,7 @@ var ScaleGizmo = Fire.extend("Fire.ScaleGizmo",
             }
 
             if ( self.pivot === "center" ) {
-                center = Fire.GizmosUtils.getCenter(entities);
+                center = Editor.GizmosUtils.getCenter(entities);
                 offsetList.length = 0;
                 for ( i = 0; i < entities.length; ++i ) {
                     offsetList.push(entities[i].transform.worldPosition.sub(center));
@@ -71,12 +71,12 @@ ScaleGizmo.prototype.update = function () {
     var worldpos,screenpos,rotation;
 
     if ( this.pivot === "center" ) {
-        worldpos = Fire.GizmosUtils.getCenter(this.target);
+        worldpos = Editor.GizmosUtils.getCenter(this.target);
         screenpos = this._svg.camera.worldToScreen(worldpos);
         rotation = 0.0;
 
-        screenpos.x = Fire.GizmosUtils.snapPixel(screenpos.x);
-        screenpos.y = Fire.GizmosUtils.snapPixel(screenpos.y);
+        screenpos.x = Editor.GizmosUtils.snapPixel(screenpos.x);
+        screenpos.y = Editor.GizmosUtils.snapPixel(screenpos.y);
 
         this._root.position = screenpos;
         this._root.rotation = 0.0;
@@ -87,8 +87,8 @@ ScaleGizmo.prototype.update = function () {
         screenpos = this._svg.camera.worldToScreen(worldpos);
         rotation = -activeTarget.transform.worldRotation;
 
-        screenpos.x = Fire.GizmosUtils.snapPixel(screenpos.x);
-        screenpos.y = Fire.GizmosUtils.snapPixel(screenpos.y);
+        screenpos.x = Editor.GizmosUtils.snapPixel(screenpos.x);
+        screenpos.y = Editor.GizmosUtils.snapPixel(screenpos.y);
 
         this._root.position = screenpos;
         this._root.rotation = rotation;
@@ -99,5 +99,5 @@ ScaleGizmo.prototype.update = function () {
               ;
 };
 
-Fire.ScaleGizmo = ScaleGizmo;
+Editor.ScaleGizmo = ScaleGizmo;
 

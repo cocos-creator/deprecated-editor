@@ -7,7 +7,7 @@ Polymer({
     _scriptsLoaded: false,
 
     created: function () {
-        Fire.mainWindow = this;
+        Editor.mainWindow = this;
 
         this.settings = {
             handle: "move", // move, rotate, scale
@@ -17,7 +17,7 @@ Polymer({
         this.sceneInfo = {};
 
         this.sceneNameObserver = null;
-        this.ipc = new Fire.IpcListener();
+        this.ipc = new Editor.IpcListener();
 
         this._updateSceneIntervalID = null;
         this._updateSceneAnimFrameID = null;
@@ -33,7 +33,7 @@ Polymer({
             // save
             case 0:
                 this.saveCurrentScene();
-                Fire.Metrics.trackEditorClose();
+                Editor.Metrics.trackEditorClose();
                 return true;
 
             // cancel
@@ -42,7 +42,7 @@ Polymer({
 
             // don't save
             case 2:
-                Fire.Metrics.trackEditorClose();
+                Editor.Metrics.trackEditorClose();
                 return true;
             }
         }.bind(this);
@@ -69,7 +69,7 @@ Polymer({
         this.ipc.on('project:ready', this.init.bind(this));
 
         this.ipc.on('reload:window-scripts', function ( compiled ) {
-            Fire._Sandbox.reloadScripts(compiled, function () {
+            Editor._Sandbox.reloadScripts(compiled, function () {
                 this._scriptsLoaded = true;
             }.bind(this) );
         }.bind(this));
@@ -80,7 +80,7 @@ Polymer({
                 var asset = Fire.AssetLibrary._uuidToAsset[p];
                 results.push( { uuid: p, name: asset.name, type: Fire.JS.getClassName(asset) } );
             }
-            Fire.sendToAll('asset-library:debugger:uuid-asset-results', {
+            Editor.sendToAll('asset-library:debugger:uuid-asset-results', {
                 results: results
             });
         }.bind(this));
@@ -130,7 +130,7 @@ Polymer({
                 this._sceneDirtyFlag = false;
                 // don't re-open current saving scene
                 if ( uuid !== Fire.Engine._scene._uuid ) {
-                    Fire.sendToMainWindow('engine:open-scene', {
+                    Editor.sendToMainWindow('engine:open-scene', {
                         uuid: uuid
                     });
                 }
@@ -143,7 +143,7 @@ Polymer({
             // don't save
             case 2:
                 this._sceneDirtyFlag = false;
-                Fire.sendToMainWindow('engine:open-scene', {
+                Editor.sendToMainWindow('engine:open-scene', {
                     uuid: uuid
                 });
                 break;
@@ -208,8 +208,8 @@ Polymer({
     },
 
     domReady: function () {
-        Fire.PanelMng.root = this.$.mainDock;
-        Fire.sendToCore('project:init');
+        Editor.PanelMng.root = this.$.mainDock;
+        Editor.sendToCore('project:init');
     },
 
     init: function () {
@@ -256,8 +256,8 @@ Polymer({
                     EditorUI.DockUtils.reset();
 
                     // for each plugin
-                    for ( var key in Fire.plugins) {
-                        var plugin = Fire.plugins[key];
+                    for ( var key in Editor.plugins) {
+                        var plugin = Editor.plugins[key];
 
                         // init plugin
                         if ( plugin.init ) {
@@ -266,9 +266,9 @@ Polymer({
                     }
 
                     // save layout
-                    Fire.sendToCore( 'window:save-layout',
-                                    Fire.PanelMng.getLayout(),
-                                    Fire.RequireIpcEvent );
+                    Editor.sendToCore( 'window:save-layout',
+                                    Editor.PanelMng.getLayout(),
+                                    Editor.RequireIpcEvent );
 
                     //
                     next();
@@ -277,7 +277,7 @@ Polymer({
 
             // compile scripts
             function ( next ) {
-                Fire.sendToCore('compiler:compile-and-reload');
+                Editor.sendToCore('compiler:compile-and-reload');
                 var id = setInterval( function () {
                     if ( self._scriptsLoaded ) {
                         clearInterval(id);
@@ -293,7 +293,7 @@ Polymer({
 
                 // query scenes
                 var SCENE_ID = Fire.JS._getClassId(Fire._Scene);
-                Fire.AssetDB.query( "assets://", {
+                Editor.AssetDB.query( "assets://", {
                     'type-id': SCENE_ID
                 }, function ( results ) {
                     for ( var i = 0; i < results.length; ++i ) {
@@ -323,7 +323,7 @@ Polymer({
                     self.newScene();
                 }
 
-                Fire.Metrics.trackEditorOpen();
+                Editor.Metrics.trackEditorOpen();
                 next();
             },
 
@@ -360,7 +360,7 @@ Polymer({
 
     updateTitle: function () {
         setImmediate(function () {
-            var url = Fire.AssetDB.uuidToUrl(Fire.Engine._scene._uuid);
+            var url = Editor.AssetDB.uuidToUrl(Fire.Engine._scene._uuid);
             if ( !url ) {
                 url = 'Untitled';
             }
@@ -410,7 +410,7 @@ Polymer({
                 type: "warning",
                 buttons: ["Save","Cancel","Don't Save"],
                 title: "Save Scene Confirm",
-                message: Fire.AssetDB.uuidToUrl(Fire.Engine._scene._uuid) + " has changed, do you want to save it?",
+                message: Editor.AssetDB.uuidToUrl(Fire.Engine._scene._uuid) + " has changed, do you want to save it?",
                 detail: "Your changes will be lost if you close this item without saving."
             } );
         }
@@ -422,10 +422,10 @@ Polymer({
     saveCurrentScene: function () {
         var currentScene = Fire.Engine._scene;
         var dialog = Remote.require('dialog');
-        var saveUrl = Fire.AssetDB.uuidToUrl(currentScene._uuid);
+        var saveUrl = Editor.AssetDB.uuidToUrl(currentScene._uuid);
 
         if ( !saveUrl ) {
-            var rootPath = Fire.AssetDB._fspath("assets://");
+            var rootPath = Editor.AssetDB._fspath("assets://");
             var savePath = dialog.showSaveDialog( Remote.getCurrentWindow(), {
                 title: "Save Scene",
                 defaultPath: rootPath,
@@ -455,7 +455,7 @@ Polymer({
         //
         if ( saveUrl ) {
             this._newsceneUrl = saveUrl;
-            Fire.AssetDB.save( this._newsceneUrl, Fire.serialize(currentScene) );
+            Editor.AssetDB.save( this._newsceneUrl, Editor.serialize(currentScene) );
         }
     },
 

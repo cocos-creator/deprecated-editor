@@ -2,7 +2,7 @@
 var Util = require('util');
 var Ipc = require('ipc');
 var Remote = require('remote');
-var RemoteFire = Remote.getGlobal('Fire');
+var RemoteEditor = Remote.getGlobal('Editor');
 
 // init argument list sending from core by url?queries
 // format: "?foo=bar&hell=world"
@@ -16,11 +16,11 @@ for ( var i = 0; i < queryList.length; ++i ) {
         queries[pair[0]] = pair[1];
     }
 }
-Fire.argv = queries;
+Editor.argv = queries;
 
 
-Fire.url = function (url) {
-    return RemoteFire.url(url);
+Editor.url = function (url) {
+    return RemoteEditor.url(url);
 };
 
 // console
@@ -33,7 +33,7 @@ Fire.log = function ( text ) {
         text = Util.format.apply(Util, arguments);
     }
     console.log(text);
-    Fire.sendToCore('console:log', text);
+    Editor.sendToCore('console:log', text);
 };
 Fire.warn = function ( text ) {
     'use strict';
@@ -44,7 +44,7 @@ Fire.warn = function ( text ) {
         text = Util.format.apply(Util, arguments);
     }
     console.warn(text);
-    Fire.sendToCore('console:warn', text);
+    Editor.sendToCore('console:warn', text);
 };
 Fire.error = function ( text ) {
     'use strict';
@@ -55,7 +55,7 @@ Fire.error = function ( text ) {
         text = Util.format.apply(Util, arguments);
     }
     console.error(text);
-    Fire.sendToCore('console:error', text);
+    Editor.sendToCore('console:error', text);
 };
 Fire.success = function ( text ) {
     'use strict';
@@ -66,7 +66,7 @@ Fire.success = function ( text ) {
         text = Util.format.apply(Util, arguments);
     }
     console.log('%c' + text, "color: green");
-    Fire.sendToCore('console:success', text);
+    Editor.sendToCore('console:success', text);
 };
 Fire.failed = function ( text ) {
     'use strict';
@@ -77,7 +77,7 @@ Fire.failed = function ( text ) {
         text = Util.format.apply(Util, arguments);
     }
     console.log('%c' + text, "color: red");
-    Fire.sendToCore('console:failed', text);
+    Editor.sendToCore('console:failed', text);
 };
 Fire.info = function ( text ) {
     'use strict';
@@ -88,7 +88,7 @@ Fire.info = function ( text ) {
         text = Util.format.apply(Util, arguments);
     }
     console.info(text);
-    Fire.sendToCore('console:info', text);
+    Editor.sendToCore('console:info', text);
 };
 
 /**
@@ -99,16 +99,16 @@ Fire.info = function ( text ) {
  */
 Fire._throw = function (error) {
     console.error(error.stack);
-    var resolvedStack = Fire._SourceMap.resolveStack(error.stack);
+    var resolvedStack = Editor._SourceMap.resolveStack(error.stack);
     if (Ipc._events['console:error']) {
         Ipc.emit('console:error', resolvedStack);
     }
     else {
-        Fire.sendToMainWindow('console:error', resolvedStack);
+        Editor.sendToMainWindow('console:error', resolvedStack);
     }
 };
 
-Fire.observe = function ( target, enabled ) {
+Editor.observe = function ( target, enabled ) {
     if ( !target.isValid ) {
         return;
     }
@@ -121,37 +121,37 @@ Fire.observe = function ( target, enabled ) {
     }
 };
 
-Fire.hintObjectById = function ( type, id ) {
+Editor.hintObjectById = function ( type, id ) {
     if ( Fire.isChildClassOf( type, Fire.Entity ) ) {
-        Fire.sendToWindows('entity:hint', id );
+        Editor.sendToWindows('entity:hint', id );
     }
     else if ( Fire.isChildClassOf( type, Fire.Component ) ) {
-        Fire.sendToWindows('entity:hint', id );
+        Editor.sendToWindows('entity:hint', id );
     }
     else if ( Fire.isChildClassOf( type, Fire.Asset ) ) {
-        Fire.sendToWindows('asset:hint', id );
+        Editor.sendToWindows('asset:hint', id );
     }
 };
 
-Fire.hintObject = function ( target ) {
+Editor.hintObject = function ( target ) {
     if ( target instanceof Fire.Entity ) {
-        Fire.sendToWindows('entity:hint', target.id );
+        Editor.sendToWindows('entity:hint', target.id );
     }
     else if ( target instanceof Fire.Component ) {
-        Fire.sendToWindows('entity:hint', target.entity.id );
+        Editor.sendToWindows('entity:hint', target.entity.id );
     }
     else if ( target instanceof Fire.Asset ) {
-        Fire.sendToWindows('asset:hint', target._uuid );
+        Editor.sendToWindows('asset:hint', target._uuid );
     }
 };
 
 var _isBrowsing = false;
-Fire.browseObject = function ( type, fobjectEL ) {
+Editor.browseObject = function ( type, fobjectEL ) {
     if ( _isBrowsing )
         return;
 
     _isBrowsing = true;
-    var ipc = new Fire.IpcListener();
+    var ipc = new Editor.IpcListener();
 
     if ( Fire.isChildClassOf( type, Fire.Entity ) ) {
         Fire.warn('TODO: ask johnny how to do this.');
@@ -163,7 +163,7 @@ Fire.browseObject = function ( type, fobjectEL ) {
     }
     else if ( Fire.isChildClassOf( type, Fire.Asset ) ) {
         var typeID = Fire.JS._getClassId(type);
-        Fire.sendToCore('window:open', 'quick-assets', 'fire://static/quick-assets.html', {
+        Editor.sendToCore('window:open', 'quick-assets', 'fire://static/quick-assets.html', {
             title: "Quick Assets",
             width: 800,
             height: 600,
@@ -182,9 +182,9 @@ Fire.browseObject = function ( type, fobjectEL ) {
     }
 };
 
-Fire.serializeMeta = function ( meta ) {
+Editor.serializeMeta = function ( meta ) {
     if ( !meta.subRawData ) {
-        return Fire.serialize(meta);
+        return Editor.serialize(meta);
     }
 
     var subUuids = meta.subRawData.map ( function ( item ) {
@@ -193,7 +193,7 @@ Fire.serializeMeta = function ( meta ) {
         return uuid;
     });
 
-    var json = Fire.serialize(meta);
+    var json = Editor.serialize(meta);
 
     for ( var i = 0; i < meta.subRawData.length; ++i ) {
         meta.subRawData[i].asset._uuid = subUuids[i];
@@ -203,6 +203,6 @@ Fire.serializeMeta = function ( meta ) {
 };
 
 //
-Fire.plugins = {}; // TODO: 做成Remote Object，确保全局只有一份?
-Fire.gizmos = {};
+Editor.plugins = {}; // TODO: 做成Remote Object，确保全局只有一份?
+Editor.gizmos = {};
 

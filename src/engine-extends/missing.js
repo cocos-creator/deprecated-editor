@@ -6,21 +6,21 @@ var MissingScript = Fire._MissingScript;
 MissingScript.getset('_scriptUuid',
     function () {
         var id = this._$erialized.__type__;
-        if (Fire.isUuid(id)) {
-            return Fire.decompressUuid(id);
+        if (Editor.isUuid(id)) {
+            return Editor.decompressUuid(id);
         }
         return '';
     },
     function (value) {
-        if ( !Fire._Sandbox.compiled ) {
+        if ( !Editor._Sandbox.compiled ) {
             Fire.error('Scripts not yet compiled, please fix script errors and compile first.');
             return;
         }
-        if (value && Fire.isUuid(value._uuid)) {
-            var classId = Fire.compressUuid(value);
+        if (value && Editor.isUuid(value._uuid)) {
+            var classId = Editor.compressUuid(value);
             if (Fire.JS._getClassById(classId)) {
                 this._$erialized.__type__ = classId;
-                Fire.sendToWindows('reload:window-scripts', Fire._Sandbox.compiled);
+                Editor.sendToWindows('reload:window-scripts', Editor._Sandbox.compiled);
             }
             else {
                 Fire.error('Can not find a component in the script which uuid is "%s".', value);
@@ -34,7 +34,7 @@ MissingScript.getset('_scriptUuid',
 
 MissingScript.get('errorInfo',
     function () {
-        return Fire._Sandbox.compiled ? MSG_COMPILED : MSG_NOT_COMPILED;
+        return Editor._Sandbox.compiled ? MSG_COMPILED : MSG_NOT_COMPILED;
     },
     Fire.MultiText
 );

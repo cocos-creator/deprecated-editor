@@ -2,7 +2,7 @@ var Url = require('fire-url');
 
 Polymer({
     created: function () {
-        this.ipc = new Fire.IpcListener();
+        this.ipc = new Editor.IpcListener();
 
         this.viewMode = "list";
         this.searchText = "";
@@ -12,7 +12,7 @@ Polymer({
 
     domReady: function () {
         // TEMP HACK: after fireball-x/dev#481 this should be removed
-        Fire.PanelMng.root = this;
+        Editor.PanelMng.root = this;
 
         var typeID = "";
         // get typeID from url query
@@ -29,7 +29,7 @@ Polymer({
         }
 
         var self = this;
-        Fire.AssetDB.query( "assets://", {
+        Editor.AssetDB.query( "assets://", {
             'type-id': typeID
         }, function ( results ) {
             self.items = results.map ( function ( item ) {
@@ -58,7 +58,7 @@ Polymer({
         var browserWindow = remote.getCurrentWindow();
         if ( browserWindow ) {
             browserWindow.on ( 'close', function () {
-                Fire.sendToWindows('quick-asset:closed');
+                Editor.sendToWindows('quick-asset:closed');
             });
         }
 
@@ -108,6 +108,6 @@ Polymer({
     selectAction: function ( event ) {
         event.stopPropagation();
 
-        Fire.sendToWindows('quick-asset:selected', event.detail.uuid);
+        Editor.sendToWindows('quick-asset:selected', event.detail.uuid);
     },
 });

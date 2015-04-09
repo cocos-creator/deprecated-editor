@@ -151,4 +151,4 @@ SvgGrids.prototype.update = function () {
     ylines.splice(cur_idx);
 };
 
-Fire.SvgGrids = SvgGrids;
+Editor.SvgGrids = SvgGrids;

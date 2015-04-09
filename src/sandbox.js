@@ -116,11 +116,11 @@ var Sandbox = (function () {
 
     Sandbox._launchScene = function (scene, onPreSceneLoad) {
         // save selection
-        var selection = Fire.Selection.entities;
+        var selection = Editor.Selection.entities;
         var paths = [];
         var i;
         for (i = 0; i < selection.length; i++) {
-            var entity = Fire._getInstanceById(selection[i]);
+            var entity = Editor.getInstanceById(selection[i]);
             if (entity) {
                 paths.push(entity._getIndices());
             }
@@ -144,7 +144,7 @@ var Sandbox = (function () {
                 selection.push(ent.id);
             }
         }
-        Fire.Selection.selectEntity(selection, false, true);
+        Editor.Selection.selectEntity(selection, false, true);
     };
 
     // 保存当前场景
@@ -192,7 +192,7 @@ var Sandbox = (function () {
 
     function recreateScene (scene) {
         // serialize scene
-        var sceneSnapshot = Fire.serialize(scene, { stringify: false });
+        var sceneSnapshot = Editor.serialize(scene, { stringify: false });
 
         // deserialize scene
         var info = new Fire._DeserializeInfo();
@@ -292,7 +292,7 @@ var runtimeScriptLoader = (function () {
         });
         function loadSrcMap () {
             console.time('load source map of ' + url);
-            Fire._SourceMap.loadSrcMap(fsPath, url, function () {
+            Editor._SourceMap.loadSrcMap(fsPath, url, function () {
                 console.timeEnd('load source map of ' + url);
             });
         }
@@ -348,7 +348,7 @@ Sandbox.reloadScripts = (function () {
         // reset menus
         Fire._componentMenuItems = builtinComponentMenus.slice();
         Fire._customAssetMenuItems = builtinCustomAssetMenus.slice();
-        Fire.MainMenu.reset();
+        Editor.MainMenu.reset();
         // remove user classes
         Fire.JS._registeredClassIds = builtinClassIds;
         Fire.JS._registeredClassNames = builtinClassNames;
@@ -380,9 +380,9 @@ Sandbox.reloadScripts = (function () {
         if (scriptsLoaded) {
             // unload old
             var LoadSequence = [runtimeScriptLoader,
-                                Fire._builtinPluginLoader,
-                                Fire._globalPluginLoader,
-                                Fire._projectPluginLoader];
+                                Editor._builtinPluginLoader,
+                                Editor._globalPluginLoader,
+                                Editor._projectPluginLoader];
             for (var j = LoadSequence.length - 1; j >= 0; j--) {
                 LoadSequence[j].unloadAll();
                 Sandbox.globalVarsChecker.restore(Fire.warn, 'unloading ' + LoadSequence[j].name);
@@ -412,8 +412,8 @@ Sandbox.reloadScripts = (function () {
                     }
                 });
                 function loadBuiltinEditors () {
-                    Fire._builtinPluginLoader.loadAll(function (err) {
-                        Sandbox.globalVarsChecker.restore(Fire.warn, 'loading ' + Fire._builtinPluginLoader.name);
+                    Editor._builtinPluginLoader.loadAll(function (err) {
+                        Sandbox.globalVarsChecker.restore(Fire.warn, 'loading ' + Editor._builtinPluginLoader.name);
                         cb();
                     });
                 }
@@ -421,8 +421,8 @@ Sandbox.reloadScripts = (function () {
             // load global editors
             function (cb) {
                 loadGlobalEditor = function () {
-                    Fire._globalPluginLoader.loadAll(function (err) {
-                        Sandbox.globalVarsChecker.restore(Fire.warn, 'loading ' + Fire._globalPluginLoader.name);
+                    Editor._globalPluginLoader.loadAll(function (err) {
+                        Sandbox.globalVarsChecker.restore(Fire.warn, 'loading ' + Editor._globalPluginLoader.name);
                         cb();
                     });
                 };
@@ -440,8 +440,8 @@ Sandbox.reloadScripts = (function () {
                             });
                         },
                         function (next) {
-                            Fire._projectPluginLoader.loadAll(function (err) {
-                                Sandbox.globalVarsChecker.restore(Fire.warn, 'loading ' + Fire._projectPluginLoader.name);
+                            Editor._projectPluginLoader.loadAll(function (err) {
+                                Sandbox.globalVarsChecker.restore(Fire.warn, 'loading ' + Editor._projectPluginLoader.name);
                                 next();
                             });
                         },
@@ -454,4 +454,4 @@ Sandbox.reloadScripts = (function () {
     return reloadScripts;
 })();
 
-Fire._Sandbox = Sandbox;
+Editor._Sandbox = Sandbox;

@@ -1,5 +1,5 @@
 //
-Fire.buildPng = function (canvas, filename, pixelBuffer, returnBinOrBase64, callback) {
+Editor.buildPng = function (canvas, filename, pixelBuffer, returnBinOrBase64, callback) {
     function getLibpng(callback) {
         if (typeof(libpng) !== 'undefined') {
             callback(libpng);
@@ -44,7 +44,7 @@ Fire.buildPng = function (canvas, filename, pixelBuffer, returnBinOrBase64, call
     }
 };
 
-Fire.savePng = function (data, filename, path, zip) {
+Editor.savePng = function (data, filename, path, zip) {
     var type = Object.keys(data)[0];
     var value = data[type];
     if (zip) {
@@ -72,10 +72,10 @@ Fire.savePng = function (data, filename, path, zip) {
     }
     else {
         if (type === 'blob') {
-            Fire.downloadBlob(value, filename);
+            Editor.downloadBlob(value, filename);
         }
         else if (type === 'canvas') {
-            Fire.downloadCanvas(value, filename);
+            Editor.downloadCanvas(value, filename);
         }
         else {
             Fire.warn('unknown browser type: ' + type);
@@ -83,12 +83,12 @@ Fire.savePng = function (data, filename, path, zip) {
     }
 };
 
-Fire.saveText = function (text, filename, path) {
+Editor.saveText = function (text, filename, path) {
     if (Fire.isNode) {
         Fs.writeFileSync(path, text, {'encoding': 'ascii'});
     }
     else {
         var blob = new Blob([text], {type: "text/plain;charset=utf-8"});    // not support 'application/json'
-        Fire.downloadBlob(blob, filename);
+        Editor.downloadBlob(blob, filename);
     }
 };
