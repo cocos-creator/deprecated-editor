@@ -1,4 +1,6 @@
-var remote = require('remote');
+var Remote = require('remote');
+var App = Remote.require('app');
+
 var watchStates = {
     "start-watching": { state: "starting", text: "Start Watching", icon: "fa-eye" },
     "watch-on": { state: "on", text: "Watching", icon: "fa-eye" },
@@ -11,7 +13,7 @@ Polymer({
     created: function () {
         this.ipc = new Fire.IpcListener();
 
-        this.version = remote.getGlobal( 'FIRE_VER' );
+        this.version = App.getVersion();
         this.watchState = watchStates["watch-off"];
         this.dbState = { state: "normal", task: "none" };
         this.showSyncingWave = false;
