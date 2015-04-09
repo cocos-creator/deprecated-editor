@@ -92,4 +92,10 @@ Fire.AssetDB = {
             url: url
         }, cb);
     },
+
+    generateUniqueUrl: function ( url, cb ) {
+        Fire.sendRequestToCore('asset-db:generate-unique-url', {
+            url: url
+        }, cb);
+    },
 };
