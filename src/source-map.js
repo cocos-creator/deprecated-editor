@@ -123,8 +123,9 @@ var SourceMap = {
                 result = SourceMap.loadFromSourceComment(source);
             }
             catch (e) {
-                Fire.error('Failed to load source map from %s, %s.', path, e.stack);
-                return callback(e);
+                // Fire.error('Failed to load source map from %s, %s.', path, e.stack);
+                // return callback(e);
+                return callback();
             }
             callback(null, result);
         });
