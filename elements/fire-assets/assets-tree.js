@@ -364,7 +364,7 @@ Polymer({
                     }
 
                     var newScene = new Fire._Scene();
-                    var camera = newScene.createEntity('Main Camera');
+                    var camera = newScene.addEntity('Main Camera');
                     camera.addComponent(Fire.Camera);
 
                     var newAssetUrl = Url.join( url, 'New Scene.fire' );
