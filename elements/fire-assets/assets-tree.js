@@ -363,10 +363,13 @@ Polymer({
                         url = this.getUrl(targetEL);
                     }
 
-                    var newAsset = new Fire._Scene();
+                    var newScene = new Fire._Scene();
+                    var camera = newScene.createEntity('Main Camera');
+                    camera.addComponent(Fire.Camera);
+
                     var newAssetUrl = Url.join( url, 'New Scene.fire' );
                     this._focusUrl = newAssetUrl;
-                    Fire.AssetDB.save( newAssetUrl, Fire.serialize(newAsset) );
+                    Fire.AssetDB.save( newAssetUrl, Fire.serialize(newScene) );
                 }.bind(this)
             },
 
