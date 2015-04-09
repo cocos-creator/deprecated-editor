@@ -800,6 +800,11 @@ Polymer({
         if ( renamingEL.name !== event.target.value ) {
             var srcUrl = this.getUrl(renamingEL);
             var destUrl = Url.join( Url.dirname(srcUrl), event.target.value + renamingEL.extname );
+
+            if ( srcUrl.toLowerCase() === destUrl.toLowerCase() ) {
+                Fire.warn('Renaming asset from lower case to upper case or vice verse will not be detected by Git.');
+            }
+
             Editor.AssetDB.move( srcUrl, destUrl );
         }
     },

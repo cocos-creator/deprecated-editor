@@ -145,6 +145,40 @@ Editor.hintObject = function ( target ) {
     }
 };
 
+Editor.openObjectById = function ( type, id ) {
+    if ( Fire.isChildClassOf( type, Fire.Entity ) ) {
+    }
+    else if ( Fire.isChildClassOf( type, Fire.Component ) ) {
+    }
+    else if ( Fire.isChildClassOf( type, Fire.Asset ) ) {
+        Editor.sendToAll('asset:open', {
+            uuid: id,
+            url: Fire.AssetDB.uuidToUrl(id),
+        } );
+    }
+};
+
+Editor.openObject = function ( target ) {
+    if ( target instanceof Fire.Entity ) {
+        // TODO:
+        // Fire.sendToWindows('scene:focus-entity', {
+        //     'entity-id': target.id
+        // } );
+    }
+    else if ( target instanceof Fire.Component ) {
+        // TODO
+        // Fire.sendToWindows('scene:focus-entity', {
+        //     'entity-id': target.entity.id
+        // } );
+    }
+    else if ( target instanceof Fire.Asset ) {
+        Editor.sendToAll('asset:open', {
+            uuid: target._uuid,
+            url: Editor.AssetDB.uuidToUrl(target._uuid),
+        } );
+    }
+};
+
 var _isBrowsing = false;
 Editor.browseObject = function ( type, fobjectEL ) {
     if ( _isBrowsing )
