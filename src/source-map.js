@@ -125,7 +125,7 @@ var SourceMap = {
             catch (e) {
                 // Fire.error('Failed to load source map from %s, %s.', path, e.stack);
                 // return callback(e);
-                return callback();
+                return callback(e);
             }
             callback(null, result);
         });
