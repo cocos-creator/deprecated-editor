@@ -5,13 +5,13 @@ var Remote = require('remote');
 var RemoteEditor = Remote.getGlobal('Editor');
 
 // init argument list sending from core by url?queries
-// format: "?foo=bar&hell=world"
-// skip "?"
+// format: '?foo=bar&hell=world'
+// skip '?'
 var queryString = decodeURIComponent(location.search.substr(1));
 var queryList = queryString.split('&');
 var queries = {};
 for ( var i = 0; i < queryList.length; ++i ) {
-    var pair = queryList[i].split("=");
+    var pair = queryList[i].split('=');
     if ( pair.length === 2) {
         queries[pair[0]] = pair[1];
     }
@@ -27,7 +27,7 @@ Editor.url = function (url) {
 Fire.log = function ( text ) {
     'use strict';
     if (arguments.length <= 1) {
-        text = "" + text;
+        text = '' + text;
     }
     else {
         text = Util.format.apply(Util, arguments);
@@ -38,7 +38,7 @@ Fire.log = function ( text ) {
 Fire.warn = function ( text ) {
     'use strict';
     if (arguments.length <= 1) {
-        text = "" + text;
+        text = '' + text;
     }
     else {
         text = Util.format.apply(Util, arguments);
@@ -49,7 +49,7 @@ Fire.warn = function ( text ) {
 Fire.error = function ( text ) {
     'use strict';
     if (arguments.length <= 1) {
-        text = "" + text;
+        text = '' + text;
     }
     else {
         text = Util.format.apply(Util, arguments);
@@ -60,29 +60,29 @@ Fire.error = function ( text ) {
 Fire.success = function ( text ) {
     'use strict';
     if (arguments.length <= 1) {
-        text = "" + text;
+        text = '' + text;
     }
     else {
         text = Util.format.apply(Util, arguments);
     }
-    console.log('%c' + text, "color: green");
+    console.log('%c' + text, 'color: green');
     Editor.sendToCore('console:success', text);
 };
 Fire.failed = function ( text ) {
     'use strict';
     if (arguments.length <= 1) {
-        text = "" + text;
+        text = '' + text;
     }
     else {
         text = Util.format.apply(Util, arguments);
     }
-    console.log('%c' + text, "color: red");
+    console.log('%c' + text, 'color: red');
     Editor.sendToCore('console:failed', text);
 };
 Fire.info = function ( text ) {
     'use strict';
     if (arguments.length <= 1) {
-        text = "" + text;
+        text = '' + text;
     }
     else {
         text = Util.format.apply(Util, arguments);
@@ -198,13 +198,17 @@ Editor.browseObject = function ( type, fobjectEL ) {
     else if ( Fire.isChildClassOf( type, Fire.Asset ) ) {
         var typeID = Fire.JS._getClassId(type);
         Editor.sendToCore('window:open', 'quick-assets', 'fire://static/quick-assets.html', {
-            title: "Quick Assets",
-            width: 800,
-            height: 600,
-            show: true,
-            resizable: true,
-            closeWhenBlur: true,
-            argv: { typeID: typeID, id: fobjectEL.value ? fobjectEL.value._uuid : "" },
+            // atom-window options
+            'title': 'Quick Assets',
+            'width': 800,
+            'height': 600,
+            'show': true,
+            'resizable': true,
+
+            // fire-window options
+            'close-when-blur': true,
+            'panel-window': true,
+            'argv': { typeID: typeID, id: fobjectEL.value ? fobjectEL.value._uuid : '' },
         } );
         ipc.on('quick-asset:selected', function ( uuid ) {
             fobjectEL.setAsset(uuid);
