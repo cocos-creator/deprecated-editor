@@ -59,10 +59,10 @@ PluginLoader.prototype._unloadImpl = function (plugin) {
             var name = metaType[index];
             if (asset[name]) {
                 var scriptPath = Path.resolve(plugin.path, asset[name]);
-                var module = cache[scriptPath];
-                if ( !module ) {
-                    Fire.error('Module not found');
-                }
+                //var module = cache[scriptPath];
+                //if ( !module ) {
+                //    Fire.error('Module not found');
+                //}
                 delete cache[scriptPath];
             }
         }
