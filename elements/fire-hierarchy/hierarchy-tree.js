@@ -390,6 +390,11 @@ Polymer({
     },
 
     contextmenuAction: function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        Remote.getCurrentWindow().focus();
+
         this.resetDragState();
 
         //
@@ -401,7 +406,6 @@ Polymer({
         Editor.Selection.setContextEntity(curContextID);
 
         Editor.popupMenu(this.getContextMenuTemplate());
-        event.stopPropagation();
     },
 
     keydownAction: function (event) {

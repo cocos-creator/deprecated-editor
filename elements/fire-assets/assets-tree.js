@@ -157,10 +157,12 @@ function _addCustomAssetMenu(target, template) {
                 targetEL = targetEL.parentElement;
             }
             var url = target.getUrl(targetEL);
-            var newCustomAsset = new item.customAsset();
+            var newAsset = new item.customAsset();
             var newAssetUrl = Url.join(url, fileName + '.asset');
-            target._focusUrl = newAssetUrl;
-            Editor.AssetDB.save( newAssetUrl, Editor.serialize(newCustomAsset) );
+            Editor.AssetDB.generateUniqueUrl( newAssetUrl, function ( uniqueUrl ) {
+                target._focusUrl = uniqueUrl;
+                Editor.AssetDB.save( uniqueUrl, Editor.serialize(newAsset) );
+            }.bind(target));
         }
     }
 
@@ -322,8 +324,10 @@ Polymer({
                     }
 
                     var newAssetUrl = Url.join( url, 'New Folder' );
-                    this._focusUrl = newAssetUrl;
-                    Editor.AssetDB.newFolder( newAssetUrl );
+                    Editor.AssetDB.generateUniqueUrl( newAssetUrl, function ( uniqueUrl ) {
+                        this._focusUrl = uniqueUrl;
+                        Editor.AssetDB.newFolder( uniqueUrl );
+                    }.bind(this));
                 }.bind(this)
             },
 
@@ -343,8 +347,10 @@ Polymer({
                     }
 
                     var newAssetUrl = Url.join( url, 'NewComponent.js' );
-                    this._focusUrl = newAssetUrl;
-                    Editor.AssetDB.newScript( newAssetUrl, "simple-component" );
+                    Editor.AssetDB.generateUniqueUrl( newAssetUrl, function ( uniqueUrl ) {
+                        this._focusUrl = uniqueUrl;
+                        Editor.AssetDB.newScript( uniqueUrl, "simple-component" );
+                    }.bind(this));
                 }.bind(this)
             },
 
@@ -363,13 +369,15 @@ Polymer({
                         url = this.getUrl(targetEL);
                     }
 
-                    var newScene = new Fire._Scene();
-                    var camera = newScene.addEntity('Main Camera');
+                    var newAsset = new Fire._Scene();
+                    var camera = newAsset.addEntity('Main Camera');
                     camera.addComponent(Fire.Camera);
 
                     var newAssetUrl = Url.join( url, 'New Scene.fire' );
-                    this._focusUrl = newAssetUrl;
-                    Editor.AssetDB.save( newAssetUrl, Editor.serialize(newScene) );
+                    Editor.AssetDB.generateUniqueUrl( newAssetUrl, function ( uniqueUrl ) {
+                        this._focusUrl = uniqueUrl;
+                        Editor.AssetDB.save( uniqueUrl, Editor.serialize(newAsset) );
+                    }.bind(this));
                 }.bind(this)
             },
 
@@ -388,8 +396,10 @@ Polymer({
 
                     var newAsset = new Fire.Atlas();
                     var newAssetUrl = Url.join( url, 'New Atlas.atlas' );
-                    this._focusUrl = newAssetUrl;
-                    Editor.AssetDB.save( newAssetUrl, Editor.serialize(newAsset) );
+                    Editor.AssetDB.generateUniqueUrl( newAssetUrl, function ( uniqueUrl ) {
+                        this._focusUrl = uniqueUrl;
+                        Editor.AssetDB.save( uniqueUrl, Editor.serialize(newAsset) );
+                    }.bind(this));
                 }.bind(this)
             },
 
@@ -407,15 +417,17 @@ Polymer({
                         var textureName = targetEL.name;
 
                         Fire.AssetLibrary.loadAssetInEditor ( targetEL.userId, function ( error, asset ) {
-                            var newSprite = new Fire.Sprite();
-                            newSprite.texture = asset;
-                            newSprite.width = asset.width;
-                            newSprite.height = asset.height;
+                            var newAsset = new Fire.Sprite();
+                            newAsset.texture = asset;
+                            newAsset.width = asset.width;
+                            newAsset.height = asset.height;
 
                             var url = this.getUrl(targetEL.parentElement);
                             var newAssetUrl = Url.join( url, textureName + '.sprite' );
-                            this._focusUrl = newAssetUrl;
-                            Editor.AssetDB.save( newAssetUrl, Editor.serialize(newSprite) );
+                            Editor.AssetDB.generateUniqueUrl( newAssetUrl, function ( uniqueUrl ) {
+                                this._focusUrl = uniqueUrl;
+                                Editor.AssetDB.save( uniqueUrl, Editor.serialize(newAsset) );
+                            }.bind(this));
                         }.bind(this) );
                     }
                     else {
@@ -828,6 +840,9 @@ Polymer({
     contextmenuAction: function (event) {
         event.preventDefault();
         event.stopPropagation();
+
+        // NOTE: without this, we will create new assets while watching ON
+        Remote.getCurrentWindow().focus();
 
         //
         this.resetDragState();

@@ -76,5 +76,5 @@ Editor.MainMenu.addTemplate = function (menuPath, template, options) {
  * @param {object[]} template -  the template is just an array of options for constructing MenuItem
  */
 Editor.popupMenu = function (template, x, y) {
-    Editor.sendToCore('menu:popup', template, x, y);
+    Editor.sendToCore('menu:popup', template, x, y, Fire.RequireIpcEvent);
 };
