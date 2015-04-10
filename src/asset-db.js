@@ -94,7 +94,7 @@ Editor.AssetDB = {
     },
 
     generateUniqueUrl: function ( url, cb ) {
-        Fire.sendRequestToCore('asset-db:generate-unique-url', {
+        Editor.sendRequestToCore('asset-db:generate-unique-url', {
             url: url
         }, cb);
     },
