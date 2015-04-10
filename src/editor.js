@@ -153,7 +153,7 @@ Editor.openObjectById = function ( type, id ) {
     else if ( Fire.isChildClassOf( type, Fire.Asset ) ) {
         Editor.sendToAll('asset:open', {
             uuid: id,
-            url: Fire.AssetDB.uuidToUrl(id),
+            url: Editor.AssetDB.uuidToUrl(id),
         } );
     }
 };
@@ -161,13 +161,13 @@ Editor.openObjectById = function ( type, id ) {
 Editor.openObject = function ( target ) {
     if ( target instanceof Fire.Entity ) {
         // TODO:
-        // Fire.sendToWindows('scene:focus-entity', {
+        // Editor.sendToWindows('scene:focus-entity', {
         //     'entity-id': target.id
         // } );
     }
     else if ( target instanceof Fire.Component ) {
         // TODO
-        // Fire.sendToWindows('scene:focus-entity', {
+        // Editor.sendToWindows('scene:focus-entity', {
         //     'entity-id': target.entity.id
         // } );
     }

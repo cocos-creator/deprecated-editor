@@ -20,7 +20,7 @@ Polymer({
 
     metaChanged: function () {
         // update preview
-        if ( this.meta instanceof Fire.TextureMeta ||
+        if ( this.meta instanceof Editor.TextureMeta ||
              this.meta instanceof Editor.SpriteMeta ||
              this.meta instanceof Editor.AudioClipMeta )
         {
