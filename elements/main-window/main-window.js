@@ -208,7 +208,7 @@ Polymer({
     },
 
     domReady: function () {
-        Editor.PanelMng.root = this.$.mainDock;
+        Editor.Panel.root = this.$.mainDock;
         Editor.sendToCore('project:init');
     },
 
@@ -267,7 +267,7 @@ Polymer({
 
                     // save layout
                     Editor.sendToCore( 'window:save-layout',
-                                    Editor.PanelMng.getLayout(),
+                                    Editor.Panel.getLayout(),
                                     Editor.RequireIpcEvent );
 
                     //

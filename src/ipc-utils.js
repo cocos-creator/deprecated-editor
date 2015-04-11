@@ -12,7 +12,7 @@ Editor.sendToCore = function ( message ) {
     'use strict';
     if ( typeof message === 'string' ) {
         var args = [].slice.call( arguments );
-        Ipc.send.apply( Ipc, ['fire:send2core'].concat( args ) );
+        Ipc.send.apply( Ipc, ['editor:send2core'].concat( args ) );
     }
     else {
         Fire.error('The message must be provided');
@@ -30,7 +30,7 @@ Editor.sendToWindows = function ( message ) {
     'use strict';
     if ( typeof message === 'string' ) {
         var args = [].slice.call( arguments );
-        Ipc.send.apply( Ipc, ['fire:send2wins'].concat( args ) );
+        Ipc.send.apply( Ipc, ['editor:send2wins'].concat( args ) );
     }
     else {
         Fire.error('The message must be provided');
@@ -47,7 +47,7 @@ Editor.sendToMainWindow = function ( message ) {
     'use strict';
     if ( typeof message === 'string' ) {
         var args = [].slice.call( arguments );
-        Ipc.send.apply( Ipc, ['fire:send2mainwin'].concat( args ) );
+        Ipc.send.apply( Ipc, ['editor:send2mainwin'].concat( args ) );
     }
     else {
         Fire.error('The message must be provided');
@@ -64,7 +64,7 @@ Editor.sendToAll = function ( message ) {
     'use strict';
     if ( typeof message === 'string' ) {
         var args = [].slice.call( arguments );
-        Ipc.send.apply( Ipc, ['fire:send2all'].concat( args ) );
+        Ipc.send.apply( Ipc, ['editor:send2all'].concat( args ) );
     }
     else {
         Fire.error('The message must be provided');
@@ -82,7 +82,7 @@ Editor.sendToPanel = function ( pluginName, panelName, message ) {
     'use strict';
     if ( typeof message === 'string' ) {
         var args = [].slice.call( arguments );
-        Ipc.send.apply( Ipc, ['fire:send2panel'].concat( args ) );
+        Ipc.send.apply( Ipc, ['editor:send2panel'].concat( args ) );
     }
     else {
         Fire.error('The message must be provided');
@@ -111,7 +111,7 @@ Editor.sendRequestToCore = function (request) {
             var key = "" + sessionId;
             replyCallbacks[key] = reply;
 
-            Ipc.send('fire:sendreq2core', request, args, sessionId);
+            Ipc.send('editor:sendreq2core', request, args, sessionId);
         }
         else {
             Fire.error('The reply must be of type function');
@@ -122,7 +122,7 @@ Editor.sendRequestToCore = function (request) {
     }
 };
 
-Ipc.on('fire:send-reply-back', function replyCallback (args, sessionId) {
+Ipc.on('editor:send-reply-back', function replyCallback (args, sessionId) {
     'use strict';
     var key = "" + sessionId;
     var cb = replyCallbacks[key];
@@ -139,6 +139,6 @@ Ipc.on('fire:send-reply-back', function replyCallback (args, sessionId) {
     }
 });
 
-Ipc.on('fire:send2panel', function () {
-    Editor.PanelMng.dispatch.apply(Editor.PanelMng,arguments);
+Ipc.on('editor:send2panel', function () {
+    Editor.Panel.dispatch.apply(Editor.Panel,arguments);
 });

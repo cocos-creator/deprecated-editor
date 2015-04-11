@@ -46,7 +46,7 @@ _getDocks = function ( dockEL ) {
     return docks;
 };
 
-Editor.PanelMng = {
+Editor.Panel = {
     root: null, // The mainDock, init by panel-init.js or main-window.js
 
     load: function ( url, panelID, panelInfo, cb ) {
@@ -114,7 +114,7 @@ Editor.PanelMng = {
 
     closeAll: function () {
         for ( var id in _idToPanelInfo ) {
-            Editor.PanelMng.close(id);
+            Editor.Panel.close(id);
         }
     },
 

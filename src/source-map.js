@@ -38,7 +38,8 @@ function resolveSourceUrls (rawSourceMap, sources) {
 
     // 不知道为什么开发版里 browserify 生成的 sources 含有 repo 所在的 dev 目录，只好这里去除
     var Remote = require('remote');
-    var root = Remote.getGlobal('FIRE_PATH');
+    var RemoteEditor = Remote.getGlobal('Editor');
+    var root = RemoteEditor.cwd;
     root = Path.resolve(root, '../');
     var stripPrefix = Path.basename(root);
 

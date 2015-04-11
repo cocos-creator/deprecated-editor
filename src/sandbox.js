@@ -251,7 +251,7 @@ var runtimeScriptLoader = (function () {
 
     var Remote = require('remote');
     var Path = require('path');
-    var projectPath = Remote.getGlobal('FIRE_PROJECT_PATH');
+    var projectPath = Remote.getGlobal('Editor').projectPath;
 
     var SRC_BUILTIN_PATH = Path.join(projectPath, 'library', SRC_BUILTIN);
     var SRC_PROJECT_PATH = Path.join(projectPath, 'library', SRC_PROJECT);
