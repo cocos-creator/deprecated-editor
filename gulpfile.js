@@ -36,8 +36,8 @@ var paths = {
         'src/engine-extends/ipc-receiver.js',
 
         // editor
-        'src/ipc-utils.js',
-        'src/panel.js',
+        'src/ipc-init.js',
+        'src/editor-panel.js',
         'src/plugin-loader.js',
         'src/source-map.js',
         'src/sandbox.js',
