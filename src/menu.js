@@ -12,7 +12,7 @@ Editor.MainMenu.addItem = function (menuPath, message, params, priority) {
     Editor.sendToCore('main-menu:add-item', menuPath, message, params, {
         priority: priority,
         type: 'window-dynamic'
-    }, Editor.RequireIpcEvent );
+    }, Editor.requireIpcEvent );
 };
 
 ///**
@@ -68,7 +68,7 @@ Editor.MainMenu.addTemplate = function (menuPath, template, options) {
                          menuPath,
                          template,
                          options,
-                         Editor.RequireIpcEvent );
+                         Editor.requireIpcEvent );
     }
 };
 
@@ -76,5 +76,5 @@ Editor.MainMenu.addTemplate = function (menuPath, template, options) {
  * @param {object[]} template -  the template is just an array of options for constructing MenuItem
  */
 Editor.popupMenu = function (template, x, y) {
-    Editor.sendToCore('menu:popup', template, x, y, Editor.RequireIpcEvent);
+    Editor.sendToCore('menu:popup', template, x, y, Editor.requireIpcEvent);
 };

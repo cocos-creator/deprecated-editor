@@ -24,7 +24,7 @@ Editor.sendToCore = function ( message ) {
  * The page is so called as atom shell's web side. Each application window is an independent page and has its own JavaScript context.
  * @param {string} message - the message to send
  * @param {...*} [arg] - whatever arguments the message needs
- * @param {object} [options] - you can indicate the options such as Editor.SelfExcluded
+ * @param {object} [options] - you can indicate the options such as Editor.selfExcluded
  */
 Editor.sendToWindows = function ( message ) {
     'use strict';
@@ -58,7 +58,7 @@ Editor.sendToMainWindow = function ( message ) {
  * Broadcast message to all pages and editor-core
  * @param {string} message - the message to send
  * @param {...*} [arg] - whatever arguments the message needs
- * @param {object} [options] - you can indicate the options such as Editor.SelfExcluded
+ * @param {object} [options] - you can indicate the options such as Editor.selfExcluded
  */
 Editor.sendToAll = function ( message ) {
     'use strict';

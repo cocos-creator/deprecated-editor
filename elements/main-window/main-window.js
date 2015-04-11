@@ -268,7 +268,7 @@ Polymer({
                     // save layout
                     Editor.sendToCore( 'window:save-layout',
                                     Editor.Panel.getLayout(),
-                                    Editor.RequireIpcEvent );
+                                    Editor.requireIpcEvent );
 
                     //
                     next();

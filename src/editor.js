@@ -207,7 +207,6 @@ Editor.browseObject = function ( type, fobjectEL ) {
 
             // fire-window options
             'close-when-blur': true,
-            'panel-window': true,
             'argv': { typeID: typeID, id: fobjectEL.value ? fobjectEL.value._uuid : '' },
         } );
         ipc.on('quick-asset:selected', function ( uuid ) {

@@ -95,7 +95,7 @@ Editor.Panel = {
                 messages: panelInfo.messages,
                 ipcListener: ipcListener
             };
-            Editor.sendToCore('panel:dock', panelID, Editor.RequireIpcEvent);
+            Editor.sendToCore('panel:dock', panelID, Editor.requireIpcEvent);
             Editor.sendRequestToCore('panel:query-settings', {
                 id: panelID,
                 settings: viewEL.settings
@@ -126,7 +126,7 @@ Editor.Panel = {
             delete _idToPanelInfo[panelID];
         }
 
-        Editor.sendToCore('panel:undock', panelID, Editor.RequireIpcEvent);
+        Editor.sendToCore('panel:undock', panelID, Editor.requireIpcEvent);
     },
 
     dispatch: function ( pluginName, panelName, ipcMessage ) {
