@@ -1,5 +1,3 @@
-var Remote = require('remote');
-
 var _idToPanelInfo = {};
 
 

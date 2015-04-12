@@ -37,11 +37,11 @@ var paths = {
 
         // editor
         'src/ipc-init.js',
+        'src/editor-init.js',
         'src/editor-panel.js',
         'src/plugin-loader.js',
         'src/source-map.js',
         'src/sandbox.js',
-        'src/editor.js',
         'src/asset-db.js',
         'src/menu.js',
         'src/pixi-grids.js',
