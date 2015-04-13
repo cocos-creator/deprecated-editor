@@ -14,6 +14,10 @@ var stylish = require('jshint-stylish');
 
 var paths = {
     src: [
+        // init
+        'src/ipc-init.js',
+        'src/editor-init.js',
+
         // asset extends
         'src/asset-extends/bitmap-font.js',
         'src/asset-extends/sprite.js',
@@ -36,8 +40,6 @@ var paths = {
         'src/engine-extends/ipc-receiver.js',
 
         // editor
-        'src/ipc-init.js',
-        'src/editor-init.js',
         'src/editor-panel.js',
         'src/plugin-loader.js',
         'src/source-map.js',

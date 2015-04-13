@@ -4,6 +4,22 @@ var Ipc = require('ipc');
 var Remote = require('remote');
 var RemoteEditor = Remote.getGlobal('Editor');
 
+/**
+ * Global object with classes, properties and methods you can access from anywhere.
+ *
+ * See [methods and properties](../classes/Editor.html).
+ * @module Editor
+ * @main Editor
+ */
+/**
+ * Global object with classes, properties and methods you can access from anywhere
+ *
+ * See [classes in Editor module](../modules/Editor.html).
+ * @class Editor
+ * @static
+ */
+var Editor = Editor || {};
+
 // init argument list sending from core by url?queries
 // format: '?foo=bar&hell=world'
 // skip '?'
