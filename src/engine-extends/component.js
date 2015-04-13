@@ -56,7 +56,7 @@ var TypoCheckList = {
     onDisabled: "onDisable",
     onDestroyed: "onDestroy",
     awake: "onLoad",
-    start: "onStart",
+    onStart: "start",
 };
 
 for (var typo in TypoCheckList) {
