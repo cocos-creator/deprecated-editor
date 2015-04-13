@@ -18,7 +18,7 @@ var RemoteEditor = Remote.getGlobal('Editor');
  * @class Editor
  * @static
  */
-var Editor = Editor || {};
+window.Editor = window.Editor || {};
 
 // init argument list sending from core by url?queries
 // format: '?foo=bar&hell=world'

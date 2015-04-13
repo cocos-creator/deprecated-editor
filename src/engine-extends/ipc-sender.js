@@ -3,9 +3,6 @@
 
 var editorCallback = Fire.Engine._editorCallback;
 
-// pre-declaration for unit tests, overridable for editor
-Editor.sendToWindows = function () {};
-
 editorCallback.onEnginePlayed = function (continued) {
     window.dispatchEvent( new CustomEvent ('engine-played', {
         detail: { continued: continued },
