@@ -275,14 +275,13 @@ var runtimeScriptLoader = (function () {
             cb('Failed to load ' + src);
         };
         script.setAttribute('type','text/javascript');
-        script.setAttribute('src', src);
+        script.setAttribute('src', FireUrl.addRandomQuery(src));
         console.time('load ' + src);
         document.head.appendChild(script);
         loadedScriptNodes.push(script);
     }
 
     function loadRuntime (url, fsPath, info, callback) {
-        url = FireUrl.addRandomQuery(url);
         doLoad(url, function (err) {
             Sandbox.globalVarsChecker.restore(Fire.log, info, 'require');
             callback(err);

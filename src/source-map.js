@@ -45,7 +45,7 @@ function resolveSourceUrls (rawSourceMap, sources) {
 
     for (var i = 0; i < srcUrls.length; i++) {
         var src = srcUrls[i];
-        // remove '../'
+        // remove '../' and '..\'
         src = src.replace(/\.\.\//g, '');
         src = src.replace(/\.\.\\/g, '');
         // remove 'dev'
