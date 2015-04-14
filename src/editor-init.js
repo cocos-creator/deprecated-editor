@@ -49,7 +49,9 @@ Fire.log = function ( text ) {
         text = Util.format.apply(Util, arguments);
     }
     console.log(text);
-    Editor.sendToCore('console:log', text);
+    Editor.sendToCore('console:log', {
+        message: text
+    });
 };
 Fire.warn = function ( text ) {
     'use strict';
@@ -60,7 +62,9 @@ Fire.warn = function ( text ) {
         text = Util.format.apply(Util, arguments);
     }
     console.warn(text);
-    Editor.sendToCore('console:warn', text);
+    Editor.sendToCore('console:warn', {
+        message: text
+    });
 };
 Fire.error = function ( text ) {
     'use strict';
@@ -71,7 +75,9 @@ Fire.error = function ( text ) {
         text = Util.format.apply(Util, arguments);
     }
     console.error(text);
-    Editor.sendToCore('console:error', text);
+    Editor.sendToCore('console:error', {
+        message: text
+    });
 };
 Fire.success = function ( text ) {
     'use strict';
@@ -82,7 +88,9 @@ Fire.success = function ( text ) {
         text = Util.format.apply(Util, arguments);
     }
     console.log('%c' + text, 'color: green');
-    Editor.sendToCore('console:success', text);
+    Editor.sendToCore('console:success', {
+        message: text
+    });
 };
 Fire.failed = function ( text ) {
     'use strict';
@@ -93,7 +101,9 @@ Fire.failed = function ( text ) {
         text = Util.format.apply(Util, arguments);
     }
     console.log('%c' + text, 'color: red');
-    Editor.sendToCore('console:failed', text);
+    Editor.sendToCore('console:failed', {
+        message: text
+    });
 };
 Fire.info = function ( text ) {
     'use strict';
@@ -104,7 +114,9 @@ Fire.info = function ( text ) {
         text = Util.format.apply(Util, arguments);
     }
     console.info(text);
-    Editor.sendToCore('console:info', text);
+    Editor.sendToCore('console:info', {
+        message: text
+    });
 };
 
 /**
@@ -117,10 +129,14 @@ Fire._throw = function (error) {
     console.error(error.stack);
     var resolvedStack = Editor._SourceMap.resolveStack(error.stack);
     if (Ipc._events['console:error']) {
-        Ipc.emit('console:error', resolvedStack);
+        Ipc.emit('console:error', {
+            message: resolvedStack
+        });
     }
     else {
-        Editor.sendToMainWindow('console:error', resolvedStack);
+        Editor.sendToMainWindow('console:error', {
+            message: resolvedStack
+        });
     }
 };
 

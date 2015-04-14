@@ -218,41 +218,75 @@ Polymer({
         Async.series([
             // init plugins
             function ( next ) {
-                Polymer.import([
-                    "fire://src/editor/fire-assets/fire-assets.html",
-                    "fire://src/editor/fire-hierarchy/fire-hierarchy.html",
-                    "fire://src/editor/fire-inspector/fire-inspector.html",
-                    "fire://src/editor/fire-console/fire-console.html",
-                    "fire://src/editor/fire-scene/fire-scene.html",
-                    "fire://src/editor/fire-game/fire-game.html",
+                Async.series([
+                    function ( done ) {
+                        Editor.sendRequestToCore( 'panel:ready', 'default@console', function ( detail ) {
+                            var panelID = detail['panel-id'];
+                            var panelInfo = detail['panel-info'];
+                            var packagePath = detail['package-path'];
+                            var argv = detail.argv;
+
+                            var Path = require('fire-path');
+                            Editor.Panel.load(Path.join( packagePath, panelInfo.view ),
+                                              panelID,
+                                              panelInfo,
+                                              function ( err, element ) {
+                                                  self.$.consolePanel.add(element);
+                                                  self.$.consolePanel.$.tabs.select(0);
+                                                  done();
+                                              });
+                        });
+                    },
+
+                    function ( done ) {
+                        Editor.Panel.import("fire://src/editor/fire-assets/fire-assets.html", function () {
+                            self.addPlugin( self.$.assetsPanel, FireAssets, 'assets', 'Assets', {
+                                width: 200,
+                            } );
+                            done();
+                        });
+                    },
+
+                    function ( done ) {
+                        Editor.Panel.import("fire://src/editor/fire-hierarchy/fire-hierarchy.html", function () {
+                            self.addPlugin( self.$.hierarchyPanel, FireHierarchy, 'hierarchy', 'Hierarchy', {
+                                width: 200,
+                            } );
+                            done();
+                        });
+                    },
+
+                    function ( done ) {
+                        Editor.Panel.import("fire://src/editor/fire-inspector/fire-inspector.html", function () {
+                            self.addPlugin( self.$.inspectorPanel, FireInspector, 'inspector', 'Inspector', {
+                                width: 300,
+                                'min-width': 240,
+                            } );
+                            done();
+                        });
+                    },
+
+                    function ( done ) {
+                        Editor.Panel.import("fire://src/editor/fire-scene/fire-scene.html", function () {
+                            self.addPlugin( self.$.editPanel, FireScene, 'scene', 'Scene', {
+                                width: 'auto',
+                                height: 'auto',
+                            } );
+                            done();
+                        });
+                    },
+
+                    function ( done ) {
+                        Editor.Panel.import("fire://src/editor/fire-game/fire-game.html", function () {
+                            self.addPlugin( self.$.editPanel, FireGame, 'game', 'Game', {
+                                width: 'auto',
+                                height: 'auto',
+                            } );
+                            done();
+                        });
+                    },
+
                 ], function () {
-                    self.addPlugin( self.$.hierarchyPanel, FireHierarchy, 'hierarchy', 'Hierarchy', {
-                        width: 200,
-                    } );
-
-                    self.addPlugin( self.$.assetsPanel, FireAssets, 'assets', 'Assets', {
-                        width: 200,
-                    } );
-
-                    self.addPlugin( self.$.inspectorPanel, FireInspector, 'inspector', 'Inspector', {
-                        width: 300,
-                        'min-width': 240,
-                    } );
-
-                    self.addPlugin( self.$.consolePanel, FireConsole, 'console', 'Console', {
-                        height: 300,
-                    } );
-
-                    self.addPlugin( self.$.editPanel, FireScene, 'scene', 'Scene', {
-                        width: 'auto',
-                        height: 'auto',
-                    } );
-
-                    self.addPlugin( self.$.editPanel, FireGame, 'game', 'Game', {
-                        width: 'auto',
-                        height: 'auto',
-                    } );
-
                     EditorUI.DockUtils.reset();
 
                     // for each plugin
@@ -286,6 +320,7 @@ Polymer({
                 }, 100 );
             },
 
+            // init asset libray and query asset from asset-db
             function ( next ) {
                 // init AssetLibrary
                 Fire.info('asset-library initializing...');
@@ -306,6 +341,7 @@ Polymer({
                 });
             },
 
+            // init scene
             function ( next ) {
                 Fire.info('fire-engine initializing...');
 
