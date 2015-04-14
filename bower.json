@@ -17,13 +17,9 @@
     "test"
   ],
   "dependencies": {
-    "FileSaver": "fireball-x/FileSaver.js",
-    "dustjs-linkedin": "",
-    "fontawesome": "",
-    "mousetrap": "",
     "chroma-js": "",
+    "fontawesome": "",
     "pace": "",
-    "pixi": "2.2.3",
     "polymer": "Polymer/polymer#~0.5.5",
     "web-animations-js": "web-animations/web-animations-js#master"
   },
