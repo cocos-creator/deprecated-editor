@@ -1,6 +1,6 @@
 ﻿// editor functions for H5 PIXI RenderContext
 
-var RenderContext = Fire._RenderContext;
+var RenderContext = Fire._Runtime.RenderContext;
 var Engine = Fire.Engine;
 
 RenderContext.createSceneRenderCtx = function (width, height, canvas, transparent) {
