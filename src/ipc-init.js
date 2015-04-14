@@ -122,7 +122,7 @@ Editor.sendRequestToCore = function (request) {
     }
 };
 
-Ipc.on('editor:send-reply-back', function replyCallback (args, sessionId) {
+Ipc.on('editor:sendreq2core:reply', function replyCallback (args, sessionId) {
     'use strict';
     var key = "" + sessionId;
     var cb = replyCallbacks[key];
