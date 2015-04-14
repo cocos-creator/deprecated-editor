@@ -74,13 +74,13 @@ Polymer({
             }.bind(this) );
         }.bind(this));
 
-        this.ipc.on('asset-library:debugger:query-uuid-asset', function () {
+        this.ipc.on('asset-db-debugger:query-uuid-asset', function () {
             var results = [];
             for ( var p in Fire.AssetLibrary._uuidToAsset ) {
                 var asset = Fire.AssetLibrary._uuidToAsset[p];
                 results.push( { uuid: p, name: asset.name, type: Fire.JS.getClassName(asset) } );
             }
-            Editor.sendToAll('asset-library:debugger:uuid-asset-results', {
+            Editor.sendToAll('asset-db-debugger:uuid-asset-results', {
                 results: results
             });
         }.bind(this));
