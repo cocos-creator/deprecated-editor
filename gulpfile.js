@@ -69,8 +69,8 @@ var paths = {
 };
 
 // clean
-gulp.task('clean', function() {
-    del('bin/');
+gulp.task('clean', function(cb) {
+    del('bin/', cb);
 });
 
 /////////////////////////////////////////////////////////////////////////////
