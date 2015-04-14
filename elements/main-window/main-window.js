@@ -212,30 +212,35 @@ Polymer({
         Editor.sendToCore('project:init');
     },
 
+    importPanel: function ( dockAt, panelID, cb ) {
+        Editor.sendRequestToCore( 'panel:ready', panelID, function ( detail ) {
+            var panelID = detail['panel-id'];
+            var panelInfo = detail['panel-info'];
+            var packagePath = detail['package-path'];
+            var argv = detail.argv;
+
+            var Path = require('fire-path');
+            Editor.Panel.load(Path.join( packagePath, panelInfo.view ),
+                              panelID,
+                              panelInfo,
+                              function ( err, element ) {
+                                  dockAt.add(element);
+                                  dockAt.$.tabs.select(0);
+                                  cb();
+                              });
+        });
+    },
+
     init: function () {
         var self = this;
 
         Async.series([
             // init plugins
             function ( next ) {
+                // NOTE: DO NOT use parallel here, the HTMLImpots onload function will be blocked
                 Async.series([
                     function ( done ) {
-                        Editor.sendRequestToCore( 'panel:ready', 'default@console', function ( detail ) {
-                            var panelID = detail['panel-id'];
-                            var panelInfo = detail['panel-info'];
-                            var packagePath = detail['package-path'];
-                            var argv = detail.argv;
-
-                            var Path = require('fire-path');
-                            Editor.Panel.load(Path.join( packagePath, panelInfo.view ),
-                                              panelID,
-                                              panelInfo,
-                                              function ( err, element ) {
-                                                  self.$.consolePanel.add(element);
-                                                  self.$.consolePanel.$.tabs.select(0);
-                                                  done();
-                                              });
-                        });
+                        self.importPanel( self.$.consolePanel, 'default@console', done );
                     },
 
                     function ( done ) {
