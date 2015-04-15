@@ -158,13 +158,13 @@ Polymer({
         this.ipc.on('entity:inspector-dirty', this.setSceneDirty.bind(this,true,false));
         this.ipc.on('gizmos:dirty', this.setSceneDirty.bind(this,true,false));
 
-        this.ipc.on('scene:new', function ( event ) {
+        this.ipc.on('scene:new', function () {
             this.newScene();
         }.bind(this));
 
         // NOTE: the scene:launched and engine:played must be ipc event to make sure component:disabled been called before it.
 
-        this.ipc.on('scene:launched', function ( event ) {
+        this.ipc.on('scene:launched', function () {
             // TEMP HACK: waiting for jare's new scene-camera, that will make scene camera only initialize once
             this.$.scene.initSceneCamera();
             this.$.game.resize();
