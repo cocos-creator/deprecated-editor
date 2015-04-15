@@ -161,7 +161,9 @@ Editor.hintObjectById = function ( type, id ) {
         Editor.sendToWindows('entity:hint', id );
     }
     else if ( Fire.isChildClassOf( type, Fire.Asset ) ) {
-        Editor.sendToWindows('asset:hint', id );
+        Editor.sendToWindows('asset:hint', {
+            uuid: id
+        });
     }
 };
 
@@ -173,7 +175,9 @@ Editor.hintObject = function ( target ) {
         Editor.sendToWindows('entity:hint', target.entity.id );
     }
     else if ( target instanceof Fire.Asset ) {
-        Editor.sendToWindows('asset:hint', target._uuid );
+        Editor.sendToWindows('asset:hint', {
+            uuid: target._uuid
+        });
     }
 };
 

@@ -240,16 +240,11 @@ Polymer({
                 // NOTE: DO NOT use parallel here, the HTMLImpots onload function will be blocked
                 Async.series([
                     function ( done ) {
-                        self.importPanel( self.$.consolePanel, 'default@console', done );
+                        self.importPanel( self.$.consolePanel, 'default@fire-console', done );
                     },
 
                     function ( done ) {
-                        Editor.Panel.import("fire://src/editor/fire-assets/fire-assets.html", function () {
-                            self.addPlugin( self.$.assetsPanel, FireAssets, 'assets', 'Assets', {
-                                width: 200,
-                            } );
-                            done();
-                        });
+                        self.importPanel( self.$.assetsPanel, 'default@fire-assets', done );
                     },
 
                     function ( done ) {
