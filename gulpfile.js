@@ -279,10 +279,6 @@ gulp.task('src-min', ['src-dev'], function() {
 
 // task plugins
 task_plugin ( 'fire-dashboard' );
-task_plugin ( 'fire-game' );
-task_plugin ( 'fire-hierarchy' );
-task_plugin ( 'fire-inspector' );
-task_plugin ( 'fire-scene' );
 task_plugin ( 'main-window' );
 task_plugin ( 'quick-assets' );
 

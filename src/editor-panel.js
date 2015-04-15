@@ -82,9 +82,7 @@ Editor.Panel = {
     },
 
     load: function ( url, panelID, panelInfo, cb ) {
-        console.log('load %s', panelID);
         Polymer.import([url], function () {
-            console.log('polymer imported %s', panelID);
             var viewEL = new window[panelInfo.ctor]();
             viewEL.setAttribute('id', panelID);
             viewEL.setAttribute('name', panelInfo.title);
