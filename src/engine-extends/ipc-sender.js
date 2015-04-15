@@ -63,20 +63,15 @@ editorCallback.onSceneLaunched = function (scene) {
 //    Editor.sendToWindows('scene:loaded', scene.entities);
 //};
 
-var onEntityCreated = 'entity:created';
 editorCallback.onEntityCreated = function (entity) {
-    if (entity._children.length === 0) {
-        Editor.sendToWindows( onEntityCreated, entity._name, entity._objFlags, entity.id );
-    }
-    else {
-        Editor.sendToWindows( onEntityCreated, takeEntitySnapshot(entity) );
-    }
+    Editor.sendToWindows('entity:created', takeEntitySnapshot(entity));
     Editor.sendToWindows('scene:dirty');
 };
 
-var onEntityRemoved = 'entity:removed';
 editorCallback.onEntityRemoved = function (entity/*, isTopMost*/) {
-    Editor.sendToWindows( onEntityRemoved, entity.id );
+    Editor.sendToWindows( 'entity:removed', {
+        'entity-id': entity.id
+    });
     Editor.sendToWindows('scene:dirty');
     // deselect
     var entities = Editor.Selection.entities;
@@ -109,13 +104,14 @@ editorCallback.onEntityRemoved = function (entity/*, isTopMost*/) {
     }
 };
 
-var onEntityParentChanged = 'entity:parentChanged';
 editorCallback.onEntityParentChanged = function (entity) {
-    Editor.sendToWindows( onEntityParentChanged, entity.id, entity.parent && entity.parent.id );
+    Editor.sendToWindows( 'entity:parent-changed', {
+        'entity-id': entity.id,
+        'parent-id': entity.parent ? entity.parent.id : null
+    });
     Editor.sendToWindows('scene:dirty');
 };
 
-var onEntityIndexChanged = 'entity:indexChanged';
 editorCallback.onEntityIndexChanged = function (entity, oldIndex, newIndex) {
     // get next sibling, skip object hidden in editor
     var next = null;
@@ -125,26 +121,42 @@ editorCallback.onEntityIndexChanged = function (entity, oldIndex, newIndex) {
         next = entity.getSibling(i);
     } while (next && (next._objFlags & Fire._ObjectFlags.HideInEditor));
     //
-    Editor.sendToWindows( onEntityIndexChanged, entity.id, next && next.id );
+    Editor.sendToWindows( 'entity:index-changed', {
+        'entity-id': entity.id,
+        'next-sibliing-id': next ? next.id : null
+    });
     Editor.sendToWindows('scene:dirty');
 };
 
 editorCallback.onEntityRenamed = function (entity) {
-    Editor.sendToWindows('entity:renamed', entity.id, entity._name);
+    Editor.sendToWindows('entity:renamed', {
+        'entity-id': entity.id,
+        'name': entity._name,
+    });
 };
 
 editorCallback.onComponentEnabled = function (component) {
-    Editor.sendToWindows('component:enabled', component.id);
+    Editor.sendToWindows('component:enabled', {
+        'component-id': component.id
+    });
 };
 
 editorCallback.onComponentDisabled = function (component) {
-    Editor.sendToWindows('component:disabled', component.id);
+    Editor.sendToWindows('component:disabled', {
+        'component-id': component.id
+    });
 };
 
 editorCallback.onComponentAdded = function (entity, component) {
-    Editor.sendToWindows('component:added', entity.id, component.id);
+    Editor.sendToWindows('component:added', {
+        'entity-id': entity.id,
+        'component-id': component.id,
+    });
 };
 
 editorCallback.onComponentRemoved = function (entity, component) {
-    Editor.sendToWindows('component:removed', entity.id, component.id);
+    Editor.sendToWindows('component:removed', {
+        'entity-id': entity.id,
+        'component-id': component.id,
+    });
 };
