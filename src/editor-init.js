@@ -155,10 +155,14 @@ Editor.observe = function ( target, enabled ) {
 
 Editor.hintObjectById = function ( type, id ) {
     if ( Fire.isChildClassOf( type, Fire.Entity ) ) {
-        Editor.sendToWindows('entity:hint', id );
+        Editor.sendToWindows('entity:hint', {
+            'entity-id': id
+        });
     }
     else if ( Fire.isChildClassOf( type, Fire.Component ) ) {
-        Editor.sendToWindows('entity:hint', id );
+        Editor.sendToWindows('entity:hint', {
+            'entity-id': id
+        });
     }
     else if ( Fire.isChildClassOf( type, Fire.Asset ) ) {
         Editor.sendToWindows('asset:hint', {
@@ -169,10 +173,14 @@ Editor.hintObjectById = function ( type, id ) {
 
 Editor.hintObject = function ( target ) {
     if ( target instanceof Fire.Entity ) {
-        Editor.sendToWindows('entity:hint', target.id );
+        Editor.sendToWindows('entity:hint', {
+            'entity-id': target.id
+        });
     }
     else if ( target instanceof Fire.Component ) {
-        Editor.sendToWindows('entity:hint', target.entity.id );
+        Editor.sendToWindows('entity:hint', {
+            'entity-id': target.entity.id
+        });
     }
     else if ( target instanceof Fire.Asset ) {
         Editor.sendToWindows('asset:hint', {

@@ -248,46 +248,25 @@ Polymer({
                     },
 
                     function ( done ) {
-                        Editor.Panel.import("fire://src/editor/fire-hierarchy/fire-hierarchy.html", function () {
-                            self.addPlugin( self.$.hierarchyPanel, FireHierarchy, 'hierarchy', 'Hierarchy', {
-                                width: 200,
-                            } );
-                            done();
-                        });
+                        self.importPanel( self.$.hierarchyPanel, 'default@fire-hierarchy', done );
                     },
 
                     function ( done ) {
-                        Editor.Panel.import("fire://src/editor/fire-inspector/fire-inspector.html", function () {
-                            self.addPlugin( self.$.inspectorPanel, FireInspector, 'inspector', 'Inspector', {
-                                width: 300,
-                                'min-width': 240,
-                            } );
-                            done();
-                        });
+                        self.importPanel( self.$.inspectorPanel, 'default@fire-inspector', done );
                     },
 
                     function ( done ) {
-                        Editor.Panel.import("fire://src/editor/fire-scene/fire-scene.html", function () {
-                            self.addPlugin( self.$.editPanel, FireScene, 'scene', 'Scene', {
-                                width: 'auto',
-                                height: 'auto',
-                            } );
-                            done();
-                        });
+                        self.importPanel( self.$.editPanel, 'default@fire-scene', done );
                     },
 
                     function ( done ) {
-                        Editor.Panel.import("fire://src/editor/fire-game/fire-game.html", function () {
-                            self.addPlugin( self.$.editPanel, FireGame, 'game', 'Game', {
-                                width: 'auto',
-                                height: 'auto',
-                            } );
-                            done();
-                        });
+                        self.importPanel( self.$.editPanel, 'default@fire-game', done );
                     },
 
                 ], function () {
                     EditorUI.DockUtils.reset();
+
+                    Editor.mainWindow.$.assets.browse();
 
                     // for each plugin
                     for ( var key in Editor.plugins) {
