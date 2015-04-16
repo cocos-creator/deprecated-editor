@@ -213,7 +213,7 @@ Polymer({
     },
 
     importPanel: function ( dockAt, panelID, cb ) {
-        Editor.sendRequestToCore( 'panel:ready', panelID, function ( detail ) {
+        Editor.sendRequestToCore( 'panel:page-ready', panelID, function ( detail ) {
             var panelID = detail['panel-id'];
             var panelInfo = detail['panel-info'];
             var packagePath = detail['package-path'];
