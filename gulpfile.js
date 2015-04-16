@@ -281,7 +281,6 @@ gulp.task('src-min', ['src-dev'], function() {
 // task plugins
 task_plugin ( 'fire-dashboard' );
 task_plugin ( 'main-window' );
-task_plugin ( 'quick-assets' );
 
 // tasks
 gulp.task('copy', task_copy_deps );

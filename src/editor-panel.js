@@ -60,8 +60,6 @@ function _registerIpc ( ipcListener, ipcName, viewEL ) {
 }
 
 Editor.Panel = {
-    root: null, // The mainDock, init by panel-ready.js or main-window.js
-
     import: function ( url, cb ) {
         var link = _url2link[url];
         if ( link ) {
@@ -83,7 +81,13 @@ Editor.Panel = {
 
     load: function ( url, panelID, panelInfo, cb ) {
         Polymer.import([url], function () {
-            var viewEL = new window[panelInfo.ctor]();
+            var viewCtor = window[panelInfo.ctor];
+            if ( !viewCtor ) {
+                Fire.error('Panel import faield. Can not find constructor %s', panelInfo.ctor );
+                return;
+            }
+
+            var viewEL = new viewCtor();
             viewEL.setAttribute('id', panelID);
             viewEL.setAttribute('name', panelInfo.title);
             viewEL.setAttribute('fit', '');
@@ -173,17 +177,18 @@ Editor.Panel = {
     },
 
     getLayout: function () {
-        if ( this.root instanceof FireDock ) {
+        var root = EditorUI.DockUtils.root;
+        if ( root instanceof FireDock ) {
             return {
                 'type': 'dock',
-                'row': this.root.row,
+                'row': root.row,
                 'no-collapse': true,
-                'docks': _getDocks(this.root),
+                'docks': _getDocks(root),
             };
         }
         else {
-            var id = this.root.getAttribute('id');
-            var rect = this.root.getBoundingClientRect();
+            var id = root.getAttribute('id');
+            var rect = root.getBoundingClientRect();
 
             return {
                 'type': 'standalone',

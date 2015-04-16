@@ -208,7 +208,7 @@ Polymer({
     },
 
     domReady: function () {
-        Editor.Panel.root = this.$.mainDock;
+        EditorUI.DockUtils.root = this.$.mainDock;
         Editor.sendToCore('project:init');
     },
 

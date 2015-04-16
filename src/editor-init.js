@@ -241,22 +241,15 @@ Editor.browseObject = function ( type, fobjectEL ) {
     }
     else if ( Fire.isChildClassOf( type, Fire.Asset ) ) {
         var typeID = Fire.JS._getClassId(type);
-        Editor.sendToCore('window:open', 'quick-assets', 'fire://static/quick-assets.html', {
-            // atom-window options
-            'title': 'Quick Assets',
-            'width': 800,
-            'height': 600,
-            'show': true,
-            'resizable': true,
 
-            // fire-window options
-            'close-when-blur': true,
-            'argv': { typeID: typeID, id: fobjectEL.value ? fobjectEL.value._uuid : '' },
-        } );
-        ipc.on('quick-asset:selected', function ( uuid ) {
+        Editor.sendToCore('quick-view:open', {
+            'type-id': typeID,
+            'id': fobjectEL.value ? fobjectEL.value._uuid : '',
+        });
+        ipc.on('quick-view:selected', function ( uuid ) {
             fobjectEL.setAsset(uuid);
         });
-        ipc.on('quick-asset:closed', function () {
+        ipc.on('quick-view:closed', function () {
             _isBrowsing = false;
             ipc.clear();
         });
