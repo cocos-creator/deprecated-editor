@@ -59,6 +59,16 @@ function _registerIpc ( ipcListener, ipcName, viewEL ) {
     }
 }
 
+function _registerProfile ( panelID, type, profile ) {
+    profile.save = function () {
+        Editor.sendToCore('panel:save-profile', {
+            id: panelID,
+            type: type,
+            profile: profile,
+        } );
+    };
+}
+
 Editor.Panel = {
     import: function ( url, cb ) {
         var link = _url2link[url];
@@ -124,19 +134,13 @@ Editor.Panel = {
                 ipcListener: ipcListener
             };
             Editor.sendToCore('panel:dock', panelID, Editor.requireIpcEvent);
-            Editor.sendRequestToCore('panel:query-settings', {
-                id: panelID,
-                settings: viewEL.settings
-            }, function ( settings ) {
-                viewEL.settings = settings;
-                viewEL.settings.save = function () {
-                    Editor.sendToCore('panel:save-settings', {
-                        id: panelID,
-                        settings: viewEL.settings,
-                    } );
-                };
-                cb ( null, viewEL );
-            } );
+
+            viewEL.profiles = panelInfo.profiles;
+            for ( var type in panelInfo.profiles ) {
+                _registerProfile ( panelID, type, panelInfo.profiles[type] );
+            }
+
+            cb ( null, viewEL );
         });
     },
 
