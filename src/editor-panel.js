@@ -157,8 +157,7 @@ Editor.Panel = {
         Editor.sendToCore('panel:undock', panelID, Editor.requireIpcEvent);
     },
 
-    dispatch: function ( packageName, panelName, ipcMessage ) {
-        var panelID = panelName + '@' + packageName;
+    dispatch: function ( panelID, ipcMessage ) {
         var panelInfo = _idToPanelInfo[panelID];
         if ( !panelInfo ) {
             Fire.warn( 'Failed to receive ipc %s, can not find panel %s', ipcMessage, panelID);
@@ -169,8 +168,8 @@ Editor.Panel = {
         var idx = panelInfo.messages.indexOf(ipcMessage);
         if ( idx !== -1 ) {
             var detail = {};
-            if ( arguments.length > 3 ) {
-                detail = arguments[3];
+            if ( arguments.length > 2 ) {
+                detail = arguments[2];
             }
             panelInfo.element.fire( ipcMessage, detail );
         }
