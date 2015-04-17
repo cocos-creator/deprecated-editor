@@ -33,8 +33,8 @@ Polymer({
         this.curSelect = null;
 
         this._templates = [
-            { name: "Cocos2D", icon: "img/dashboard/cocos-html5.png" },
-            { name: "Pixi", icon: "img/dashboard/pixi.png" },
+            { type: 'cocos-js', name: "Cocos2D", icon: "img/dashboard/cocos-html5.png" },
+            { type: 'pixi', name: "Pixi", icon: "img/dashboard/pixi.png" },
         ];
         this._gamekits = [];
     },
@@ -81,7 +81,10 @@ Polymer({
             return;
         }
 
-        Editor.sendToCore( 'dashboard:create-project', projectPath );
+        Editor.sendToCore( 'dashboard:create-project', {
+            path: projectPath,
+            type: this.curSelect.type,
+        });
     },
 
     templateAction: function ( event ) {
