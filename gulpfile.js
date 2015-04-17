@@ -81,20 +81,19 @@ gulp.task('clean', function(cb) {
 var task_copy_deps = [];
 var task_min_deps = [ 'src-min' ];
 var task_dev_deps = [ 'src-dev' ];
-var plugin_watchers = [];
+var polymer_watchers = [];
 
-var task_plugin = function ( name ) {
+var task_polymer = function ( name ) {
     var basePath = 'elements/' + name + '/';
 
-    var task_css = 'plugin-' + name + '-css';
-    var task_styl = 'plugin-' + name + '-styl';
-    var task_js = 'plugin-' + name + '-js';
-    var task_js_dev = 'plugin-' + name + '-js-dev';
-    var task_js_ext = 'plugin-' + name + '-js-ext';
-    var task_html = 'plugin-' + name + '-html';
-    var task_html_dev = 'plugin-' + name + '-html-dev';
-    var task_copy_html = 'plugin-' + name + '-copy-html';
-    var task_copy_res = 'plugin-' + name + '-copy-res';
+    var task_css = 'polymer-' + name + '-css';
+    var task_styl = 'polymer-' + name + '-styl';
+    var task_js = 'polymer-' + name + '-js';
+    var task_js_dev = 'polymer-' + name + '-js-dev';
+    var task_html = 'polymer-' + name + '-html';
+    var task_html_dev = 'polymer-' + name + '-html-dev';
+    var task_copy_html = 'polymer-' + name + '-copy-html';
+    var task_copy_res = 'polymer-' + name + '-copy-res';
 
     task_copy_deps.push(task_copy_html, task_copy_res);
     task_min_deps.push(task_html);
@@ -109,7 +108,7 @@ var task_plugin = function ( name ) {
         html: { files: basePath + '**/*.html', tasks: [task_html_dev] },
         res: { files: [basePath + '**/*.jpg', basePath + '**/*.png'], tasks: [task_copy_res] }
     };
-    plugin_watchers.push(watcher);
+    polymer_watchers.push(watcher);
 
     // copy
     gulp.task( task_copy_html, function() {
@@ -147,13 +146,7 @@ var task_plugin = function ( name ) {
     });
 
     // js
-    gulp.task(task_js_ext, function() {
-        return gulp.src(basePath + 'ext/**/*.js', {base: 'elements'})
-        .pipe(gulp.dest('bin/tmp/'))
-        ;
-    });
-
-    gulp.task(task_js, [task_js_ext], function(callback) {
+    gulp.task(task_js, function(callback) {
         var uglify = require('gulp-uglifyjs');
         var gulpSrcFiles = require('gulp-src-files');
         var files = gulpSrcFiles(js_files, {base: 'elements'});
@@ -187,7 +180,7 @@ var task_plugin = function ( name ) {
         });
     });
 
-    gulp.task(task_js_dev, [task_js_ext], function() {
+    gulp.task(task_js_dev, function() {
         return gulp.src(js_files, {base: 'elements'})
         .pipe(fb.wrapScope())
         .pipe(jshint({
@@ -278,9 +271,9 @@ gulp.task('src-min', ['src-dev'], function() {
 // commands
 /////////////////////////////////////////////////////////////////////////////
 
-// task plugins
-task_plugin ( 'fire-dashboard' );
-task_plugin ( 'main-window' );
+// task polymers
+task_polymer ( 'fire-dashboard' );
+task_polymer ( 'main-window' );
 
 // tasks
 gulp.task('copy', task_copy_deps );
@@ -289,8 +282,8 @@ gulp.task('default', task_min_deps );
 
 // watch
 gulp.task('watch', function() {
-    for ( var i = 0; i < plugin_watchers.length; ++i ) {
-        var watcher = plugin_watchers[i];
+    for ( var i = 0; i < polymer_watchers.length; ++i ) {
+        var watcher = polymer_watchers[i];
         gulp.watch( watcher.css.files, watcher.css.tasks ).on ( 'error', gutil.log );
         gulp.watch( watcher.styl.files, watcher.styl.tasks ).on ( 'error', gutil.log );
         gulp.watch( watcher.js.files, watcher.js.tasks ).on ( 'error', gutil.log );

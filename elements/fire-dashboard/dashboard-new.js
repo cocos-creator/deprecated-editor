@@ -33,8 +33,8 @@ Polymer({
         this.curSelect = null;
 
         this._templates = [
-            { name: "Fireball", icon: "img/dashboard/fireball.png" },
             { name: "Cocos2D", icon: "img/dashboard/cocos-html5.png" },
+            { name: "Pixi", icon: "img/dashboard/pixi.png" },
         ];
         this._gamekits = [];
     },
