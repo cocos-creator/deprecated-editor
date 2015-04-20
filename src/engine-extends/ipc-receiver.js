@@ -178,18 +178,30 @@ Ipc.on('asset:moved', function ( detail ) {
 Ipc.on('assets:deleted', function (detail) {
     var results = detail.results;
     for ( var i = 0; i < results.length; ++i ) {
-        var cachedAsset = Fire.AssetLibrary.getCachedAsset(results[i].uuid);
+        var uuid = results[i].uuid;
+        var url = results[i].url;
+        var name;
+        var cachedAsset = Fire.AssetLibrary.getCachedAsset(uuid);
         if (cachedAsset) {
             if (cachedAsset instanceof Fire._Scene) {
                 // unregister scene
                 // 如果是场景反注册就行了，不用销毁，因为可能还正在编辑。
-                var name = Url.basenameNoExt(results[i].url);
+                name = Url.basenameNoExt(url);
                 delete Fire.Engine._sceneInfos[name];
             }
             else {
                 Fire.AssetLibrary.unloadAsset(cachedAsset, true);
             }
         }
+        else {
+            if (Url.extname(url) === '.fire') {
+                name = Url.basenameNoExt(url);
+                delete Fire.Engine._sceneInfos[name];
+            }
+        }
+        //// update Resources
+        //var bundle = Fire.Resources._resBundle;
+        //bundle._removeByUuid(uuid);
     }
 });
 
@@ -200,15 +212,52 @@ Ipc.on('asset:changed', function (detail) {
     Fire.AssetLibrary.onAssetReimported(uuid);
 });
 
+function onAssetCreated ( detail ) {
+    var url = detail.url;
+    var uuid = detail.uuid;
+
+    // register scene
+    if (Url.extname(url) === '.fire') {
+        var name = Url.basenameNoExt(url);
+        Fire.Engine._sceneInfos[name] = uuid;
+    }
+
+    //// update Resources
+    //var bundle = Fire.Resources._resBundle;
+    //bundle.onAssetCreated(url, uuid);
+}
+
+//Ipc.on('asset:created', onAssetCreated);
+
 Ipc.on('assets:created', function ( detail ) {
     var results = detail.results;
     for ( var i = 0; i < results.length; ++i ) {
-        var info = results[i];
+        onAssetCreated(results[i]);
+    }
+});
 
-        // register scene
-        if (Url.extname(info.url) === '.fire') {
-            var name = Url.basenameNoExt(info.url);
-            Fire.Engine._sceneInfos[name] = info.uuid;
-        }
+Ipc.on('resources:moved', function ( detail ) {
+    var results = detail.results;
+    var bundle = Fire.Resources._resBundle;
+    for ( var i = 0; i < results.length; ++i ) {
+        var item = results[i];
+        bundle._removeByPath(item['src-path']);
+        bundle._add(item['dest-path'], item.uuid);
+    }
+});
+Ipc.on('resources:created', function ( detail ) {
+    var results = detail.results;
+    var bundle = Fire.Resources._resBundle;
+    for ( var i = 0; i < results.length; ++i ) {
+        var item = results[i];
+        bundle._add(item.path, item.uuid);
+    }
+});
+Ipc.on('resources:deleted', function ( detail ) {
+    var results = detail.results;
+    var bundle = Fire.Resources._resBundle;
+    for ( var i = 0; i < results.length; ++i ) {
+        var item = results[i];
+        bundle._removeByPath(item.path, item.uuid);
     }
 });

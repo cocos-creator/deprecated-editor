@@ -95,16 +95,6 @@ Polymer({
             }
         }.bind(this));
 
-        this.ipc.on('resources:moved', function ( detail ) {
-            console.log('moved', detail.results);
-        });
-        this.ipc.on('resources:created', function ( detail ) {
-            console.log('created', detail.results);
-        });
-        this.ipc.on('resources:deleted', function ( detail ) {
-            console.log('deleted', detail.results);
-        });
-
         this.ipc.on('scene:save', this.saveCurrentScene.bind(this) );
 
         // scene saved
@@ -325,6 +315,18 @@ Polymer({
                         var name = Url.basenameNoExt(result.url);
                         self.sceneInfo[result.uuid] = result.url;
                         Fire.Engine._sceneInfos[name] = result.uuid;
+                    }
+                    next();
+                });
+            },
+
+            // init Resources folder from asset-db
+            function ( next ) {
+                Editor.AssetDB.queryResources(function ( results ) {
+                    var bundle = Fire.Resources._resBundle;
+                    for ( var i = 0; i < results.length; ++i ) {
+                        var result = results[i];
+                        bundle._add(result.path, result.uuid);
                     }
                     next();
                 });
