@@ -87,6 +87,10 @@ Editor.AssetDB = {
         Editor.sendRequestToCore('asset-db:query', options, cb);
     },
 
+    queryResources: function ( cb ) {
+        Editor.sendRequestToCore('asset-db:query-resources', cb);
+    },
+
     deepQuery: function ( url, cb ) {
         Editor.sendRequestToCore('asset-db:deep-query', {
             url: url
