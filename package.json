@@ -12,6 +12,7 @@
   "devDependencies": {
     "gulp-concat": "",
     "gulp-fb": "",
+    "gulp-header": "^1.2.2",
     "gulp-jshint": "",
     "gulp-stylus": "",
     "gulp-util": "",

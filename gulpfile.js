@@ -8,6 +8,7 @@ var stylus = require('gulp-stylus');
 var vulcanize = require('gulp-vulcanize');
 var minifyCSS = require('gulp-minify-css');
 var fb = require('gulp-fb');
+var header = require('gulp-header');
 
 var del = require('del');
 var stylish = require('jshint-stylish');
@@ -66,6 +67,9 @@ var paths = {
         'src/gizmos/bitmap-text-gizmo.js',
         'src/gizmos/audio-source-gizmo.js',
         'src/gizmos/text-gizmo.js',
+    ],
+    api: [
+        'src/ipc-init.js',
     ],
 };
 
@@ -265,6 +269,29 @@ gulp.task('src-min', ['src-dev'], function() {
             }
         }))
         .pipe(gulp.dest('bin'));
+});
+
+// doc
+gulp.task('export-api-syntax', function (done) {
+
+    // 默认模块是 Editor
+    var DefaultModuleHeader = "/**\n" +
+        " * @module Editor\n" +
+        " * @class Editor\n" +
+        " */\n";
+    var dest = '../../utils/api/editor';
+
+    del(dest + '/**/*', { force: true }, function (err) {
+        if (err) {
+            done(err);
+            return;
+        }
+
+        gulp.src(paths.api)
+            .pipe(header(DefaultModuleHeader))
+            .pipe(gulp.dest(dest))
+            .on('end', done);
+    });
 });
 
 /////////////////////////////////////////////////////////////////////////////
