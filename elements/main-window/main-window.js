@@ -95,6 +95,16 @@ Polymer({
             }
         }.bind(this));
 
+        this.ipc.on('resources:moved', function ( detail ) {
+            console.log('moved', detail.results);
+        });
+        this.ipc.on('resources:created', function ( detail ) {
+            console.log('created', detail.results);
+        });
+        this.ipc.on('resources:deleted', function ( detail ) {
+            console.log('deleted', detail.results);
+        });
+
         this.ipc.on('scene:save', this.saveCurrentScene.bind(this) );
 
         // scene saved
