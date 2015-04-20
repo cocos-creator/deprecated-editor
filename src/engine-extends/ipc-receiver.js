@@ -200,21 +200,11 @@ Ipc.on('asset:changed', function (detail) {
     Fire.AssetLibrary.onAssetReimported(uuid);
 });
 
-Ipc.on('asset:created', function ( detail ) {
-    var url = detail.url;
-    var id = detail.uuid;
-
-    // register scene
-    if (Url.extname(url) === '.fire') {
-        var name = Url.basenameNoExt(url);
-        Fire.Engine._sceneInfos[name] = id;
-    }
-});
-
 Ipc.on('assets:created', function ( detail ) {
     var results = detail.results;
     for ( var i = 0; i < results.length; ++i ) {
         var info = results[i];
+
         // register scene
         if (Url.extname(info.url) === '.fire') {
             var name = Url.basenameNoExt(info.url);
