@@ -37,7 +37,6 @@ var paths = {
         'src/engine-extends/entity.js',
         'src/engine-extends/scene.js',
         'src/engine-extends/engine.js',
-        'src/engine-extends/render-context.js',
         'src/engine-extends/ipc-sender.js',
         'src/engine-extends/ipc-receiver.js',
 
