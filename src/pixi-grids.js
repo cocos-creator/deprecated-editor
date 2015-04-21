@@ -6,27 +6,27 @@ function _smooth (t) {
     return ( t === 1.0 ) ? 1.0 : 1.001 * ( 1.0 - Math.pow( 2, -10 * t ) );
 }
 
-function PixiGrids () {
+function Grids () {
     this.view = {
         width: 0,
         height: 0,
     };
 }
 
-PixiGrids.prototype.setGraphics = function ( graphics ) {
+Grids.prototype.setGraphics = function ( graphics ) {
     this.graphics = graphics;
 };
 
-PixiGrids.prototype.setCamera = function ( camera ) {
+Grids.prototype.setCamera = function ( camera ) {
     this.camera = camera;
 };
 
-PixiGrids.prototype.resize = function ( width, height ) {
+Grids.prototype.resize = function ( width, height ) {
     this.view.width = width;
     this.view.height = height;
 };
 
-PixiGrids.prototype.update = function () {
+Grids.prototype.update = function () {
     var i = 0;
     // var center = this.renderContext.camera.worldToScreen( 0.0, 0.0 );
     // origin.center( center.x, center.y );
@@ -111,4 +111,4 @@ PixiGrids.prototype.update = function () {
     this.graphics.endFill();
 };
 
-Editor.PixiGrids = PixiGrids;
+Editor.Grids = Grids;
