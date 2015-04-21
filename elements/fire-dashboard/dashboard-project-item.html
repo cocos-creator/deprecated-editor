@@ -1,6 +1,7 @@
 <polymer-element
     name="dashboard-project-item"
     constructor="DashboardProjectItem"
+    on-click="{{openAction}}"
     >
     <template>
         <link rel="stylesheet" href="dashboard-project-item.css">
@@ -9,7 +10,6 @@
         <div class="path">{{path}}</div>
 
         <div class="btn-group">
-            <div class="open" on-click="{{openAction}}">Open</div>
             <div class="close" on-click="{{closeAction}}">Close</div>
         </div>
     </template>
