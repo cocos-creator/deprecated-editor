@@ -1,8 +1,9 @@
 //
+var Remote = require('remote');
 var Util = require('util');
 var Ipc = require('ipc');
-var Remote = require('remote');
-var RemoteEditor = Remote.getGlobal('Editor');
+var Path = require('fire-path');
+var Url = require('fire-url');
 
 /**
  * Global object with classes, properties and methods you can access from anywhere.
@@ -19,6 +20,7 @@ var RemoteEditor = Remote.getGlobal('Editor');
  * @static
  */
 window.Editor = window.Editor || {};
+Editor.remote = Remote.getGlobal('Editor');
 
 // init argument list sending from core by url?queries
 // format: '?foo=bar&hell=world'
@@ -33,10 +35,21 @@ for ( var i = 0; i < queryList.length; ++i ) {
     }
 }
 Editor.argv = queries;
+Editor.cwd = Editor.remote.url('fire://');
 
-
+//
 Editor.url = function (url) {
-    return RemoteEditor.url(url);
+    // NOTE: we cache editor:// protocol to get rid of ipc-sync function calls
+    var urlInfo = Url.parse(url);
+    if ( urlInfo.protocol === 'editor:' ) {
+        if ( urlInfo.pathname ) {
+            return Path.join( Editor.cwd, urlInfo.host, urlInfo.pathname );
+        }
+        return Path.join( Editor.cwd, urlInfo.host );
+    }
+
+    // try ipc-sync function
+    return Editor.remote.url(url);
 };
 
 // console
