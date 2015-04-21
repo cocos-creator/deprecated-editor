@@ -7,6 +7,8 @@
 
     background: #222
 
+    cursor: pointer
+
     .name {
         font-size: 22px
     }
@@ -45,28 +47,14 @@
         }
     }
 
-    .open {
-        display: inline-block
-        padding: 5px 10px
-        font-size: 15px
-        font-weight: 900
-        width: 50px
-        text-align: center
-
-        color: #090
-
-        &:hover {
-            background: #333
-            cursor: pointer
-        }
-        &:active {
-            background: #333 + 10%
-        }
-    }
-
     &(:hover) {
         .btn-group {
             display: inline-block
         }
+
+        color: orange
+        background: #222 - 20%
     }
+
+
 }
