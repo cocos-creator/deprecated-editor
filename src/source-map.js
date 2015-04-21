@@ -97,15 +97,21 @@ var SourceMap = {
 
         var lastLine = getLastLine(source);
         if (! lastLine) {
-            throw 'file is empty';
+            throw new Error('file is empty');
         }
-        if (lastLine.substring(0, HEAD.length) !== HEAD) {
-            throw 'unknown syntax';
+        if (lastLine.substr(0, 2) === '//') {
+            if (lastLine.substr(0, HEAD.length) !== HEAD) {
+                throw new Error('unknown syntax');
+            }
+        }
+        else {
+            // 项目里没有脚本，所以就没有生成 source map
+            return null;
         }
         var base64 = lastLine.substring(HEAD.length);
         var json = decodeBase64(base64);
         if (! json) {
-            throw 'can not decode from base64';
+            throw new Error('can not decode from base64');
         }
         return JSON.parse(json);
     },
@@ -124,7 +130,7 @@ var SourceMap = {
                 result = SourceMap.loadFromSourceComment(source);
             }
             catch (e) {
-                Fire.error('Failed to load source map from %s, %s.', path, e.stack);
+                Fire.error('Failed to load source map from %s, %s.', path, e);
                 return callback(e);
             }
             callback(null, result);
@@ -134,6 +140,10 @@ var SourceMap = {
     loadSrcMap: function (path, url, callback) {
         this.loadFromFileComment(path, function (err, rawSourceMap) {
             if (err) {
+                return callback();
+            }
+            if (rawSourceMap === null) {
+                Fire.JS.clear(srcMaps);
                 return callback();
             }
 
