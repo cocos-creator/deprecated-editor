@@ -48,7 +48,7 @@ editorCallback.onStartUnloadScene = function (scene) {
     }) );
 };
 
-editorCallback.onSceneLaunched = function (scene) {
+editorCallback.onBeforeActivateScene = function (scene) {
     window.dispatchEvent( new CustomEvent ('scene-launched', {
         detail: { scene: scene },
         bubbles: false,
@@ -59,9 +59,9 @@ editorCallback.onSceneLaunched = function (scene) {
     Editor.sendToWindows('scene:dirty');
 };
 
-//editorCallback.onSceneLoaded = function (scene) {
-//    Editor.sendToWindows('scene:loaded', scene.entities);
-//};
+editorCallback.onSceneLaunched = function (scene) {
+
+};
 
 editorCallback.onEntityCreated = function (entity) {
     Editor.sendToWindows('entity:created', takeEntitySnapshot(entity));
