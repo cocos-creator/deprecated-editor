@@ -43,7 +43,6 @@ MissingScript.get('errorInfo',
 // NOTE: '_$erialized' 这个特殊标记只有声明为最后一个 prop 才有用，这个FireClass的原始序列化数据将直接赋给 prop。
 MissingScript.prop('_$erialized', null, Fire.HideInInspector, Fire.EditorOnly);
 
-
 /**
  * @param {string} id
  * @return {function} constructor
