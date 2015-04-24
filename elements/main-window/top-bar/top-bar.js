@@ -11,4 +11,8 @@ Polymer({
         }
 
     },
+
+    loginAction: function () {
+        Editor.sendToCore('fire-login:open');
+    },
 });
