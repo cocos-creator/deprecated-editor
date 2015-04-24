@@ -26,6 +26,7 @@ Polymer({
     },
 
     closeAction: function ( event ) {
+        event.stopPropagation();
         Editor.sendToCore('dashboard:remove-project', this.path);
     },
 });
