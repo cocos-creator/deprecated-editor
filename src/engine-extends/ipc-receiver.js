@@ -34,11 +34,12 @@ Ipc.on('engine:delete-entities', function ( detail ) {
 });
 
 Ipc.on('engine:create-entity', function (detail) {
-    var parentId;
+    var parentId, options;
     if ( detail ) {
         parentId = detail['parent-id'];
+        options = detail.options;
     }
-    var ent = new Entity();
+    var ent = new Entity('New Entity', options);
     if (parentId) {
         var parent = Editor.getInstanceById(parentId);
         if (parent) {
@@ -113,6 +114,9 @@ Ipc.on('engine:duplicate-entities', function ( detail ) {
             // duplicate
             var clone = Fire.instantiate(entity);
             clone.parent = entity.parent;
+            if (i === idList.length - 1) {
+                Editor.Selection.selectEntity(clone.id);
+            }
         }
     }
 });

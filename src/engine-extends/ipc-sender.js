@@ -24,11 +24,12 @@ editorCallback.onEnginePaused = function () {
     Editor.sendToWindows('engine:paused');
 };
 
-function takeEntitySnapshot(entity) {
+function takeEntitySnapshot(entity, options) {
     return {
         name: entity._name,
         objFlags: entity._objFlags,
         id: entity.id,
+        options: options,   // 只有 root entity 会有 option
         children: entity._children.map(takeEntitySnapshot),
     };
 }
@@ -63,8 +64,8 @@ editorCallback.onSceneLaunched = function (scene) {
 
 };
 
-editorCallback.onEntityCreated = function (entity) {
-    Editor.sendToWindows('entity:created', takeEntitySnapshot(entity));
+editorCallback.onEntityCreated = function (entity, options) {
+    Editor.sendToWindows('entity:created', takeEntitySnapshot(entity, options));
     Editor.sendToWindows('scene:dirty');
 };
 

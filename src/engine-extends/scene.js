@@ -4,7 +4,7 @@ var Scene = Fire._Scene;
 var Engine = Fire.Engine;
 var Entity = Fire.Entity;
 
-Scene.prototype.addEntity = function (name, flags) {
+Scene.prototype.addEntity = function (name, options) {
     var currentScene = Engine._scene;
     var isCurrentScene = Engine._scene === this;
     if (isCurrentScene === false) {
@@ -12,7 +12,7 @@ Scene.prototype.addEntity = function (name, flags) {
         Engine._scene = this;
     }
 
-    var ent = Entity.createWithFlags(name, flags);
+    var ent = new Entity(name, options);
 
     if (isCurrentScene === false) {
         Engine._canModifyCurrentScene = true;

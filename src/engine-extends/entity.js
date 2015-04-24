@@ -2,13 +2,6 @@
 
 var Entity = Fire.Entity;
 
-Entity.createWithFlags = function (name, flags) {
-    Entity._defaultFlags = flags;
-    var ent = new Entity(name);
-    Entity._defaultFlags = 0;
-    return ent;
-};
-
 // register id
 Object.defineProperty ( Entity.prototype, 'id', {
     get: function () {
