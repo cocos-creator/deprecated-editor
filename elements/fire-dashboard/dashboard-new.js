@@ -33,8 +33,8 @@ Polymer({
         this.curSelect = null;
 
         this._templates = [
-            // { type: 'cocos-js', name: "Cocos2D", icon: "img/dashboard/cocos-html5.png" },
-            { type: 'pixi', name: "Pixi", icon: "img/dashboard/pixi.png" },
+            // { type: 'cocos2d-js', name: "Cocos2d-JS", icon: "img/dashboard/cocos-html5.png" },
+            { type: 'pixi', name: "Pixi.js", icon: "img/dashboard/pixi.png" },
         ];
         this._gamekits = [];
     },
