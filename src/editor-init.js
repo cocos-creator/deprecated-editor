@@ -56,47 +56,16 @@ Editor.url = function (url) {
 };
 
 // console
-Fire.log = function ( text ) {
+Fire.log = function () {
     'use strict';
-    if (arguments.length <= 1) {
-        text = '' + text;
-    }
-    else {
-        text = Util.format.apply(Util, arguments);
-    }
-    console.log(text);
-    Editor.sendToCore('console:log', {
-        message: text
-    });
+    console.log.apply( console, arguments );
+    var args = [].slice.call(arguments);
+    Editor.sendToCore.apply( Editor, ['console:log'].concat(args) );
 };
-Fire.warn = function ( text ) {
+Fire.success = function () {
     'use strict';
-    if (arguments.length <= 1) {
-        text = '' + text;
-    }
-    else {
-        text = Util.format.apply(Util, arguments);
-    }
-    console.warn(text);
-    Editor.sendToCore('console:warn', {
-        message: text
-    });
-};
-Fire.error = function ( text ) {
-    'use strict';
-    if (arguments.length <= 1) {
-        text = '' + text;
-    }
-    else {
-        text = Util.format.apply(Util, arguments);
-    }
-    console.error(text);
-    Editor.sendToCore('console:error', {
-        message: text
-    });
-};
-Fire.success = function ( text ) {
-    'use strict';
+
+    var text = arguments.length > 0 ?  arguments[0] : '';
     if (arguments.length <= 1) {
         text = '' + text;
     }
@@ -104,12 +73,14 @@ Fire.success = function ( text ) {
         text = Util.format.apply(Util, arguments);
     }
     console.log('%c' + text, 'color: green');
-    Editor.sendToCore('console:success', {
-        message: text
-    });
+
+    var args = [].slice.call(arguments);
+    Editor.sendToCore.apply( Editor, ['console:success'].concat(args) );
 };
-Fire.failed = function ( text ) {
+Fire.failed = function () {
     'use strict';
+
+    var text = arguments.length > 0 ?  arguments[0] : '';
     if (arguments.length <= 1) {
         text = '' + text;
     }
@@ -117,22 +88,27 @@ Fire.failed = function ( text ) {
         text = Util.format.apply(Util, arguments);
     }
     console.log('%c' + text, 'color: red');
-    Editor.sendToCore('console:failed', {
-        message: text
-    });
+
+    var args = [].slice.call(arguments);
+    Editor.sendToCore.apply( Editor, ['console:failed'].concat(args) );
 };
-Fire.info = function ( text ) {
+Fire.info = function () {
     'use strict';
-    if (arguments.length <= 1) {
-        text = '' + text;
-    }
-    else {
-        text = Util.format.apply(Util, arguments);
-    }
-    console.info(text);
-    Editor.sendToCore('console:info', {
-        message: text
-    });
+    console.info.apply( console, arguments );
+    var args = [].slice.call(arguments);
+    Editor.sendToCore.apply( Editor, ['console:info'].concat(args) );
+};
+Fire.warn = function () {
+    'use strict';
+    console.warn.apply( console, arguments );
+    var args = [].slice.call(arguments);
+    Editor.sendToCore.apply( Editor, ['console:warn'].concat(args) );
+};
+Fire.error = function () {
+    'use strict';
+    console.error.apply( console, arguments );
+    var args = [].slice.call(arguments);
+    Editor.sendToCore.apply( Editor, ['console:error'].concat(args) );
 };
 
 /**
