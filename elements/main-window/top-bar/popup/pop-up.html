@@ -4,7 +4,20 @@
     >
 <template>
     <link rel="stylesheet" href="pop-up.css">
-    popup
+    <div class="sharp">
+
+    </div>
+    <div class="list">
+        <li class="userName">
+            {{userObj.username}}
+        </li>
+        <li class="item" on-click="{{AccountManage}}">
+            Account management
+        </li>
+        <li class="item" on-click="{{loginOut}}">
+            Log out
+        </li>
+    </div>
 </template>
 <script type="text/javascript" src="pop-up.js"></script>
 </polymer-element>

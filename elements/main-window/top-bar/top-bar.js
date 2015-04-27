@@ -1,5 +1,6 @@
 Polymer({
     keySettings: null,
+    popUp: null,
 
     helpAction: function () {
         if (!this.keySettings) {
@@ -12,7 +13,20 @@ Polymer({
 
     },
 
-    loginAction: function () {
-        // Editor.sendToCore('fire-login:open');
+    profile: function () {
+        if (!this.popUp) {
+            this.popUp = new PopUp();
+            this.popUp.userObj = Editor.userInfo;
+            document.body.appendChild(this.popUp);
+        }
+        else {
+            if (this.popUp.style.display !== 'none') {
+                this.popUp.style.display = 'none';
+            }
+            else {
+                this.popUp.style.display = 'block';
+            }
+        }
+
     },
 });
