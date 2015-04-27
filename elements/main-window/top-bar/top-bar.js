@@ -2,6 +2,14 @@ Polymer({
     keySettings: null,
     popUp: null,
     mask: null,
+    avatar: '../img/avatar-placeholder.jpg',
+
+    domReady: function () {
+        if (Editor.userInfo.avatarurl !== undefined) {
+            this.avatar = Editor.userInfo.avatarurl;
+        }
+    },
+
     helpAction: function () {
         if (!this.keySettings) {
             this.keySettings = new KeySettings();
