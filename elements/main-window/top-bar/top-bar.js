@@ -13,6 +13,6 @@ Polymer({
     },
 
     loginAction: function () {
-        Editor.sendToCore('fire-login:open');
+        // Editor.sendToCore('fire-login:open');
     },
 });
