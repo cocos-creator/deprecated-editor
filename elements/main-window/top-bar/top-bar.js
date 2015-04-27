@@ -13,7 +13,7 @@ Polymer({
 
     },
 
-    profile: function () {
+    popUpWindow: function () {
         if (!this.popUp) {
             this.popUp = new PopUp();
             this.popUp.userObj = Editor.userInfo;
