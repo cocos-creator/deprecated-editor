@@ -1,7 +1,7 @@
 Polymer({
     keySettings: null,
     popUp: null,
-
+    mask: null,
     helpAction: function () {
         if (!this.keySettings) {
             this.keySettings = new KeySettings();
@@ -13,18 +13,18 @@ Polymer({
 
     },
 
-    popUpWindow: function () {
-        if (!this.popUp) {
+    popUpSettings: function () {
+        if ( !this.popUp ) {
             this.popUp = new PopUp();
             this.popUp.userObj = Editor.userInfo;
             document.body.appendChild(this.popUp);
         }
         else {
-            if (this.popUp.style.display !== 'none') {
-                this.popUp.style.display = 'none';
+            if ( !this.popUp.hide ) {
+                this.popUp.hide = true;
             }
             else {
-                this.popUp.style.display = 'block';
+                this.popUp.hide = false;
             }
         }
 
