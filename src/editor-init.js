@@ -279,7 +279,11 @@ Editor.serializeMeta = function ( meta ) {
 };
 
 Editor.login = function ( account, passwd, cb ) {
-    Editor.sendRequestToCore( 'editor:login', account, passwd, cb );
+    return Editor.sendRequestToCore( 'editor:login', account, passwd, cb );
+};
+
+Editor.cancelLogin = function ( id ) {
+    Editor.cancelRequestToCore( id );
 };
 
 Editor.logout = function ( cb ) {
