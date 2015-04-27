@@ -240,27 +240,27 @@ Polymer({
                 // NOTE: DO NOT use parallel here, the HTMLImpots onload function will be blocked
                 Async.series([
                     function ( done ) {
-                        self.importPanel( self.$.consolePanel, 'default@fire-console', done );
+                        self.importPanel( self.$.consolePanel, 'fire-console.default', done );
                     },
 
                     function ( done ) {
-                        self.importPanel( self.$.assetsPanel, 'default@fire-assets', done );
+                        self.importPanel( self.$.assetsPanel, 'fire-assets.default', done );
                     },
 
                     function ( done ) {
-                        self.importPanel( self.$.hierarchyPanel, 'default@fire-hierarchy', done );
+                        self.importPanel( self.$.hierarchyPanel, 'fire-hierarchy.default', done );
                     },
 
                     function ( done ) {
-                        self.importPanel( self.$.inspectorPanel, 'default@fire-inspector', done );
+                        self.importPanel( self.$.inspectorPanel, 'fire-inspector.default', done );
                     },
 
                     function ( done ) {
-                        self.importPanel( self.$.editPanel, 'default@fire-scene', done );
+                        self.importPanel( self.$.editPanel, 'fire-scene.default', done );
                     },
 
                     function ( done ) {
-                        self.importPanel( self.$.editPanel, 'default@fire-game', done );
+                        self.importPanel( self.$.editPanel, 'fire-game.default', done );
                     },
 
                 ], function () {
