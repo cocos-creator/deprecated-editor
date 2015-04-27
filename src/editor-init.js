@@ -39,6 +39,8 @@ Editor.argv = queries;
 Editor.remote = Remote.getGlobal('Editor');
 Editor.cwd = Editor.remote.url('fire://');
 Editor.isDev = Editor.remote.isDev;
+Editor.token = Editor.remote.token;
+Editor.userInfo = Editor.remote.userInfo;
 
 //
 Editor.url = function (url) {
@@ -275,6 +277,19 @@ Editor.serializeMeta = function ( meta ) {
 
     return json;
 };
+
+Editor.login = function ( account, passwd, cb ) {
+    Editor.sendRequestToCore( 'editor:login', account, passwd, cb );
+};
+
+Editor.logout = function ( cb ) {
+    Editor.sendRequestToCore( 'editor:logout', cb );
+};
+
+Ipc.on('editor:user-info-changed', function ( detail ) {
+    Editor.token = detail.token;
+    Editor.userInfo = detail['user-info'];
+});
 
 //
 Editor.plugins = {}; // TODO: 做成Remote Object，确保全局只有一份?
