@@ -28,5 +28,10 @@ Polymer({
             }
         }
 
+        EditorUI.addHitGhost('cursor', '998', function () {
+            this.popUp.hide = true;
+            EditorUI.removeHitGhost();
+        }.bind(this));
+
     },
 });
