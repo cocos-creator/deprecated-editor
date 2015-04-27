@@ -5,12 +5,19 @@ var hierarchy = {
 
     init: function () {
         ipc.on('main-menu:create-entity', function () {
-            Editor.sendToMainWindow('engine:create-entity');
+            Editor.sendToMainWindow('engine:create-entity', {
+                'options': {
+                    'select-in-hierarchy': true
+                }
+            });
         });
         ipc.on('main-menu:create-child-entity', function () {
             var activeId = Editor.Selection.activeEntityId;
             Editor.sendToMainWindow('engine:create-entity', {
-                'parent-id': activeId
+                'parent-id': activeId,
+                'options': {
+                    'select-in-hierarchy': true
+                }
             });
         });
 
