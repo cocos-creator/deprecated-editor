@@ -89,63 +89,71 @@ Editor.Panel = {
         _url2link[url] = link;
     },
 
-    load: function ( url, panelID, panelInfo, cb ) {
-        Polymer.import([url], function () {
-            var viewCtor = window[panelInfo.ctor];
-            if ( !viewCtor ) {
-                Fire.error('Panel import faield. Can not find constructor %s', panelInfo.ctor );
-                return;
-            }
+    load: function ( panelID, cb ) {
+        Editor.sendRequestToCore('panel:query-info', panelID, function ( detail ) {
+            var Path = require('fire-path');
 
-            var viewEL = new viewCtor();
-            viewEL.setAttribute('id', panelID);
-            viewEL.setAttribute('name', panelInfo.title);
-            viewEL.setAttribute('fit', '');
+            var panelInfo = detail['panel-info'];
+            var packagePath = detail['package-path'];
+            var viewPath = Path.join( packagePath, panelInfo.view );
 
-            // set size attribute
-            if ( panelInfo.width )
-                viewEL.setAttribute( 'width', panelInfo.width );
+            Polymer.import([viewPath], function () {
+                var viewCtor = window[panelInfo.ctor];
+                if ( !viewCtor ) {
+                    Fire.error('Panel import faield. Can not find constructor %s', panelInfo.ctor );
+                    return;
+                }
 
-            if ( panelInfo.height )
-                viewEL.setAttribute( 'height', panelInfo.height );
+                var viewEL = new viewCtor();
+                viewEL.setAttribute('id', panelID);
+                viewEL.setAttribute('name', panelInfo.title);
+                viewEL.setAttribute('fit', '');
 
-            if ( panelInfo['min-width'] )
-                viewEL.setAttribute( 'min-width', panelInfo['min-width'] );
+                // set size attribute
+                if ( panelInfo.width )
+                    viewEL.setAttribute( 'width', panelInfo.width );
 
-            if ( panelInfo['min-height'] )
-                viewEL.setAttribute( 'min-height', panelInfo['min-height'] );
+                if ( panelInfo.height )
+                    viewEL.setAttribute( 'height', panelInfo.height );
 
-            if ( panelInfo['max-width'] )
-                viewEL.setAttribute( 'max-width', panelInfo['max-width'] );
+                if ( panelInfo['min-width'] )
+                    viewEL.setAttribute( 'min-width', panelInfo['min-width'] );
 
-            if ( panelInfo['max-height'] )
-                viewEL.setAttribute( 'max-height', panelInfo['max-height'] );
+                if ( panelInfo['min-height'] )
+                    viewEL.setAttribute( 'min-height', panelInfo['min-height'] );
 
-            // register ipc events
-            var ipcListener = new Editor.IpcListener();
+                if ( panelInfo['max-width'] )
+                    viewEL.setAttribute( 'max-width', panelInfo['max-width'] );
 
-            // always have panel:open message
-            if ( panelInfo.messages.indexOf('panel:open') === -1 ) {
-                panelInfo.messages.push('panel:open');
-            }
+                if ( panelInfo['max-height'] )
+                    viewEL.setAttribute( 'max-height', panelInfo['max-height'] );
 
-            for ( i = 0; i < panelInfo.messages.length; ++i ) {
-                _registerIpc( panelID, viewEL, ipcListener, panelInfo.messages[i] );
-            }
+                // register ipc events
+                var ipcListener = new Editor.IpcListener();
 
-            //
-            _idToPanelInfo[panelID] = {
-                element: viewEL,
-                messages: panelInfo.messages,
-                ipcListener: ipcListener
-            };
+                // always have panel:open message
+                if ( panelInfo.messages.indexOf('panel:open') === -1 ) {
+                    panelInfo.messages.push('panel:open');
+                }
 
-            viewEL.profiles = panelInfo.profiles;
-            for ( var type in panelInfo.profiles ) {
-                _registerProfile ( panelID, type, panelInfo.profiles[type] );
-            }
+                for ( i = 0; i < panelInfo.messages.length; ++i ) {
+                    _registerIpc( panelID, viewEL, ipcListener, panelInfo.messages[i] );
+                }
 
-            cb ( null, viewEL );
+                //
+                _idToPanelInfo[panelID] = {
+                    element: viewEL,
+                    messages: panelInfo.messages,
+                    ipcListener: ipcListener
+                };
+
+                viewEL.profiles = panelInfo.profiles;
+                for ( var type in panelInfo.profiles ) {
+                    _registerProfile ( panelID, type, panelInfo.profiles[type] );
+                }
+
+                cb ( null, viewEL, panelInfo );
+            });
         });
     },
 
