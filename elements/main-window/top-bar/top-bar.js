@@ -2,10 +2,10 @@ Polymer({
     keySettings: null,
     popUp: null,
     mask: null,
-    avatar: '../img/avatar-placeholder.jpg',
+    avatar: 'fire://src/editor/main-window/img/avatar-placeholder.jpg',
 
     domReady: function () {
-        if (Editor.userInfo.avatarurl !== undefined) {
+        if ( Editor.userInfo && Editor.userInfo.avatarurl ) {
             this.avatar = Editor.userInfo.avatarurl;
         }
     },
