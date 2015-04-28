@@ -287,6 +287,10 @@ Editor.login = function ( account, passwd, cb ) {
     return Editor.sendRequestToCore( 'editor:login', account, passwd, cb );
 };
 
+Editor.tokenLogin = function ( token, userId, cb ) {
+    return Editor.sendRequestToCore( 'editor:token-login', token, userId, cb );
+};
+
 Editor.cancelLogin = function ( id ) {
     Editor.cancelRequestToCore( id );
 };
@@ -360,4 +364,3 @@ Ipc.on( 'editor:reset-layout', function ( layoutInfo ) {
 //
 Editor.plugins = {}; // TODO: 做成Remote Object，确保全局只有一份?
 Editor.gizmos = {};
-
