@@ -2,7 +2,15 @@ Polymer({
     publish: {
         userObj: null,
     },
+    userName: "",
     hide: false,
+    topBar: null,
+
+    domReady: function () {
+        if (this.userObj) {
+            this.userName = this.userObj.username;
+        }
+    },
 
     hideChanged: function () {
         if (this.hide) {
@@ -20,14 +28,17 @@ Polymer({
         shell.openExternal('http://fireball-x.com/user/edit');
     },
 
-    doAction: function () {
-
-    },
-
     loginOut: function () {
         this.hide = true;
-        Editor.logout(function (){
-            console.log('log out');
-        });
+        Editor.logout(function (res){
+            Editor.sendToWindows('editor:user-info-changed', {
+                'token': null,
+                'user-info': null,
+            });
+
+            this.userObj = Editor.userInfo;
+            this.userName = "";
+            this.topBar.resetAvatar();
+        }.bind(this));
     },
 });

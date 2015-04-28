@@ -10,6 +10,10 @@ Polymer({
         }
     },
 
+    resetAvatar: function () {
+        this.avatar =  'fire://src/editor/main-window/img/avatar-placeholder.jpg';
+    },
+
     helpAction: function () {
         if (!this.keySettings) {
             this.keySettings = new KeySettings();
@@ -25,6 +29,7 @@ Polymer({
         if ( !this.popUp ) {
             this.popUp = new PopUp();
             this.popUp.userObj = Editor.userInfo;
+            this.popUp.topBar = this;
             document.body.appendChild(this.popUp);
         }
         else {
