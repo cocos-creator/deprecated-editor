@@ -38,7 +38,7 @@ Editor.MainMenu.reset = function () {
 function checkTemplate(template) {
     // ensure no click
     for (var i = 0; i < template.length; i++) {
-        var item = template[0];
+        var item = template[i];
         if (item.click) {
             Fire.error('Not support to use click in web-side menu declaration, it may caused dead lock due to ipc problem of atom-shell');
             return false;

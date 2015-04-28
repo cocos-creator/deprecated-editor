@@ -208,26 +208,7 @@ Polymer({
     },
 
     domReady: function () {
-        EditorUI.DockUtils.root = this.$.mainDock;
         Editor.sendToCore('project:init');
-    },
-
-    importPanel: function ( dockAt, panelID, cb ) {
-        Editor.sendRequestToCore( 'panel:page-ready', panelID, function ( detail ) {
-            var panelInfo = detail['panel-info'];
-            var packagePath = detail['package-path'];
-            var argv = detail.argv;
-
-            var Path = require('fire-path');
-            Editor.Panel.load(Path.join( packagePath, panelInfo.view ),
-                              panelID,
-                              panelInfo,
-                              function ( err, element ) {
-                                  dockAt.add(element);
-                                  dockAt.$.tabs.select(0);
-                                  cb();
-                              });
-        });
     },
 
     init: function () {
@@ -236,35 +217,8 @@ Polymer({
         Async.series([
             // init plugins
             function ( next ) {
-                // NOTE: DO NOT use parallel here, the HTMLImpots onload function will be blocked
-                Async.series([
-                    function ( done ) {
-                        self.importPanel( self.$.consolePanel, 'fire-console.default', done );
-                    },
 
-                    function ( done ) {
-                        self.importPanel( self.$.assetsPanel, 'fire-assets.default', done );
-                    },
-
-                    function ( done ) {
-                        self.importPanel( self.$.hierarchyPanel, 'fire-hierarchy.default', done );
-                    },
-
-                    function ( done ) {
-                        self.importPanel( self.$.inspectorPanel, 'fire-inspector.default', done );
-                    },
-
-                    function ( done ) {
-                        self.importPanel( self.$.editPanel, 'fire-scene.default', done );
-                    },
-
-                    function ( done ) {
-                        self.importPanel( self.$.editPanel, 'fire-game.default', done );
-                    },
-
-                ], function () {
-                    EditorUI.DockUtils.reset();
-
+                Editor.loadLayout( self.$.mainDock, function () {
                     Editor.mainWindow.$.assets.browse();
 
                     // for each plugin

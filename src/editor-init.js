@@ -4,6 +4,7 @@ var Util = require('util');
 var Ipc = require('ipc');
 var Path = require('fire-path');
 var Url = require('fire-url');
+var Async = require('async');
 
 /**
  * Global object with classes, properties and methods you can access from anywhere.
@@ -278,6 +279,10 @@ Editor.serializeMeta = function ( meta ) {
     return json;
 };
 
+// ==========================
+// login API
+// ==========================
+
 Editor.login = function ( account, passwd, cb ) {
     return Editor.sendRequestToCore( 'editor:login', account, passwd, cb );
 };
@@ -290,9 +295,66 @@ Editor.logout = function ( cb ) {
     Editor.sendRequestToCore( 'editor:logout', cb );
 };
 
+// ==========================
+// Layout API
+// ==========================
+
+var _importPanel = function ( dockAt, panelID, cb ) {
+    Editor.sendRequestToCore ('panel:query-info', panelID, function ( detail ) {
+        var panelInfo = detail['panel-info'];
+        var packagePath = detail['package-path'];
+
+        Editor.Panel.load(Path.join( packagePath, panelInfo.view ),
+                          panelID,
+                          panelInfo,
+                          function ( err, viewEL ) {
+            dockAt.add(viewEL);
+            dockAt.$.tabs.select(0);
+            cb();
+        });
+    });
+};
+
+Editor.loadLayout = function ( anchorEL, cb ) {
+    Editor.sendRequestToCore( 'window:query-layout', Editor.requireIpcEvent, function (wininfo) {
+        if ( !wininfo ) {
+            cb();
+            return;
+        }
+
+        Editor.resetLayout( anchorEL, wininfo.layout, cb );
+    });
+};
+
+Editor.resetLayout = function ( anchorEL, layoutInfo, cb ) {
+    var importList = EditorUI.createLayout( anchorEL, layoutInfo );
+    Async.eachSeries( importList, function ( item, done ) {
+        _importPanel ( item.dockEL, item.panelID, done );
+    }, function ( err ) {
+        EditorUI.DockUtils.flush();
+        Editor.sendToCore('window:save-layout',
+                          Editor.Panel.getLayout(),
+                          Editor.requireIpcEvent);
+        if ( cb ) cb ();
+    } );
+};
+
+// ==========================
+// Ipc events
+// ==========================
+
 Ipc.on('editor:user-info-changed', function ( detail ) {
     Editor.token = detail.token;
     Editor.userInfo = detail['user-info'];
+});
+
+Ipc.on( 'editor:reset-layout', function ( layoutInfo ) {
+    var anchorEL = document.body;
+    if ( EditorUI.DockUtils.root ) {
+        anchorEL = EditorUI.DockUtils.root.parentElement;
+    }
+
+    Editor.resetLayout( anchorEL, layoutInfo );
 });
 
 //

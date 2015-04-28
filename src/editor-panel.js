@@ -139,7 +139,6 @@ Editor.Panel = {
                 messages: panelInfo.messages,
                 ipcListener: ipcListener
             };
-            Editor.sendToCore('panel:dock', panelID, Editor.requireIpcEvent);
 
             viewEL.profiles = panelInfo.profiles;
             for ( var type in panelInfo.profiles ) {
@@ -150,21 +149,38 @@ Editor.Panel = {
         });
     },
 
+    open: function ( panelID, argv ) {
+        Editor.sendToCore('panel:open', panelID, argv);
+    },
+
+    close: function ( panelID ) {
+        Panel.undock(panelID);
+        Editor.sendToCore('panel:close', panelID);
+    },
+
     closeAll: function () {
         for ( var id in _idToPanelInfo ) {
             Editor.Panel.close(id);
         }
     },
 
-    close: function ( panelID ) {
-        var panelInfo = _idToPanelInfo[panelID];
+    undock: function ( panelID ) {
+        // remove panel element from tab
+        var viewEL = Editor.Panel.find(panelID);
+        if ( viewEL ) {
+            var panelEL = viewEL.parentElement;
+            var currentTabEL = panelEL.$.tabs.findTab(viewEL);
+            panelEL.close(currentTabEL);
 
+            EditorUI.DockUtils.flush();
+        }
+
+        // remove panelInfo
+        var panelInfo = _idToPanelInfo[panelID];
         if ( panelInfo) {
             panelInfo.ipcListener.clear();
             delete _idToPanelInfo[panelID];
         }
-
-        Editor.sendToCore('panel:undock', panelID, Editor.requireIpcEvent);
     },
 
     dispatch: function ( panelID, ipcName ) {
@@ -194,6 +210,9 @@ Editor.Panel = {
 
     getLayout: function () {
         var root = EditorUI.DockUtils.root;
+        if ( !root )
+            return null;
+
         if ( root instanceof FireDock ) {
             return {
                 'type': 'dock',
@@ -214,5 +233,40 @@ Editor.Panel = {
             };
         }
     },
+
+    find: function ( panelID ) {
+        var panelInfo = _idToPanelInfo[panelID];
+        if ( !panelInfo ) {
+            return null;
+        }
+        return panelInfo.element;
+    },
 };
 
+// ==========================
+// Ipc events
+// ==========================
+
+var Ipc = require('ipc');
+
+Ipc.on('panel:close', function ( panelID ) {
+    // NOTE: if we don't do this in requestAnimationFrame,
+    // the tab will remain, something wrong for Polymer.dom
+    // operation when they are in ipc callback.
+    window.requestAnimationFrame( function () {
+        Editor.Panel.close(panelID);
+    });
+});
+
+Ipc.on('panel:popup', function ( panelID ) {
+    window.requestAnimationFrame( function () {
+        Editor.Panel.close(panelID);
+        Editor.sendToCore('panel:new', panelID);
+    });
+});
+
+Ipc.on('panel:undock', function ( panelID ) {
+    window.requestAnimationFrame( function () {
+        Editor.Panel.undock(panelID);
+    });
+});
