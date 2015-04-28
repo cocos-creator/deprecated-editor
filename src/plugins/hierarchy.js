@@ -10,6 +10,7 @@ var hierarchy = {
                     'select-in-hierarchy': true
                 }
             });
+            Editor.sendToMainWindow( 'scene:dirty' );
         });
         ipc.on('main-menu:create-child-entity', function () {
             var activeId = Editor.Selection.activeEntityId;
@@ -19,6 +20,7 @@ var hierarchy = {
                     'select-in-hierarchy': true
                 }
             });
+            Editor.sendToMainWindow( 'scene:dirty' );
         });
 
         Editor.MainMenu.addTemplate('Entity', this.getMenuTemplate('main-menu'), {

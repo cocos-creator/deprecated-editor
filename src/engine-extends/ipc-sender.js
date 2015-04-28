@@ -57,7 +57,7 @@ editorCallback.onBeforeActivateScene = function (scene) {
     }) );
 
     Editor.sendToWindows('scene:launched', takeSceneSnapshot(scene));
-    Editor.sendToWindows('scene:dirty');
+    Editor.sendToWindows('scene:repaint');
 };
 
 editorCallback.onSceneLaunched = function (scene) {
@@ -66,14 +66,14 @@ editorCallback.onSceneLaunched = function (scene) {
 
 editorCallback.onEntityCreated = function (entity, options) {
     Editor.sendToWindows('entity:created', takeEntitySnapshot(entity, options));
-    Editor.sendToWindows('scene:dirty');
+    Editor.sendToWindows('scene:repaint');
 };
 
 editorCallback.onEntityRemoved = function (entity/*, isTopMost*/) {
     Editor.sendToWindows( 'entity:removed', {
         'entity-id': entity.id
     });
-    Editor.sendToWindows('scene:dirty');
+    Editor.sendToWindows('scene:repaint');
     // deselect
     var entities = Editor.Selection.entities;
     if (entity.childCount > 0) {
@@ -110,7 +110,7 @@ editorCallback.onEntityParentChanged = function (entity) {
         'entity-id': entity.id,
         'parent-id': entity.parent ? entity.parent.id : null
     });
-    Editor.sendToWindows('scene:dirty');
+    Editor.sendToWindows('scene:repaint');
 };
 
 editorCallback.onEntityIndexChanged = function (entity, oldIndex, newIndex) {
@@ -126,7 +126,7 @@ editorCallback.onEntityIndexChanged = function (entity, oldIndex, newIndex) {
         'entity-id': entity.id,
         'next-sibliing-id': next ? next.id : null
     });
-    Editor.sendToWindows('scene:dirty');
+    Editor.sendToWindows('scene:repaint');
 };
 
 editorCallback.onEntityRenamed = function (entity) {

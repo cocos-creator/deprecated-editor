@@ -150,13 +150,13 @@ Polymer({
             }
         }.bind(this) );
 
-        this.ipc.on('entity:added', this.setSceneDirty.bind(this,true,false));
         this.ipc.on('entity:removed', this.setSceneDirty.bind(this,true,false));
         this.ipc.on('entity:parent-changed', this.setSceneDirty.bind(this,true,false));
         this.ipc.on('entity:index-changed', this.setSceneDirty.bind(this,true,false));
         this.ipc.on('entity:renamed', this.setSceneDirty.bind(this,true,false));
         this.ipc.on('entity:inspector-dirty', this.setSceneDirty.bind(this,true,false));
         this.ipc.on('gizmos:dirty', this.setSceneDirty.bind(this,true,false));
+        this.ipc.on('scene:dirty', this.setSceneDirty.bind(this,true,false));
 
         this.ipc.on('scene:new', function () {
             this.newScene();
