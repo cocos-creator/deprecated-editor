@@ -177,7 +177,7 @@ Editor.Panel = {
         var viewEL = Editor.Panel.find(panelID);
         if ( viewEL ) {
             var panelEL = viewEL.parentElement;
-            var currentTabEL = panelEL.$.tabs.findTab(viewEL);
+            var currentTabEL = panelEL.$.tabs.find(viewEL);
             panelEL.close(currentTabEL);
 
             EditorUI.DockUtils.flush();
