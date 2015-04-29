@@ -10,6 +10,13 @@ Polymer({
             ],
             },
 
+            {name:"Scene View",
+            value:[
+                {keys:"Shift+Mouse Left",discription:"Panning"},
+                {keys:"Mouse Scroll",discription:"Zoom In/Out"},
+            ],
+            },
+
             {name:"Edit",
             value:[
                 {keys:"⌘+Z",discription:"Undo"},
@@ -38,21 +45,21 @@ Polymer({
 
             {name:"Code-Editor",
             value:[
-                {keys:"Tab",discription:"缩进"},
+                {keys:"Tab",discription:"Indent"},
                 {keys:"⌘+C",discription:"Copy"},
                 {keys:"⌘+V",discription:"Paste"},
                 {keys:"⌘+X",discription:"Cut"},
                 {keys:"⌘+Z",discription:"Undo"},
                 {keys:"⇧+⌘+Z",discription:"Redo"},
-                {keys:"⌘+/",discription:"注释选中内容"},
+                {keys:"⌘+/",discription:"Select Comment Contents"},
                 {keys:"⌘+O",discription:"Auto Formating"},
                 {keys:"⌘+S",discription:"Save"},
                 {keys:"⌘+R",discription:"Reload File"},
-                {keys:"⌘+[",discription:"向左移动选中行"},
-                {keys:"⌘+]",discription:"向右移动选中行"},
-                {keys:"⌘+KU",discription:"改为大写"},
-                {keys:"⌘+L",discription:"选择整行(按住-继续选择下行)"},
-                {keys:"⌘+J",discription:"合并选中行"},
+                {keys:"⌘+[",discription:"Indent Left"},
+                {keys:"⌘+]",discription:"Indent Right"},
+                {keys:"⌘+KU",discription:"Convert to uppercase"},
+                {keys:"⌘+L",discription:"Line Selection"},
+                {keys:"⌘+J",discription:"Merge Selected Lines"},
             ],
             },
         ],
