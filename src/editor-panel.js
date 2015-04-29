@@ -177,8 +177,13 @@ Editor.Panel = {
         var viewEL = Editor.Panel.find(panelID);
         if ( viewEL ) {
             var panelEL = viewEL.parentElement;
-            var currentTabEL = panelEL.$.tabs.find(viewEL);
-            panelEL.close(currentTabEL);
+            if ( panelEL instanceof FirePanel ) {
+                var currentTabEL = panelEL.$.tabs.find(viewEL);
+                panelEL.close(currentTabEL);
+            }
+            else {
+                viewEL.remove();
+            }
 
             EditorUI.DockUtils.flush();
         }
