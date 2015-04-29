@@ -38,19 +38,32 @@ Polymer({
         }.bind(this) );
 
         Ipc.on( 'dashboard:project-added', function ( path, openWhenAdded ) {
-            this.recentProjets.push({
-                name: Path.basename(path),
-                path: path,
-                blink: true,
-            });
-
-            setTimeout( function () {
-                if ( openWhenAdded ) {
-                    Editor.sendToCore('dashboard:open-project', path);
+            var alreadyExists = false;
+            for ( var i = 0; i < this.recentProjets.length; ++i ) {
+                if ( this.recentProjets[i].path === path ) {
+                    alreadyExists = true;
+                    break;
                 }
-            }, 300 );
+            }
+            if ( !alreadyExists ) {
+                this.recentProjets.push({
+                    name: Path.basename(path),
+                    path: path,
+                    blink: true,
+                });
 
-            this.fire('project-added');
+                setTimeout( function () {
+                    if ( openWhenAdded ) {
+                        Editor.sendToCore('dashboard:open-project', path);
+                    }
+                }, 300 );
+
+                this.fire('project-added');
+            }
+            else {
+                Editor.sendToCore('dashboard:open-project', path);
+                this.fire('project-added');
+            }
         }.bind(this) );
 
         Ipc.on( 'dashboard:project-removed', function ( path ) {
