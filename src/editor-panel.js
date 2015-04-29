@@ -162,7 +162,7 @@ Editor.Panel = {
     },
 
     close: function ( panelID ) {
-        Panel.undock(panelID);
+        Editor.Panel.undock(panelID);
         Editor.sendToCore('panel:close', panelID);
     },
 
