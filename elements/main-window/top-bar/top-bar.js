@@ -8,6 +8,7 @@ Polymer({
         if ( Editor.userInfo && Editor.userInfo.avatarurl ) {
             this.avatar = Editor.userInfo.avatarurl;
         }
+        this.$.popup.topBar = this;
     },
 
     resetAvatar: function () {
@@ -26,25 +27,11 @@ Polymer({
     },
 
     popUpSettings: function () {
-        if ( !this.popUp ) {
-            this.popUp = new PopUp();
-            this.popUp.userObj = Editor.userInfo;
-            this.popUp.topBar = this;
-            document.body.appendChild(this.popUp);
+        if ( Editor.token ) {
+            this.$.popup.hide = !this.$.popup.hide;
         }
         else {
-            if ( !this.popUp.hide ) {
-                this.popUp.hide = true;
-            }
-            else {
-                this.popUp.hide = false;
-            }
+            Editor.sendToCore('fire-login:open');
         }
-
-        EditorUI.addHitGhost('cursor', '998', function () {
-            this.popUp.hide = true;
-            EditorUI.removeHitGhost();
-        }.bind(this));
-
     },
 });

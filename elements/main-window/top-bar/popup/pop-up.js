@@ -1,15 +1,25 @@
+var Ipc = require('ipc');
+
 Polymer({
-    publish: {
-        userObj: null,
-    },
     userName: "",
-    hide: false,
+    hide: true,
+    isLogin: false,
     topBar: null,
 
     domReady: function () {
-        if (this.userObj) {
-            this.userName = this.userObj.username;
+        if (Editor.userInfo && Editor.userInfo.username) {
+            this.userName = Editor.userInfo.username;
         }
+
+        Ipc.on('popup:login',function(detail) {
+            if (Editor.userInfo && Editor.userInfo.username) {
+                this.userName = Editor.userInfo.username;
+            }
+
+            if (Editor.userInfo && Editor.userInfo.avatarurl) {
+                this.topBar.avatar = Editor.userInfo.avatarurl;
+            }
+        }.bind(this));
     },
 
     hideChanged: function () {
@@ -19,6 +29,10 @@ Polymer({
         }
         else {
             this.style.display = 'block';
+            EditorUI.addHitGhost('cursor', '998', function () {
+                this.hide = true;
+                EditorUI.removeHitGhost();
+            }.bind(this));
         }
     },
 
@@ -36,9 +50,9 @@ Polymer({
                 'user-info': null,
             });
 
-            this.userObj = Editor.userInfo;
             this.userName = "";
             this.topBar.resetAvatar();
+            this.isLogin = false;
         }.bind(this));
     },
 });
