@@ -33,6 +33,7 @@ Polymer({
             // save
             case 0:
                 this.saveCurrentScene();
+                this.$.assets.saveCollapses();
                 Editor.Metrics.trackEditorClose();
                 return true;
 
@@ -42,6 +43,7 @@ Polymer({
 
             // don't save
             case 2:
+                this.$.assets.saveCollapses();
                 Editor.Metrics.trackEditorClose();
                 return true;
             }
