@@ -177,7 +177,7 @@ Fire.AssetLibrary.onAssetReimported = function (uuid) {
     //}.bind(this));
 };
 
-var doUnload = Fire.AssetLibrary.unloadAsset.bind(Fire.AssetLibrary);
+var doUnload = Fire.AssetLibrary.unloadAsset;
 Fire.AssetLibrary.unloadAsset = function (assetOrUuid, destroyAsset) {
     var uuid;
     var asset;
@@ -190,7 +190,7 @@ Fire.AssetLibrary.unloadAsset = function (assetOrUuid, destroyAsset) {
     }
     if (uuid) {
         this._onAssetChanged(uuid, null);
-        doUnload(assetOrUuid, destroyAsset);
+        doUnload.call(Fire.AssetLibrary, assetOrUuid, destroyAsset);
     }
     else if (asset) {
         asset.destroy();

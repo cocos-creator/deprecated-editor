@@ -28,9 +28,6 @@ Ipc.on('engine:delete-entities', function ( detail ) {
             entity.destroy();
         }
     }
-    if ( !Engine.isPlaying ) {
-        FObject._deferredDestroy();
-    }
 });
 
 Ipc.on('engine:create-entity', function (detail) {
@@ -139,9 +136,6 @@ Ipc.on('engine:remove-component', function ( detail ) {
     var comp = Editor.getInstanceById(componentId);
     if (comp) {
         comp.destroy();
-    }
-    if ( !Engine.isPlaying ) {
-        FObject._deferredDestroy();
     }
 });
 
