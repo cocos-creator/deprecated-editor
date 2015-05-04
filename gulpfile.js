@@ -276,7 +276,6 @@ gulp.task('export-api-syntax', function (done) {
     // 默认模块是 Editor
     var DefaultModuleHeader = "/**\n" +
         " * @module Editor\n" +
-        " * @class Editor\n" +
         " */\n";
     var dest = '../../utils/api/editor';
 
