@@ -31,7 +31,7 @@ SpriteRendererGizmo.prototype.update = function () {
     var bounds, v1, v2, v3, v4;
     var radius = 5;
 
-    if ( this.editing && this.target.customSize ) {
+    if ( this.editing && this.target.useCustomSize ) {
         if ( !this._editTools ) {
             var self = this;
             var center, vtable = {};
@@ -169,7 +169,7 @@ SpriteRendererGizmo.prototype.update = function () {
 
     if ( this.editing ) {
         var color = "#09f";
-        if ( this.target.customSize ) {
+        if ( this.target.useCustomSize ) {
             color = "#0f9";
         }
 
@@ -190,7 +190,7 @@ SpriteRendererGizmo.prototype.update = function () {
         .stroke( { color: color, width: 1 } )
         ;
 
-        if ( this.target.customSize ) {
+        if ( this.target.useCustomSize ) {
             v1.x = v1.x - radius; v1.y = v1.y - radius;
             v2.x = v2.x - radius; v2.y = v2.y - radius;
             v3.x = v3.x - radius; v3.y = v3.y - radius;
