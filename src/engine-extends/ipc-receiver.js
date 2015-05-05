@@ -38,8 +38,8 @@ Ipc.on('engine:create-input-field', function (detail) {
     }
     var ent = new Entity('InputField', options);
     var renderer = ent.addComponent(Fire.SpriteRenderer);
-    var childEnt = new Entity('text', options);
-    var com = childEnt.addComponent(Fire.InputField);
+    var childEntity = new Entity('Text');
+    var com = childEntity.addComponent(Fire.InputField);
     com.background = renderer;
     childEnt.parent = ent;
 
