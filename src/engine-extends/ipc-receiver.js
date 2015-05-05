@@ -30,6 +30,27 @@ Ipc.on('engine:delete-entities', function ( detail ) {
     }
 });
 
+Ipc.on('engine:create-input-field', function (detail) {
+    var parentId, options;
+    if (detail) {
+        parentId = detail['parent-id'];
+        options = detail.options;
+    }
+    var ent = new Entity('InputField', options);
+    var renderer = ent.addComponent(Fire.SpriteRenderer);
+    var childEntity = new Entity('Text');
+    var com = childEntity.addComponent(Fire.InputField);
+    com.background = renderer;
+    childEnt.parent = ent;
+
+    if (parentId) {
+        var parent = Editor.getInstanceById(parentId);
+        if (parent) {
+            ent.parent = parent;
+        }
+    }
+});
+
 Ipc.on('engine:create-entity', function (detail) {
     var parentId, options;
     if ( detail ) {
