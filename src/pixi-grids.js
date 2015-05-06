@@ -3,7 +3,8 @@ function _snapPixel (p) {
 }
 
 function _smooth (t) {
-    return ( t === 1.0 ) ? 1.0 : 1.001 * ( 1.0 - Math.pow( 2, -10 * t ) );
+    return t;
+    // return ( t === 1.0 ) ? 1.0 : 1.001 * ( 1.0 - Math.pow( 2, -10 * t ) );
 }
 
 function Grids () {
@@ -33,7 +34,7 @@ Grids.prototype.update = function () {
 
     var tickUnit = 100;
     var tickCount = 10;
-    var tickDistance = 50;
+    var tickDistance = 10;
 
     var nextTickCount = 1;
     var curTickUnit = tickUnit;
