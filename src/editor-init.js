@@ -13,13 +13,6 @@ var Async = require('async');
  * @module Editor
  * @main Editor
  */
-/**
- * Global object with classes, properties and methods you can access from anywhere
- *
- * See [classes in Editor module](../modules/Editor.html).
- * @class Editor
- * @static
- */
 window.Editor = window.Editor || {};
 
 // init argument list sending from core by url?queries
