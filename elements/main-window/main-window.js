@@ -223,16 +223,6 @@ Polymer({
                 Editor.loadLayout( self.$.mainDock, function () {
                     Editor.mainWindow.$.assets.browse();
 
-                    // for each plugin
-                    for ( var key in Editor.plugins) {
-                        var plugin = Editor.plugins[key];
-
-                        // init plugin
-                        if ( plugin.init ) {
-                            plugin.init();
-                        }
-                    }
-
                     // save layout
                     Editor.sendToCore( 'window:save-layout',
                                     Editor.Panel.getLayout(),

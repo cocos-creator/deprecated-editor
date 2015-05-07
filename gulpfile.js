@@ -53,9 +53,6 @@ var paths = {
         'src/svg-gizmos.js',
         'src/build-assets.js',
 
-        // plugins
-        'src/plugins/hierarchy.js',
-
         // gizmos
         'src/gizmos/gizmo.js',
         'src/gizmos/position-gizmo.js',

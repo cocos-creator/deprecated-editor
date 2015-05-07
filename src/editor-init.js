@@ -354,5 +354,4 @@ Ipc.on( 'editor:reset-layout', function ( layoutInfo ) {
 });
 
 //
-Editor.plugins = {}; // TODO: 做成Remote Object，确保全局只有一份?
 Editor.gizmos = {};
