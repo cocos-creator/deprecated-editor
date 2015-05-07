@@ -174,8 +174,16 @@ Polymer({
                 return;
             }
 
-            var entityId = detail['entity-id'];
-            if ( Editor.isLiveInEditMode(entityId) ) {
+            var list = Editor.Selection.entities;
+            var hasLiveEntity = false;
+            for ( var i = 0; i < list.length; ++i ) {
+                if ( Editor.isLiveInEditMode(list[i]) ) {
+                    hasLiveEntity = true;
+                    break;
+                }
+            }
+
+            if ( hasLiveEntity ) {
                 this.tickInFrame();
             }
         }.bind(this));
@@ -188,8 +196,16 @@ Polymer({
                 return;
             }
 
-            var entityId = detail['entity-id'];
-            if ( !Editor.isLiveInEditMode(entityId) ) {
+            var list = Editor.Selection.entities;
+            var hasLiveEntity = false;
+            for ( var i = 0; i < list.length; ++i ) {
+                if ( Editor.isLiveInEditMode(list[i]) ) {
+                    hasLiveEntity = true;
+                    break;
+                }
+            }
+
+            if ( !hasLiveEntity ) {
                 this.tickSlow();
             }
         }.bind(this));
@@ -496,20 +512,25 @@ Polymer({
     },
 
     tickInFrame: function () {
-        console.log('tick frame');
         this._stopSceneInterval();
         this._updateSceneInAnimationFrame();
+
+        Editor.sendToMainWindow('engine:fast-tick');
     },
 
     tickSlow: function () {
-        console.log('tick slow');
         this._stopSceneInAnimationFrame();
         this._updateSceneInterval();
+
+        Editor.sendToMainWindow('engine:slow-tick');
     },
 
     _updateSceneInterval: function () {
         this._updateSceneIntervalID = setInterval ( function () {
             this.$.scene.repaintScene();
+            if ( !Fire.Engine.isPlaying ) {
+                this.$.game.repaintScene();
+            }
         }.bind(this), 500 );
     },
 
@@ -523,6 +544,9 @@ Polymer({
     _updateSceneInAnimationFrame: function () {
         this._updateSceneAnimFrameID = window.requestAnimationFrame( function () {
             this.$.scene.repaintScene();
+            if ( !Fire.Engine.isPlaying ) {
+                this.$.game.repaintScene();
+            }
             this._updateSceneInAnimationFrame();
         }.bind(this) );
     },
