@@ -75,3 +75,23 @@ for (var typo in TypoCheckList) {
         });
     })(typo);
 }
+
+/**
+ * @method isLiveInEditMode
+ * @param {number} entityId
+ * @return {boolean}
+ */
+Editor.isLiveInEditMode = function (entityId) {
+    var ent = Editor.getInstanceById(entityId);
+    if (ent) {
+        var i = 1;  // always skip Transform
+        for (; i < ent._components.length; i++) {
+            var comp = ent._components[i];
+            var execute = Fire.attr(comp, 'executeInEditMode');
+            if (execute && execute.live) {
+                return true;
+            }
+        }
+    }
+    return false;
+};
