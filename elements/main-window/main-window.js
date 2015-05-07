@@ -166,6 +166,78 @@ Polymer({
 
         // NOTE: the scene:launched and engine:played must be ipc event to make sure component:disabled been called before it.
 
+        this.ipc.on('component:added', function ( detail ) {
+            if ( Fire.Engine.isPlaying ) {
+                return;
+            }
+            if ( !this.$.scene ) {
+                return;
+            }
+
+            var entityId = detail['entity-id'];
+            if ( Editor.isLiveInEditMode(entityId) ) {
+                this.tickInFrame();
+            }
+        }.bind(this));
+
+        this.ipc.on('component:removed', function ( detail ) {
+            if ( Fire.Engine.isPlaying ) {
+                return;
+            }
+            if ( !this.$.scene ) {
+                return;
+            }
+
+            var entityId = detail['entity-id'];
+            if ( !Editor.isLiveInEditMode(entityId) ) {
+                this.tickSlow();
+            }
+        }.bind(this));
+
+        this.ipc.on('selection:entity:selected', function ( detail ) {
+            if ( Fire.Engine.isPlaying ) {
+                return;
+            }
+            if ( !this.$.scene ) {
+                return;
+            }
+
+            var list = Editor.Selection.entities;
+            var hasLiveEntity = false;
+            for ( var i = 0; i < list.length; ++i ) {
+                if ( Editor.isLiveInEditMode(list[i]) ) {
+                    hasLiveEntity = true;
+                    break;
+                }
+            }
+
+            if ( hasLiveEntity ) {
+                this.tickInFrame();
+            }
+        }.bind(this));
+
+        this.ipc.on('selection:entity:unselected', function ( detail ) {
+            if ( Fire.Engine.isPlaying ) {
+                return;
+            }
+            if ( !this.$.scene ) {
+                return;
+            }
+
+            var list = Editor.Selection.entities;
+            var hasLiveEntity = false;
+            for ( var i = 0; i < list.length; ++i ) {
+                if ( Editor.isLiveInEditMode(list[i]) ) {
+                    hasLiveEntity = true;
+                    break;
+                }
+            }
+
+            if ( !hasLiveEntity ) {
+                this.tickSlow();
+            }
+        }.bind(this));
+
         this.ipc.on('scene:launched', function () {
             // TEMP HACK: waiting for jare's new scene-camera, that will make scene camera only initialize once
             this.$.scene.initSceneCamera();
@@ -180,11 +252,7 @@ Polymer({
             this.setSceneDirty(this._sceneDirtyFlag,true);
 
             //
-            if ( this._updateSceneIntervalID ) {
-                Fire.warn( 'The _updateSceneInterval still ON' );
-                return;
-            }
-            this._updateSceneInterval();
+            this.tickSlow();
         }.bind(this));
 
         this.ipc.on('engine:played', function ( continued ) {
@@ -193,15 +261,11 @@ Polymer({
                 return;
             }
 
-            // check if we have invalid anim frame request
-            if ( this._updateSceneAnimFrameID ) {
-                Fire.warn( 'The _updateSceneInAnimationFrame still ON' );
-                return;
-            }
-
             // store scene dirty flag
             this._sceneDirtyFlag = Fire.Engine._scene.dirty;
-            this._updateSceneInAnimationFrame();
+
+            //
+            this.tickInFrame();
         }.bind(this));
     },
 
@@ -429,6 +493,18 @@ Polymer({
             this._newsceneUrl = saveUrl;
             Editor.AssetDB.save( this._newsceneUrl, Editor.serialize(currentScene) );
         }
+    },
+
+    tickInFrame: function () {
+        console.log('tick frame');
+        this._stopSceneInterval();
+        this._updateSceneInAnimationFrame();
+    },
+
+    tickSlow: function () {
+        console.log('tick slow');
+        this._stopSceneInAnimationFrame();
+        this._updateSceneInterval();
     },
 
     _updateSceneInterval: function () {
