@@ -23,7 +23,7 @@ var ParticleSystemGizmo = Fire.Class({
     },
 
     remove: function () {
-        this._selectTools.remove();
+        this._icon.remove();
     },
 
     update: function () {
