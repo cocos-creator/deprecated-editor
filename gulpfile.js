@@ -18,6 +18,10 @@ var paths = {
         // init
         'src/editor-init.js',
         'src/ipc-init.js',
+        'src/editor-window.js',
+        'src/editor-panel.js',
+        'src/editor-menu.js',
+        'src/main-menu.js',
 
         // asset extends
         'src/asset-extends/bitmap-font.js',
@@ -41,12 +45,10 @@ var paths = {
         'src/engine-extends/ipc-receiver.js',
 
         // editor
-        'src/editor-panel.js',
         'src/plugin-loader.js',
         'src/source-map.js',
         'src/sandbox.js',
         'src/asset-db.js',
-        'src/menu.js',
         'src/pixi-grids.js',
         'src/svg-grids.js',
         'src/gizmos-utils.js',

@@ -303,11 +303,6 @@ Polymer({
                 Editor.loadLayout( self.$.mainDock, function () {
                     Editor.mainWindow.$.assets.browse();
 
-                    // save layout
-                    Editor.sendToCore( 'window:save-layout',
-                                    Editor.Panel.getLayout(),
-                                    Editor.requireIpcEvent );
-
                     //
                     next();
                 });

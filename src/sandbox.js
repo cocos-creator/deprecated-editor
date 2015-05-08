@@ -347,7 +347,7 @@ Sandbox.reloadScripts = (function () {
         // reset menus
         Fire._componentMenuItems = builtinComponentMenus.slice();
         Fire._customAssetMenuItems = builtinCustomAssetMenus.slice();
-        Editor.MainMenu.reset();
+        // Editor.MainMenu.reset();
         // remove user classes
         Fire.JS._registeredClassIds = builtinClassIds;
         Fire.JS._registeredClassNames = builtinClassNames;

@@ -1,7 +1,7 @@
 //
 var Remote = require('remote');
-var Util = require('util');
 var Ipc = require('ipc');
+var Util = require('util');
 var Path = require('fire-path');
 var Url = require('fire-url');
 var Async = require('async');
@@ -14,6 +14,9 @@ var Async = require('async');
  * @main Editor
  */
 window.Editor = window.Editor || {};
+Editor.require = function ( path ) {
+    return require( Editor.url(path) );
+};
 
 // init argument list sending from core by url?queries
 // format: '?foo=bar&hell=world'
@@ -36,23 +39,33 @@ Editor.isDev = Editor.remote.isDev;
 Editor.token = Editor.remote.token;
 Editor.userInfo = Editor.remote.userInfo;
 
-//
+var _urlToPath = function ( base, urlInfo ) {
+    if ( urlInfo.pathname ) {
+        return Path.join( base, urlInfo.host, urlInfo.pathname );
+    }
+    return Path.join( base, urlInfo.host );
+};
+
+// url
 Editor.url = function (url) {
     // NOTE: we cache editor:// protocol to get rid of ipc-sync function calls
     var urlInfo = Url.parse(url);
     if ( urlInfo.protocol === 'editor:' ) {
-        if ( urlInfo.pathname ) {
-            return Path.join( Editor.cwd, urlInfo.host, urlInfo.pathname );
-        }
-        return Path.join( Editor.cwd, urlInfo.host );
+        return _urlToPath( Editor.cwd, urlInfo );
     }
 
     // try ipc-sync function
     return Editor.remote.url(url);
 };
 
-// console
-Fire.log = function ( text ) {
+Editor.JS = Fire.JS;
+Editor.gizmos = {};
+
+// ==========================
+// console log API
+// ==========================
+
+Editor.log = function ( text ) {
     'use strict';
 
     if ( arguments.length <= 1 ) {
@@ -63,7 +76,9 @@ Fire.log = function ( text ) {
     console.log(text);
     Editor.sendToCore('console:log', text);
 };
-Fire.success = function ( text ) {
+Fire.log = Editor.log;
+
+Editor.success = function ( text ) {
     'use strict';
 
     if ( arguments.length <= 1 ) {
@@ -74,7 +89,9 @@ Fire.success = function ( text ) {
     console.log('%c' + text, 'color: green');
     Editor.sendToCore('console:success', text);
 };
-Fire.failed = function ( text ) {
+Fire.success = Editor.success;
+
+Editor.failed = function ( text ) {
     'use strict';
 
     if ( arguments.length <= 1 ) {
@@ -85,7 +102,9 @@ Fire.failed = function ( text ) {
     console.log('%c' + text, 'color: red');
     Editor.sendToCore('console:failed', text);
 };
-Fire.info = function ( text ) {
+Fire.failed = Editor.failed;
+
+Editor.info = function ( text ) {
     'use strict';
 
     if ( arguments.length <= 1 ) {
@@ -96,7 +115,9 @@ Fire.info = function ( text ) {
     console.info(text);
     Editor.sendToCore('console:info', text);
 };
-Fire.warn = function ( text ) {
+Fire.info = Editor.info;
+
+Editor.warn = function ( text ) {
     'use strict';
 
     if ( arguments.length <= 1 ) {
@@ -112,7 +133,9 @@ Fire.warn = function ( text ) {
 
     Editor.sendToCore('console:warn', text);
 };
-Fire.error = function ( text ) {
+Fire.warn = Editor.warn;
+
+Editor.error = function ( text ) {
     'use strict';
 
     if ( arguments.length <= 1 ) {
@@ -128,6 +151,7 @@ Fire.error = function ( text ) {
 
     Editor.sendToCore('console:error', text);
 };
+Fire.error = Editor.error;
 
 /**
  * show error stacks in editor
@@ -306,6 +330,8 @@ Editor.logout = function ( cb ) {
 // Layout API
 // ==========================
 
+var _layouting = false;
+
 Editor.loadLayout = function ( anchorEL, cb ) {
     Editor.sendRequestToCore( 'window:query-layout', Editor.requireIpcEvent, function (layout) {
         if ( !layout ) {
@@ -318,21 +344,41 @@ Editor.loadLayout = function ( anchorEL, cb ) {
 };
 
 Editor.resetLayout = function ( anchorEL, layoutInfo, cb ) {
+    _layouting = true;
+
     var importList = EditorUI.createLayout( anchorEL, layoutInfo );
     Async.eachSeries( importList, function ( item, done ) {
         Editor.Panel.load (item.panelID, function ( err, viewEL ) {
+            if ( err ) {
+                done();
+                return;
+            }
+
             var dockAt = item.dockEL;
             dockAt.add(viewEL);
-            dockAt.$.tabs.select(0);
+            if ( item.active ) {
+                dockAt.select(viewEL);
+            }
             done();
         });
     }, function ( err ) {
-        EditorUI.DockUtils.flush();
-        Editor.sendToCore('window:save-layout',
-                          Editor.Panel.getLayout(),
-                          Editor.requireIpcEvent);
+        _layouting = false;
+
+        // close error panels
+        EditorUI.DockUtils.flushWithCollapse();
+        Editor.saveLayout();
         if ( cb ) cb ();
     } );
+};
+
+Editor.saveLayout = function () {
+    // don't save layout when we are layouting
+    if ( _layouting )
+        return;
+
+    window.requestAnimationFrame ( function () {
+        Editor.sendToCore('window:save-layout', Editor.Panel.dumpLayout(), Editor.requireIpcEvent);
+    });
 };
 
 // ==========================
@@ -353,5 +399,30 @@ Ipc.on( 'editor:reset-layout', function ( layoutInfo ) {
     Editor.resetLayout( anchorEL, layoutInfo );
 });
 
-//
-Editor.gizmos = {};
+Ipc.on( 'ipc-debugger:query', function ( reply ) {
+    var ipcInfos = [];
+    for ( var p in Ipc._events ) {
+        var listeners = Ipc._events[p];
+        var count = Array.isArray(listeners) ? listeners.length : 1;
+        ipcInfos.push({
+            name: p,
+            level: 'page',
+            count: count,
+        });
+    }
+    reply(ipcInfos);
+});
+
+// ==========================
+// extends
+// ==========================
+
+Editor.registerPanel = function ( panelID, obj ) {
+    if ( window[panelID] !== undefined ) {
+        Editor.error('Failed to register panel %s, panelID has been registered.', panelID);
+        return;
+    }
+
+    window[panelID] = Polymer(obj);
+};
+
