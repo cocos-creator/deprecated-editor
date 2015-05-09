@@ -1,4 +1,4 @@
-var _idToPanelInfo = {};
+var _idToPagePanelInfo = {};
 var _url2link = {};
 
 _getPanels = function ( panelEL ) {
@@ -45,8 +45,8 @@ _getDocks = function ( dockEL ) {
     return docks;
 };
 
-function _registerIpc ( panelID, viewEL, ipcListener, ipcName ) {
-    var fn = viewEL[ipcName];
+function _registerIpc ( panelID, frameEL, ipcListener, ipcName ) {
+    var fn = frameEL[ipcName];
     if ( !fn || typeof fn !== 'function' ) {
         if ( ipcName !== 'panel:open') {
             Editor.warn('Failed to register ipc message %s in panel %s, Can not find implementation', ipcName, panelID );
@@ -55,12 +55,12 @@ function _registerIpc ( panelID, viewEL, ipcListener, ipcName ) {
     }
 
     ipcListener.on( ipcName, function () {
-        var fn = viewEL[ipcName];
+        var fn = frameEL[ipcName];
         if ( !fn || typeof fn !== 'function' ) {
             Editor.warn('Failed to respond ipc message %s in panel %s, Can not find implementation', ipcName, panelID );
             return;
         }
-        fn.apply( viewEL, arguments );
+        fn.apply( frameEL, arguments );
     } );
 }
 
@@ -105,7 +105,7 @@ Panel.load = function ( panelID, cb ) {
         }
 
         var Path = require('fire-path');
-        var viewPath = Path.join( panelInfo.path, panelInfo.view );
+        var viewPath = Path.join( panelInfo.path, panelInfo.frame );
 
         Polymer.import([viewPath], function () {
             var viewCtor = window[panelInfo.ctor];
@@ -117,34 +117,34 @@ Panel.load = function ( panelID, cb ) {
 
             Editor.sendToCore('panel:dock', panelID, Editor.requireIpcEvent);
 
-            var viewEL = new viewCtor();
+            var frameEL = new viewCtor();
             if ( panelInfo.icon ) {
-                viewEL.icon = new Image();
-                viewEL.icon.src = Path.join( panelInfo.path, panelInfo.icon );
+                frameEL.icon = new Image();
+                frameEL.icon.src = Path.join( panelInfo.path, panelInfo.icon );
             }
-            viewEL.setAttribute('id', panelID);
-            viewEL.setAttribute('name', panelInfo.title);
-            viewEL.setAttribute('fit', '');
-            viewEL.tabIndex = 1;
+            frameEL.setAttribute('id', panelID);
+            frameEL.setAttribute('name', panelInfo.title);
+            frameEL.setAttribute('fit', '');
+            frameEL.tabIndex = 1;
 
             // set size attribute
             if ( panelInfo.width )
-                viewEL.setAttribute( 'width', panelInfo.width );
+                frameEL.setAttribute( 'width', panelInfo.width );
 
             if ( panelInfo.height )
-                viewEL.setAttribute( 'height', panelInfo.height );
+                frameEL.setAttribute( 'height', panelInfo.height );
 
             if ( panelInfo['min-width'] )
-                viewEL.setAttribute( 'min-width', panelInfo['min-width'] );
+                frameEL.setAttribute( 'min-width', panelInfo['min-width'] );
 
             if ( panelInfo['min-height'] )
-                viewEL.setAttribute( 'min-height', panelInfo['min-height'] );
+                frameEL.setAttribute( 'min-height', panelInfo['min-height'] );
 
             if ( panelInfo['max-width'] )
-                viewEL.setAttribute( 'max-width', panelInfo['max-width'] );
+                frameEL.setAttribute( 'max-width', panelInfo['max-width'] );
 
             if ( panelInfo['max-height'] )
-                viewEL.setAttribute( 'max-height', panelInfo['max-height'] );
+                frameEL.setAttribute( 'max-height', panelInfo['max-height'] );
 
             // register ipc events
             var ipcListener = new Editor.IpcListener();
@@ -155,19 +155,19 @@ Panel.load = function ( panelID, cb ) {
             }
 
             for ( var i = 0; i < panelInfo.messages.length; ++i ) {
-                _registerIpc( panelID, viewEL, ipcListener, panelInfo.messages[i] );
+                _registerIpc( panelID, frameEL, ipcListener, panelInfo.messages[i] );
             }
 
             //
-            _idToPanelInfo[panelID] = {
-                view: viewEL,
+            _idToPagePanelInfo[panelID] = {
+                frameEL: frameEL,
                 messages: panelInfo.messages,
                 ipcListener: ipcListener,
                 popable: panelInfo.popable,
             };
 
             // register profiles
-            viewEL.profiles = panelInfo.profiles;
+            frameEL.profiles = panelInfo.profiles;
             for ( var type in panelInfo.profiles ) {
                 _registerProfile ( panelID, type, panelInfo.profiles[type] );
             }
@@ -175,12 +175,12 @@ Panel.load = function ( panelID, cb ) {
             // register shortcuts
             // TODO: load overwrited shortcuts from profile?
             if ( panelInfo.shortcuts ) {
-                var mousetrap = new Mousetrap(viewEL);
+                var mousetrap = new Mousetrap(frameEL);
                 for ( var shortcut in panelInfo.shortcuts ) {
                     var methodName = panelInfo.shortcuts[shortcut];
-                    var fn = viewEL[methodName];
+                    var fn = frameEL[methodName];
                     if ( typeof fn === 'function' ) {
-                        mousetrap.bind(shortcut, fn.bind(viewEL) );
+                        mousetrap.bind(shortcut, fn.bind(frameEL) );
                     }
                     else {
                         Editor.warn('Failed to register shortcut for method %s in panel %s, can not find it.', methodName, panelID );
@@ -189,7 +189,7 @@ Panel.load = function ( panelID, cb ) {
             }
 
             // done
-            cb ( null, viewEL, panelInfo );
+            cb ( null, frameEL, panelInfo );
         });
     });
 };
@@ -200,7 +200,7 @@ Panel.open = function ( panelID, argv ) {
 
 Panel.popup = function ( panelID ) {
     var panelCounts = 0;
-    for ( var id in _idToPanelInfo ) {
+    for ( var id in _idToPagePanelInfo ) {
         ++panelCounts;
     }
 
@@ -216,22 +216,22 @@ Panel.close = function ( panelID ) {
 };
 
 Panel.closeAll = function () {
-    for ( var id in _idToPanelInfo ) {
+    for ( var id in _idToPagePanelInfo ) {
         Panel.close(id);
     }
 };
 
 Panel.undock = function ( panelID ) {
     // remove panel element from tab
-    var viewEL = Editor.Panel.find(panelID);
-    if ( viewEL ) {
-        var panelEL = viewEL.parentElement;
+    var frameEL = Editor.Panel.find(panelID);
+    if ( frameEL ) {
+        var panelEL = frameEL.parentElement;
         if ( panelEL instanceof FirePanel ) {
-            var currentTabEL = panelEL.$.tabs.findTab(viewEL);
+            var currentTabEL = panelEL.$.tabs.findTab(frameEL);
             panelEL.close(currentTabEL);
         }
         else {
-            viewEL.remove();
+            frameEL.remove();
         }
 
         EditorUI.DockUtils.flush();
@@ -239,22 +239,22 @@ Panel.undock = function ( panelID ) {
     }
 
     // remove panelInfo
-    var panelInfo = _idToPanelInfo[panelID];
-    if ( panelInfo) {
-        panelInfo.ipcListener.clear();
-        delete _idToPanelInfo[panelID];
+    var pagePanelInfo = _idToPagePanelInfo[panelID];
+    if ( pagePanelInfo) {
+        pagePanelInfo.ipcListener.clear();
+        delete _idToPagePanelInfo[panelID];
     }
 };
 
 Panel.dispatch = function ( panelID, ipcName ) {
-    var panelInfo = _idToPanelInfo[panelID];
-    if ( !panelInfo ) {
+    var pagePanelInfo = _idToPagePanelInfo[panelID];
+    if ( !pagePanelInfo ) {
         Editor.warn( 'Failed to receive ipc %s, can not find panel %s', ipcName, panelID);
         return;
     }
 
     // messages
-    var idx = panelInfo.messages.indexOf(ipcName);
+    var idx = pagePanelInfo.messages.indexOf(ipcName);
     if ( idx === -1 ) {
         Editor.warn('Can not find ipc message %s register in panel %s', ipcName, panelID );
         return;
@@ -264,7 +264,7 @@ Panel.dispatch = function ( panelID, ipcName ) {
         Panel.focus(panelID);
     }
 
-    var fn = panelInfo.view[ipcName];
+    var fn = pagePanelInfo.frameEL[ipcName];
     if ( !fn || typeof fn !== 'function' ) {
         if ( ipcName !== 'panel:open') {
             Editor.warn('Failed to respond ipc message %s in panel %s, Can not find implementation', ipcName, panelID );
@@ -272,7 +272,7 @@ Panel.dispatch = function ( panelID, ipcName ) {
         return;
     }
     var args = [].slice.call( arguments, 2 );
-    fn.apply( panelInfo.view, args );
+    fn.apply( pagePanelInfo.frameEL, args );
 };
 
 Panel.dumpLayout = function () {
@@ -302,24 +302,24 @@ Panel.dumpLayout = function () {
 };
 
 Panel.find = function ( panelID ) {
-    var panelInfo = _idToPanelInfo[panelID];
-    if ( !panelInfo ) {
+    var pagePanelInfo = _idToPagePanelInfo[panelID];
+    if ( !pagePanelInfo ) {
         return null;
     }
-    return panelInfo.view;
+    return pagePanelInfo.frameEL;
 };
 
 Panel.focus = function ( panelID ) {
-    var viewEL = Panel.find(panelID);
-    var parentEL = viewEL.parentElement;
+    var frameEL = Panel.find(panelID);
+    var parentEL = frameEL.parentElement;
     if ( parentEL instanceof FirePanel ) {
-        parentEL.select(viewEL);
+        parentEL.select(frameEL);
         parentEL.focus();
     }
 };
 
 Panel.getPanelInfo = function ( panelID ) {
-    return _idToPanelInfo[panelID];
+    return _idToPagePanelInfo[panelID];
 };
 
 // position: top, bottom, left, right, top-left, top-right, bottom-left, bottom-right
@@ -370,11 +370,11 @@ Ipc.on('panel:undock', function ( panelID ) {
 
 var _dirtyPanels = [];
 Ipc.on('panel:dirty', function ( panelID ) {
-    var viewEL = Editor.Panel.find(panelID);
-    if ( viewEL ) {
-        var parentEL = viewEL.parentElement;
+    var frameEL = Editor.Panel.find(panelID);
+    if ( frameEL ) {
+        var parentEL = frameEL.parentElement;
         if ( parentEL instanceof FirePanel ) {
-            parentEL.warn(viewEL);
+            parentEL.warn(frameEL);
         }
     }
 

@@ -348,16 +348,16 @@ Editor.resetLayout = function ( anchorEL, layoutInfo, cb ) {
 
     var importList = EditorUI.createLayout( anchorEL, layoutInfo );
     Async.eachSeries( importList, function ( item, done ) {
-        Editor.Panel.load (item.panelID, function ( err, viewEL ) {
+        Editor.Panel.load (item.panelID, function ( err, frameEL ) {
             if ( err ) {
                 done();
                 return;
             }
 
             var dockAt = item.dockEL;
-            dockAt.add(viewEL);
+            dockAt.add(frameEL);
             if ( item.active ) {
-                dockAt.select(viewEL);
+                dockAt.select(frameEL);
             }
             done();
         });
