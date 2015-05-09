@@ -65,6 +65,7 @@ var paths = {
         'src/gizmos/bitmap-text-gizmo.js',
         'src/gizmos/audio-source-gizmo.js',
         'src/gizmos/text-gizmo.js',
+        'src/gizmos/particle-system-gizmo.js',
     ],
     api: [
         'src/ipc-init.js',

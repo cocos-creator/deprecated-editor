@@ -41,7 +41,7 @@ Ipc.on('engine:create-input-field', function (detail) {
     var childEntity = new Entity('Text');
     var com = childEntity.addComponent(Fire.InputField);
     com.background = renderer;
-    childEnt.parent = ent;
+    childEntity.parent = ent;
 
     if (parentId) {
         var parent = Editor.getInstanceById(parentId);

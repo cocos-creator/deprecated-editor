@@ -9,7 +9,6 @@ var Async = require('async');
 /**
  * Global object with classes, properties and methods you can access from anywhere.
  *
- * See [methods and properties](../classes/Editor.html).
  * @module Editor
  * @main Editor
  */
