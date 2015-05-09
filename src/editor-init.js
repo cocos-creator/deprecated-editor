@@ -395,7 +395,9 @@ Ipc.on( 'editor:reset-layout', function ( layoutInfo ) {
         anchorEL = EditorUI.DockUtils.root.parentElement;
     }
 
-    Editor.resetLayout( anchorEL, layoutInfo );
+    Editor.resetLayout( anchorEL, layoutInfo, function () {
+        EditorUI.DockUtils.reset();
+    });
 });
 
 Ipc.on( 'ipc-debugger:query', function ( reply ) {
