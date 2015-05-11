@@ -69,6 +69,7 @@ var paths = {
     ],
     api: [
         'src/ipc-init.js',
+        'src/editor-init.js',
     ],
 };
 
