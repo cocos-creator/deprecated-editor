@@ -159,13 +159,19 @@ Fire.error = Editor.error;
  * @private
  */
 Fire._throw = function (error) {
-    console.error(error.stack);
-    var resolvedStack = Editor._SourceMap.resolveStack(error.stack);
-    if (Ipc._events['console:error']) {
-        Ipc.emit('console:error', resolvedStack);
+    var info;
+    if (error.stack) {
+        info = Editor._SourceMap.resolveStack(error.stack);
     }
     else {
-        Editor.sendToMainWindow('console:error', resolvedStack);
+        info = error;
+    }
+    console.error(info);
+    if (Ipc._events['console:error']) {
+        Ipc.emit('console:error', info);
+    }
+    else {
+        Editor.sendToMainWindow('console:error', info);
     }
 };
 
