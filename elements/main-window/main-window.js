@@ -34,7 +34,7 @@ Polymer({
             case 0:
                 this.saveCurrentScene();
                 this.$.assets.saveCollapses();
-                Editor.Metrics.trackEditorClose();
+                Editor.sendToCore('metrics:editor-close');
                 return true;
 
             // cancel
@@ -44,7 +44,7 @@ Polymer({
             // don't save
             case 2:
                 this.$.assets.saveCollapses();
-                Editor.Metrics.trackEditorClose();
+                Editor.sendToCore('metrics:editor-close');
                 return true;
             }
         }.bind(this);
@@ -370,7 +370,7 @@ Polymer({
                     self.newScene();
                 }
 
-                Editor.Metrics.trackEditorOpen();
+                Editor.sendToCore('metrics:editor-open');
                 next();
             },
 
