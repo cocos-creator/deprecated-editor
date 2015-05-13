@@ -6,7 +6,7 @@ Polymer({
 
     ready: function () {
         this.selectItem(0);
-        Editor.Metrics.trackDashboardOpen();
+        Editor.sendToCore('metrics:dashboard-open');
     },
 
     detached: function () {
