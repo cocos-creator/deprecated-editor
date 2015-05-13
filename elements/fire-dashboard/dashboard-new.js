@@ -87,18 +87,17 @@ Polymer({
         });
     },
 
-    templateAction: function ( event ) {
-        event.stopPropagation();
-
-        this.items = this._templates;
-        this.select(this.items.length > 0 ? this.items[0] : null);
-    },
-
-    gamekitsAction: function ( event ) {
-        event.stopPropagation();
-
-        this.items = this._gamekits;
-        this.select(this.items.length > 0 ? this.items[0] : null);
+    _onTabChanged: function ( event ) {
+        var detail = event.detail;
+        if ( detail.new === this.$.templates ) {
+            this.items = this._templates;
+        }
+        else if ( detail.new === this.$.gamekits ) {
+            this.items = this._gamekits;
+        }
+        else {
+            this.items = null;
+        }
     },
 
     selectAction: function ( event ) {
