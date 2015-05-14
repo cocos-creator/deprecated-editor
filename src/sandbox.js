@@ -275,6 +275,7 @@ var runtimeScriptLoader = (function () {
             cb('Failed to load ' + src);
         };
         script.setAttribute('type','text/javascript');
+        script.setAttribute('charset', 'utf-8');
         script.setAttribute('src', FireUrl.addRandomQuery(src));
         console.time('load ' + src);
         document.head.appendChild(script);
