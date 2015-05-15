@@ -29,6 +29,7 @@ var paths = {
         'src/asset-extends/texture.js',
         'src/asset-extends/script-asset.js',
         'src/asset-extends/audio-clip.js',
+        'src/asset-extends/animation-clip.js',
 
         // engine extends
         'src/engine-extends/asset-library.js',
