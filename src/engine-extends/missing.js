@@ -1,10 +1,6 @@
 var MSG_COMPILED = 'Can not load the associated script. Please assign a valid script.';
 var MSG_NOT_COMPILED = 'Compilation fails, please fix errors and retry.';
 
-/**
-* @class MissingScript
-* @static
-*/
 var MissingScript = Fire._MissingScript;
 
 MissingScript.getset('_scriptUuid',
@@ -48,7 +44,6 @@ MissingScript.get('errorInfo',
 MissingScript.prop('_$erialized', null, Fire.HideInInspector, Fire.EditorOnly);
 
 /**
- * @method safeFindClass
  * @param {string} id
  * @return {function} constructor
  */
