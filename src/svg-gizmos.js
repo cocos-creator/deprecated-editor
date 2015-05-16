@@ -64,7 +64,7 @@ SvgGizmos.prototype.resize = function ( width, height ) {
 SvgGizmos.prototype.update = function () {
     for ( var i = 0; i < this.gizmos.length; ++i ) {
         var gizmo = this.gizmos[i];
-        
+
         if (Array.isArray(gizmo.target)) {
             var invalid = gizmo.target.some(function (target) {
                 return !Fire.isValid(target);
