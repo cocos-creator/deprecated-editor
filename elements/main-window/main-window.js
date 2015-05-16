@@ -507,17 +507,21 @@ Polymer({
     },
 
     tickInFrame: function () {
-        this._stopSceneInterval();
-        this._updateSceneInAnimationFrame();
+        if ( !this._updateSceneAnimFrameID ) {
+            this._stopSceneInterval();
+            this._updateSceneInAnimationFrame();
 
-        Editor.sendToMainWindow('engine:fast-tick');
+            Editor.sendToMainWindow('engine:fast-tick');
+        }
     },
 
     tickSlow: function () {
-        this._stopSceneInAnimationFrame();
-        this._updateSceneInterval();
+        if ( !this._updateSceneIntervalID ) {
+            this._stopSceneInAnimationFrame();
+            this._updateSceneInterval();
 
-        Editor.sendToMainWindow('engine:slow-tick');
+            Editor.sendToMainWindow('engine:slow-tick');
+        }
     },
 
     _updateSceneInterval: function () {

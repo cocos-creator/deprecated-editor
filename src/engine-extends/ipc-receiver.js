@@ -170,6 +170,64 @@ Ipc.on('engine:open-scene', function ( detail ) {
     }
 });
 
+Ipc.on('engine:fast-tick', function () {
+    Fire.Engine._editorAnimating = true;
+});
+
+Ipc.on('engine:slow-tick', function () {
+    Fire.Engine._editorAnimating = false;
+});
+
+function callOnFocusInTryCatch (c) {
+    try {
+        c.onFocusInEditMode();
+    }
+    catch (e) {
+        Fire._throw(e);
+    }
+}
+
+Ipc.on('selection:entity:activated', function ( detail ) {
+    if (!Fire.Engine.isPlaying) {
+        var entity = Editor.getInstanceById(detail.id);
+        if (entity) {
+            var comps = entity._components;
+            // skip transform
+            for (var i = 1; i < comps.length; i++) {
+                var c = comps[i];
+                if (c.onFocusInEditMode && c.isValid) {
+                    callOnFocusInTryCatch(c);
+                }
+            }
+        }
+    }
+});
+
+function callOnLostFocusInTryCatch (c) {
+    try {
+        c.onLostFocusInEditMode();
+    }
+    catch (e) {
+        Fire._throw(e);
+    }
+}
+
+Ipc.on('selection:entity:deactivated', function ( detail ) {
+    if (!Fire.Engine.isPlaying) {
+        var entity = Editor.getInstanceById(detail.id);
+        if (entity) {
+            var comps = entity._components;
+            // skip transform
+            for (var i = 1; i < comps.length; i++) {
+                var c = comps[i];
+                if (c.onLostFocusInEditMode && c.isValid) {
+                    callOnLostFocusInTryCatch(c);
+                }
+            }
+        }
+    }
+});
+
 Ipc.on('asset:moved', function ( detail ) {
     var uuid = detail.uuid;
     var destUrl = detail['dest-url'];

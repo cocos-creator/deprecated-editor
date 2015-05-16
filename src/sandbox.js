@@ -271,7 +271,7 @@ var runtimeScriptLoader = (function () {
             if (loadedScriptNodes.length > 0) {
                 loader.unloadAll();
             }
-            Fire.error('Failed to load %s', src);
+            console.error('Failed to load %s', src);
             cb('Failed to load ' + src);
         };
         script.setAttribute('type','text/javascript');
