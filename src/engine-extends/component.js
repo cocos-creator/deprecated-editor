@@ -88,7 +88,7 @@ Editor.isLiveInEditMode = function (entityId) {
         for (; i < ent._components.length; i++) {
             var comp = ent._components[i];
             var execute = Fire.attr(comp, 'executeInEditMode');
-            if (execute && execute.live) {
+            if (execute && Fire.attr(comp, 'liveInEditMode')) {
                 return true;
             }
         }
