@@ -530,7 +530,7 @@ Polymer({
             if ( !Fire.Engine.isPlaying ) {
                 this.$.game.repaintScene();
             }
-        }.bind(this), 500 );
+        }.bind(this), 1000 );
     },
 
     _stopSceneInterval: function () {

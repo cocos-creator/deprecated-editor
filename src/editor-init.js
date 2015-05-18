@@ -224,6 +224,45 @@ Editor.hintObject = function ( target ) {
     }
 };
 
+Editor.snapshotEntity = function ( entity ) {
+    var snapshot = [];
+
+    for ( var i = 0; i < entity._components.length; ++i ) {
+        var comp = entity._components[i];
+        var compName = Fire.JS.getClassName(comp);
+        var klass = comp.constructor;
+        if (klass.__props__) {
+            for (var p = 0; p < klass.__props__.length; p++) {
+                var propName = klass.__props__[p];
+                var attrs = Fire.attr(comp, propName);
+
+                // skip hide-in-inspector
+                if ( attrs.hideInInspector ) {
+                    continue;
+                }
+
+                snapshot.push({
+                    component: compName,
+                    property: propName,
+                    value: comp[propName],
+                });
+            }
+        }
+    }
+
+    return snapshot;
+};
+
+Editor.applyFromSnapshot = function ( entity, snapshot ) {
+    for ( var i = 0; i < snapshot.length; ++i ) {
+        var item = snapshot[i];
+        var comp = entity.getComponent(item.component);
+        if ( comp ) {
+            comp[item.property] = item.value;
+        }
+    }
+};
+
 Editor.openObjectById = function ( type, id ) {
     if ( Fire.isChildClassOf( type, Fire.Entity ) ) {
     }
