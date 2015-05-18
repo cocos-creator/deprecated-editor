@@ -1,5 +1,6 @@
 <link rel="import" href="dashboard-recent.html">
 <link rel="import" href="dashboard-new.html">
+<link rel="import" href="dashboard-example.html">
 
 <polymer-element
     name="fire-dashboard"
@@ -13,6 +14,7 @@
             <div id="menu">
                 <div class="item" on-click="{{recentAction}}">Recent Proejcts</div>
                 <div class="item" on-click="{{newAction}}">New Project</div>
+                <div class="item" on-click="{{exampleAction}}">Examples</div>
                 <div class="item" style="cursor:pointer;color:rgb(255,186,0);" on-click="{{openAction}}">Open Other ...</div>
                 <div class="item" on-click="{{helpAction}}">Help</div>
             </div>
@@ -23,6 +25,7 @@
         <div id="content" class="content">
             <dashboard-recent></dashboard-recent>
             <dashboard-new></dashboard-new>
+            <dashboard-example></dashboard-example>
             <span></span>
             <dashboard-help></dashboard-help>
         </div>

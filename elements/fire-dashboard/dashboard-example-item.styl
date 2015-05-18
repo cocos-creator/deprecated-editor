@@ -1,0 +1,66 @@
+:host {
+    position: relative
+    display: block
+    height: 50px
+    margin-bottom: 1px
+    padding: 15px 30px 5px
+
+    background: #222
+
+    cursor: pointer
+
+    .name {
+        font-size: 22px
+    }
+
+    .path {
+        font-size: 15px
+
+        color: #777
+    }
+
+    .desc {
+      font-size: 14px
+      color: #777
+      float: right
+    }
+
+    .btn-group {
+        display: none
+        position: absolute
+        right: 5px
+        bottom: 10px
+        font-size: 15px
+        font-weight: 900
+    }
+
+    .close {
+        display: inline-block
+        padding: 5px 10px
+        font-size: 15px
+        font-weight: 900
+        width: 50px
+        text-align: center
+
+        color: #900
+
+        &:hover {
+            background: #333
+            cursor: pointer
+        }
+        &:active {
+            background: #333 + 10%
+        }
+    }
+
+    &(:hover) {
+        .btn-group {
+            display: inline-block
+        }
+
+        color: orange
+        background: #222 - 20%
+    }
+
+
+}

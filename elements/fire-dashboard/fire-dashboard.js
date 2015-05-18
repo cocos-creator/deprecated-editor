@@ -25,20 +25,6 @@ Polymer({
         }
     },
 
-    openAction: function ( event ) {
-        var dialog = Remote.require('dialog');
-
-        var result = dialog.showOpenDialog ( {
-            title: "Choose a project",
-            properties: [ 'openDirectory' ]
-        } );
-
-        if ( result ) {
-            Editor.sendToCore( 'dashboard:add-project', result[0], true );
-        }
-        this.selectItem(2);
-    },
-
     projectAddedAction: function ( event ) {
         event.stopPropagation();
 
@@ -57,9 +43,28 @@ Polymer({
         this.selectItem(1);
     },
 
+    exampleAction: function( event ) {
+        event.stopPropagation();
+        this.selectItem(2);
+    },
+
+    openAction: function ( event ) {
+        var dialog = Remote.require('dialog');
+
+        var result = dialog.showOpenDialog ( {
+            title: "Choose a project",
+            properties: [ 'openDirectory' ]
+        } );
+
+        if ( result ) {
+            Editor.sendToCore( 'dashboard:add-project', result[0], true );
+        }
+        this.selectItem(3);
+    },
+
     helpAction: function ( event ) {
         event.stopPropagation();
 
-        this.selectItem(3);
-    },
+        this.selectItem(4);
+    }
 });

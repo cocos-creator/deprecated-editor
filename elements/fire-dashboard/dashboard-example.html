@@ -1,0 +1,27 @@
+<link rel="import" href="dashboard-example-item.html">
+
+<polymer-element
+    name="dashboard-example"
+    constructor="DashboardExample"
+    on-drop="{{dropAction}}"
+    >
+    <template>
+        <link rel="stylesheet" href="dashboard-example.css">
+
+        <div class="title">Example Projects</div>
+        <div id="border" class="border" flex-1>
+            <template repeat="{{item in exampleProjects}}">
+                <dashboard-example-item
+                        name="{{item.name}}"
+                        path="{{item.path}}"
+                        desc = "{{item.desc}}"
+                        blink="{{item.blink}}"
+                        >
+                </dashboard-example-item>
+            </template>
+        </div>
+
+    </template>
+
+    <script type="text/javascript" src="dashboard-example.js"></script>
+</polymer-element>
