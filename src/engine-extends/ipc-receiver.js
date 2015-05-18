@@ -51,6 +51,58 @@ Ipc.on('engine:create-input-field', function (detail) {
     }
 });
 
+Ipc.on('engine:create-particle-system', function (detail) {
+    var parentId, options;
+    if (detail) {
+        parentId = detail['parent-id'];
+        options = detail.options;
+    }
+    var ent = new Entity('New Particle System', options);
+    ent.addComponent(Fire.ParticleSystem);
+
+    if (parentId) {
+        var parent = Editor.getInstanceById(parentId);
+        if (parent) {
+            ent.parent = parent;
+        }
+    }
+});
+
+Ipc.on('engine:create-text', function (detail) {
+    var parentId, options;
+    if (detail) {
+        parentId = detail['parent-id'];
+        options = detail.options;
+    }
+    var ent = new Entity('New Text', options);
+    ent.addComponent(Fire.Text);
+
+    if (parentId) {
+        var parent = Editor.getInstanceById(parentId);
+        if (parent) {
+            ent.parent = parent;
+        }
+    }
+});
+
+Ipc.on('engine:create-sprite-animation', function (detail) {
+    var parentId, options;
+    if (detail) {
+        parentId = detail['parent-id'];
+        options = detail.options;
+    }
+    var ent = new Entity('New Sprite Animation', options);
+    ent.addComponent(Fire.SpriteRenderer);
+    ent.addComponent(Fire.SpriteAnimation);
+
+    if (parentId) {
+        var parent = Editor.getInstanceById(parentId);
+        if (parent) {
+            ent.parent = parent;
+        }
+    }
+});
+
 Ipc.on('engine:create-entity', function (detail) {
     var parentId, options;
     if ( detail ) {
