@@ -10,32 +10,21 @@ Engine.createInteractionContext = function () {
     return new Fire._InteractionContext();
 };
 
-var animateOneMoreTick = false;
+var maxDeltaTimeInEditMode = 0.03;
 
 Engine.tickInEditMode = function (renderContext) {
-    var animate = false;
-    if (! Engine._isPlaying) {
-        if (renderContext && renderContext.isSceneView) {
-            if (Engine._editorAnimating) {
-                animate = true;
-                animateOneMoreTick = true;
-            }
-            else if (animateOneMoreTick) {
-                animate = true;
-                animateOneMoreTick = false;
-            }
-        }
-        var now = Fire._Ticker.now();
-        Fire.Time._update(now);
+    var runtime = Fire._Runtime;
+    if (runtime.tickInEditMode) {
+        runtime.tickInEditMode(renderContext);
     }
     else {
-        animateOneMoreTick = false;
+        if (! Engine._isPlaying && renderContext && renderContext.isSceneView) {
+            var now = Fire._Ticker.now();
+            Fire.Time._update(now, false, maxDeltaTimeInEditMode);
+            if (Engine._editorAnimating) {
+                runtime.animate();
+            }
+        }
+        runtime.render(renderContext);
     }
-
-    if (animate) {
-        //Time.deltaTime = Time.deltaTime || (1 / 60);
-        Fire._Runtime.animate();
-    }
-
-    Fire._Runtime.render(renderContext);
 };
