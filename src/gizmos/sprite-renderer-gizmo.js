@@ -99,10 +99,10 @@ SpriteRendererGizmo.prototype.update = function () {
                     theta = right.signAngle(delta);
                     // theta = Math.atan2( right.y, right.x ) - Math.atan2( delta.y, delta.x );
                     if ( ratioW !== 0.0 )
-                        self.target.width = ratioW * Math.cos(theta) * length / worldscale.x;
+                        self.target.customWidth = ratioW * Math.cos(theta) * length / worldscale.x;
 
                     if ( ratioH !== 0.0 )
-                        self.target.height = ratioH * Math.sin(theta) * length / worldscale.y;
+                        self.target.customHeight = ratioH * Math.sin(theta) * length / worldscale.y;
 
                     entity.transform.worldPosition = worldpos.add(new_center.sub(center));
                     self.dirty();
