@@ -1,92 +1,89 @@
-﻿var CameraGizmo = Fire.extend("Fire.CameraGizmo",
-                              Editor.Gizmo,
-                              function () {
-    var svg = arguments[0];
-    var target = arguments[1];
+﻿var CameraGizmo = Fire.Class({
+    name: "Fire.CameraGizmo",
+    extends: Editor.Gizmo,
+    constructor: function () {
+        var svg = arguments[0];
+        var target = arguments[1];
 
-    this.hitTest = true;
+        this.hitTest = true;
 
-    this._icon = svg.icon( "fire://static/img/gizmos-camera.png", 40, 40, target.entity );
+        this._icon = svg.icon( "fire://static/img/gizmos-camera.png", 40, 40, target.entity );
 
-    //
-    var selectTools = svg.scene.group();
-    var color = "#ff0";
+        //
+        var selectTools = svg.scene.group();
+        var color = "#ff0";
 
-    var rect = selectTools.rect ()
-         .fill( "none" )
-         .stroke( { width: 1, color: color } )
-         ;
-    var l1 = selectTools.line().stroke( { width: 1, color: color } );
-    var l2 = selectTools.line().stroke( { width: 1, color: color } );
-    var l3 = selectTools.line().stroke( { width: 1, color: color } );
-    var l4 = selectTools.line().stroke( { width: 1, color: color } );
-    selectTools.hide();
+        var rect = selectTools.rect ()
+                .fill( "none" )
+                .stroke( { width: 1, color: color } )
+            ;
+        var l1 = selectTools.line().stroke( { width: 1, color: color } );
+        var l2 = selectTools.line().stroke( { width: 1, color: color } );
+        var l3 = selectTools.line().stroke( { width: 1, color: color } );
+        var l4 = selectTools.line().stroke( { width: 1, color: color } );
+        selectTools.hide();
 
-    selectTools.update = function ( w, h ) {
-        rect.size( w, h )
-            .move( -0.5 * w, -0.5 * h )
+        selectTools.update = function ( w, h ) {
+            rect.size( w, h )
+                .move( -0.5 * w, -0.5 * h )
             ;
 
-        var len = 10;
-        l1.plot(  0.0, -0.5 * h, 0, -0.5 * h + len );
-        l2.plot(  0.0,  0.5 * h, 0,  0.5 * h - len );
-        l3.plot( -0.5 * w, 0.0, -0.5 * w + len, 0 );
-        l4.plot(  0.5 * w, 0.0,  0.5 * w - len, 0 );
-    };
+            var len = 10;
+            l1.plot(  0.0, -0.5 * h, 0, -0.5 * h + len );
+            l2.plot(  0.0,  0.5 * h, 0,  0.5 * h - len );
+            l3.plot( -0.5 * w, 0.0, -0.5 * w + len, 0 );
+            l4.plot(  0.5 * w, 0.0,  0.5 * w - len, 0 );
+        };
 
-    this._selectTools = selectTools;
-});
-Editor.gizmos['Fire.Camera'] = CameraGizmo;
+        this._selectTools = selectTools;
+    },
+    remove: function () {
+        this._icon.remove();
+        this._selectTools.remove();
+    },
+    contains: function ( svgElements ) {
+        for ( var j = 0; j < svgElements.length; ++j ) {
+            if ( this._icon.node === svgElements[j] ) {
+                return true;
+            }
+        }
+    },
+    update: function () {
+        if ( !this.target.isValid )
+            return;
 
-//
-CameraGizmo.prototype.remove = function () {
-    this._icon.remove();
-    this._selectTools.remove();
-};
+        var zoom = this._svg.view.height / this._svg.camera.size;
 
-//
-CameraGizmo.prototype.contains = function ( svgElements ) {
-    for ( var j = 0; j < svgElements.length; ++j ) {
-        if ( this._icon.node === svgElements[j] ) {
-            return true;
+        var localToWorld = this.target.entity.transform.getLocalToWorldMatrix();
+        var worldpos = new Fire.Vec2(localToWorld.tx, localToWorld.ty);
+        var screenpos = this._svg.camera.worldToScreen(worldpos);
+        screenpos.x = Editor.GizmosUtils.snapPixel(screenpos.x);
+        screenpos.y = Editor.GizmosUtils.snapPixel(screenpos.y);
+        var rotation = -this.target.entity.transform.worldRotation;
+
+        var s = Math.max( zoom, 0.5 );
+        this._icon.scale(s,s);
+        this._icon.translate( screenpos.x, screenpos.y )
+            .rotate( rotation, screenpos.x, screenpos.y )
+        ;
+
+        if ( this.hovering || this.selecting ) {
+            var gameViewSize = Fire.Screen.size;
+            var height = this.target.size * zoom;
+            var width = gameViewSize.x/gameViewSize.y * height;
+
+            this._selectTools.show();
+            this._selectTools.update( width, height );
+            this._selectTools.translate( screenpos.x, screenpos.y )
+                .rotate( rotation, screenpos.x, screenpos.y )
+            ;
+        }
+        else {
+            this._selectTools.hide();
         }
     }
-};
+});
 
-//
-CameraGizmo.prototype.update = function () {
-    if ( !this.target.isValid )
-        return;
-
-    var zoom = this._svg.view.height / this._svg.camera.size;
-
-    var localToWorld = this.target.entity.transform.getLocalToWorldMatrix();
-    var worldpos = new Fire.Vec2(localToWorld.tx, localToWorld.ty);
-    var screenpos = this._svg.camera.worldToScreen(worldpos);
-    screenpos.x = Editor.GizmosUtils.snapPixel(screenpos.x);
-    screenpos.y = Editor.GizmosUtils.snapPixel(screenpos.y);
-    var rotation = -this.target.entity.transform.worldRotation;
-
-    var s = Math.max( zoom, 0.5 );
-    this._icon.scale(s,s);
-    this._icon.translate( screenpos.x, screenpos.y )
-              .rotate( rotation, screenpos.x, screenpos.y )
-              ;
-
-    if ( this.hovering || this.selecting ) {
-        var gameViewSize = Fire.Screen.size;
-        var height = this.target.size * zoom;
-        var width = gameViewSize.x/gameViewSize.y * height;
-
-        this._selectTools.show();
-        this._selectTools.update( width, height );
-        this._selectTools.translate( screenpos.x, screenpos.y )
-                       .rotate( rotation, screenpos.x, screenpos.y )
-                       ;
-    }
-    else {
-        this._selectTools.hide();
-    }
-};
+Editor.gizmos['Fire.Camera'] = CameraGizmo;
 
 Editor.CameraGizmo = CameraGizmo;
