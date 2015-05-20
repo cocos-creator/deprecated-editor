@@ -65,6 +65,8 @@ Fire.AnimationClip.prototype.applyKeyFrame = function ( ent, frameAt ) {
 
         // NOTE: only add key when last key value is not equal to it
         var newKeyInfo = {
+            component: frameInfo.component,
+            property: frameInfo.property,
             frame: frameAt,
             value: prop,
             curve: 'linear',
@@ -73,7 +75,6 @@ Fire.AnimationClip.prototype.applyKeyFrame = function ( ent, frameAt ) {
         if ( keyInfo ) {
             if ( keyInfo.frame === frameAt ) {
                 keyInfo.value = prop;
-                results.push(newKeyInfo);
             }
             else if ( keyInfo.value !== prop ) {
                 frameInfo.keys.splice(k, 0, newKeyInfo);
