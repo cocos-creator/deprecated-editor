@@ -93,3 +93,49 @@ Fire.AnimationClip.prototype.applyKeyFrame = function ( ent, frameAt ) {
     }
     return results;
 };
+
+Fire.AnimationClip.prototype.removeKey = function ( comp, prop, frame ) {
+    var frameInfo = this.getFrameInfo( comp, prop );
+    if ( !frameInfo )
+        return null;
+
+    for ( var i = 0; i < frameInfo.keys.length; ++i ) {
+        var key = frameInfo.keys[i];
+        if ( key.frame === frame ) {
+            frameInfo.keys.splice( i, 1 );
+            return key;
+        }
+    }
+
+    return null;
+};
+
+Fire.AnimationClip.prototype.addKey = function ( comp, prop, newKey ) {
+    var frameInfo = this.getFrameInfo( comp, prop );
+    if ( !frameInfo ) {
+        return null;
+    }
+
+    for ( var i = 0; i < frameInfo.keys.length; ++i ) {
+        var key = frameInfo.keys[i];
+        if ( newKey.frame === key.frame ) {
+            frameInfo.keys[i] = newKey;
+            return;
+        }
+        if ( newKey.frame < key.frame ) {
+            frameInfo.keys.splice(i, 0, newKey);
+            return;
+        }
+    }
+
+    frameInfo.keys.push(newKey);
+};
+
+Fire.AnimationClip.prototype.sortKeys = function ( comp, prop ) {
+    var frameInfo = this.getFrameInfo( comp, prop );
+    if ( frameInfo ) {
+        frameInfo.keys.sort(function ( a, b ) {
+            return a.frame - b.frame;
+        });
+    }
+};
