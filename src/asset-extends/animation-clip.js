@@ -15,18 +15,18 @@ Fire.AnimationClip.prototype.createEntity = function ( cb ) {
 Fire.AnimationClip.prototype.applyKeyFrame = function ( ent, frameAt ) {
     var results = [];
 
-    for ( var i = 0; i < this.frames.length; ++i ) {
-        var frameInfo = this.frames[i];
-        var comp = ent.getComponent(frameInfo.component);
+    for ( var i = 0; i < this.curveData.length; ++i ) {
+        var curveInfo = this.curveData[i];
+        var comp = ent.getComponent(curveInfo.component);
         if ( !comp ) {
             continue;
         }
 
-        var splits = frameInfo.property.split('.');
+        var splits = curveInfo.property.split('.');
         var prop;
 
         if ( splits.length === 1 ) {
-            prop = comp[frameInfo.property];
+            prop = comp[curveInfo.property];
             if ( !prop ) {
                 continue;
             }
@@ -44,15 +44,15 @@ Fire.AnimationClip.prototype.applyKeyFrame = function ( ent, frameAt ) {
         }
 
         var k, keyInfo;
-        for ( k = 0; k < frameInfo.keys.length; ++k ) {
-            keyInfo = frameInfo.keys[k];
+        for ( k = 0; k < curveInfo.keys.length; ++k ) {
+            keyInfo = curveInfo.keys[k];
             if ( keyInfo.frame === frameAt ) {
                 break;
             }
 
             if ( keyInfo.frame > frameAt ) {
                 if ( k > 0 ) {
-                    keyInfo = frameInfo.keys[k-1];
+                    keyInfo = curveInfo.keys[k-1];
                     k = k-1;
                 }
                 else {
@@ -65,8 +65,8 @@ Fire.AnimationClip.prototype.applyKeyFrame = function ( ent, frameAt ) {
 
         // NOTE: only add key when last key value is not equal to it
         var newKeyInfo = {
-            component: frameInfo.component,
-            property: frameInfo.property,
+            component: curveInfo.component,
+            property: curveInfo.property,
             frame: frameAt,
             value: prop,
             curve: 'linear',
@@ -77,16 +77,16 @@ Fire.AnimationClip.prototype.applyKeyFrame = function ( ent, frameAt ) {
                 keyInfo.value = prop;
             }
             else if ( keyInfo.value !== prop ) {
-                frameInfo.keys.splice(k, 0, newKeyInfo);
+                curveInfo.keys.splice(k, 0, newKeyInfo);
                 results.push(newKeyInfo);
             }
         }
         else {
-            if ( frameInfo.keys.length > 0 ) {
-                frameInfo.keys.splice(0, 0, newKeyInfo);
+            if ( curveInfo.keys.length > 0 ) {
+                curveInfo.keys.splice(0, 0, newKeyInfo);
             }
             else {
-                frameInfo.keys.push(newKeyInfo);
+                curveInfo.keys.push(newKeyInfo);
             }
             results.push(newKeyInfo);
         }
@@ -95,14 +95,14 @@ Fire.AnimationClip.prototype.applyKeyFrame = function ( ent, frameAt ) {
 };
 
 Fire.AnimationClip.prototype.removeKey = function ( comp, prop, frame ) {
-    var frameInfo = this.getFrameInfo( comp, prop );
-    if ( !frameInfo )
+    var curveInfo = this.getCurveInfo( comp, prop );
+    if ( !curveInfo )
         return null;
 
-    for ( var i = 0; i < frameInfo.keys.length; ++i ) {
-        var key = frameInfo.keys[i];
+    for ( var i = 0; i < curveInfo.keys.length; ++i ) {
+        var key = curveInfo.keys[i];
         if ( key.frame === frame ) {
-            frameInfo.keys.splice( i, 1 );
+            curveInfo.keys.splice( i, 1 );
             return key;
         }
     }
@@ -111,31 +111,46 @@ Fire.AnimationClip.prototype.removeKey = function ( comp, prop, frame ) {
 };
 
 Fire.AnimationClip.prototype.addKey = function ( comp, prop, newKey ) {
-    var frameInfo = this.getFrameInfo( comp, prop );
-    if ( !frameInfo ) {
+    var curveInfo = this.getCurveInfo( comp, prop );
+    if ( !curveInfo ) {
         return null;
     }
 
-    for ( var i = 0; i < frameInfo.keys.length; ++i ) {
-        var key = frameInfo.keys[i];
+    for ( var i = 0; i < curveInfo.keys.length; ++i ) {
+        var key = curveInfo.keys[i];
         if ( newKey.frame === key.frame ) {
-            frameInfo.keys[i] = newKey;
+            curveInfo.keys[i] = newKey;
             return;
         }
         if ( newKey.frame < key.frame ) {
-            frameInfo.keys.splice(i, 0, newKey);
+            curveInfo.keys.splice(i, 0, newKey);
             return;
         }
     }
 
-    frameInfo.keys.push(newKey);
+    curveInfo.keys.push(newKey);
 };
 
 Fire.AnimationClip.prototype.sortKeys = function ( comp, prop ) {
-    var frameInfo = this.getFrameInfo( comp, prop );
-    if ( frameInfo ) {
-        frameInfo.keys.sort(function ( a, b ) {
+    var curveInfo = this.getCurveInfo( comp, prop );
+    if ( curveInfo ) {
+        curveInfo.keys.sort(function ( a, b ) {
             return a.frame - b.frame;
         });
     }
+};
+
+Fire.AnimationClip.prototype.updateLength = function () {
+    var maxFrame = 0;
+    for ( var i = 0; i < this.curveData.length; ++i ) {
+        var curveInfo = this.curveData[i];
+        if ( curveInfo.keys.length > 0 ) {
+            var lastKey = curveInfo.keys[curveInfo.keys.length-1];
+            if ( maxFrame < lastKey.frame ) {
+                maxFrame = lastKey.frame;
+            }
+        }
+    }
+
+    this._length = maxFrame / this.frameRate;
 };
