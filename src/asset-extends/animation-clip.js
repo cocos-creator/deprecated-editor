@@ -27,18 +27,18 @@ Fire.AnimationClip.prototype.applyKeyFrame = function ( ent, frameAt ) {
 
         if ( splits.length === 1 ) {
             prop = comp[curveInfo.property];
-            if ( !prop ) {
+            if ( prop === undefined ) {
                 continue;
             }
         }
         // get value type properties
         else {
             prop = comp[splits[0]];
-            if ( !prop ) {
+            if ( prop === undefined ) {
                 continue;
             }
             prop = prop[splits[1]];
-            if ( !prop ) {
+            if ( prop === undefined ) {
                 continue;
             }
         }
@@ -65,6 +65,11 @@ Fire.AnimationClip.prototype.applyKeyFrame = function ( ent, frameAt ) {
 
         // NOTE: only add key when last key value is not equal to it
         var newKeyInfo = {
+            frame: frameAt,
+            value: prop,
+            curve: 'linear',
+        };
+        var result = {
             component: curveInfo.component,
             property: curveInfo.property,
             frame: frameAt,
@@ -78,7 +83,7 @@ Fire.AnimationClip.prototype.applyKeyFrame = function ( ent, frameAt ) {
             }
             else if ( keyInfo.value !== prop ) {
                 curveInfo.keys.splice(k, 0, newKeyInfo);
-                results.push(newKeyInfo);
+                results.push(result);
             }
         }
         else {
@@ -88,7 +93,7 @@ Fire.AnimationClip.prototype.applyKeyFrame = function ( ent, frameAt ) {
             else {
                 curveInfo.keys.push(newKeyInfo);
             }
-            results.push(newKeyInfo);
+            results.push(result);
         }
     }
     return results;
@@ -110,10 +115,24 @@ Fire.AnimationClip.prototype.removeKey = function ( comp, prop, frame ) {
     return null;
 };
 
-Fire.AnimationClip.prototype.addKey = function ( comp, prop, newKey ) {
+Fire.AnimationClip.prototype.findKey = function ( comp, prop, frame ) {
     var curveInfo = this.getCurveInfo( comp, prop );
     if ( !curveInfo ) {
         return null;
+    }
+
+    for ( var i = 0; i < curveInfo.keys.length; ++i ) {
+        var key = curveInfo.keys[i];
+        if ( frame === key.frame ) {
+            return key;
+        }
+    }
+};
+
+Fire.AnimationClip.prototype.addKey = function ( comp, prop, newKey ) {
+    var curveInfo = this.getCurveInfo( comp, prop );
+    if ( !curveInfo ) {
+        return;
     }
 
     for ( var i = 0; i < curveInfo.keys.length; ++i ) {
