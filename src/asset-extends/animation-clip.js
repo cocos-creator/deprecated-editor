@@ -67,14 +67,14 @@ Fire.AnimationClip.prototype.applyKeyFrame = function ( ent, frameAt ) {
         var newKeyInfo = {
             frame: frameAt,
             value: prop,
-            curve: 'linear',
+            curve: [0.5,0.5,0.5,0.5],
         };
         var result = {
             component: curveInfo.component,
             property: curveInfo.property,
             frame: frameAt,
             value: prop,
-            curve: 'linear',
+            curve: [0.5,0.5,0.5,0.5],
         };
 
         if ( keyInfo ) {
