@@ -22,13 +22,13 @@ Fire.JS.get(Fire, '$0C', function () {
 });
 
 (function () {
-    for (var i = 1; i <= 3; i++) {
+    for (var i = 0; i <= 2; i++) {
         (function (i) {
             Fire.JS.get(Fire, '$0C' + i, function () {
                 var id = Editor.Selection.entities[0];
                 if (id) {
                     var entity = Editor.getInstanceById(id);
-                    return entity._components[i - 1];
+                    return entity._components[i];
                 }
             });
         })(i);
