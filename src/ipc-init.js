@@ -47,9 +47,10 @@ Ipc.on('editor:sendreq2page', function (request, args, sessionId) {
 
 /**
  * Send message to editor-core, which is so called as main app, or atom shell's browser side.
+ * 
  * @method sendToCore
  * @param {string} message - the message to send
- * @param {...*} [arg] - whatever arguments the message needs
+ * @param {any} [...arg] - whatever arguments the message needs
  */
 Editor.sendToCore = function ( message ) {
     'use strict';
@@ -65,9 +66,10 @@ Editor.sendToCore = function ( message ) {
 /**
  * Broadcast message to all pages.
  * The page is so called as atom shell's web side. Each application window is an independent page and has its own JavaScript context.
+ *
  * @method sendToWindows
  * @param {string} message - the message to send
- * @param {...*} [arg] - whatever arguments the message needs
+ * @param {any} [...arg] - whatever arguments the message needs
  * @param {object} [options] - you can indicate the options such as Editor.selfExcluded
  */
 Editor.sendToWindows = function ( message ) {
@@ -84,9 +86,10 @@ Editor.sendToWindows = function ( message ) {
 /**
  * Broadcast message to main page.
  * The page is so called as atom shell's web side. Each application window is an independent page and has its own JavaScript context.
+ *
  * @method sendToMainWindow
  * @param {string} message - the message to send
- * @param {...*} [arg] - whatever arguments the message needs
+ * @param {any} [...arg] - whatever arguments the message needs
  */
 Editor.sendToMainWindow = function ( message ) {
     'use strict';
@@ -101,9 +104,10 @@ Editor.sendToMainWindow = function ( message ) {
 
 /**
  * Broadcast message to all pages and editor-core
+ *
  * @method sendToAll
  * @param {string} message - the message to send
- * @param {...*} [arg] - whatever arguments the message needs
+ * @param {any} [...arg] - whatever arguments the message needs
  * @param {object} [options] - you can indicate the options such as Editor.selfExcluded
  */
 Editor.sendToAll = function ( message ) {
@@ -119,10 +123,11 @@ Editor.sendToAll = function ( message ) {
 
 /**
  * Send message to specific panel
+ *
  * @method sendToPanel
  * @param {string} panelID - the panel id
  * @param {string} message - the message to send
- * @param {...*} [arg] - whatever arguments the message needs
+ * @param {any} [...arg] - whatever arguments the message needs
  */
 Editor.sendToPanel = function ( panelID, message ) {
     'use strict';
@@ -135,13 +140,16 @@ Editor.sendToPanel = function ( panelID, message ) {
     }
 };
 
+// Communication Patterns
+
 var nextSessionId = 0;
 var replyCallbacks = {};
 
 /**
+ * 发送一个请求给 editor-core，该方法的最后一个参数需要传入一个回调函数，当 editor-core 返回请求结果时该回调会被调用
  * @method sendRequestToCore
  * @param {string} request - the request to send
- * @param {...*} [arg] - whatever arguments the request needs
+ * @param {any} [...arg] - whatever arguments the message needs
  * @param {function} reply - the callback used to handle replied arguments
  * @return {number} - session id, can be used in Editor.cancelRequestToCore
  */
