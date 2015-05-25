@@ -302,6 +302,7 @@ Polymer({
 
                 Editor.loadLayout( self.$.mainDock, function () {
                     Editor.mainWindow.$.assets.browse();
+                    Editor.Panel.focus('fire-scene.panel');
 
                     //
                     next();
