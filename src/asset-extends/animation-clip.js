@@ -4,7 +4,8 @@ Fire.AnimationClip.prototype.createEntity = function ( cb ) {
 
     var animation = ent.addComponent(Fire.Animation);
 
-    animation.defaultAnimation = this;
+    animation.defaultClip = this;
+    animation.addClip(this);
 
     if ( cb ) {
         cb (ent);

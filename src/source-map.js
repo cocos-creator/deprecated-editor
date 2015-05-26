@@ -93,7 +93,7 @@ var SourceMap = {
     _srcMaps: srcMaps,
 
     loadFromSourceComment: function (source) {
-        var HEAD = '//# sourceMappingURL=data:application/json;base64,';
+        var HEAD = '//# sourceMappingURL=data:application/json;charset:utf-8;base64,';
 
         var lastLine = getLastLine(source);
         if (! lastLine) {
