@@ -12,6 +12,9 @@ Fire.AnimationClip.prototype.createEntity = function ( cb ) {
     }
 };
 
+Fire.AnimationClip.prototype.frameToTime = function ( frame ) {
+    return frame/this.frameRate;
+};
 
 Fire.AnimationClip.prototype.applyKeyFrame = function ( ent, frameAt ) {
     var results = [];

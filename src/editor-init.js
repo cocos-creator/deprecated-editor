@@ -241,6 +241,10 @@ Editor.snapshotEntity = function ( entity ) {
                     continue;
                 }
 
+                if ( propName === '_scriptUuid' ) {
+                    continue;
+                }
+
                 snapshot.push({
                     component: compName,
                     property: propName,
