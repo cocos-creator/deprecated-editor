@@ -245,10 +245,14 @@ Editor.snapshotEntity = function ( entity ) {
                     continue;
                 }
 
+                var value = comp[propName];
+                if ( value.clone )
+                    value = value.clone();
+
                 snapshot.push({
                     component: compName,
                     property: propName,
-                    value: comp[propName],
+                    value: value,
                 });
             }
         }

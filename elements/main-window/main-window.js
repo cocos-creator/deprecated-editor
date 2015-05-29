@@ -558,4 +558,11 @@ Polymer({
             this._updateSceneAnimFrameID = null;
         }
     },
+
+    repaint: function () {
+        this.$.scene.repaintScene();
+        if ( !Fire.Engine.isPlaying ) {
+            this.$.game.repaintScene();
+        }
+    }
 });
