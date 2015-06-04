@@ -1,3 +1,5 @@
+**This repo is deprecated, the latest editor can be found in [fireball-x/fireball](https://github.com/fireball-x/fireball)**
+
 # Intro
 
 Fireball Editor
